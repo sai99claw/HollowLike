@@ -1,0 +1,17 @@
+{
+  "original_size": [
+    1536,
+    1024
+  ],
+  "bounds": [
+    0,
+    0,
+    1536,
+    393
+  ],
+  "recommended_origin": [
+    0,
+    -100
+  ],
+  "notes": "Thin upper-corner boughs; alpha-zero center/lower gameplay area. Draw behind UI and never treat as collision."
+}

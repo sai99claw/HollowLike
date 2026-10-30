@@ -1,0 +1,19 @@
+# v0.14 獨立動畫素材
+
+本批使用內建 ImageGen。三張原始透明PNG已完整納入專案，各動畫分別取用6／8／12張不同來源區域；影格間維持固定縮放，沒有修改點陣原圖內容。
+
+## jet14
+
+Use case stylized-concept. Asset type: transparent sprite animation sheet for a 2D forest platformer, EXACTLY SIX frames in 3 columns and 2 rows on a 1536 by 1024 canvas. Each cell 512 by 512. No lines, labels or text. One short SMALL air jet behind a pigeon during a normal dash, NOT a long spear or giant tornado. All frames fixed canvas, identical anchored nozzle at cell x=390 y=256, blast flows LEFT from that fixed point. Sequence: tiny compression puff, short sharp three-stream jet, slightly longer puff, thin curling air wisps, breaking into two tiny strands, almost dissipated final wisp. Painted ivory-white with a little pale mint edge, crisp compressed center and soft air edges, matching a hand-painted storybook game. Each frame entirely within its OWN cell with 60 pixels empty transparent padding; absolutely no effects crossing cell boundaries. No character, no background, no scenery, no large glow plate. Six genuinely different drawings, chronological changes of shape, suitable for 0.16-second playback.
+
+## wind14
+
+Use case stylized-concept. Reference image establishes the pigeon hero's grey-blue, ivory, teal and navy palette. Create a NEW transparent eight-frame sprite animation sheet: exactly 4 columns by 2 rows, 1536 by 1024 canvas, each cell 384 by 512. No grid lines, no text. The hero has TRANSFORMED ENTIRELY INTO STRONG WIND for a special double dash, traveling RIGHT. Do NOT draw a solid intact bird or ordinary exhaust jet. Draw an aerodynamic ivory and teal wind spirit with a faint pointed bird-head/beak-shaped leading core on the right, sweeping wing-like ribbons and dissolving navy/teal feather streaks trailing to the left. Fast elegant narrow silhouette. Eight chronological genuinely different drawings: body dissolves into air, wind crest forms, tight spear-like gust, curving turbulent ribbons cycle through 3 variations, pressure crest releases, tail disperses. Consistent palette, identical world scale and leading core anchor at x=270 y=256 within EACH cell, form fills width but stays inside 35 pixel transparent margin. Rows read left to right. Bright hand-painted pale ivory strokes and sharp pale cyan core, no full circular bubble or rectangle haze, true transparent background. This should read as becoming wind, distinctly more powerful than a small normal dash puff.
+
+## impact14
+
+Use case stylized-concept. Asset type: NEW genuinely frame-by-frame ground slam skill animation sprite atlas, transparent background. EXACTLY TWELVE distinct drawings, 4 columns and 3 rows, 1536x1024 canvas. Equal 384 by approximately 341 cells. NO grid lines or text. Hand-painted storybook 2D platformer VFX, ivory white and pale mint wind matching a wind-transforming pigeon. Every cell has the SAME fixed ground contact anchor x=192 y=295, same world scale, clean horizontal invisible ground line at y=295, ALL effects stay ABOVE this baseline. Large transparent margins, no effect crosses into neighbor cells. Read frames chronologically left to right, top to bottom: 1 thin downward contact spike; 2 compressed bright flash at floor; 3 pressure erupts sideways; 4 two outward curling gusts launch dust; 5 wider feather-like crescents; 6 crescents open and split; 7 dust wisps and sharp tiny stone chips arc up; 8 pressure ribbons peel apart; 9 scattered short wind streaks and settling chips; 10 fine drifting dust; 11 tiny dissolving wisps; 12 nearly vanished final dust and two small flecks. This is a real evolving animation, NOT twelve scaled copies of one explosion. Vary internal contours, pressure arcs and debris positions each frame. Flat side-on contact, no ellipse under the floor, no shock rays below the baseline, no character, no scenery, no thick opaque glow.
+
+
+路徑：`assets/motion_v14/dash-jet.png`、`assets/motion_v14/wind-form.png`、`assets/motion_v14/ground-impact.png`。
+

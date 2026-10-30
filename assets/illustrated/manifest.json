@@ -1,0 +1,2436 @@
+{
+  "version": 1,
+  "animations": {
+    "pigeon_walk": {
+      "frames": [
+        {
+          "path": "pigeon_walk_0_0.png",
+          "pivot": [
+            39.5,
+            49.0
+          ],
+          "size": [
+            61,
+            51
+          ],
+          "source_rect": [
+            53,
+            34,
+            244,
+            204
+          ]
+        },
+        {
+          "path": "pigeon_walk_0_1.png",
+          "pivot": [
+            37.0,
+            41.75
+          ],
+          "size": [
+            63,
+            44
+          ],
+          "source_rect": [
+            439,
+            63,
+            253,
+            177
+          ]
+        },
+        {
+          "path": "pigeon_walk_0_2.png",
+          "pivot": [
+            45.75,
+            48.5
+          ],
+          "size": [
+            64,
+            51
+          ],
+          "source_rect": [
+            812,
+            36,
+            254,
+            204
+          ]
+        },
+        {
+          "path": "pigeon_walk_0_3.png",
+          "pivot": [
+            21.25,
+            46.5
+          ],
+          "size": [
+            66,
+            50
+          ],
+          "source_rect": [
+            1215,
+            34,
+            265,
+            199
+          ]
+        }
+      ],
+      "source": "16隻鴿子角色透明精靈圖集.png"
+    },
+    "pigeon_quick_pose": {
+      "frames": [
+        {
+          "path": "pigeon_walk_1_0.png",
+          "pivot": [
+            38.25,
+            48.25
+          ],
+          "size": [
+            61,
+            50
+          ],
+          "source_rect": [
+            48,
+            284,
+            245,
+            202
+          ]
+        },
+        {
+          "path": "pigeon_walk_1_1.png",
+          "pivot": [
+            43.5,
+            46.75
+          ],
+          "size": [
+            95,
+            49
+          ],
+          "source_rect": [
+            429,
+            290,
+            380,
+            196
+          ]
+        },
+        {
+          "path": "pigeon_walk_1_2.png",
+          "pivot": [
+            40.75,
+            47.5
+          ],
+          "size": [
+            95,
+            50
+          ],
+          "source_rect": [
+            855,
+            287,
+            381,
+            200
+          ]
+        },
+        {
+          "path": "pigeon_walk_1_3.png",
+          "pivot": [
+            40.25,
+            46.75
+          ],
+          "size": [
+            64,
+            49
+          ],
+          "source_rect": [
+            1235,
+            290,
+            254,
+            196
+          ]
+        }
+      ],
+      "source": "16隻鴿子角色透明精靈圖集.png"
+    },
+    "pigeon_heavy_pose": {
+      "frames": [
+        {
+          "path": "pigeon_walk_2_0.png",
+          "pivot": [
+            39.62,
+            67.0
+          ],
+          "size": [
+            55,
+            70
+          ],
+          "source_rect": [
+            49,
+            490,
+            221,
+            278
+          ]
+        },
+        {
+          "path": "pigeon_walk_2_1.png",
+          "pivot": [
+            44.25,
+            65.25
+          ],
+          "size": [
+            68,
+            68
+          ],
+          "source_rect": [
+            430,
+            498,
+            271,
+            270
+          ]
+        },
+        {
+          "path": "pigeon_walk_2_2.png",
+          "pivot": [
+            37.75,
+            46.0
+          ],
+          "size": [
+            108,
+            49
+          ],
+          "source_rect": [
+            805,
+            573,
+            432,
+            195
+          ]
+        },
+        {
+          "path": "pigeon_walk_2_3.png",
+          "pivot": [
+            19.0,
+            48.75
+          ],
+          "size": [
+            66,
+            52
+          ],
+          "source_rect": [
+            1250,
+            563,
+            263,
+            206
+          ]
+        }
+      ],
+      "source": "16隻鴿子角色透明精靈圖集.png"
+    },
+    "pigeon_reach_pose": {
+      "frames": [
+        {
+          "path": "pigeon_walk_3_0.png",
+          "pivot": [
+            52.5,
+            45.25
+          ],
+          "size": [
+            87,
+            48
+          ],
+          "source_rect": [
+            17,
+            802,
+            348,
+            191
+          ]
+        },
+        {
+          "path": "pigeon_walk_3_1.png",
+          "pivot": [
+            39.0,
+            41.75
+          ],
+          "size": [
+            108,
+            44
+          ],
+          "source_rect": [
+            390,
+            816,
+            432,
+            177
+          ]
+        },
+        {
+          "path": "pigeon_walk_3_2.png",
+          "pivot": [
+            36.0,
+            40.0
+          ],
+          "size": [
+            96,
+            42
+          ],
+          "source_rect": [
+            812,
+            825,
+            384,
+            170
+          ]
+        },
+        {
+          "path": "pigeon_walk_3_3.png",
+          "pivot": [
+            43.75,
+            43.0
+          ],
+          "size": [
+            82,
+            46
+          ],
+          "source_rect": [
+            1197,
+            812,
+            327,
+            183
+          ]
+        }
+      ],
+      "source": "16隻鴿子角色透明精靈圖集.png"
+    },
+    "pigeon_quick": {
+      "frames": [
+        {
+          "path": "pigeon_attack_1_0.png",
+          "pivot": [
+            38.5,
+            48.0
+          ],
+          "size": [
+            61,
+            50
+          ],
+          "source_rect": [
+            49,
+            285,
+            244,
+            200
+          ]
+        },
+        {
+          "path": "pigeon_attack_1_1.png",
+          "pivot": [
+            41.75,
+            45.25
+          ],
+          "size": [
+            93,
+            48
+          ],
+          "source_rect": [
+            435,
+            295,
+            372,
+            190
+          ]
+        },
+        {
+          "path": "pigeon_attack_1_2.png",
+          "pivot": [
+            40.0,
+            45.25
+          ],
+          "size": [
+            94,
+            48
+          ],
+          "source_rect": [
+            858,
+            295,
+            376,
+            190
+          ]
+        },
+        {
+          "path": "pigeon_attack_1_3.png",
+          "pivot": [
+            40.0,
+            46.25
+          ],
+          "size": [
+            63,
+            48
+          ],
+          "source_rect": [
+            1235,
+            291,
+            252,
+            194
+          ]
+        }
+      ],
+      "source": "哥德風鴿子英雄戰鬥動作圖集.png"
+    },
+    "pigeon_heavy": {
+      "frames": [
+        {
+          "path": "pigeon_attack_2_0.png",
+          "pivot": [
+            39.5,
+            66.75
+          ],
+          "size": [
+            54,
+            69
+          ],
+          "source_rect": [
+            51,
+            491,
+            218,
+            275
+          ]
+        },
+        {
+          "path": "pigeon_attack_2_1.png",
+          "pivot": [
+            44.0,
+            64.0
+          ],
+          "size": [
+            67,
+            66
+          ],
+          "source_rect": [
+            432,
+            501,
+            267,
+            265
+          ]
+        },
+        {
+          "path": "pigeon_attack_2_2.png",
+          "pivot": [
+            37.0,
+            44.5
+          ],
+          "size": [
+            107,
+            47
+          ],
+          "source_rect": [
+            808,
+            578,
+            428,
+            188
+          ]
+        },
+        {
+          "path": "pigeon_attack_2_3.png",
+          "pivot": [
+            18.75,
+            48.5
+          ],
+          "size": [
+            65,
+            51
+          ],
+          "source_rect": [
+            1251,
+            563,
+            260,
+            204
+          ]
+        }
+      ],
+      "source": "哥德風鴿子英雄戰鬥動作圖集.png"
+    },
+    "pigeon_reach": {
+      "frames": [
+        {
+          "path": "pigeon_attack_3_0.png",
+          "pivot": [
+            52.0,
+            45.0
+          ],
+          "size": [
+            86,
+            47
+          ],
+          "source_rect": [
+            19,
+            803,
+            344,
+            189
+          ]
+        },
+        {
+          "path": "pigeon_attack_3_1.png",
+          "pivot": [
+            38.25,
+            40.5
+          ],
+          "size": [
+            107,
+            43
+          ],
+          "source_rect": [
+            393,
+            820,
+            427,
+            171
+          ]
+        },
+        {
+          "path": "pigeon_attack_3_2.png",
+          "pivot": [
+            35.5,
+            39.5
+          ],
+          "size": [
+            95,
+            42
+          ],
+          "source_rect": [
+            814,
+            825,
+            380,
+            167
+          ]
+        },
+        {
+          "path": "pigeon_attack_3_3.png",
+          "pivot": [
+            44.0,
+            42.25
+          ],
+          "size": [
+            81,
+            44
+          ],
+          "source_rect": [
+            1199,
+            814,
+            323,
+            178
+          ]
+        }
+      ],
+      "source": "哥德風鴿子英雄戰鬥動作圖集.png"
+    },
+    "pigeon_jump": {
+      "frames": [
+        {
+          "path": "pigeon_move_0_0.png",
+          "pivot": [
+            36.8,
+            35.8
+          ],
+          "size": [
+            60,
+            38
+          ],
+          "source_rect": [
+            46,
+            161,
+            302,
+            189
+          ]
+        },
+        {
+          "path": "pigeon_move_0_1.png",
+          "pivot": [
+            25.6,
+            64.0
+          ],
+          "size": [
+            67,
+            66
+          ],
+          "source_rect": [
+            397,
+            12,
+            336,
+            330
+          ]
+        },
+        {
+          "path": "pigeon_move_0_2.png",
+          "pivot": [
+            38.4,
+            61.6
+          ],
+          "size": [
+            66,
+            64
+          ],
+          "source_rect": [
+            778,
+            18,
+            331,
+            322
+          ]
+        },
+        {
+          "path": "pigeon_move_0_3.png",
+          "pivot": [
+            36.0,
+            54.8
+          ],
+          "size": [
+            63,
+            58
+          ],
+          "source_rect": [
+            1211,
+            75,
+            316,
+            292
+          ]
+        }
+      ],
+      "source": "鴿子英雄跳躍衝刺精靈表.png"
+    },
+    "pigeon_wall": {
+      "frames": [
+        {
+          "path": "pigeon_move_1_0.png",
+          "pivot": [
+            21.0,
+            65.4
+          ],
+          "size": [
+            71,
+            68
+          ],
+          "source_rect": [
+            16,
+            363,
+            354,
+            338
+          ]
+        },
+        {
+          "path": "pigeon_move_1_1.png",
+          "pivot": [
+            42.8,
+            42.0
+          ],
+          "size": [
+            49,
+            64
+          ],
+          "source_rect": [
+            442,
+            372,
+            245,
+            319
+          ]
+        },
+        {
+          "path": "pigeon_move_1_2.png",
+          "pivot": [
+            33.2,
+            47.6
+          ],
+          "size": [
+            54,
+            54
+          ],
+          "source_rect": [
+            825,
+            410,
+            269,
+            272
+          ]
+        }
+      ],
+      "source": "鴿子英雄跳躍衝刺精靈表.png"
+    },
+    "pigeon_dash": {
+      "frames": [
+        {
+          "path": "pigeon_move_2_0.png",
+          "pivot": [
+            43.2,
+            35.8
+          ],
+          "size": [
+            65,
+            38
+          ],
+          "source_rect": [
+            27,
+            783,
+            327,
+            189
+          ]
+        },
+        {
+          "path": "pigeon_move_2_1.png",
+          "pivot": [
+            8.0,
+            29.6
+          ],
+          "size": [
+            69,
+            32
+          ],
+          "source_rect": [
+            396,
+            776,
+            345,
+            160
+          ]
+        },
+        {
+          "path": "pigeon_move_2_2.png",
+          "pivot": [
+            14.2,
+            25.6
+          ],
+          "size": [
+            74,
+            29
+          ],
+          "source_rect": [
+            778,
+            791,
+            371,
+            147
+          ]
+        }
+      ],
+      "source": "鴿子英雄跳躍衝刺精靈表.png"
+    },
+    "pigeon_land": {
+      "frames": [
+        {
+          "path": "pigeon_move_2_3.png",
+          "pivot": [
+            47.2,
+            57.8
+          ],
+          "size": [
+            67,
+            61
+          ],
+          "source_rect": [
+            1169,
+            692,
+            337,
+            304
+          ]
+        }
+      ],
+      "source": "鴿子英雄跳躍衝刺精靈表.png"
+    },
+    "pigeon_charge_quick": {
+      "frames": [
+        {
+          "path": "pigeon_special_0_0.png",
+          "pivot": [
+            60.06,
+            40.3
+          ],
+          "size": [
+            80,
+            43
+          ],
+          "source_rect": [
+            89,
+            33,
+            306,
+            164
+          ]
+        },
+        {
+          "path": "pigeon_special_0_1.png",
+          "pivot": [
+            50.57,
+            45.76
+          ],
+          "size": [
+            109,
+            48
+          ],
+          "source_rect": [
+            597,
+            13,
+            419,
+            185
+          ]
+        },
+        {
+          "path": "pigeon_special_0_2.png",
+          "pivot": [
+            42.64,
+            41.86
+          ],
+          "size": [
+            103,
+            44
+          ],
+          "source_rect": [
+            1099,
+            25,
+            396,
+            171
+          ]
+        }
+      ],
+      "source": "鴿子英雄五式攻擊圖鑑.png"
+    },
+    "pigeon_charge_heavy": {
+      "frames": [
+        {
+          "path": "pigeon_special_1_0.png",
+          "pivot": [
+            49.79,
+            63.96
+          ],
+          "size": [
+            69,
+            67
+          ],
+          "source_rect": [
+            92,
+            197,
+            264,
+            256
+          ]
+        },
+        {
+          "path": "pigeon_special_1_1.png",
+          "pivot": [
+            44.2,
+            64.48
+          ],
+          "size": [
+            102,
+            70
+          ],
+          "source_rect": [
+            614,
+            194,
+            392,
+            269
+          ]
+        },
+        {
+          "path": "pigeon_special_1_2.png",
+          "pivot": [
+            39.78,
+            44.98
+          ],
+          "size": [
+            93,
+            49
+          ],
+          "source_rect": [
+            1132,
+            269,
+            356,
+            188
+          ]
+        }
+      ],
+      "source": "鴿子英雄五式攻擊圖鑑.png"
+    },
+    "pigeon_charge_reach": {
+      "frames": [
+        {
+          "path": "pigeon_special_2_0.png",
+          "pivot": [
+            70.46,
+            44.72
+          ],
+          "size": [
+            103,
+            47
+          ],
+          "source_rect": [
+            49,
+            467,
+            398,
+            181
+          ]
+        },
+        {
+          "path": "pigeon_special_2_1.png",
+          "pivot": [
+            10.92,
+            37.7
+          ],
+          "size": [
+            128,
+            40
+          ],
+          "source_rect": [
+            579,
+            472,
+            492,
+            155
+          ]
+        },
+        {
+          "path": "pigeon_special_2_2.png",
+          "pivot": [
+            55.9,
+            45.24
+          ],
+          "size": [
+            110,
+            48
+          ],
+          "source_rect": [
+            1086,
+            465,
+            422,
+            183
+          ]
+        }
+      ],
+      "source": "鴿子英雄五式攻擊圖鑑.png"
+    },
+    "pigeon_pierce": {
+      "frames": [
+        {
+          "path": "pigeon_special_3_0.png",
+          "pivot": [
+            9.62,
+            37.7
+          ],
+          "size": [
+            66,
+            40
+          ],
+          "source_rect": [
+            154,
+            664,
+            254,
+            155
+          ]
+        },
+        {
+          "path": "pigeon_special_3_1.png",
+          "pivot": [
+            10.92,
+            25.22
+          ],
+          "size": [
+            84,
+            35
+          ],
+          "source_rect": [
+            613,
+            661,
+            323,
+            133
+          ]
+        },
+        {
+          "path": "pigeon_special_3_2.png",
+          "pivot": [
+            50.44,
+            49.4
+          ],
+          "size": [
+            76,
+            52
+          ],
+          "source_rect": [
+            1178,
+            640,
+            291,
+            199
+          ]
+        }
+      ],
+      "source": "鴿子英雄五式攻擊圖鑑.png"
+    },
+    "pigeon_slam": {
+      "frames": [
+        {
+          "path": "pigeon_special_4_0.png",
+          "pivot": [
+            25.48,
+            43.16
+          ],
+          "size": [
+            54,
+            46
+          ],
+          "source_rect": [
+            188,
+            821,
+            209,
+            177
+          ]
+        },
+        {
+          "path": "pigeon_special_4_1.png",
+          "pivot": [
+            21.58,
+            47.58
+          ],
+          "size": [
+            33,
+            57
+          ],
+          "source_rect": [
+            710,
+            795,
+            126,
+            219
+          ]
+        },
+        {
+          "path": "pigeon_special_4_2.png",
+          "pivot": [
+            48.88,
+            47.32
+          ],
+          "size": [
+            73,
+            49
+          ],
+          "source_rect": [
+            1147,
+            824,
+            282,
+            190
+          ]
+        }
+      ],
+      "source": "鴿子英雄五式攻擊圖鑑.png"
+    },
+    "beetle_walk": {
+      "frames": [
+        {
+          "path": "beetle_0_0.png",
+          "pivot": [
+            28.09,
+            42.56
+          ],
+          "size": [
+            64,
+            43
+          ],
+          "source_rect": [
+            30,
+            117,
+            399,
+            271
+          ]
+        },
+        {
+          "path": "beetle_0_1.png",
+          "pivot": [
+            28.93,
+            43.84
+          ],
+          "size": [
+            66,
+            45
+          ],
+          "source_rect": [
+            463,
+            109,
+            411,
+            279
+          ]
+        },
+        {
+          "path": "beetle_0_2.png",
+          "pivot": [
+            27.88,
+            40.8
+          ],
+          "size": [
+            63,
+            42
+          ],
+          "source_rect": [
+            915,
+            128,
+            396,
+            260
+          ]
+        },
+        {
+          "path": "beetle_0_3.png",
+          "pivot": [
+            28.72,
+            41.6
+          ],
+          "size": [
+            65,
+            42
+          ],
+          "source_rect": [
+            1359,
+            123,
+            408,
+            265
+          ]
+        }
+      ],
+      "source": "苔甲甲蟲守衛動作圖集.png"
+    },
+    "beetle_attack": {
+      "frames": [
+        {
+          "path": "beetle_1_0.png",
+          "pivot": [
+            24.57,
+            59.2
+          ],
+          "size": [
+            56,
+            60
+          ],
+          "source_rect": [
+            36,
+            454,
+            349,
+            375
+          ]
+        },
+        {
+          "path": "beetle_1_1.png",
+          "pivot": [
+            29.99,
+            44.96
+          ],
+          "size": [
+            68,
+            46
+          ],
+          "source_rect": [
+            461,
+            546,
+            426,
+            286
+          ]
+        },
+        {
+          "path": "beetle_1_2.png",
+          "pivot": [
+            33.44,
+            40.48
+          ],
+          "size": [
+            76,
+            41
+          ],
+          "source_rect": [
+            897,
+            569,
+            475,
+            258
+          ]
+        },
+        {
+          "path": "beetle_1_3.png",
+          "pivot": [
+            28.02,
+            43.36
+          ],
+          "size": [
+            64,
+            44
+          ],
+          "source_rect": [
+            1370,
+            552,
+            398,
+            276
+          ]
+        }
+      ],
+      "source": "苔甲甲蟲守衛動作圖集.png"
+    },
+    "slinger_walk": {
+      "frames": [
+        {
+          "path": "slinger_0_0.png",
+          "pivot": [
+            22.73,
+            54.72
+          ],
+          "size": [
+            52,
+            56
+          ],
+          "source_rect": [
+            54,
+            42,
+            287,
+            309
+          ]
+        },
+        {
+          "path": "slinger_0_1.png",
+          "pivot": [
+            21.62,
+            54.0
+          ],
+          "size": [
+            49,
+            55
+          ],
+          "source_rect": [
+            421,
+            47,
+            273,
+            305
+          ]
+        },
+        {
+          "path": "slinger_0_2.png",
+          "pivot": [
+            21.86,
+            53.28
+          ],
+          "size": [
+            50,
+            54
+          ],
+          "source_rect": [
+            777,
+            47,
+            276,
+            301
+          ]
+        },
+        {
+          "path": "slinger_0_3.png",
+          "pivot": [
+            21.94,
+            53.82
+          ],
+          "size": [
+            50,
+            55
+          ],
+          "source_rect": [
+            1127,
+            46,
+            277,
+            304
+          ]
+        }
+      ],
+      "source": "森林果實投擲者動作精靈圖集.png"
+    },
+    "slinger_attack": {
+      "frames": [
+        {
+          "path": "slinger_1_0.png",
+          "pivot": [
+            22.89,
+            54.0
+          ],
+          "size": [
+            52,
+            55
+          ],
+          "source_rect": [
+            54,
+            402,
+            289,
+            305
+          ]
+        },
+        {
+          "path": "slinger_1_1.png",
+          "pivot": [
+            31.84,
+            52.38
+          ],
+          "size": [
+            72,
+            53
+          ],
+          "source_rect": [
+            391,
+            409,
+            402,
+            296
+          ]
+        },
+        {
+          "path": "slinger_1_2.png",
+          "pivot": [
+            31.05,
+            47.52
+          ],
+          "size": [
+            71,
+            48
+          ],
+          "source_rect": [
+            768,
+            437,
+            392,
+            269
+          ]
+        },
+        {
+          "path": "slinger_1_3.png",
+          "pivot": [
+            19.4,
+            53.64
+          ],
+          "size": [
+            44,
+            55
+          ],
+          "source_rect": [
+            1167,
+            407,
+            245,
+            303
+          ]
+        }
+      ],
+      "source": "森林果實投擲者動作精靈圖集.png"
+    },
+    "slinger_ranged": {
+      "frames": [
+        {
+          "path": "slinger_2_0.png",
+          "pivot": [
+            24.24,
+            53.46
+          ],
+          "size": [
+            55,
+            54
+          ],
+          "source_rect": [
+            43,
+            745,
+            306,
+            302
+          ]
+        },
+        {
+          "path": "slinger_2_1.png",
+          "pivot": [
+            24.31,
+            52.92
+          ],
+          "size": [
+            55,
+            54
+          ],
+          "source_rect": [
+            407,
+            745,
+            307,
+            299
+          ]
+        },
+        {
+          "path": "slinger_2_2.png",
+          "pivot": [
+            29.86,
+            50.76
+          ],
+          "size": [
+            68,
+            52
+          ],
+          "source_rect": [
+            766,
+            758,
+            377,
+            287
+          ]
+        },
+        {
+          "path": "slinger_2_3.png",
+          "pivot": [
+            20.59,
+            53.46
+          ],
+          "size": [
+            47,
+            54
+          ],
+          "source_rect": [
+            1155,
+            745,
+            260,
+            302
+          ]
+        }
+      ],
+      "source": "森林果實投擲者動作精靈圖集.png"
+    },
+    "moth_walk": {
+      "frames": [
+        {
+          "path": "moth_0_0.png",
+          "pivot": [
+            23.55,
+            35.06
+          ],
+          "size": [
+            47,
+            57
+          ],
+          "source_rect": [
+            66,
+            8,
+            277,
+            335
+          ]
+        },
+        {
+          "path": "moth_0_1.png",
+          "pivot": [
+            25.42,
+            29.17
+          ],
+          "size": [
+            51,
+            46
+          ],
+          "source_rect": [
+            448,
+            75,
+            299,
+            272
+          ]
+        },
+        {
+          "path": "moth_0_2.png",
+          "pivot": [
+            28.14,
+            24.68
+          ],
+          "size": [
+            56,
+            38
+          ],
+          "source_rect": [
+            799,
+            125,
+            331,
+            224
+          ]
+        },
+        {
+          "path": "moth_0_3.png",
+          "pivot": [
+            25.5,
+            29.55
+          ],
+          "size": [
+            51,
+            47
+          ],
+          "source_rect": [
+            1198,
+            69,
+            300,
+            276
+          ]
+        }
+      ],
+      "source": "暮色獵蛾動作圖集.png"
+    },
+    "moth_attack": {
+      "frames": [
+        {
+          "path": "moth_1_0.png",
+          "pivot": [
+            22.87,
+            34.88
+          ],
+          "size": [
+            46,
+            57
+          ],
+          "source_rect": [
+            75,
+            345,
+            269,
+            333
+          ]
+        },
+        {
+          "path": "moth_1_1.png",
+          "pivot": [
+            36.3,
+            27.77
+          ],
+          "size": [
+            73,
+            44
+          ],
+          "source_rect": [
+            408,
+            420,
+            427,
+            257
+          ]
+        },
+        {
+          "path": "moth_1_2.png",
+          "pivot": [
+            38.08,
+            21.88
+          ],
+          "size": [
+            76,
+            33
+          ],
+          "source_rect": [
+            799,
+            479,
+            448,
+            194
+          ]
+        },
+        {
+          "path": "moth_1_3.png",
+          "pivot": [
+            25.67,
+            34.13
+          ],
+          "size": [
+            51,
+            55
+          ],
+          "source_rect": [
+            1205,
+            353,
+            302,
+            325
+          ]
+        }
+      ],
+      "source": "暮色獵蛾動作圖集.png"
+    },
+    "moth_ranged": {
+      "frames": [
+        {
+          "path": "moth_2_0.png",
+          "pivot": [
+            25.59,
+            28.05
+          ],
+          "size": [
+            51,
+            44
+          ],
+          "source_rect": [
+            41,
+            735,
+            301,
+            260
+          ]
+        },
+        {
+          "path": "moth_2_1.png",
+          "pivot": [
+            31.11,
+            29.45
+          ],
+          "size": [
+            62,
+            47
+          ],
+          "source_rect": [
+            410,
+            719,
+            366,
+            275
+          ]
+        },
+        {
+          "path": "moth_2_2.png",
+          "pivot": [
+            34.6,
+            28.05
+          ],
+          "size": [
+            69,
+            44
+          ],
+          "source_rect": [
+            810,
+            731,
+            407,
+            260
+          ]
+        },
+        {
+          "path": "moth_2_3.png",
+          "pivot": [
+            22.1,
+            32.91
+          ],
+          "size": [
+            44,
+            53
+          ],
+          "source_rect": [
+            1230,
+            685,
+            260,
+            312
+          ]
+        }
+      ],
+      "source": "暮色獵蛾動作圖集.png"
+    },
+    "guardian_walk": {
+      "frames": [
+        {
+          "path": "guardian_0_0.png",
+          "pivot": [
+            29.68,
+            65.17
+          ],
+          "size": [
+            67,
+            66
+          ],
+          "source_rect": [
+            46,
+            15,
+            355,
+            348
+          ]
+        },
+        {
+          "path": "guardian_0_1.png",
+          "pivot": [
+            28.51,
+            64.22
+          ],
+          "size": [
+            65,
+            65
+          ],
+          "source_rect": [
+            405,
+            20,
+            341,
+            343
+          ]
+        },
+        {
+          "path": "guardian_0_2.png",
+          "pivot": [
+            30.43,
+            64.98
+          ],
+          "size": [
+            69,
+            66
+          ],
+          "source_rect": [
+            757,
+            17,
+            364,
+            347
+          ]
+        },
+        {
+          "path": "guardian_0_3.png",
+          "pivot": [
+            27.25,
+            65.17
+          ],
+          "size": [
+            62,
+            66
+          ],
+          "source_rect": [
+            1122,
+            16,
+            326,
+            348
+          ]
+        }
+      ],
+      "source": "古老枝木守衛動畫圖集.png"
+    },
+    "guardian_attack": {
+      "frames": [
+        {
+          "path": "guardian_1_0.png",
+          "pivot": [
+            25.08,
+            66.31
+          ],
+          "size": [
+            57,
+            67
+          ],
+          "source_rect": [
+            6,
+            377,
+            300,
+            354
+          ]
+        },
+        {
+          "path": "guardian_1_1.png",
+          "pivot": [
+            28.51,
+            65.55
+          ],
+          "size": [
+            65,
+            66
+          ],
+          "source_rect": [
+            361,
+            381,
+            341,
+            350
+          ]
+        },
+        {
+          "path": "guardian_1_2.png",
+          "pivot": [
+            41.05,
+            51.49
+          ],
+          "size": [
+            93,
+            52
+          ],
+          "source_rect": [
+            660,
+            456,
+            491,
+            276
+          ]
+        },
+        {
+          "path": "guardian_1_3.png",
+          "pivot": [
+            27.76,
+            52.44
+          ],
+          "size": [
+            63,
+            53
+          ],
+          "source_rect": [
+            1115,
+            449,
+            332,
+            281
+          ]
+        }
+      ],
+      "source": "古老枝木守衛動畫圖集.png"
+    },
+    "guardian_ranged": {
+      "frames": [
+        {
+          "path": "guardian_2_0.png",
+          "pivot": [
+            28.93,
+            57.38
+          ],
+          "size": [
+            66,
+            58
+          ],
+          "source_rect": [
+            16,
+            758,
+            346,
+            307
+          ]
+        },
+        {
+          "path": "guardian_2_1.png",
+          "pivot": [
+            29.34,
+            55.48
+          ],
+          "size": [
+            67,
+            56
+          ],
+          "source_rect": [
+            370,
+            768,
+            351,
+            297
+          ]
+        },
+        {
+          "path": "guardian_2_2.png",
+          "pivot": [
+            33.61,
+            57.57
+          ],
+          "size": [
+            76,
+            59
+          ],
+          "source_rect": [
+            694,
+            757,
+            402,
+            308
+          ]
+        },
+        {
+          "path": "guardian_2_3.png",
+          "pivot": [
+            28.51,
+            55.86
+          ],
+          "size": [
+            65,
+            57
+          ],
+          "source_rect": [
+            1105,
+            767,
+            341,
+            299
+          ]
+        }
+      ],
+      "source": "古老枝木守衛動畫圖集.png"
+    },
+    "boss_walk": {
+      "frames": [
+        {
+          "path": "boss_0_0.png",
+          "pivot": [
+            43.64,
+            98.02
+          ],
+          "size": [
+            99,
+            99
+          ],
+          "source_rect": [
+            5,
+            0,
+            342,
+            343
+          ]
+        },
+        {
+          "path": "boss_0_1.png",
+          "pivot": [
+            42.49,
+            97.73
+          ],
+          "size": [
+            97,
+            99
+          ],
+          "source_rect": [
+            369,
+            1,
+            333,
+            342
+          ]
+        },
+        {
+          "path": "boss_0_2.png",
+          "pivot": [
+            42.62,
+            100.63
+          ],
+          "size": [
+            97,
+            102
+          ],
+          "source_rect": [
+            728,
+            3,
+            334,
+            352
+          ]
+        },
+        {
+          "path": "boss_0_3.png",
+          "pivot": [
+            44.28,
+            100.34
+          ],
+          "size": [
+            101,
+            102
+          ],
+          "source_rect": [
+            1091,
+            4,
+            347,
+            351
+          ]
+        }
+      ],
+      "source": "樹心巨像首領十二姿態圖集.png"
+    },
+    "boss_attack": {
+      "frames": [
+        {
+          "path": "boss_1_0.png",
+          "pivot": [
+            51.42,
+            108.46
+          ],
+          "size": [
+            117,
+            110
+          ],
+          "source_rect": [
+            0,
+            345,
+            403,
+            379
+          ]
+        },
+        {
+          "path": "boss_1_1.png",
+          "pivot": [
+            43.13,
+            113.97
+          ],
+          "size": [
+            98,
+            115
+          ],
+          "source_rect": [
+            379,
+            328,
+            338,
+            398
+          ]
+        },
+        {
+          "path": "boss_1_2.png",
+          "pivot": [
+            49.51,
+            88.74
+          ],
+          "size": [
+            113,
+            90
+          ],
+          "source_rect": [
+            710,
+            428,
+            388,
+            311
+          ]
+        },
+        {
+          "path": "boss_1_3.png",
+          "pivot": [
+            45.94,
+            88.74
+          ],
+          "size": [
+            104,
+            90
+          ],
+          "source_rect": [
+            1088,
+            430,
+            360,
+            311
+          ]
+        }
+      ],
+      "source": "樹心巨像首領十二姿態圖集.png"
+    },
+    "boss_ranged": {
+      "frames": [
+        {
+          "path": "boss_2_0.png",
+          "pivot": [
+            50.4,
+            94.83
+          ],
+          "size": [
+            115,
+            96
+          ],
+          "source_rect": [
+            3,
+            747,
+            395,
+            332
+          ]
+        },
+        {
+          "path": "boss_2_1.png",
+          "pivot": [
+            42.87,
+            106.14
+          ],
+          "size": [
+            97,
+            108
+          ],
+          "source_rect": [
+            389,
+            708,
+            336,
+            371
+          ]
+        },
+        {
+          "path": "boss_2_2.png",
+          "pivot": [
+            50.02,
+            92.8
+          ],
+          "size": [
+            114,
+            94
+          ],
+          "source_rect": [
+            732,
+            755,
+            392,
+            325
+          ]
+        },
+        {
+          "path": "boss_2_3.png",
+          "pivot": [
+            42.36,
+            94.25
+          ],
+          "size": [
+            96,
+            96
+          ],
+          "source_rect": [
+            1113,
+            753,
+            332,
+            330
+          ]
+        }
+      ],
+      "source": "樹心巨像首領十二姿態圖集.png"
+    },
+    "projectile_needle": {
+      "frames": [
+        {
+          "path": "projectile_0_0.png",
+          "pivot": [
+            11.33,
+            7.98
+          ],
+          "size": [
+            26,
+            8
+          ],
+          "source_rect": [
+            90,
+            75,
+            271,
+            89
+          ]
+        },
+        {
+          "path": "projectile_0_1.png",
+          "pivot": [
+            10.74,
+            8.84
+          ],
+          "size": [
+            24,
+            9
+          ],
+          "source_rect": [
+            483,
+            63,
+            257,
+            98
+          ]
+        },
+        {
+          "path": "projectile_0_2.png",
+          "pivot": [
+            11.95,
+            10.54
+          ],
+          "size": [
+            27,
+            11
+          ],
+          "source_rect": [
+            853,
+            54,
+            286,
+            116
+          ]
+        },
+        {
+          "path": "projectile_0_3.png",
+          "pivot": [
+            11.87,
+            10.36
+          ],
+          "size": [
+            27,
+            11
+          ],
+          "source_rect": [
+            1229,
+            61,
+            284,
+            114
+          ]
+        }
+      ],
+      "source": "森林投射物四列動畫圖集.png"
+    },
+    "projectile_fruit": {
+      "frames": [
+        {
+          "path": "projectile_1_0.png",
+          "pivot": [
+            8.9,
+            15.96
+          ],
+          "size": [
+            20,
+            16
+          ],
+          "source_rect": [
+            76,
+            269,
+            213,
+            173
+          ]
+        },
+        {
+          "path": "projectile_1_1.png",
+          "pivot": [
+            6.9,
+            19.76
+          ],
+          "size": [
+            16,
+            20
+          ],
+          "source_rect": [
+            500,
+            231,
+            165,
+            213
+          ]
+        },
+        {
+          "path": "projectile_1_2.png",
+          "pivot": [
+            9.24,
+            15.87
+          ],
+          "size": [
+            21,
+            16
+          ],
+          "source_rect": [
+            868,
+            264,
+            221,
+            172
+          ]
+        },
+        {
+          "path": "projectile_1_3.png",
+          "pivot": [
+            6.9,
+            20.43
+          ],
+          "size": [
+            16,
+            21
+          ],
+          "source_rect": [
+            1278,
+            254,
+            165,
+            220
+          ]
+        }
+      ],
+      "source": "森林投射物四列動畫圖集.png"
+    },
+    "projectile_acorn": {
+      "frames": [
+        {
+          "path": "projectile_2_0.png",
+          "pivot": [
+            7.86,
+            10.93
+          ],
+          "size": [
+            18,
+            11
+          ],
+          "source_rect": [
+            104,
+            541,
+            188,
+            120
+          ]
+        },
+        {
+          "path": "projectile_2_1.png",
+          "pivot": [
+            5.06,
+            16.53
+          ],
+          "size": [
+            11,
+            17
+          ],
+          "source_rect": [
+            516,
+            509,
+            121,
+            179
+          ]
+        },
+        {
+          "path": "projectile_2_2.png",
+          "pivot": [
+            7.9,
+            10.93
+          ],
+          "size": [
+            18,
+            11
+          ],
+          "source_rect": [
+            865,
+            540,
+            189,
+            120
+          ]
+        },
+        {
+          "path": "projectile_2_3.png",
+          "pivot": [
+            5.14,
+            16.62
+          ],
+          "size": [
+            12,
+            17
+          ],
+          "source_rect": [
+            1287,
+            507,
+            123,
+            180
+          ]
+        }
+      ],
+      "source": "森林投射物四列動畫圖集.png"
+    },
+    "projectile_bossfruit": {
+      "frames": [
+        {
+          "path": "projectile_3_0.png",
+          "pivot": [
+            12.71,
+            23.66
+          ],
+          "size": [
+            29,
+            24
+          ],
+          "source_rect": [
+            30,
+            714,
+            304,
+            254
+          ]
+        },
+        {
+          "path": "projectile_3_1.png",
+          "pivot": [
+            10.58,
+            26.22
+          ],
+          "size": [
+            24,
+            27
+          ],
+          "source_rect": [
+            449,
+            707,
+            253,
+            281
+          ]
+        },
+        {
+          "path": "projectile_3_2.png",
+          "pivot": [
+            12.67,
+            23.66
+          ],
+          "size": [
+            29,
+            24
+          ],
+          "source_rect": [
+            817,
+            715,
+            303,
+            254
+          ]
+        },
+        {
+          "path": "projectile_3_3.png",
+          "pivot": [
+            10.32,
+            29.07
+          ],
+          "size": [
+            23,
+            30
+          ],
+          "source_rect": [
+            1233,
+            700,
+            247,
+            311
+          ]
+        }
+      ],
+      "source": "森林投射物四列動畫圖集.png"
+    }
+  },
+  "modules": {
+    "branch_small": {
+      "path": "module_branch_small.png",
+      "size": [
+        275,
+        180
+      ],
+      "surface_y": 65
+    },
+    "branch_medium": {
+      "path": "module_branch_medium.png",
+      "size": [
+        369,
+        220
+      ],
+      "surface_y": 57
+    },
+    "branch_large": {
+      "path": "module_branch_large.png",
+      "size": [
+        465,
+        234
+      ],
+      "surface_y": 48
+    },
+    "grass_platform": {
+      "path": "module_grass_platform.png",
+      "size": [
+        360,
+        238
+      ],
+      "surface_y": 95
+    },
+    "root_platform": {
+      "path": "module_root_platform.png",
+      "size": [
+        368,
+        257
+      ],
+      "surface_y": 55
+    },
+    "mushroom_platform": {
+      "path": "module_mushroom_platform.png",
+      "size": [
+        408,
+        270
+      ],
+      "surface_y": 65
+    },
+    "foliage": {
+      "path": "module_foliage.png",
+      "size": [
+        414,
+        323
+      ]
+    },
+    "fern": {
+      "path": "module_fern.png",
+      "size": [
+        349,
+        308
+      ]
+    },
+    "hanging_root": {
+      "path": "module_hanging_root.png",
+      "size": [
+        367,
+        417
+      ]
+    },
+    "door_musou": {
+      "path": "module_door_musou.png",
+      "size": [
+        415,
+        410
+      ]
+    },
+    "door_rogue": {
+      "path": "module_door_rogue.png",
+      "size": [
+        408,
+        380
+      ]
+    },
+    "nest": {
+      "path": "module_nest.png",
+      "size": [
+        333,
+        231
+      ]
+    }
+  },
+  "backgrounds": {
+    "sky": "background_sky.webp",
+    "canopy": "background_canopy.webp",
+    "branches": "background_branches.webp",
+    "trunk": "background_trunk.webp",
+    "grass": "background_grass.webp",
+    "underground": "background_underground.webp"
+  },
+  "sources": [
+    "16隻鴿子角色透明精靈圖集.png",
+    "哥德風鴿子英雄戰鬥動作圖集.png",
+    "鴿子英雄跳躍衝刺精靈表.png",
+    "鴿子英雄五式攻擊圖鑑.png",
+    "苔甲甲蟲守衛動作圖集.png",
+    "森林果實投擲者動作精靈圖集.png",
+    "暮色獵蛾動作圖集.png",
+    "古老枝木守衛動畫圖集.png",
+    "樹心巨像首領十二姿態圖集.png",
+    "森林投射物四列動畫圖集.png",
+    "哥德森林平台與樹門圖集.png",
+    "巨樹之上的暮色天穹.png",
+    "月霧中的古老樹冠.png",
+    "古樹枝間的靛藍霧境.png",
+    "幽藍古樹根境.png",
+    "巨樹根畔的月霧草原.png",
+    "幽藍古樹根窟.png"
+  ]
+}

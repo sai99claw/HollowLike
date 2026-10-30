@@ -1,0 +1,12 @@
+{
+  "original_size": [
+    1536,
+    1024
+  ],
+  "generated_with": "builtin imagegen",
+  "source_sha256": "09219841e90edd8fc7e39b005e48a752353a70ce9326c876cd213e4429454839",
+  "biome": "trunk",
+  "aspect_ratio": 1.5,
+  "floor_y_source": 670,
+  "draw_contract": "Preserve three-to-two ratio; align painted floor line to physical floor if using cover crop; no foreground stations baked in."
+}

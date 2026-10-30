@@ -1,0 +1,184 @@
+{
+  "version": 31,
+  "id": "ricochet",
+  "original_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    443.5,
+    443.5
+  ],
+  "layout": [
+    4,
+    2
+  ],
+  "rotation": "counterclockwise",
+  "frame_degrees": [
+    0,
+    -45,
+    -90,
+    -135,
+    -180,
+    -225,
+    -270,
+    -315
+  ],
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        221.0,
+        236.5
+      ],
+      "visible_bounds": [
+        55,
+        12,
+        334,
+        384
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        227.5,
+        227.0
+      ],
+      "visible_bounds": [
+        59,
+        53,
+        334,
+        337
+      ],
+      "smear": true
+    },
+    {
+      "rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        230.0,
+        224.5
+      ],
+      "visible_bounds": [
+        18,
+        52,
+        377,
+        340
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        227.0,
+        223.0
+      ],
+      "visible_bounds": [
+        68,
+        52,
+        316,
+        331
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        221.0,
+        206.5
+      ],
+      "visible_bounds": [
+        53,
+        48,
+        338,
+        383
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        221.0,
+        205.5
+      ],
+      "visible_bounds": [
+        53,
+        33,
+        339,
+        355
+      ],
+      "smear": true
+    },
+    {
+      "rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        211.0,
+        204.0
+      ],
+      "visible_bounds": [
+        47,
+        38,
+        378,
+        333
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        226.0,
+        206.5
+      ],
+      "visible_bounds": [
+        58,
+        40,
+        336,
+        331
+      ],
+      "smear": false
+    }
+  ],
+  "max_body_extent": 449.0,
+  "pivot_space": "local to rect",
+  "notes": "Pivots measured from closed transparent center hole; use a single stable style scale. Smear is drawn in frames1,5."
+}

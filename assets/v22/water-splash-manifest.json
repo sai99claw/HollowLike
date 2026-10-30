@@ -1,0 +1,175 @@
+{
+  "version": 22,
+  "path": "water-attack-splash.png",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "grid": [
+    4,
+    2
+  ],
+  "fps": 16,
+  "loop": false,
+  "duration": 0.5,
+  "world_size": [
+    176,
+    176
+  ],
+  "direction": "right",
+  "sha256": "d2ddef749548a2ecb01fc109de30113559950ed8a7edb19a56724a8ee9674e24",
+  "frames": [
+    {
+      "source_rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "bounds": [
+        32,
+        243,
+        226,
+        154
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "5f9653bcf1ebaadb7daa7e695f2dc1fa155e01721efe6201260620577679ca43"
+    },
+    {
+      "source_rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "bounds": [
+        15,
+        147,
+        416,
+        250
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "f82b64188edf20bf18b70beb1ed7f3a4cc00d357f2a7056618ca408229502cff"
+    },
+    {
+      "source_rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "bounds": [
+        12,
+        159,
+        421,
+        234
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "cc583664ee6f694d3f393322e7b1c9d79da775c14519a4c954ea65b1d24f46a4"
+    },
+    {
+      "source_rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "bounds": [
+        12,
+        156,
+        405,
+        238
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "1b93ba7e84e0dd291580b2ee3d7178e390be6e63161420c8f70646e419f68b45"
+    },
+    {
+      "source_rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "bounds": [
+        18,
+        130,
+        405,
+        250
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "e38c11292c43bd6d2d5cf3da66dd83c43af506fb9738999948cd9dd9ef41eafc"
+    },
+    {
+      "source_rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "bounds": [
+        15,
+        170,
+        399,
+        210
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "70b36abf369c1a948ab856b3146a117dcffd1040c8d6d0c477ce6578cf201d4c"
+    },
+    {
+      "source_rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "bounds": [
+        16,
+        227,
+        347,
+        151
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "981428cb3b9870fde4c04e794c954a645ae5cbfef00911ec3d99a1c726573926"
+    },
+    {
+      "source_rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "bounds": [
+        16,
+        264,
+        305,
+        114
+      ],
+      "pivot": [
+        20,
+        385
+      ],
+      "sha256": "cee5fead27ac84450bd146416fb35e9fbd8736e9879f0c98f789e3809ebc83db"
+    }
+  ]
+}

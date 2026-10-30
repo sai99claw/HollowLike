@@ -1,0 +1,88 @@
+{
+  "texture": "res://assets/v29/effects/downward-gust.png",
+  "frames": [
+    {
+      "pivot": [
+        256,
+        100
+      ],
+      "visible_bounds_alpha_gt_16": [
+        145,
+        135,
+        237,
+        506
+      ],
+      "source_rect": [
+        0,
+        0,
+        512,
+        768
+      ]
+    },
+    {
+      "pivot": [
+        256,
+        100
+      ],
+      "visible_bounds_alpha_gt_16": [
+        96,
+        96,
+        319,
+        595
+      ],
+      "source_rect": [
+        512,
+        0,
+        512,
+        768
+      ]
+    },
+    {
+      "pivot": [
+        256,
+        100
+      ],
+      "visible_bounds_alpha_gt_16": [
+        54,
+        160,
+        385,
+        494
+      ],
+      "source_rect": [
+        1024,
+        0,
+        512,
+        768
+      ]
+    },
+    {
+      "pivot": [
+        256,
+        100
+      ],
+      "visible_bounds_alpha_gt_16": [
+        85,
+        241,
+        376,
+        414
+      ],
+      "source_rect": [
+        1536,
+        0,
+        512,
+        768
+      ]
+    }
+  ],
+  "duration": 0.36,
+  "suggested_scale": 0.18,
+  "recommended_emission_offset": [
+    0,
+    -12
+  ],
+  "description": "Four painted downward gust frames. Pivot is local to each full cell. Visible-bounds threshold avoids faint antialias haze.",
+  "original_size": [
+    2048,
+    768
+  ]
+}

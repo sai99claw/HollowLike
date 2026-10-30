@@ -1,0 +1,166 @@
+{
+  "path": "laser-beam.webp",
+  "frames": [
+    {
+      "source_rect": [
+        0,
+        0,
+        768,
+        128
+      ],
+      "pivot": [
+        26,
+        64
+      ],
+      "reference_width": 715,
+      "reference_height": 78,
+      "bounds": [
+        26,
+        25,
+        715,
+        78
+      ]
+    },
+    {
+      "source_rect": [
+        768,
+        0,
+        768,
+        128
+      ],
+      "pivot": [
+        32,
+        64
+      ],
+      "reference_width": 703,
+      "reference_height": 71,
+      "bounds": [
+        32,
+        28,
+        703,
+        71
+      ]
+    },
+    {
+      "source_rect": [
+        0,
+        128,
+        768,
+        128
+      ],
+      "pivot": [
+        26,
+        64
+      ],
+      "reference_width": 715,
+      "reference_height": 81,
+      "bounds": [
+        26,
+        23,
+        715,
+        81
+      ]
+    },
+    {
+      "source_rect": [
+        768,
+        128,
+        768,
+        128
+      ],
+      "pivot": [
+        32,
+        64
+      ],
+      "reference_width": 704,
+      "reference_height": 69,
+      "bounds": [
+        32,
+        29,
+        704,
+        69
+      ]
+    },
+    {
+      "source_rect": [
+        0,
+        256,
+        768,
+        128
+      ],
+      "pivot": [
+        26,
+        64
+      ],
+      "reference_width": 715,
+      "reference_height": 75,
+      "bounds": [
+        26,
+        26,
+        715,
+        75
+      ]
+    },
+    {
+      "source_rect": [
+        768,
+        256,
+        768,
+        128
+      ],
+      "pivot": [
+        32,
+        64
+      ],
+      "reference_width": 704,
+      "reference_height": 76,
+      "bounds": [
+        32,
+        26,
+        704,
+        76
+      ]
+    },
+    {
+      "source_rect": [
+        0,
+        384,
+        768,
+        128
+      ],
+      "pivot": [
+        26,
+        64
+      ],
+      "reference_width": 715,
+      "reference_height": 80,
+      "bounds": [
+        26,
+        24,
+        715,
+        80
+      ]
+    },
+    {
+      "source_rect": [
+        768,
+        384,
+        768,
+        128
+      ],
+      "pivot": [
+        32,
+        64
+      ],
+      "reference_width": 704,
+      "reference_height": 70,
+      "bounds": [
+        32,
+        29,
+        704,
+        70
+      ]
+    }
+  ],
+  "fps": 24
+}

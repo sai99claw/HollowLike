@@ -1,0 +1,91 @@
+{
+  "version": 23,
+  "generator": "built-in image_gen",
+  "note": "New native four-cell shelves matching v21 root/stone suspended platform style. Uniform scale384/(body_span[1]-body_span[0]); align body_span[0],surface_y with collisiontop-left. Leaves above and roots below are foreground detail, noimage editing/stretch. body_span is [left,right-exclusive] in source_rect coordinates. Everytop span alpha>=240.",
+  "biomes": {
+    "sky": {
+      "path": "platform-four.png",
+      "source_rect": [
+        0,
+        0,
+        1536,
+        420
+      ],
+      "surface_y": 193,
+      "body_span": [
+        49,
+        1493
+      ],
+      "pivot": [
+        49,
+        193
+      ],
+      "visible_bounds": [
+        39,
+        131,
+        1461,
+        262
+      ],
+      "world_width": 384,
+      "reference_width": 1444,
+      "alpha_surface_min": 240,
+      "sha256": "2f8d59d28eb5f87fff6963223bdd4f72aee6d8f3c060b53145f7a3bec941e3ae"
+    },
+    "trunk": {
+      "path": "platform-four.png",
+      "source_rect": [
+        0,
+        420,
+        1536,
+        290
+      ],
+      "surface_y": 74,
+      "body_span": [
+        49,
+        1495
+      ],
+      "pivot": [
+        49,
+        74
+      ],
+      "visible_bounds": [
+        40,
+        15,
+        1459,
+        262
+      ],
+      "world_width": 384,
+      "reference_width": 1446,
+      "alpha_surface_min": 245,
+      "sha256": "2e849b55ac1892cd686d56c1310c602ba4edd0e48fe317053b18900751fc7bf6"
+    },
+    "underground": {
+      "path": "platform-four.png",
+      "source_rect": [
+        0,
+        710,
+        1536,
+        314
+      ],
+      "surface_y": 77,
+      "body_span": [
+        52,
+        1483
+      ],
+      "pivot": [
+        52,
+        77
+      ],
+      "visible_bounds": [
+        43,
+        18,
+        1454,
+        258
+      ],
+      "world_width": 384,
+      "reference_width": 1431,
+      "alpha_surface_min": 242,
+      "sha256": "5c9f37bce0f41a91d42dc1eb1c91c2dc7f281782df1277054559d490a7a32606"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+Use case: stylized-concept. Asset type: production inventory icon atlas, real alpha transparency.
+Exactly FOUR distinct rune stones in an exact 2 columns by 2 rows regular grid, each separate centered complete icon filling about 70 percent of its cell, generous transparent gutters, no overlap, no text. Hand-painted gothic dark fantasy game art with crisp black ink edgework, carved dark purple mineral stone frames, restrained luminous violet accents and weathered bone-silver details.
+Top left: Swift Arrow rune, an unmistakable streamlined arrowhead with three rear speed streaks; expresses projectile velocity.
+Top right: Far Star rune, a tiny star on the far end of an arcing trajectory with distance tick marks; expresses projectile range.
+Bottom left: Burning Feather rune, a single sharp feather surrounding a glowing flame/spear-shaped center; expresses projectile damage.
+Bottom right: Flourishing Feather rune, a cluster of three fan-shaped broad feathers inside expanding concentric circles; expresses projectile size and blast area.
+Every icon must be visually distinct at small display size. Same consistent rune-stone frame and painted pixel density, front-facing flat inventory sprites. Complete silhouettes fully inside cells, no chopped frame edges. No letters, digits, UI labels, shadow floors, colored background, checkerboard, scenery or characters. GENUINE transparent PNG, outside icons alpha zero.

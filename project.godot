@@ -1,0 +1,36 @@
+; Godot 4.7.2 portable source project.
+config_version=5
+
+[application]
+config/name="枝間鴿行 Pigeon Tower"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/description="A pigeon adventure through a living tree tower."
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+window/vsync/vsync_mode=1
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+environment/defaults/default_clear_color=Color(0.08, 0.15, 0.18, 1)
+
+[audio]
+driver/enable_input=false
+
+[physics]
+common/physics_ticks_per_second=60
+
+[input_devices]
+pointing/emulate_touch_from_mouse=false
+
+[debug]
+gdscript/warnings/untyped_declaration=0
+gdscript/warnings/unused_variable=0

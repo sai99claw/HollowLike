@@ -1,0 +1,463 @@
+{
+  "version": 23,
+  "generator": "built-in image_gen",
+  "note": "Original PNGs unchanged. source_rect is authoritative: generated layout is nonuniform. Fixed world height per authored piece; no perinstance random scaling. Anchors touch the actual terrain boundary; top/root and side pieces already have correct orientation.",
+  "biomes": {
+    "underground": [
+      {
+        "id": "underground:pebbles",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          0,
+          0,
+          500,
+          440
+        ],
+        "pivot": [
+          257.0,
+          388
+        ],
+        "visible_bounds": [
+          26,
+          248,
+          462,
+          140
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "reference_height": 140,
+        "sha256": "ac81a5139891bb3bc5de069564d30ebd61e7527480ca09d466fb44041d77589b"
+      },
+      {
+        "id": "underground:grass",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          500,
+          0,
+          500,
+          440
+        ],
+        "pivot": [
+          255.0,
+          392
+        ],
+        "visible_bounds": [
+          39,
+          140,
+          432,
+          252
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "reference_height": 252,
+        "sha256": "7abaa76d4dee9b5941adf7e4ab1e3bbb8732a6c66a6e0d0eb200dd598fd8a92e"
+      },
+      {
+        "id": "underground:root_cluster",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          1000,
+          0,
+          536,
+          440
+        ],
+        "pivot": [
+          267.0,
+          390
+        ],
+        "visible_bounds": [
+          25,
+          24,
+          484,
+          366
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "reference_height": 366,
+        "sha256": "3ad66f57ba304f8ad99a273415231b2913ab93dffa10a61cf2f927195144f38f"
+      },
+      {
+        "id": "underground:hanging_roots",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          0,
+          440,
+          600,
+          584
+        ],
+        "pivot": [
+          291.0,
+          82
+        ],
+        "visible_bounds": [
+          38,
+          82,
+          506,
+          409
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "reference_height": 409,
+        "sha256": "29921e6ef6ad63570884537687bdd811d8b37f0c9595b92582be04659a46db44"
+      },
+      {
+        "id": "underground:wall_growth",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          600,
+          440,
+          400,
+          584
+        ],
+        "pivot": [
+          76,
+          276.5
+        ],
+        "visible_bounds": [
+          76,
+          28,
+          248,
+          497
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "reference_height": 497,
+        "sha256": "9483411f6f6a2437c0960b4590f660f9406c9b3cf6e2c6c6e1aa3d2fe913bd46"
+      },
+      {
+        "id": "underground:wall_roots",
+        "path": "edge-decor-underground.png",
+        "source_rect": [
+          1000,
+          440,
+          536,
+          584
+        ],
+        "pivot": [
+          473,
+          281.5
+        ],
+        "visible_bounds": [
+          110,
+          3,
+          363,
+          557
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "reference_height": 557,
+        "sha256": "2604a11512e7b6df19131737cf14643b0f0d3f62a0f2f2560fc935638241f176"
+      }
+    ],
+    "trunk": [
+      {
+        "id": "trunk:pebbles",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          0,
+          0,
+          500,
+          440
+        ],
+        "pivot": [
+          260.5,
+          420
+        ],
+        "visible_bounds": [
+          44,
+          245,
+          433,
+          175
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "reference_height": 175,
+        "sha256": "50a06c225f3be0b5d795ff805f94ec4860b8b039420de4218bfe6ad9fb0b7fa0"
+      },
+      {
+        "id": "trunk:grass",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          500,
+          0,
+          500,
+          440
+        ],
+        "pivot": [
+          247.0,
+          416
+        ],
+        "visible_bounds": [
+          2,
+          156,
+          490,
+          260
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "reference_height": 260,
+        "sha256": "72f243cb5d9c22943408da3f951220221a5d2c517e891e79d2fd2764a4d0d375"
+      },
+      {
+        "id": "trunk:root_cluster",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          1000,
+          0,
+          536,
+          440
+        ],
+        "pivot": [
+          260.0,
+          424
+        ],
+        "visible_bounds": [
+          18,
+          22,
+          484,
+          402
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "reference_height": 402,
+        "sha256": "acbb3f993718ba40982f84712c21cb892d4069d760e95297213a5f4e21af67cf"
+      },
+      {
+        "id": "trunk:hanging_roots",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          0,
+          440,
+          600,
+          584
+        ],
+        "pivot": [
+          307.0,
+          75
+        ],
+        "visible_bounds": [
+          48,
+          75,
+          518,
+          449
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "reference_height": 449,
+        "sha256": "62c6519ae2ca61fb21c4ada1aa8409b964e4fbdbd2989e02acd021704b64df06"
+      },
+      {
+        "id": "trunk:wall_growth",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          600,
+          440,
+          400,
+          584
+        ],
+        "pivot": [
+          54,
+          286.5
+        ],
+        "visible_bounds": [
+          54,
+          25,
+          264,
+          523
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "reference_height": 523,
+        "sha256": "7701741e648c1481ce8726c932ed286bff741f92bfa8ebb8f0ac0f259996acc9"
+      },
+      {
+        "id": "trunk:wall_roots",
+        "path": "edge-decor-trunk.png",
+        "source_rect": [
+          1000,
+          440,
+          536,
+          584
+        ],
+        "pivot": [
+          502,
+          296.0
+        ],
+        "visible_bounds": [
+          141,
+          26,
+          361,
+          540
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "reference_height": 540,
+        "sha256": "f973020d86df8ab71e2c7ce77e14d613b464f4d2c7a10191fb956672fd3a691f"
+      }
+    ],
+    "sky": [
+      {
+        "id": "sky:pebbles",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          0,
+          0,
+          500,
+          440
+        ],
+        "pivot": [
+          235.0,
+          428
+        ],
+        "visible_bounds": [
+          25,
+          271,
+          420,
+          157
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "reference_height": 157,
+        "sha256": "1d33ed5cc1806d71f9fe5a071dc3dc873e47aa41eb823ab173769540523fd76f"
+      },
+      {
+        "id": "sky:grass",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          500,
+          0,
+          435,
+          440
+        ],
+        "pivot": [
+          214.5,
+          430
+        ],
+        "visible_bounds": [
+          12,
+          156,
+          405,
+          274
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "reference_height": 274,
+        "sha256": "8ddaf00506dd32a1edfbfd84b25633745823f42842706aeb19b0e467ddff464c"
+      },
+      {
+        "id": "sky:root_cluster",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          935,
+          0,
+          601,
+          440
+        ],
+        "pivot": [
+          301.0,
+          438
+        ],
+        "visible_bounds": [
+          23,
+          27,
+          556,
+          411
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "reference_height": 411,
+        "sha256": "6251bbe625bdb15bcb920afcca4237bf8aecfbddabe9c97b0e94ea4101c4653a"
+      },
+      {
+        "id": "sky:hanging_roots",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          0,
+          440,
+          600,
+          584
+        ],
+        "pivot": [
+          278.0,
+          141
+        ],
+        "visible_bounds": [
+          37,
+          141,
+          482,
+          413
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "reference_height": 413,
+        "sha256": "e7810c3e1a9de25969c21ba92b0f21a6735908a46620d6098f9f835366b21be9"
+      },
+      {
+        "id": "sky:wall_growth",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          600,
+          440,
+          400,
+          584
+        ],
+        "pivot": [
+          92,
+          306.5
+        ],
+        "visible_bounds": [
+          92,
+          55,
+          227,
+          503
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "reference_height": 503,
+        "sha256": "281f5fb3a2e4737dfc6099e3a9a67ba89b4205fa5eb5156773af725551ff0af8"
+      },
+      {
+        "id": "sky:wall_roots",
+        "path": "edge-decor-sky.png",
+        "source_rect": [
+          1000,
+          440,
+          536,
+          584
+        ],
+        "pivot": [
+          495,
+          300.0
+        ],
+        "visible_bounds": [
+          34,
+          33,
+          461,
+          534
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "reference_height": 534,
+        "sha256": "0a5d0554a540c03b9b3bb44ef108324a3be1bdffbdf05ddfe56f7e53bf3756bc"
+      }
+    ]
+  }
+}

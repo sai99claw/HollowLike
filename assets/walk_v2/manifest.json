@@ -1,0 +1,385 @@
+{
+  "version": 2,
+  "asset_root": "res://assets/walk_v2/",
+  "animations": {
+    "pigeon_walk_master": {
+      "fps": 20,
+      "loop": true,
+      "loop_start": 0,
+      "loop_end": 11,
+      "frames": [
+        {
+          "path": "common/pigeon/walk_00.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_01.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_02.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_03.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_04.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_05.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_06.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_07.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_08.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_09.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_10.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        },
+        {
+          "path": "common/pigeon/walk_11.png",
+          "pivot": [
+            164,
+            224
+          ],
+          "size": [
+            256,
+            256
+          ]
+        }
+      ],
+      "events": [
+        {
+          "frame": 0,
+          "event": "footstep",
+          "foot": "near"
+        },
+        {
+          "frame": 6,
+          "event": "footstep",
+          "foot": "far"
+        }
+      ]
+    },
+    "pigeon_walk": {
+      "fps": 20,
+      "loop": true,
+      "loop_start": 0,
+      "loop_end": 11,
+      "frames": [
+        {
+          "path": "runtime80/walk_00.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_01.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_02.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_03.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_04.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_05.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_06.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_07.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_08.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_09.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_10.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        },
+        {
+          "path": "runtime80/walk_11.png",
+          "pivot": [
+            51.25,
+            70
+          ],
+          "size": [
+            80,
+            80
+          ]
+        }
+      ],
+      "events": [
+        {
+          "frame": 0,
+          "event": "footstep",
+          "foot": "near"
+        },
+        {
+          "frame": 6,
+          "event": "footstep",
+          "foot": "far"
+        }
+      ]
+    }
+  },
+  "source_rects": [
+    [
+      42,
+      98,
+      303,
+      254
+    ],
+    [
+      403,
+      98,
+      304,
+      255
+    ],
+    [
+      772,
+      98,
+      286,
+      257
+    ],
+    [
+      1116,
+      102,
+      300,
+      250
+    ],
+    [
+      44,
+      442,
+      312,
+      253
+    ],
+    [
+      406,
+      437,
+      306,
+      254
+    ],
+    [
+      763,
+      447,
+      309,
+      244
+    ],
+    [
+      1128,
+      438,
+      293,
+      256
+    ],
+    [
+      45,
+      762,
+      305,
+      249
+    ],
+    [
+      405,
+      760,
+      309,
+      252
+    ],
+    [
+      766,
+      762,
+      309,
+      250
+    ],
+    [
+      1118,
+      765,
+      306,
+      249
+    ]
+  ],
+  "notes": "Candidate art set. Uniform scale and root pivot; no blending/tween-generated poses. Review motion in preview before replacing live game."
+}

@@ -1,0 +1,189 @@
+{
+  "version": 31,
+  "id": "needle",
+  "original_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    443.5,
+    443.5
+  ],
+  "layout": [
+    4,
+    2
+  ],
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        229.5,
+        229.751
+      ],
+      "visible_bounds": [
+        42,
+        170,
+        375,
+        122
+      ],
+      "source_cell": 0,
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        228.5,
+        229.794
+      ],
+      "visible_bounds": [
+        41,
+        155,
+        375,
+        151
+      ],
+      "source_cell": 1,
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        228.5,
+        231.977
+      ],
+      "visible_bounds": [
+        41,
+        140,
+        375,
+        179
+      ],
+      "source_cell": 2,
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        228.5,
+        229.873
+      ],
+      "visible_bounds": [
+        41,
+        128,
+        375,
+        203
+      ],
+      "source_cell": 3,
+      "smear": false
+    },
+    {
+      "rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        229.5,
+        229.215
+      ],
+      "visible_bounds": [
+        42,
+        151,
+        375,
+        152
+      ],
+      "source_cell": 4,
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        228.5,
+        229.32
+      ],
+      "visible_bounds": [
+        41,
+        179,
+        375,
+        101
+      ],
+      "source_cell": 6,
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        228.5,
+        228.884
+      ],
+      "visible_bounds": [
+        41,
+        136,
+        375,
+        185
+      ],
+      "source_cell": 5,
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        228.5,
+        229.226
+      ],
+      "visible_bounds": [
+        41,
+        169,
+        375,
+        121
+      ],
+      "source_cell": 7,
+      "smear": false
+    }
+  ],
+  "max_body_extent": 375,
+  "rotation_direction": "clockwise",
+  "animation_kind": "axial_roll",
+  "heading": "right in every frame; runtime follows flight heading",
+  "smear_frames": [
+    2,
+    6
+  ],
+  "fps": 18,
+  "sha256": "a8c5c5ea58efef97575d30f3fef297d31909cbd07572e891af73d2f4ee648ad7",
+  "pixel_edits": "none; generated source copied intact"
+}

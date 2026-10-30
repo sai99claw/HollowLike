@@ -1,0 +1,81 @@
+{
+  "source": "Built-in imagegen, transparent original PNGs, code selects atlas regions without pixel processing",
+  "parts": {
+    "pool_back": {
+      "file": "pool.png",
+      "region": [
+        28,
+        172,
+        740,
+        191
+      ]
+    },
+    "water": {
+      "file": "pool.png",
+      "region": [
+        768,
+        297,
+        737,
+        143
+      ]
+    },
+    "pool_front": {
+      "file": "pool.png",
+      "region": [
+        27,
+        656,
+        741,
+        228
+      ]
+    },
+    "steam": {
+      "file": "pool.png",
+      "region": [
+        768,
+        566,
+        693,
+        315
+      ]
+    },
+    "table": {
+      "file": "shop.png",
+      "region": [
+        35,
+        235,
+        733,
+        220
+      ]
+    },
+    "awning": {
+      "file": "shop.png",
+      "region": [
+        768,
+        11,
+        743,
+        501
+      ]
+    },
+    "sign": {
+      "file": "shop.png",
+      "region": [
+        125,
+        540,
+        522,
+        382
+      ]
+    },
+    "dummy": {
+      "file": "shop.png",
+      "region": [
+        919,
+        512,
+        455,
+        489
+      ]
+    }
+  },
+  "prompts": [
+    "Modular transparent woodland hot spring: separate rear mossy stone rim with transparent middle, jade water oval, foreground stone rim to occlude bathing pigeon legs, wispy white steam. Four equal cells, same side view and scale, gouache, no text.",
+    "Modular transparent owl shop: empty long sage-cloth wooden table, branch-and-cloth awning with lanterns, feather relief shop sign, padded twig training dummy. Four equal cells, gouache fantasy forest, no text or merchandise baked in."
+  ]
+}

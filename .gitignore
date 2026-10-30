@@ -1,0 +1,28 @@
+.godot/
+*.tmp
+*.log
+exports/
+__pycache__/
+dist/game-*.bin
+
+dist/.index.*
+dist/index.pck
+dist/index.wasm
+
+assets/**/.spring.png.*
+dist/.game-*.bin.*
+
+dist/.engine-*.bin.*
+
+node_modules/
+.wrangler/
+dist/client/
+dist/server/
+dist/.openai/
+
+# Reproducible exports and filesystem transfer staging are never source.
+dist/
+**/.rsync-tmp/
+
+# Incomplete asset transfer files; original PNGs remain tracked.
+**/.*.png.*

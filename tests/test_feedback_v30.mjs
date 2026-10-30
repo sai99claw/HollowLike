@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import worker from '../server/index.js';
+const rows=new Map();
+const env={ASSETS:{fetch:()=>new Response('game')},DB:{prepare(sql){assert(sql.startsWith('INSERT'));return {bind(...values){return {async run(){if(!rows.has(values[0]))rows.set(values[0],values);}};}};}}};
+const post=(body,origin='https://game.test')=>new Request('https://game.test/api/feedback',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
+assert.equal((await worker.fetch(new Request('https://game.test/'),env)).status,200);
+assert.equal((await worker.fetch(new Request('https://game.test/api/feedback'),env)).status,405);
+assert.equal((await worker.fetch(post({message:'很好玩'},'https://other.test'),env)).status,403);
+assert.equal((await worker.fetch(post({message:'x'}),env)).status,400);
+assert.equal((await worker.fetch(post({message:'x'.repeat(2001)}),env)).status,400);
+const body={id:crypto.randomUUID(),message:'試玩：跳躍操作建議',category:'操作與手感'};
+assert.equal((await worker.fetch(post(body),env)).status,200);assert.equal(rows.size,1);
+await worker.fetch(post(body),env);assert.equal(rows.size,1);
+const row=[...rows.values()][0];assert.equal(row[1],'匿名玩家');assert.equal(row[3],body.message);assert.equal(row[4],'v0.38');
+console.log('PASS feedback: bounded validation, origin, private reads, bound insert, retry idempotency');

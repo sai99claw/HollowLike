@@ -1,0 +1,25 @@
+{
+  "version": 29,
+  "path": "cloak-wardrobe.png",
+  "original_size": [
+    1312,
+    1199
+  ],
+  "source_rect": [
+    89,
+    1,
+    1141,
+    1160
+  ],
+  "pivot": [
+    659.5,
+    1161
+  ],
+  "suggested_world_size": [
+    112,
+    113.9
+  ],
+  "import_size_limit": 512,
+  "alpha_threshold": 8,
+  "sha256": "a2c413b86dafe8af6e8ab1c2c292bb513a30c33081907e4aa816b4bbc95c2f29"
+}

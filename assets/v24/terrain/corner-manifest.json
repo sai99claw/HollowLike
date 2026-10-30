@@ -1,0 +1,188 @@
+{
+  "version": 24,
+  "source_pixels_per_world": 2.0,
+  "orientation": "top_left",
+  "biomes": {
+    "sky": {
+      "convex": {
+        "path": "corner-sky-convex.png",
+        "source_rect": [
+          0,
+          0,
+          459,
+          463
+        ],
+        "atlas_source_rect": [
+          30,
+          21,
+          459,
+          463
+        ],
+        "anchor_source": [
+          70,
+          60
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "lower_right",
+        "air_quadrant": "upper_or_left",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          229.5,
+          231.5
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      },
+      "concave": {
+        "path": "corner-sky-concave.png",
+        "source_rect": [
+          0,
+          0,
+          450,
+          467
+        ],
+        "atlas_source_rect": [
+          50,
+          521,
+          450,
+          467
+        ],
+        "anchor_source": [
+          144,
+          113
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "upper_or_left",
+        "air_quadrant": "lower_right",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          225.0,
+          233.5
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      }
+    },
+    "trunk": {
+      "convex": {
+        "path": "corner-trunk-convex.png",
+        "source_rect": [
+          0,
+          0,
+          451,
+          471
+        ],
+        "atlas_source_rect": [
+          560,
+          12,
+          451,
+          471
+        ],
+        "anchor_source": [
+          60,
+          70
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "lower_right",
+        "air_quadrant": "upper_or_left",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          225.5,
+          235.5
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      },
+      "concave": {
+        "path": "corner-trunk-concave.png",
+        "source_rect": [
+          0,
+          0,
+          442,
+          465
+        ],
+        "atlas_source_rect": [
+          560,
+          522,
+          442,
+          465
+        ],
+        "anchor_source": [
+          150,
+          112
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "upper_or_left",
+        "air_quadrant": "lower_right",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          221.0,
+          232.5
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      }
+    },
+    "underground": {
+      "convex": {
+        "path": "corner-underground-convex.png",
+        "source_rect": [
+          0,
+          0,
+          427,
+          471
+        ],
+        "atlas_source_rect": [
+          1078,
+          12,
+          427,
+          471
+        ],
+        "anchor_source": [
+          54,
+          70
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "lower_right",
+        "air_quadrant": "upper_or_left",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          213.5,
+          235.5
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      },
+      "concave": {
+        "path": "corner-underground-concave.png",
+        "source_rect": [
+          0,
+          0,
+          434,
+          472
+        ],
+        "atlas_source_rect": [
+          1070,
+          516,
+          434,
+          472
+        ],
+        "anchor_source": [
+          148,
+          118
+        ],
+        "orientation": "top_left",
+        "solid_quadrant": "upper_or_left",
+        "air_quadrant": "lower_right",
+        "world_scale": 0.5,
+        "world_full_extent": [
+          217.0,
+          236.0
+        ],
+        "local_overlay_limit_world": 96,
+        "render_note": "For a compact 48\u201396world cap keep native 0.5 scale and clip the draw to a 96world neighborhood around the corner; do not scale whole chunk down."
+      }
+    }
+  },
+  "notes": "Convex solid right/down, concave air right/down. Anchor is the intersection of straight collision planes before rounding. Rotate all local coordinates together to match the actual union-solid corner. Only place on real corners. Images retain natural decoration outside the physical planes."
+}

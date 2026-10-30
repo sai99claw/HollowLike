@@ -1,0 +1,1999 @@
+{
+  "version": 22,
+  "mode": "built-in image_gen",
+  "note": "Each sheet preserves its own v18 species identity. Measured transparent gutters define source rectangles, not a presumed equal grid. All clips for a species share one reference_height from final neutral pose; only posture changes. No per-frame fit/stretch. Ground/lower-claw pivots use measured alpha foot.",
+  "clips": {
+    "walk_attack": {
+      "path": "action-walk.png",
+      "species": "walk",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 213,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            372,
+            402
+          ],
+          "size": [
+            372,
+            402
+          ],
+          "pivot": [
+            112.5,
+            347
+          ],
+          "visible_bounds": [
+            57,
+            140,
+            285,
+            207
+          ],
+          "sha256": "1336f7b3abb569d49a78514b0d78d8c1dd8685cf300e71ad0c7daea8772440fe"
+        },
+        {
+          "source_rect": [
+            372,
+            0,
+            362,
+            402
+          ],
+          "size": [
+            362,
+            402
+          ],
+          "pivot": [
+            178.5,
+            351
+          ],
+          "visible_bounds": [
+            31,
+            144,
+            308,
+            207
+          ],
+          "sha256": "fe54e9c5739d66fcc5404b0e12a5a3c04f1456310aaa2fe3f78a9670ca7ee187"
+        },
+        {
+          "source_rect": [
+            734,
+            0,
+            366,
+            402
+          ],
+          "size": [
+            366,
+            402
+          ],
+          "pivot": [
+            220.0,
+            353
+          ],
+          "visible_bounds": [
+            24,
+            146,
+            314,
+            207
+          ],
+          "sha256": "554e502abdab5e4f4529a4d4e2cce2895f8dadcedb94bb77e2f9ea1c35b57eeb"
+        },
+        {
+          "source_rect": [
+            1100,
+            0,
+            348,
+            402
+          ],
+          "size": [
+            348,
+            402
+          ],
+          "pivot": [
+            160.0,
+            351
+          ],
+          "visible_bounds": [
+            29,
+            142,
+            285,
+            209
+          ],
+          "sha256": "9c145857b0be5a189cd1edc929261e3fd45e421e42e16e2b794c6902e6612b8f"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "walk_hurt": {
+      "path": "action-walk.png",
+      "species": "walk",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 213,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            402,
+            381,
+            338
+          ],
+          "size": [
+            381,
+            338
+          ],
+          "pivot": [
+            140.5,
+            283
+          ],
+          "visible_bounds": [
+            58,
+            59,
+            291,
+            224
+          ],
+          "sha256": "e54f4e038ca6a02c7072e316c17787599ad20ab4cd66de2559d909c774aa67eb"
+        },
+        {
+          "source_rect": [
+            381,
+            402,
+            357,
+            338
+          ],
+          "size": [
+            357,
+            338
+          ],
+          "pivot": [
+            170.5,
+            283
+          ],
+          "visible_bounds": [
+            33,
+            63,
+            286,
+            220
+          ],
+          "sha256": "7bdebc1225d4c341f9ad16df0fc8ae17c22e39dc090d565dc20a8accaa555016"
+        },
+        {
+          "source_rect": [
+            738,
+            402,
+            350,
+            338
+          ],
+          "size": [
+            350,
+            338
+          ],
+          "pivot": [
+            142.0,
+            284
+          ],
+          "visible_bounds": [
+            38,
+            49,
+            273,
+            235
+          ],
+          "sha256": "72e3a2e169d0130b6475bd1c312b0efcb0d1563f268b0472e37b6b4559bf32bc"
+        },
+        {
+          "source_rect": [
+            1088,
+            402,
+            360,
+            338
+          ],
+          "size": [
+            360,
+            338
+          ],
+          "pivot": [
+            126.0,
+            282
+          ],
+          "visible_bounds": [
+            40,
+            70,
+            293,
+            212
+          ],
+          "sha256": "273572ea79a552aed75b013f474d4443e37885081ccbe6192a2496a860831394"
+        }
+      ]
+    },
+    "walk_prepare": {
+      "path": "action-walk.png",
+      "species": "walk",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 213,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            740,
+            381,
+            346
+          ],
+          "size": [
+            381,
+            346
+          ],
+          "pivot": [
+            112.5,
+            259
+          ],
+          "visible_bounds": [
+            55,
+            54,
+            308,
+            205
+          ],
+          "sha256": "6b1cf46ee134fdd55a3c2d4fe91a9a67a0d0120ecd31273faf5aec2d894108d6"
+        },
+        {
+          "source_rect": [
+            381,
+            740,
+            353,
+            346
+          ],
+          "size": [
+            353,
+            346
+          ],
+          "pivot": [
+            171.0,
+            265
+          ],
+          "visible_bounds": [
+            19,
+            55,
+            319,
+            210
+          ],
+          "sha256": "92a0b92d28674e4db808468ebff7e59d84e497bebefa933c4ad9f36cb9da034d"
+        }
+      ]
+    },
+    "walk_brake": {
+      "path": "action-walk.png",
+      "species": "walk",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 213,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            734,
+            740,
+            366,
+            346
+          ],
+          "size": [
+            366,
+            346
+          ],
+          "pivot": [
+            194.5,
+            269
+          ],
+          "visible_bounds": [
+            15,
+            65,
+            327,
+            204
+          ],
+          "sha256": "9612c5af42fdc494d10d2d9ba65ae4093b4f5d490dccaf90f14a478b3f85826a"
+        },
+        {
+          "source_rect": [
+            1100,
+            740,
+            348,
+            346
+          ],
+          "size": [
+            348,
+            346
+          ],
+          "pivot": [
+            159.5,
+            270
+          ],
+          "visible_bounds": [
+            24,
+            57,
+            297,
+            213
+          ],
+          "sha256": "52eacbb8470f2fe84804e53c4670bc946b03fdaf2ce996493d07ccb68ec36263"
+        }
+      ]
+    },
+    "jump_attack": {
+      "path": "action-jump.png",
+      "species": "jump",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 301,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            350,
+            408
+          ],
+          "size": [
+            350,
+            408
+          ],
+          "pivot": [
+            170.0,
+            379
+          ],
+          "visible_bounds": [
+            34,
+            148,
+            280,
+            231
+          ],
+          "sha256": "ffdeba831f944878f40b1795b4991ae130116879557fd23eb787f7542c79bb3b"
+        },
+        {
+          "source_rect": [
+            350,
+            0,
+            380,
+            408
+          ],
+          "size": [
+            380,
+            408
+          ],
+          "pivot": [
+            180.0,
+            379
+          ],
+          "visible_bounds": [
+            38,
+            200,
+            303,
+            179
+          ],
+          "sha256": "f7e9f6c5c8339a796dfb7206e8970c6e50b92f235fd7fa487c7d0d347acd0958"
+        },
+        {
+          "source_rect": [
+            730,
+            0,
+            422,
+            408
+          ],
+          "size": [
+            422,
+            408
+          ],
+          "pivot": [
+            175.0,
+            379
+          ],
+          "visible_bounds": [
+            41,
+            130,
+            366,
+            249
+          ],
+          "sha256": "149a60144dc2af88ab103cdeffe186b7cfddffd745cbe4b4a94f84c200971ecd"
+        },
+        {
+          "source_rect": [
+            1152,
+            0,
+            296,
+            408
+          ],
+          "size": [
+            296,
+            408
+          ],
+          "pivot": [
+            135.0,
+            381
+          ],
+          "visible_bounds": [
+            17,
+            81,
+            259,
+            300
+          ],
+          "sha256": "723bd189021f9737c5af7a16908720d7e9e63f9f874172f9ed112cfdd06ae900"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "jump_hurt": {
+      "path": "action-jump.png",
+      "species": "jump",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 301,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            408,
+            372,
+            312
+          ],
+          "size": [
+            372,
+            312
+          ],
+          "pivot": [
+            198.5,
+            295
+          ],
+          "visible_bounds": [
+            44,
+            29,
+            283,
+            266
+          ],
+          "sha256": "8589e663792c29904669e55e2fdb6469c534a2c4d5a3c82e99b478bd76c6462c"
+        },
+        {
+          "source_rect": [
+            372,
+            408,
+            368,
+            312
+          ],
+          "size": [
+            368,
+            312
+          ],
+          "pivot": [
+            213.5,
+            295
+          ],
+          "visible_bounds": [
+            46,
+            40,
+            271,
+            255
+          ],
+          "sha256": "79f2c54870941ee1dbd89d0b528e933633ab54bf12801ac476d1503babd33e4f"
+        },
+        {
+          "source_rect": [
+            740,
+            408,
+            368,
+            312
+          ],
+          "size": [
+            368,
+            312
+          ],
+          "pivot": [
+            207.0,
+            295
+          ],
+          "visible_bounds": [
+            53,
+            93,
+            263,
+            202
+          ],
+          "sha256": "cd549444ddd28dd636820375b96b8c2d12c3952096bf594d73b98beb9db3fdc9"
+        },
+        {
+          "source_rect": [
+            1108,
+            408,
+            340,
+            312
+          ],
+          "size": [
+            340,
+            312
+          ],
+          "pivot": [
+            192.5,
+            296
+          ],
+          "visible_bounds": [
+            53,
+            64,
+            272,
+            232
+          ],
+          "sha256": "1cc1fe342ec33bb34a5f311431a0a950b4cbe99bcb6eed736b1b6b348efcaadf"
+        }
+      ]
+    },
+    "jump_prepare": {
+      "path": "action-jump.png",
+      "species": "jump",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 301,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            720,
+            360,
+            366
+          ],
+          "size": [
+            360,
+            366
+          ],
+          "pivot": [
+            196.0,
+            319
+          ],
+          "visible_bounds": [
+            42,
+            114,
+            293,
+            205
+          ],
+          "sha256": "4864507a2080d0429718b2d9446d49c70d2b3073a331a23219b38e517f668a98"
+        },
+        {
+          "source_rect": [
+            360,
+            720,
+            392,
+            366
+          ],
+          "size": [
+            392,
+            366
+          ],
+          "pivot": [
+            172.5,
+            318
+          ],
+          "visible_bounds": [
+            26,
+            81,
+            337,
+            237
+          ],
+          "sha256": "8a9e750c89ce6fcf8513ee2eafef510dd5e622331bb3cfbbff52549ab1c32c44"
+        }
+      ]
+    },
+    "jump_brake": {
+      "path": "action-jump.png",
+      "species": "jump",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 301,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            752,
+            720,
+            383,
+            366
+          ],
+          "size": [
+            383,
+            366
+          ],
+          "pivot": [
+            180.0,
+            318
+          ],
+          "visible_bounds": [
+            30,
+            78,
+            325,
+            240
+          ],
+          "sha256": "acfb108cc53bd87225e8cd6c425b1db8d3f448ad780aa9f4cf25fc8d8370fcf5"
+        },
+        {
+          "source_rect": [
+            1135,
+            720,
+            313,
+            366
+          ],
+          "size": [
+            313,
+            366
+          ],
+          "pivot": [
+            166.0,
+            318
+          ],
+          "visible_bounds": [
+            29,
+            17,
+            262,
+            301
+          ],
+          "sha256": "9c9bf32529bd3c426f418140cf8409db1d6a7c1d5442187ea9af058f97763b63"
+        }
+      ]
+    },
+    "hover_attack": {
+      "path": "action-hover.png",
+      "species": "hover",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 274,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            378,
+            392
+          ],
+          "size": [
+            378,
+            392
+          ],
+          "pivot": [
+            236.0,
+            346
+          ],
+          "visible_bounds": [
+            85,
+            76,
+            240,
+            270
+          ],
+          "sha256": "45bc053d887cc362b75f3b209b493313cdd1f217ab3a68b957ff01f59c79582d"
+        },
+        {
+          "source_rect": [
+            378,
+            0,
+            353,
+            392
+          ],
+          "size": [
+            353,
+            392
+          ],
+          "pivot": [
+            249.0,
+            346
+          ],
+          "visible_bounds": [
+            53,
+            145,
+            271,
+            201
+          ],
+          "sha256": "8382bf20aed4d7e04d6533f0354cd2c3756e8e05a7449922f2922f94249ef081"
+        },
+        {
+          "source_rect": [
+            731,
+            0,
+            401,
+            392
+          ],
+          "size": [
+            401,
+            392
+          ],
+          "pivot": [
+            238.0,
+            350
+          ],
+          "visible_bounds": [
+            30,
+            185,
+            345,
+            165
+          ],
+          "sha256": "be94bdf3289196b9447679bfd3fd2098e579cfe583c06da75c7bfe94849732bc"
+        },
+        {
+          "source_rect": [
+            1132,
+            0,
+            316,
+            392
+          ],
+          "size": [
+            316,
+            392
+          ],
+          "pivot": [
+            165.0,
+            353
+          ],
+          "visible_bounds": [
+            28,
+            85,
+            225,
+            268
+          ],
+          "sha256": "7d4848321aa9a79865ae984130e4fadd76732572425989cda599db84d6bdd21f"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "hover_hurt": {
+      "path": "action-hover.png",
+      "species": "hover",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 274,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            392,
+            382,
+            314
+          ],
+          "size": [
+            382,
+            314
+          ],
+          "pivot": [
+            234.5,
+            267
+          ],
+          "visible_bounds": [
+            56,
+            93,
+            267,
+            174
+          ],
+          "sha256": "b77467f646a1832daa7e2bf754f613d787c13e2fa9f6a2f0f313c96d18e11981"
+        },
+        {
+          "source_rect": [
+            382,
+            392,
+            368,
+            314
+          ],
+          "size": [
+            368,
+            314
+          ],
+          "pivot": [
+            241.0,
+            265
+          ],
+          "visible_bounds": [
+            60,
+            68,
+            260,
+            197
+          ],
+          "sha256": "6c5e3c965ebf9f5875d3ec9badf87f2958faada0305472989db03779226cf395"
+        },
+        {
+          "source_rect": [
+            750,
+            392,
+            368,
+            314
+          ],
+          "size": [
+            368,
+            314
+          ],
+          "pivot": [
+            217.5,
+            274
+          ],
+          "visible_bounds": [
+            49,
+            97,
+            268,
+            177
+          ],
+          "sha256": "332da2441fc3cd3cc8a829d927188ca94cd38ba1800d79718940b32dd374aed0"
+        },
+        {
+          "source_rect": [
+            1118,
+            392,
+            330,
+            314
+          ],
+          "size": [
+            330,
+            314
+          ],
+          "pivot": [
+            190.5,
+            286
+          ],
+          "visible_bounds": [
+            52,
+            40,
+            226,
+            246
+          ],
+          "sha256": "98248e640d140bc193989ef6a22df6bdc94755794e81183a82d570af9064358f"
+        }
+      ]
+    },
+    "hover_prepare": {
+      "path": "action-hover.png",
+      "species": "hover",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 274,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            706,
+            371,
+            380
+          ],
+          "size": [
+            371,
+            380
+          ],
+          "pivot": [
+            235.5,
+            302
+          ],
+          "visible_bounds": [
+            75,
+            29,
+            248,
+            273
+          ],
+          "sha256": "93da81fbd8980b59b67680ad0886a5161502cebaec19aa27d65e48ae239850f0"
+        },
+        {
+          "source_rect": [
+            371,
+            706,
+            369,
+            380
+          ],
+          "size": [
+            369,
+            380
+          ],
+          "pivot": [
+            241.5,
+            302
+          ],
+          "visible_bounds": [
+            49,
+            72,
+            285,
+            230
+          ],
+          "sha256": "17e76bdaaaf094d43cc3482d024c819147c02b1f52343287f2b55c50a81000aa"
+        }
+      ]
+    },
+    "hover_brake": {
+      "path": "action-hover.png",
+      "species": "hover",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 274,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            740,
+            706,
+            387,
+            380
+          ],
+          "size": [
+            387,
+            380
+          ],
+          "pivot": [
+            201.0,
+            311
+          ],
+          "visible_bounds": [
+            35,
+            123,
+            314,
+            188
+          ],
+          "sha256": "ae8c63418f6bd51054033d5832fb277d0697c53bc9c72e0928d6cda73eac0309"
+        },
+        {
+          "source_rect": [
+            1127,
+            706,
+            321,
+            380
+          ],
+          "size": [
+            321,
+            380
+          ],
+          "pivot": [
+            191.5,
+            304
+          ],
+          "visible_bounds": [
+            39,
+            30,
+            241,
+            274
+          ],
+          "sha256": "b317fc28528932aed4d5a58032edc2a732252ef2bccc41411d63a2633120500b"
+        }
+      ]
+    },
+    "drift_attack": {
+      "path": "action-drift.png",
+      "species": "drift",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 334,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            363,
+            412
+          ],
+          "size": [
+            363,
+            412
+          ],
+          "pivot": [
+            229.0,
+            380
+          ],
+          "visible_bounds": [
+            23,
+            36,
+            325,
+            344
+          ],
+          "sha256": "fe06157c7df64d92d30ee51f8db6ff7bb6d4e79421dd74bb6275b536bfc08790"
+        },
+        {
+          "source_rect": [
+            363,
+            0,
+            355,
+            412
+          ],
+          "size": [
+            355,
+            412
+          ],
+          "pivot": [
+            189.5,
+            369
+          ],
+          "visible_bounds": [
+            16,
+            72,
+            333,
+            297
+          ],
+          "sha256": "c5781f4f00d49d535dcc8469724e39d693fcc38851e3c6ef99ebe4022e07e2ce"
+        },
+        {
+          "source_rect": [
+            718,
+            0,
+            386,
+            412
+          ],
+          "size": [
+            386,
+            412
+          ],
+          "pivot": [
+            195.5,
+            368
+          ],
+          "visible_bounds": [
+            6,
+            85,
+            361,
+            283
+          ],
+          "sha256": "4dbfb943fb64d942c40dbfd94da74c35f3d582cd4a729ce3c8b395dc73a9b3a0"
+        },
+        {
+          "source_rect": [
+            1104,
+            0,
+            344,
+            412
+          ],
+          "size": [
+            344,
+            412
+          ],
+          "pivot": [
+            213.0,
+            381
+          ],
+          "visible_bounds": [
+            21,
+            156,
+            309,
+            225
+          ],
+          "sha256": "3b0ff4bc2f7b4829907aaf017401406d7114d616e6e8ef6edfc4f798965496ca"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "drift_hurt": {
+      "path": "action-drift.png",
+      "species": "drift",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 334,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            412,
+            364,
+            296
+          ],
+          "size": [
+            364,
+            296
+          ],
+          "pivot": [
+            176.0,
+            283
+          ],
+          "visible_bounds": [
+            17,
+            62,
+            310,
+            221
+          ],
+          "sha256": "470c53ba9e0265218193d34a32136454fd081f0c26fdff891dd744da0554c254"
+        },
+        {
+          "source_rect": [
+            364,
+            412,
+            363,
+            296
+          ],
+          "size": [
+            363,
+            296
+          ],
+          "pivot": [
+            108.5,
+            290
+          ],
+          "visible_bounds": [
+            39,
+            66,
+            292,
+            224
+          ],
+          "sha256": "362d2a6659365d2ce1b498b880efdef99bc5977fb56da2a3e27f4addb6b22dff"
+        },
+        {
+          "source_rect": [
+            727,
+            412,
+            381,
+            296
+          ],
+          "size": [
+            381,
+            296
+          ],
+          "pivot": [
+            242.5,
+            290
+          ],
+          "visible_bounds": [
+            33,
+            32,
+            305,
+            258
+          ],
+          "sha256": "067df4e4d02f6658ce35dca3425ad1ab2b0ee5452e0b2d5395571e376c1eb3d7"
+        },
+        {
+          "source_rect": [
+            1108,
+            412,
+            340,
+            296
+          ],
+          "size": [
+            340,
+            296
+          ],
+          "pivot": [
+            181.0,
+            277
+          ],
+          "visible_bounds": [
+            45,
+            79,
+            267,
+            198
+          ],
+          "sha256": "2f17e099402c600c3e74404aa2408ae5b364e1f8ace1530d01a55e3e14e8c548"
+        }
+      ]
+    },
+    "drift_prepare": {
+      "path": "action-drift.png",
+      "species": "drift",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 334,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            708,
+            384,
+            378
+          ],
+          "size": [
+            384,
+            378
+          ],
+          "pivot": [
+            248.5,
+            335
+          ],
+          "visible_bounds": [
+            27,
+            115,
+            333,
+            220
+          ],
+          "sha256": "030a9926e5affb10d836115edbe871d9b25b0434be793278622ec652c5149c68"
+        },
+        {
+          "source_rect": [
+            384,
+            708,
+            334,
+            378
+          ],
+          "size": [
+            334,
+            378
+          ],
+          "pivot": [
+            148.5,
+            340
+          ],
+          "visible_bounds": [
+            24,
+            26,
+            298,
+            314
+          ],
+          "sha256": "30711e80fa76a59fd759d248ded5a0c37d51f39f26b3dbae2d0419d509cb6e14"
+        }
+      ]
+    },
+    "drift_brake": {
+      "path": "action-drift.png",
+      "species": "drift",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 334,
+      "reference_frame": 11,
+      "flying": true,
+      "frames": [
+        {
+          "source_rect": [
+            718,
+            708,
+            377,
+            378
+          ],
+          "size": [
+            377,
+            378
+          ],
+          "pivot": [
+            251.0,
+            340
+          ],
+          "visible_bounds": [
+            12,
+            122,
+            357,
+            218
+          ],
+          "sha256": "06e660da155d1c24a9b1227bdb1d9b2858ad34c1abc841211e8e57c5c5455fc0"
+        },
+        {
+          "source_rect": [
+            1095,
+            708,
+            353,
+            378
+          ],
+          "size": [
+            353,
+            378
+          ],
+          "pivot": [
+            211.5,
+            342
+          ],
+          "visible_bounds": [
+            9,
+            8,
+            328,
+            334
+          ],
+          "sha256": "8c798b6ca2ecf810ec80822b2db527dbed7425a25957101e82c25be4ef6686a8"
+        }
+      ]
+    },
+    "dash_attack": {
+      "path": "action-dash.png",
+      "species": "dash",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 164,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            377,
+            394
+          ],
+          "size": [
+            377,
+            394
+          ],
+          "pivot": [
+            175.0,
+            330
+          ],
+          "visible_bounds": [
+            50,
+            170,
+            300,
+            160
+          ],
+          "sha256": "5fde14f915fd7d989fff519225226fb9315d410817742a2db78e8bb7e462661c"
+        },
+        {
+          "source_rect": [
+            377,
+            0,
+            338,
+            394
+          ],
+          "size": [
+            338,
+            394
+          ],
+          "pivot": [
+            157.5,
+            330
+          ],
+          "visible_bounds": [
+            28,
+            167,
+            293,
+            163
+          ],
+          "sha256": "8ce6bbb92a47ea07079ecfc289c3c1d150b59d27b2e46c15c71c29d8a9f2fdf1"
+        },
+        {
+          "source_rect": [
+            715,
+            0,
+            409,
+            394
+          ],
+          "size": [
+            409,
+            394
+          ],
+          "pivot": [
+            185.0,
+            334
+          ],
+          "visible_bounds": [
+            18,
+            189,
+            362,
+            145
+          ],
+          "sha256": "5b9653edb52fd0fc4707479174900c3736ce67ae64f9008bc9c4433453727731"
+        },
+        {
+          "source_rect": [
+            1124,
+            0,
+            324,
+            394
+          ],
+          "size": [
+            324,
+            394
+          ],
+          "pivot": [
+            149.5,
+            326
+          ],
+          "visible_bounds": [
+            29,
+            165,
+            274,
+            161
+          ],
+          "sha256": "3d87699efd8ae618db68477e4a54be7655d61cf991eba26c2c93ced77dce0dcf"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "dash_hurt": {
+      "path": "action-dash.png",
+      "species": "dash",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 164,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            394,
+            361,
+            352
+          ],
+          "size": [
+            361,
+            352
+          ],
+          "pivot": [
+            160.5,
+            280
+          ],
+          "visible_bounds": [
+            60,
+            61,
+            264,
+            219
+          ],
+          "sha256": "9a3f04905dc85bb9340fc8bf05e5b2ab2717bd226bc65f8dd5e28b95c0175893"
+        },
+        {
+          "source_rect": [
+            361,
+            394,
+            387,
+            352
+          ],
+          "size": [
+            387,
+            352
+          ],
+          "pivot": [
+            176.0,
+            277
+          ],
+          "visible_bounds": [
+            38,
+            110,
+            313,
+            167
+          ],
+          "sha256": "e0b0d90c2a8ec8886bb2a0da06c027a74b1dedf7226fb7e94a7f389b8a0842ae"
+        },
+        {
+          "source_rect": [
+            748,
+            394,
+            331,
+            352
+          ],
+          "size": [
+            331,
+            352
+          ],
+          "pivot": [
+            154.5,
+            285
+          ],
+          "visible_bounds": [
+            37,
+            62,
+            249,
+            223
+          ],
+          "sha256": "c163f8d4bdac1380990f07d5a56d92efca4b45c97026b7f36a2f8d9bf7fe00fd"
+        },
+        {
+          "source_rect": [
+            1079,
+            394,
+            369,
+            352
+          ],
+          "size": [
+            369,
+            352
+          ],
+          "pivot": [
+            186.5,
+            280
+          ],
+          "visible_bounds": [
+            46,
+            114,
+            311,
+            166
+          ],
+          "sha256": "ec829721261d6155525e2b8f5fda669113e5e3277e2ce786a996434be4d0284e"
+        }
+      ]
+    },
+    "dash_prepare": {
+      "path": "action-dash.png",
+      "species": "dash",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 164,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            746,
+            375,
+            340
+          ],
+          "size": [
+            375,
+            340
+          ],
+          "pivot": [
+            202.0,
+            225
+          ],
+          "visible_bounds": [
+            61,
+            73,
+            293,
+            152
+          ],
+          "sha256": "896a585c2f82a1b8eba027aa8dc65f390cc6c418b676179b3f6288ff52b049fe"
+        },
+        {
+          "source_rect": [
+            375,
+            746,
+            353,
+            340
+          ],
+          "size": [
+            353,
+            340
+          ],
+          "pivot": [
+            162.0,
+            226
+          ],
+          "visible_bounds": [
+            22,
+            71,
+            318,
+            155
+          ],
+          "sha256": "bfb0b30e8e16785799e20d2092a4e253e62e7624a61fac5b9951e9b7ba03b0cc"
+        }
+      ]
+    },
+    "dash_brake": {
+      "path": "action-dash.png",
+      "species": "dash",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 164,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            728,
+            746,
+            372,
+            340
+          ],
+          "size": [
+            372,
+            340
+          ],
+          "pivot": [
+            171.0,
+            230
+          ],
+          "visible_bounds": [
+            13,
+            71,
+            342,
+            159
+          ],
+          "sha256": "1750639b6ba908532f1f1bea3dce85e198bbf2abfbde987acddfa2fd92693e6e"
+        },
+        {
+          "source_rect": [
+            1100,
+            746,
+            348,
+            340
+          ],
+          "size": [
+            348,
+            340
+          ],
+          "pivot": [
+            156.5,
+            231
+          ],
+          "visible_bounds": [
+            19,
+            67,
+            315,
+            164
+          ],
+          "sha256": "959cc28afd69e6ab45d78992f26b6afd116f849dde2bcdc2b857374982c0f0a4"
+        }
+      ]
+    },
+    "pillbug_attack": {
+      "path": "action-pillbug.png",
+      "species": "pillbug",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 224,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            355,
+            402
+          ],
+          "size": [
+            355,
+            402
+          ],
+          "pivot": [
+            156.5,
+            327
+          ],
+          "visible_bounds": [
+            32,
+            111,
+            279,
+            216
+          ],
+          "sha256": "53bffa7e727277d686c4d20edd357e4c283091bf7008da80c231a77982f691fc"
+        },
+        {
+          "source_rect": [
+            355,
+            0,
+            366,
+            402
+          ],
+          "size": [
+            366,
+            402
+          ],
+          "pivot": [
+            170.0,
+            331
+          ],
+          "visible_bounds": [
+            45,
+            121,
+            284,
+            210
+          ],
+          "sha256": "16bc97a1a9431d1c6c7e15f8897da1d92f52cad0a8509274dea76b20e4b19e67"
+        },
+        {
+          "source_rect": [
+            721,
+            0,
+            366,
+            402
+          ],
+          "size": [
+            366,
+            402
+          ],
+          "pivot": [
+            170.0,
+            339
+          ],
+          "visible_bounds": [
+            38,
+            150,
+            293,
+            189
+          ],
+          "sha256": "f7be9e6cd73fca90d061e1514a08d1b65bc509a61f288ade575be7a8e5b84e6b"
+        },
+        {
+          "source_rect": [
+            1087,
+            0,
+            361,
+            402
+          ],
+          "size": [
+            361,
+            402
+          ],
+          "pivot": [
+            161.5,
+            328
+          ],
+          "visible_bounds": [
+            36,
+            106,
+            281,
+            222
+          ],
+          "sha256": "860c8c6662edebfd0ddd00257e6b7878cd3e8767615a3a6c531ef5df1c1f32a5"
+        }
+      ],
+      "phases": {
+        "windup": [
+          0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "recovery": [
+          3
+        ]
+      }
+    },
+    "pillbug_hurt": {
+      "path": "action-pillbug.png",
+      "species": "pillbug",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 224,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            402,
+            362,
+            326
+          ],
+          "size": [
+            362,
+            326
+          ],
+          "pivot": [
+            200.0,
+            277
+          ],
+          "visible_bounds": [
+            30,
+            74,
+            295,
+            203
+          ],
+          "sha256": "e551ed89aef74c34ca73344a838842de881bf7fd8efc359266bde3098c5a004c"
+        },
+        {
+          "source_rect": [
+            362,
+            402,
+            357,
+            326
+          ],
+          "size": [
+            357,
+            326
+          ],
+          "pivot": [
+            118.0,
+            264
+          ],
+          "visible_bounds": [
+            38,
+            65,
+            284,
+            199
+          ],
+          "sha256": "347310ff3cef3c7f9702617a2d0c53f24d51cd73c0f560a869a38c0e5ea7ea92"
+        },
+        {
+          "source_rect": [
+            719,
+            402,
+            370,
+            326
+          ],
+          "size": [
+            370,
+            326
+          ],
+          "pivot": [
+            210.0,
+            277
+          ],
+          "visible_bounds": [
+            36,
+            85,
+            302,
+            192
+          ],
+          "sha256": "148ffe6226ff89a036dc9b790adcc85d02ba3d8789fb5369640f9294c89d40df"
+        },
+        {
+          "source_rect": [
+            1089,
+            402,
+            359,
+            326
+          ],
+          "size": [
+            359,
+            326
+          ],
+          "pivot": [
+            158.0,
+            273
+          ],
+          "visible_bounds": [
+            33,
+            74,
+            296,
+            199
+          ],
+          "sha256": "2a2c31e9345752f8f6f9fa0a829a561f193d9ec0aa78398f3301c68ca165d134"
+        }
+      ]
+    },
+    "pillbug_prepare": {
+      "path": "action-pillbug.png",
+      "species": "pillbug",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 224,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            728,
+            366,
+            358
+          ],
+          "size": [
+            366,
+            358
+          ],
+          "pivot": [
+            163.0,
+            275
+          ],
+          "visible_bounds": [
+            36,
+            82,
+            293,
+            193
+          ],
+          "sha256": "b564e64bbdff884eb32287bbf81862812905ceaa978d677a78589aad2a5946cd"
+        },
+        {
+          "source_rect": [
+            366,
+            728,
+            358,
+            358
+          ],
+          "size": [
+            358,
+            358
+          ],
+          "pivot": [
+            174.0,
+            273
+          ],
+          "visible_bounds": [
+            37,
+            98,
+            286,
+            175
+          ],
+          "sha256": "d98a166833e9111389e88bf1f6230bc1245a801ce5085e140c1610b898d3587d"
+        }
+      ]
+    },
+    "pillbug_brake": {
+      "path": "action-pillbug.png",
+      "species": "pillbug",
+      "fps": 12,
+      "world_height": 57,
+      "reference_height": 224,
+      "reference_frame": 11,
+      "flying": false,
+      "frames": [
+        {
+          "source_rect": [
+            724,
+            728,
+            362,
+            358
+          ],
+          "size": [
+            362,
+            358
+          ],
+          "pivot": [
+            149.0,
+            274
+          ],
+          "visible_bounds": [
+            35,
+            55,
+            290,
+            219
+          ],
+          "sha256": "47ca8b29b57b294d0eb371f1910c1799c40e67955d70c420d9ad7048a9866fc8"
+        },
+        {
+          "source_rect": [
+            1086,
+            728,
+            362,
+            358
+          ],
+          "size": [
+            362,
+            358
+          ],
+          "pivot": [
+            165.0,
+            275
+          ],
+          "visible_bounds": [
+            38,
+            51,
+            291,
+            224
+          ],
+          "sha256": "989816167b6cc8a132040cb59c46f90e58286aacb8b0c98d331dba20e5fc6640"
+        }
+      ]
+    }
+  }
+}

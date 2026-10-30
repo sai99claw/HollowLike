@@ -1,0 +1,17 @@
+# v0.34 — grounded middle scenery and home corrections
+
+- Repainted the home nest with simpler ink contours, emerald leaves and ivory feather bedding. Original generated RGBA retained in assets/v34/home; lossless512px import. Foreground nest rim remains a separate draw over the resting pigeon. Provenance: v34-nest-art.md.
+- Replaced the home-only contact pod with the real trunk launcher and its eight-frame animation. Both contact and melee hits use the existing gameplay collision/impulse paths: normal jump velocity on contact, sqrt(3) velocity on hit for threefold jump height. Remote projectiles cannot trigger player recoil.
+- Restored middle scenery in safehouses, merchants and other quiet rooms. Quiet-room particles/audio behavior remains independent.
+- Middle props now choose actual exposed support surfaces. Their full footprints fit the support; complete silhouettes avoid solids and intervening one-way platforms. Use measured source pivots and a10px root inset. Grounded props share the terrain's world camera transform, with depth conveyed by Z and the existing fog/contrast shader; camera motion can no longer pull roots off the floor.
+- Platform left, center and right now sample contiguous parts of the same original. The old center renderer cropped the first part of the source and jumped to a distant right cap, visibly severing roots and rocks. The entire central strip now fits between unchanged outer caps; vertical scale, cap scale, overhangs and collision remain at the previous calibration. Central horizontal density varies with platform length; no claim that all axes retain identical PPI. No new platform art or alternate styles introduced.
+- Reviewed all three safehouse paintings and station artwork directly. Their perspective floor contact lines were incorrectly placed by centered cover scaling. Runtime now aligns each painting's authored floor line to the physical floor while preserving aspect ratio and room coverage, and applies the far-plane grade to reduce background competition.
+- Repositioned wardrobe to fit fully on the upper gallery; spaced all six station centers consistently. Moved the free weapon pedestal/display out from under the lower stair and separated the grounded practice dummy. Safehouse heading now follows actual room floor/size.
+- Updated the art catalog's home nest entry and export exclusion of the retired nest; shared feedback Worker records v0.34. Existing warehouse/permanent profile and D1 data unchanged.
+
+## Verification
+
+- Initial packed build:35/35 suites passed, including the new grounded-art suite.
+- Final packed build after safehouse placement/catalog refinements:35/35 suites passed. Web touch regression and feedback Worker regression passed; git diff --check passed. Static output266,807,668bytes, under256MiB; WASM/resource chunk hashes verified.
+- New suite checks240 generated rooms across four seeds,340 grounded scenery placements, all three background contact-line transforms, home launcher contact/attack behavior, visible safehouse/merchant middle layers, shared camera transform, gallery support and free display/stair separation.
+- Public browser attempt reached the v0.33 loader, which reports WebGL2 unavailable. This environment also lacks a native graphical display, so there is no actual rendered gameplay screenshot/visual playtest. Asset inspection and packed runtime/geometry checks are verified; final appearance in a WebGL2 browser remains a verification limit.

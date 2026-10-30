@@ -1,0 +1,39 @@
+{
+  "version": 33,
+  "biome": "trunk",
+  "path": "trunk.png",
+  "original_size": [
+    1774,
+    887
+  ],
+  "body_bounds": [
+    223,
+    252,
+    1337,
+    474
+  ],
+  "alpha_bounds_threshold": 20,
+  "pivot_source": [
+    891.5,
+    725
+  ],
+  "water_rect_source": [
+    335,
+    409,
+    1100,
+    124
+  ],
+  "water_surface_source": [
+    885.0,
+    471.0
+  ],
+  "world_body_width": 180,
+  "world_body_height": 63.81451,
+  "world_scale": 0.13462976813762154,
+  "water_offset_world": [
+    -0.87509349289454,
+    -34.19596110695587
+  ],
+  "render": "Keep complete original canvas; scale uniformly by world_body_width/body_bounds.width and anchor pivot_source at ground. Water effects are native droplets, never sprite splash textures.",
+  "sha256": "d85d1f7d63bfd918c908149c35b45e369c91e565ea461f53c8bfdc894ca79456"
+}

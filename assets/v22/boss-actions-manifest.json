@@ -1,0 +1,1698 @@
+{
+  "version": 22,
+  "method": "Built-in image_gen, own-species action sheets and padding corrections; metadata from alpha inspection without pixel editing",
+  "clips": {
+    "sky_melee": {
+      "path": "boss-action-sky.png",
+      "label": "天空雷羽首領 · 近戰",
+      "fps": 12,
+      "reference_height": 272.0,
+      "reference_width": 255.61446,
+      "world_height": 168.0,
+      "world_width": 157.87952,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-sky.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            365
+          ],
+          "visible_bounds": [
+            66,
+            77,
+            239,
+            272
+          ],
+          "pivot": [
+            185.5,
+            349
+          ],
+          "sha256": "0c944411d74245439a08a43711b3e70ca4bd3f5036d8b8062dba6e7384b00f2d"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            362,
+            365
+          ],
+          "visible_bounds": [
+            52,
+            106,
+            265,
+            247
+          ],
+          "pivot": [
+            184.5,
+            353
+          ],
+          "sha256": "b34d22b18bbb2d8fe92857af64617110f4272ef0864b43e98999e06611d45e1f"
+        },
+        {
+          "source_rect": [
+            724,
+            0,
+            362,
+            365
+          ],
+          "visible_bounds": [
+            35,
+            166,
+            295,
+            186
+          ],
+          "pivot": [
+            182.5,
+            352
+          ],
+          "sha256": "4290aae268d05570c91d58a2039e979e7307e1eed43f01e4bddd14647e52868b"
+        },
+        {
+          "source_rect": [
+            1086,
+            0,
+            362,
+            365
+          ],
+          "visible_bounds": [
+            39,
+            206,
+            251,
+            159
+          ],
+          "pivot": [
+            164.5,
+            365
+          ],
+          "sha256": "dcb2f9b6706220c464efa7330fc7f0b75278fcedec37634a1558bd233c5c9ce2"
+        }
+      ]
+    },
+    "sky_ranged": {
+      "path": "boss-action-sky.png",
+      "label": "天空雷羽首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 272.0,
+      "reference_width": 255.61446,
+      "world_height": 168.0,
+      "world_width": 157.87952,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-sky.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            365,
+            362,
+            359
+          ],
+          "visible_bounds": [
+            54,
+            65,
+            251,
+            267
+          ],
+          "pivot": [
+            179.5,
+            332
+          ],
+          "sha256": "b05e2e0ad8832e4ccab3cfae8ba5bf1d8f0bdba7e42696e9da3d027a7c4324a1"
+        },
+        {
+          "source_rect": [
+            362,
+            365,
+            362,
+            359
+          ],
+          "visible_bounds": [
+            50,
+            74,
+            265,
+            259
+          ],
+          "pivot": [
+            182.5,
+            333
+          ],
+          "sha256": "8c88a8ba97303550ff93060bacaba1cbd5386531487cfeaa6fd16198fc5a37df"
+        },
+        {
+          "source_rect": [
+            724,
+            365,
+            362,
+            359
+          ],
+          "visible_bounds": [
+            16,
+            123,
+            313,
+            211
+          ],
+          "pivot": [
+            172.5,
+            334
+          ],
+          "sha256": "a257d767d008cb67120e0d7e86b59dcace21e828928bbad3e68ff2eb2d1ee9a5"
+        },
+        {
+          "source_rect": [
+            1086,
+            365,
+            362,
+            359
+          ],
+          "visible_bounds": [
+            43,
+            74,
+            265,
+            261
+          ],
+          "pivot": [
+            175.5,
+            335
+          ],
+          "sha256": "0779b24a48cad23d65c9ac224f8659f6a6232c0f4730803b329163a47b89dc0b"
+        }
+      ]
+    },
+    "sky_hurt": {
+      "path": "boss-action-sky.png",
+      "label": "天空雷羽首領 · 受傷",
+      "fps": 12,
+      "reference_height": 272.0,
+      "reference_width": 255.61446,
+      "world_height": 168.0,
+      "world_width": 157.87952,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-sky.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            56,
+            101,
+            245,
+            203
+          ],
+          "pivot": [
+            178.5,
+            304
+          ],
+          "sha256": "a9afe7eb7c53109186a57f9381de138842bb8c686227b433af028709ad40d5c4"
+        },
+        {
+          "source_rect": [
+            362,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            34,
+            143,
+            293,
+            166
+          ],
+          "pivot": [
+            180.5,
+            309
+          ],
+          "sha256": "48a7315fa33920468ff7625147f12d43a3b2684fb2df347e96892c1ffc4ac40e"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            41,
+            45,
+            289,
+            246
+          ],
+          "pivot": [
+            185.5,
+            291
+          ],
+          "sha256": "700cc6425b09c1fe45de7193be65b73e049033cb20c5cef809d7fb738e773277"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            55,
+            33,
+            255,
+            261
+          ],
+          "pivot": [
+            182.5,
+            294
+          ],
+          "sha256": "c24cef89ac7c419ac6dbf5882a4aa1dfbf6c24fb60772a75481a657f8d09ff8b"
+        }
+      ]
+    },
+    "canopy_melee": {
+      "path": "boss-action-canopy.png",
+      "label": "葉鐮首領 · 近戰",
+      "fps": 12,
+      "reference_height": 265.0,
+      "reference_width": 286.41414,
+      "world_height": 122.0,
+      "world_width": 131.85859,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-canopy.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            34,
+            96,
+            275,
+            265
+          ],
+          "pivot": [
+            145.5,
+            361
+          ],
+          "sha256": "a10d5d0f238ef8d180608ee8f71fa37fd5dd755c28344d1c56aa7c3a9bb7ed4b"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            373,
+            362
+          ],
+          "visible_bounds": [
+            13,
+            138,
+            360,
+            223
+          ],
+          "pivot": [
+            232.0,
+            361
+          ],
+          "sha256": "e4bd2b89160eb15578904d3e7d59d4872aab0e608f48cbed0e666a2757946fe2"
+        },
+        {
+          "source_rect": [
+            735,
+            0,
+            384,
+            362
+          ],
+          "visible_bounds": [
+            39,
+            172,
+            345,
+            189
+          ],
+          "pivot": [
+            167.0,
+            361
+          ],
+          "sha256": "079d8ca2f7bb45d80c69afa1a783e3dda6995bcb3a2ca162191f0cb8cb5f7ffe"
+        },
+        {
+          "source_rect": [
+            1119,
+            0,
+            329,
+            362
+          ],
+          "visible_bounds": [
+            60,
+            96,
+            233,
+            264
+          ],
+          "pivot": [
+            186.0,
+            360
+          ],
+          "sha256": "de810964b123b9d3a4b3e04b914712a8fa241448eb4beab7f60028e7e6c0d48f"
+        }
+      ]
+    },
+    "canopy_ranged": {
+      "path": "boss-action-canopy.png",
+      "label": "葉鐮首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 265.0,
+      "reference_width": 286.41414,
+      "world_height": 122.0,
+      "world_width": 131.85859,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-canopy.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            57,
+            84,
+            226,
+            270
+          ],
+          "pivot": [
+            185.0,
+            354
+          ],
+          "sha256": "07e84b4fc81b5e82010ac64959821e47ab2126f84fe6932ed29ae2367005ecaa"
+        },
+        {
+          "source_rect": [
+            362,
+            362,
+            383,
+            362
+          ],
+          "visible_bounds": [
+            17,
+            104,
+            366,
+            251
+          ],
+          "pivot": [
+            144.0,
+            355
+          ],
+          "sha256": "8a77320660440002edea5d6c0fd758a8b8ae2bbe90b1cd750689eede57994cb3"
+        },
+        {
+          "source_rect": [
+            745,
+            362,
+            401,
+            362
+          ],
+          "visible_bounds": [
+            29,
+            130,
+            372,
+            225
+          ],
+          "pivot": [
+            158.5,
+            355
+          ],
+          "sha256": "49a902ec37f3a3cda60c60650e554c19b99acbc7fa9dd49704e506decb2c239a"
+        },
+        {
+          "source_rect": [
+            1146,
+            362,
+            302,
+            362
+          ],
+          "visible_bounds": [
+            48,
+            75,
+            217,
+            279
+          ],
+          "pivot": [
+            171.0,
+            354
+          ],
+          "sha256": "8dc21392df5a0afe54d87e5ed8e6bf4eb5bc1c730266c3924616952c7bf7e535"
+        }
+      ]
+    },
+    "canopy_hurt": {
+      "path": "boss-action-canopy.png",
+      "label": "葉鐮首領 · 受傷",
+      "fps": 12,
+      "reference_height": 265.0,
+      "reference_width": 286.41414,
+      "world_height": 122.0,
+      "world_width": 131.85859,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 0,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-canopy.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            60,
+            56,
+            207,
+            264
+          ],
+          "pivot": [
+            148.5,
+            320
+          ],
+          "sha256": "380a648e89091fe2b3e9925a26b2a847fcbcad61c636a365646121a1ecb85bf0"
+        },
+        {
+          "source_rect": [
+            362,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            34,
+            118,
+            257,
+            200
+          ],
+          "pivot": [
+            171.0,
+            318
+          ],
+          "sha256": "d094298b1fe5bbff91ddac53de3c81bc370248e705f58573c6fd5e38eb13f8f0"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            45,
+            68,
+            282,
+            253
+          ],
+          "pivot": [
+            112.0,
+            321
+          ],
+          "sha256": "aa4c85a1d1a5832836908a7896450b041c1a099ca8a3796d1558d672f189cca2"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            81,
+            59,
+            249,
+            262
+          ],
+          "pivot": [
+            152.0,
+            321
+          ],
+          "sha256": "d2d5ed7516dfd0f8c416f32fd0fdda7119335848f610b3dce46986d1e5295da1"
+        }
+      ]
+    },
+    "branches_melee": {
+      "path": "boss-action-branches.png",
+      "label": "織絲首領 · 近戰",
+      "fps": 12,
+      "reference_height": 199.0,
+      "reference_width": 250.13622,
+      "world_height": 105.0,
+      "world_width": 131.98142,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-branches.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            56,
+            86,
+            290,
+            257
+          ],
+          "pivot": [
+            134.0,
+            343
+          ],
+          "sha256": "a02d604778167686450d2e704b48714583d897e1401b8d5a07a5ca7ffd34fdfa"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            47,
+            127,
+            306,
+            216
+          ],
+          "pivot": [
+            193.0,
+            343
+          ],
+          "sha256": "e61edce0523add7d7b49a4857c0f4d349916a5cc5bba5ae1f155914748dc1852"
+        },
+        {
+          "source_rect": [
+            724,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            47,
+            152,
+            297,
+            190
+          ],
+          "pivot": [
+            217.5,
+            342
+          ],
+          "sha256": "3fa90c043070168cc39f74421dba6b6fc8592a7aa4a345bb43e8e08914838ae6"
+        },
+        {
+          "source_rect": [
+            1086,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            31,
+            144,
+            292,
+            199
+          ],
+          "pivot": [
+            148.0,
+            343
+          ],
+          "sha256": "c32eaa2adf0bfa769f12301143943b3de82c6212791c033a04c774882eb6f065"
+        }
+      ]
+    },
+    "branches_ranged": {
+      "path": "boss-action-branches.png",
+      "label": "織絲首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 199.0,
+      "reference_width": 250.13622,
+      "world_height": 105.0,
+      "world_width": 131.98142,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-branches.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            56,
+            59,
+            260,
+            269
+          ],
+          "pivot": [
+            170.0,
+            328
+          ],
+          "sha256": "8ecbd2d56162b750942322119b609b2b19b291269e593fddd641ef3f8f7c12ba"
+        },
+        {
+          "source_rect": [
+            362,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            37,
+            69,
+            324,
+            261
+          ],
+          "pivot": [
+            179.0,
+            330
+          ],
+          "sha256": "17624522ee3908dba2be13a593bed739defe093c92ad2c1d5cc7b1cb481f50c3"
+        },
+        {
+          "source_rect": [
+            724,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            55,
+            131,
+            306,
+            201
+          ],
+          "pivot": [
+            115.0,
+            332
+          ],
+          "sha256": "4286eea581f63c02a312c39c911b52dfb5df35726e6934f14555834e73413904"
+        },
+        {
+          "source_rect": [
+            1086,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            49,
+            129,
+            276,
+            202
+          ],
+          "pivot": [
+            196.0,
+            331
+          ],
+          "sha256": "81bb42a5d3f65f3413475266eb99398286c681d3b688d943f39a4008411c88b5"
+        }
+      ]
+    },
+    "branches_hurt": {
+      "path": "boss-action-branches.png",
+      "label": "織絲首領 · 受傷",
+      "fps": 12,
+      "reference_height": 199.0,
+      "reference_width": 250.13622,
+      "world_height": 105.0,
+      "world_width": 131.98142,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-branches.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            365,
+            362
+          ],
+          "visible_bounds": [
+            64,
+            41,
+            301,
+            249
+          ],
+          "pivot": [
+            164.0,
+            290
+          ],
+          "sha256": "a884b1b2a8f688f00ddc3a1bd0ba15b4ec6f839fa85967713d9c5b152dcfd047"
+        },
+        {
+          "source_rect": [
+            365,
+            724,
+            359,
+            362
+          ],
+          "visible_bounds": [
+            51,
+            91,
+            300,
+            199
+          ],
+          "pivot": [
+            152.0,
+            290
+          ],
+          "sha256": "39cdddc420f944b49e4f2be63a689f08133f5ba86b0d73f2fbd9a3d108c5191b"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            54,
+            83,
+            298,
+            207
+          ],
+          "pivot": [
+            165.0,
+            290
+          ],
+          "sha256": "cbf859f90f3fd281080dad96d61df8d33b72d4e20e468d5b04b72359550c1584"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            41,
+            84,
+            289,
+            207
+          ],
+          "pivot": [
+            144.0,
+            291
+          ],
+          "sha256": "32b09298096f0dedf83b93c30587158370b6f1699f243f44287f769204eed8dd"
+        }
+      ]
+    },
+    "trunk_melee": {
+      "path": "boss-action-trunk.png",
+      "label": "琥珀鍬甲首領 · 近戰",
+      "fps": 12,
+      "reference_height": 159.0,
+      "reference_width": 288.14694,
+      "world_height": 86.0,
+      "world_width": 155.85306,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-trunk.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            371
+          ],
+          "visible_bounds": [
+            58,
+            124,
+            272,
+            247
+          ],
+          "pivot": [
+            166.0,
+            371
+          ],
+          "sha256": "68c165118beb09f2461652972dbb5820b832ce2bdfab7d12a14562c591d2d7f7"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            362,
+            371
+          ],
+          "visible_bounds": [
+            30,
+            191,
+            324,
+            178
+          ],
+          "pivot": [
+            140.0,
+            369
+          ],
+          "sha256": "5ea328a2619376e16a45f267c3ede11fecdf25c2356880bfabd1efba62dd53c4"
+        },
+        {
+          "source_rect": [
+            724,
+            0,
+            362,
+            371
+          ],
+          "visible_bounds": [
+            32,
+            223,
+            304,
+            148
+          ],
+          "pivot": [
+            224.0,
+            371
+          ],
+          "sha256": "737ee0edb5bcc0947dd0cf7a195b3785c301510d6d9e786210b84f9924771a52"
+        },
+        {
+          "source_rect": [
+            1086,
+            0,
+            362,
+            371
+          ],
+          "visible_bounds": [
+            32,
+            211,
+            283,
+            159
+          ],
+          "pivot": [
+            141.0,
+            370
+          ],
+          "sha256": "310f93a3fbbacfa80e2bb0e79ac2879842288c0a07e3d9db4ad6d78874019594"
+        }
+      ]
+    },
+    "trunk_ranged": {
+      "path": "boss-action-trunk.png",
+      "label": "琥珀鍬甲首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 159.0,
+      "reference_width": 288.14694,
+      "world_height": 86.0,
+      "world_width": 155.85306,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-trunk.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            371,
+            362,
+            353
+          ],
+          "visible_bounds": [
+            51,
+            152,
+            287,
+            173
+          ],
+          "pivot": [
+            168.0,
+            325
+          ],
+          "sha256": "14af297cec3a954018ffe62006b583b542d1e8c2916a685f5c70054385299009"
+        },
+        {
+          "source_rect": [
+            362,
+            371,
+            362,
+            353
+          ],
+          "visible_bounds": [
+            31,
+            134,
+            305,
+            191
+          ],
+          "pivot": [
+            152.0,
+            325
+          ],
+          "sha256": "073e007acede942519d4116f26d71c0c460bf1070dc0c2708bc71fce87e6e664"
+        },
+        {
+          "source_rect": [
+            724,
+            371,
+            362,
+            353
+          ],
+          "visible_bounds": [
+            31,
+            168,
+            319,
+            158
+          ],
+          "pivot": [
+            141.0,
+            326
+          ],
+          "sha256": "dcb579413aac58a42ef1af45040d44c8470d49c5c8369c9cb22b24e2e7e37341"
+        },
+        {
+          "source_rect": [
+            1086,
+            371,
+            362,
+            353
+          ],
+          "visible_bounds": [
+            34,
+            156,
+            300,
+            170
+          ],
+          "pivot": [
+            146.0,
+            326
+          ],
+          "sha256": "011641d0c1392880c3d3c507f22de12f44ef4800dfa9b18b74ae09f374b87c4a"
+        }
+      ]
+    },
+    "trunk_hurt": {
+      "path": "boss-action-trunk.png",
+      "label": "琥珀鍬甲首領 · 受傷",
+      "fps": 12,
+      "reference_height": 159.0,
+      "reference_width": 288.14694,
+      "world_height": 86.0,
+      "world_width": 155.85306,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-trunk.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            57,
+            46,
+            237,
+            237
+          ],
+          "pivot": [
+            89.0,
+            283
+          ],
+          "sha256": "cafca6deb681f79e6f23b8d6f1c02c9843bb1835b4480ff810c6df95f15096e2"
+        },
+        {
+          "source_rect": [
+            362,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            30,
+            120,
+            306,
+            159
+          ],
+          "pivot": [
+            149.5,
+            279
+          ],
+          "sha256": "187854eb8af2bbf18875396037758a8a25ac43b8c8b7f438bc309de5302cdb98"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            30,
+            120,
+            297,
+            159
+          ],
+          "pivot": [
+            215.0,
+            279
+          ],
+          "sha256": "499dd57c14c12b50b7e10b8cd6cd2bce71ced8b4a91a314eb952646f023c275c"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            27,
+            121,
+            299,
+            157
+          ],
+          "pivot": [
+            146.0,
+            278
+          ],
+          "sha256": "4be5ccb3df86800a14e7f489da482810fa34220d012f82db4cd19314235f2514"
+        }
+      ]
+    },
+    "grass_melee": {
+      "path": "boss-action-grass.png",
+      "label": "苔露蛙首領 · 近戰",
+      "fps": 12,
+      "reference_height": 207.0,
+      "reference_width": 280.01455,
+      "world_height": 99.0,
+      "world_width": 133.92,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-grass.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            52,
+            149,
+            258,
+            208
+          ],
+          "pivot": [
+            235.0,
+            357
+          ],
+          "sha256": "f188e1cfa0990fdeef344ce4c95b6fc9d3c9b58b0458b62790ef6baf345627d6"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            401,
+            362
+          ],
+          "visible_bounds": [
+            21,
+            132,
+            380,
+            222
+          ],
+          "pivot": [
+            51.0,
+            354
+          ],
+          "sha256": "1bb8ed93bfeb6d45580e18cc036c59779d3ed762044d551e08d727935c40dae2"
+        },
+        {
+          "source_rect": [
+            763,
+            0,
+            323,
+            362
+          ],
+          "visible_bounds": [
+            36,
+            175,
+            277,
+            182
+          ],
+          "pivot": [
+            219.0,
+            357
+          ],
+          "sha256": "88fa2de0af5b5d5fdd5cff8bf75e4c247899dd4cd0dd86ae8a11b200c9a6b267"
+        },
+        {
+          "source_rect": [
+            1086,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            63,
+            149,
+            248,
+            207
+          ],
+          "pivot": [
+            229.0,
+            356
+          ],
+          "sha256": "4755e5d8f0fff6a14867241b3976c151bfc1af6e967e548435c9771f2831fb71"
+        }
+      ]
+    },
+    "grass_ranged": {
+      "path": "boss-action-grass.png",
+      "label": "苔露蛙首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 207.0,
+      "reference_width": 280.01455,
+      "world_height": 99.0,
+      "world_width": 133.92,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-grass.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            47,
+            99,
+            259,
+            225
+          ],
+          "pivot": [
+            225.0,
+            324
+          ],
+          "sha256": "f211a416512206df0dc38e22515b40e527f0f144787737c99054ba3726edbcba"
+        },
+        {
+          "source_rect": [
+            362,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            50,
+            81,
+            286,
+            243
+          ],
+          "pivot": [
+            169.0,
+            324
+          ],
+          "sha256": "fa06f6296be472a975c6e3ee511119ed3e20391170216fee569ace000f25939a"
+        },
+        {
+          "source_rect": [
+            724,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            55,
+            130,
+            299,
+            195
+          ],
+          "pivot": [
+            275.0,
+            325
+          ],
+          "sha256": "ae849f6a539b8cf43fc51d2b344a61948118d2ad55eb07d531b3792b6766b580"
+        },
+        {
+          "source_rect": [
+            1086,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            65,
+            114,
+            253,
+            209
+          ],
+          "pivot": [
+            229.0,
+            323
+          ],
+          "sha256": "b5ef99238bfa6b04ee45137a4035a75ccdac8748456da702a6dd3ed1920a29a0"
+        }
+      ]
+    },
+    "grass_hurt": {
+      "path": "boss-action-grass.png",
+      "label": "苔露蛙首領 · 受傷",
+      "fps": 12,
+      "reference_height": 207.0,
+      "reference_width": 280.01455,
+      "world_height": 99.0,
+      "world_width": 133.92,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-grass.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            65,
+            57,
+            267,
+            236
+          ],
+          "pivot": [
+            101.0,
+            293
+          ],
+          "sha256": "a68eb848253cd45f332e70adc48593aac499b0b74de7f08df2ded33c2fed8a7d"
+        },
+        {
+          "source_rect": [
+            362,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            58,
+            130,
+            293,
+            167
+          ],
+          "pivot": [
+            254.0,
+            297
+          ],
+          "sha256": "3c42bd7b8bcba53c6bf6f7a38aec82b68715f575f6e1fb823d5a51b2a1451332"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            61,
+            83,
+            290,
+            210
+          ],
+          "pivot": [
+            110.0,
+            293
+          ],
+          "sha256": "dfdd1d00a8563f3461d639b5891061b2f7b13123024548b9293c19f8581d0c8f"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            68,
+            88,
+            248,
+            205
+          ],
+          "pivot": [
+            230.0,
+            293
+          ],
+          "sha256": "9278aa3d7967624a8ce73968eb2eee45ff8a3ca06a219b1b10227738442db306"
+        }
+      ]
+    },
+    "underground_melee": {
+      "path": "boss-action-underground.png",
+      "label": "根鑽首領 · 近戰",
+      "fps": 12,
+      "reference_height": 192.0,
+      "reference_width": 325.03937,
+      "world_height": 99.0,
+      "world_width": 167.59843,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-underground.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            33,
+            151,
+            280,
+            185
+          ],
+          "pivot": [
+            205.0,
+            336
+          ],
+          "sha256": "76908bfee927277877e534091dda9dbc967d127f7d76f81258282500b77e2d5e"
+        },
+        {
+          "source_rect": [
+            362,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            41,
+            151,
+            314,
+            181
+          ],
+          "pivot": [
+            333.0,
+            332
+          ],
+          "sha256": "fa7927c11efeeee4ac5dc367bbc16a452fb6a2ad06546c2f965b34ac9a0b6b3b"
+        },
+        {
+          "source_rect": [
+            724,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            43,
+            152,
+            296,
+            190
+          ],
+          "pivot": [
+            312.0,
+            342
+          ],
+          "sha256": "f16d2f31738ff5c7f75c89d43b9b355a1da6dad05b6cea7b2293dee0a6229c14"
+        },
+        {
+          "source_rect": [
+            1086,
+            0,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            44,
+            151,
+            282,
+            192
+          ],
+          "pivot": [
+            266.5,
+            343
+          ],
+          "sha256": "48fb858db18af21b1d5d60755a9fd5cf610693742abebe02464dc47da37fdc6d"
+        }
+      ]
+    },
+    "underground_ranged": {
+      "path": "boss-action-underground.png",
+      "label": "根鑽首領 · 遠攻",
+      "fps": 12,
+      "reference_height": 192.0,
+      "reference_width": 325.03937,
+      "world_height": 99.0,
+      "world_width": 167.59843,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-underground.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            31,
+            112,
+            277,
+            194
+          ],
+          "pivot": [
+            252.0,
+            306
+          ],
+          "sha256": "9865955793799db7f437a33e15a8cb6f28448943e70c8b3b87933498d1400720"
+        },
+        {
+          "source_rect": [
+            362,
+            362,
+            365,
+            362
+          ],
+          "visible_bounds": [
+            9,
+            118,
+            356,
+            180
+          ],
+          "pivot": [
+            56.0,
+            298
+          ],
+          "sha256": "0d8bec0fa79ddb079c7b7c266d4ecea3698902c581bac0ee8ce3558c2b142ae4"
+        },
+        {
+          "source_rect": [
+            727,
+            362,
+            359,
+            362
+          ],
+          "visible_bounds": [
+            24,
+            140,
+            334,
+            176
+          ],
+          "pivot": [
+            333.0,
+            316
+          ],
+          "sha256": "04f079112cecea3c33c08169dbba6f2c5d2da05bebfe0694e312cdddf86e3154"
+        },
+        {
+          "source_rect": [
+            1086,
+            362,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            42,
+            110,
+            290,
+            198
+          ],
+          "pivot": [
+            284.0,
+            308
+          ],
+          "sha256": "329d16b1efb87546218ab4bf07279777b4241b43c882aa0506de93883fd75f7b"
+        }
+      ]
+    },
+    "underground_hurt": {
+      "path": "boss-action-underground.png",
+      "label": "根鑽首領 · 受傷",
+      "fps": 12,
+      "reference_height": 192.0,
+      "reference_width": 325.03937,
+      "world_height": 99.0,
+      "world_width": 167.59843,
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "reference_calibration_frame": 3,
+      "reference_calibration_role": "melee",
+      "identity_reference": "res://assets/v18/monster-motion-underground.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            39,
+            62,
+            281,
+            209
+          ],
+          "pivot": [
+            169.5,
+            271
+          ],
+          "sha256": "6cf138cdec0d9878fced5871f676329241e578eba4a66433d16751a895bcfd78"
+        },
+        {
+          "source_rect": [
+            362,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            34,
+            82,
+            279,
+            198
+          ],
+          "pivot": [
+            251.0,
+            280
+          ],
+          "sha256": "dc23f250a37bd57f748642745a4f7142a8fddf8622352a0868ee72296174ef36"
+        },
+        {
+          "source_rect": [
+            724,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            33,
+            90,
+            303,
+            199
+          ],
+          "pivot": [
+            304.0,
+            289
+          ],
+          "sha256": "fbe058b5363590f87336d2aef00e8f9aee3a5b66094054d5eb0a6f2f12a5c908"
+        },
+        {
+          "source_rect": [
+            1086,
+            724,
+            362,
+            362
+          ],
+          "visible_bounds": [
+            39,
+            86,
+            293,
+            198
+          ],
+          "pivot": [
+            291.0,
+            284
+          ],
+          "sha256": "7729b4efa4a42c3acaebe63a0efa0f0c9092c3c74178461b8935172cd401a6e4"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "texture": "res://assets/v29/effects/refined-feather.png",
+  "visible_bounds_alpha_gt_16": [
+    76,
+    46,
+    1121,
+    1162
+  ],
+  "pivot": [
+    627,
+    627
+  ],
+  "suggested_collectible_world_size": [
+    56,
+    56
+  ],
+  "suggested_falling_world_size_range": [
+    10,
+    22
+  ],
+  "description": "Single refined hand-painted ivory feather. Full original image, real alpha, no baked halo.",
+  "original_size": [
+    1254,
+    1254
+  ],
+  "source_rect": [
+    0,
+    0,
+    1254,
+    1254
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": 29,
+  "path": "free-weapon-pedestal.png",
+  "original_size": [
+    1536,
+    1024
+  ],
+  "source_rect": [
+    205,
+    365,
+    1127,
+    596
+  ],
+  "pivot": [
+    768.5,
+    961
+  ],
+  "suggested_world_size": [
+    112.7,
+    59.6
+  ],
+  "import_size_limit": 512,
+  "alpha_threshold": 8,
+  "sha256": "c643cf9468d20f92e1e948ea1a63cde41629c8a5f0772b0abcc3eeea52533643",
+  "support_center": [
+    768,
+    421
+  ]
+}

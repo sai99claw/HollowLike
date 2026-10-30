@@ -1,0 +1,194 @@
+{
+  "version": 31,
+  "id": "moonblade",
+  "original_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    443.5,
+    443.5
+  ],
+  "layout": [
+    4,
+    2
+  ],
+  "rotation": "clockwise",
+  "frame_degrees": [
+    0,
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315
+  ],
+  "opening_directions": [
+    "left",
+    "upper_left",
+    "up",
+    "upper_right",
+    "right",
+    "lower_right",
+    "down",
+    "lower_left"
+  ],
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        222.0,
+        222.0
+      ],
+      "visible_bounds": [
+        80,
+        68,
+        318,
+        321
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        221.5,
+        222.0
+      ],
+      "visible_bounds": [
+        40,
+        46,
+        324,
+        325
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        221.5,
+        222.0
+      ],
+      "visible_bounds": [
+        56,
+        59,
+        353,
+        344
+      ],
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        222.0,
+        222.0
+      ],
+      "visible_bounds": [
+        74,
+        56,
+        331,
+        319
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        222.0,
+        221.5
+      ],
+      "visible_bounds": [
+        53,
+        40,
+        336,
+        328
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        221.5,
+        221.5
+      ],
+      "visible_bounds": [
+        76,
+        49,
+        331,
+        315
+      ],
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        221.5,
+        221.5
+      ],
+      "visible_bounds": [
+        54,
+        34,
+        354,
+        338
+      ],
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        222.0,
+        221.5
+      ],
+      "visible_bounds": [
+        67,
+        57,
+        327,
+        313
+      ],
+      "smear": false
+    }
+  ],
+  "max_body_extent": 375.0,
+  "pivot_space": "local to rect",
+  "notes": "Fixed geometric center of crescent sweep, not the gold off-center ornament. Use a single stable style scale; no extra frame rotation at runtime. Smear baked into frames2,6."
+}

@@ -1,0 +1,5 @@
+{
+  "version":10,
+  "spring":{"path":"spring.png","grid":[2,2],"cell_size":[768,512],"foot_y":466,"width":260,"fps":3,"source":"Built-in imagegen; original transparent PNG retained without pixel processing","prompt":"Transparent 2x2 four-frame atlas of the same hand-painted mossy stone hot spring, pale turquoise water, small ferns and soft translucent white steam. Side view, slight view into water, soft gouache illustration, no outlines, no text, no scenery. Same baseline, water ripples and shifting steam only."},
+  "rain":{"path":"rain.wav","sample_rate":16000,"duration_seconds":8,"source":"Original deterministic filtered noise and fine-drop synthesis, runtime loop"}
+}

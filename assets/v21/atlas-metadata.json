@@ -1,0 +1,3158 @@
+{
+  "terrain-underground": {
+    "path": "/tmp/pigeon-v21-art/terrain-underground.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      4,
+      4
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.427298672954679,
+    "sha256": "f8e762e3b3bdedd2749e0339083173ed4db4b8450ae5822b300d5a8a6de8f6b4",
+    "cells": {
+      "0,0": {
+        "region": [
+          8,
+          6,
+          300,
+          301
+        ],
+        "bounds": [
+          0,
+          0,
+          300,
+          301
+        ],
+        "anchor": [
+          150.0,
+          301
+        ],
+        "sha256": "779e104802c32cbbb74377da89955e09e981b01828a608d398d96c6ed20df6ee"
+      },
+      "1,0": {
+        "region": [
+          313,
+          45,
+          320,
+          263
+        ],
+        "bounds": [
+          0,
+          0,
+          320,
+          263
+        ],
+        "anchor": [
+          160.0,
+          263
+        ],
+        "sha256": "03b2da6bb1ee3f88dc188b391b4b81a0671dc53f3ada32c29a28c63198f6cfda"
+      },
+      "2,0": {
+        "region": [
+          630,
+          85,
+          312,
+          223
+        ],
+        "bounds": [
+          0,
+          1,
+          312,
+          222
+        ],
+        "anchor": [
+          156.0,
+          223
+        ],
+        "sha256": "51635a64d48089e124be93306bcaef86911fe675e425311161238bf8fbf56183"
+      },
+      "3,0": {
+        "region": [
+          1015,
+          0,
+          173,
+          316
+        ],
+        "bounds": [
+          3,
+          0,
+          166,
+          316
+        ],
+        "anchor": [
+          86.0,
+          316
+        ],
+        "sha256": "81c579692e3d20e693aeea199e01bcd0ad3e7414287056eb12aa70ba03a451f6"
+      },
+      "0,1": {
+        "region": [
+          10,
+          316,
+          303,
+          316
+        ],
+        "bounds": [
+          3,
+          4,
+          300,
+          310
+        ],
+        "anchor": [
+          153.0,
+          314
+        ],
+        "sha256": "eb0f38bb317609d30c3066296c540f0e39eea668795dbd9dab098e3917f3c2fa"
+      },
+      "1,1": {
+        "region": [
+          323,
+          316,
+          310,
+          313
+        ],
+        "bounds": [
+          0,
+          4,
+          310,
+          309
+        ],
+        "anchor": [
+          155.0,
+          313
+        ],
+        "sha256": "917df3b55658af11bc7f8ede0f8014643cba23544632b764567bed4cf9abaff3"
+      },
+      "2,1": {
+        "region": [
+          667,
+          337,
+          258,
+          293
+        ],
+        "bounds": [
+          2,
+          0,
+          256,
+          293
+        ],
+        "anchor": [
+          130.0,
+          293
+        ],
+        "sha256": "b65cca07f2455d150a5fecb285d32aa8e238e5f19e06ae1f8fc7a500a5fb9957"
+      },
+      "3,1": {
+        "region": [
+          1013,
+          322,
+          174,
+          317
+        ],
+        "bounds": [
+          0,
+          0,
+          174,
+          317
+        ],
+        "anchor": [
+          87.0,
+          317
+        ],
+        "sha256": "c02042da4f85d7eafff15decc90b8da58b2806cfdaa421db8a2095018eebdcab"
+      },
+      "0,2": {
+        "region": [
+          32,
+          714,
+          233,
+          158
+        ],
+        "bounds": [
+          1,
+          3,
+          232,
+          155
+        ],
+        "anchor": [
+          117.0,
+          158
+        ],
+        "sha256": "a37107a43aac8dcdb4546c3d84a604654ba15baaa45d7e918d09f2b4bfb83405"
+      },
+      "1,2": {
+        "region": [
+          276,
+          714,
+          311,
+          173
+        ],
+        "bounds": [
+          0,
+          0,
+          311,
+          173
+        ],
+        "anchor": [
+          155.5,
+          173
+        ],
+        "sha256": "65a51ded4579a939fa87952b9a026e54040d5d456b56779e149c1194efca5bfa"
+      },
+      "2,2": {
+        "region": [
+          595,
+          712,
+          411,
+          178
+        ],
+        "bounds": [
+          0,
+          0,
+          411,
+          178
+        ],
+        "anchor": [
+          205.5,
+          178
+        ],
+        "sha256": "ff3849a8dd8762d0fa714f7a68cc370fbca3fbb4e901ef5e176a1de9ca16d18a"
+      },
+      "3,2": {
+        "region": [
+          974,
+          721,
+          276,
+          201
+        ],
+        "bounds": [
+          0,
+          1,
+          276,
+          196
+        ],
+        "anchor": [
+          138.0,
+          197
+        ],
+        "sha256": "ebc4fe9646ff4a8dc18eadd40e42e2bb7d92dfcc2f025c667684e089494eef67"
+      },
+      "0,3": {
+        "region": [
+          12,
+          965,
+          298,
+          244
+        ],
+        "bounds": [
+          1,
+          0,
+          297,
+          244
+        ],
+        "anchor": [
+          149.5,
+          244
+        ],
+        "sha256": "327f6768c051a6763dd8dac6cacfea302f5eddf5f3851e3f0d3805c58149c9f9"
+      },
+      "1,3": {
+        "region": [
+          310,
+          925,
+          324,
+          315
+        ],
+        "bounds": [
+          0,
+          0,
+          324,
+          315
+        ],
+        "anchor": [
+          162.0,
+          315
+        ],
+        "sha256": "5b20d39e7076275454691af9feda639ed4744a7af752c70546d774ed2ae62ff4"
+      },
+      "2,3": {
+        "region": [
+          634,
+          920,
+          302,
+          298
+        ],
+        "bounds": [
+          0,
+          0,
+          302,
+          298
+        ],
+        "anchor": [
+          151.0,
+          298
+        ],
+        "sha256": "d11fc4ede36553b36cfe72ce285b5fd35edb8a876cd41967eab4a0b63e1c20f0"
+      },
+      "3,3": {
+        "region": [
+          933,
+          982,
+          321,
+          236
+        ],
+        "bounds": [
+          0,
+          0,
+          321,
+          236
+        ],
+        "anchor": [
+          160.5,
+          236
+        ],
+        "sha256": "16686c8b1bc7e445e39f59c15ec8084de5710ce536adbab318b5923e8b0c4467"
+      }
+    }
+  },
+  "props-underground": {
+    "path": "/tmp/pigeon-v21-art/props-underground.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      6,
+      6
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.5013831337805148,
+    "sha256": "6cf32afe12e6879b80c4d8c6857d2ace25b54fdba4c8d8479760fc16197086c6",
+    "cells": {
+      "0,0": {
+        "region": [
+          0,
+          0,
+          255,
+          284
+        ],
+        "bounds": [
+          0,
+          0,
+          255,
+          283
+        ],
+        "anchor": [
+          127.5,
+          283
+        ],
+        "sha256": "1fac824abedf878eee11c41d9c194c992f714e49d1a7f56361958142f75258f9"
+      },
+      "1,0": {
+        "region": [
+          255,
+          0,
+          231,
+          284
+        ],
+        "bounds": [
+          0,
+          0,
+          231,
+          281
+        ],
+        "anchor": [
+          115.5,
+          281
+        ],
+        "sha256": "f52c8d2621e8f3fbf1c9fbc825dc690b68043a1574eaeda4b46ee336769b9475"
+      },
+      "2,0": {
+        "region": [
+          486,
+          0,
+          252,
+          284
+        ],
+        "bounds": [
+          0,
+          23,
+          252,
+          254
+        ],
+        "anchor": [
+          126.0,
+          277
+        ],
+        "sha256": "4dc924887c642659945cc4f52996fe9fde1b5c5c1a8bdfba35d62b5ecfeaf927"
+      },
+      "3,0": {
+        "region": [
+          738,
+          0,
+          157,
+          284
+        ],
+        "bounds": [
+          0,
+          31,
+          157,
+          248
+        ],
+        "anchor": [
+          78.5,
+          279
+        ],
+        "sha256": "05c3465e799f1dfdb2b275d81adafcadf7ca9648e5b3ae1b5478b9f082c6f802"
+      },
+      "4,0": {
+        "region": [
+          895,
+          0,
+          206,
+          284
+        ],
+        "bounds": [
+          0,
+          13,
+          206,
+          262
+        ],
+        "anchor": [
+          103.0,
+          275
+        ],
+        "sha256": "13db2d9a6f3a9809091deb5825b3188172374fc521cc62980b63a7631cd1177f"
+      },
+      "5,0": {
+        "region": [
+          1101,
+          0,
+          153,
+          284
+        ],
+        "bounds": [
+          0,
+          9,
+          153,
+          270
+        ],
+        "anchor": [
+          76.5,
+          279
+        ],
+        "sha256": "612cd71dc6615d5383b0f210717c3469409508a2954efea1abcab1bfdac7fee3"
+      },
+      "0,1": {
+        "region": [
+          0,
+          284,
+          218,
+          211
+        ],
+        "bounds": [
+          29,
+          6,
+          189,
+          205
+        ],
+        "anchor": [
+          123.5,
+          211
+        ],
+        "sha256": "0df5e28baf279c329fa604d61bd7a5e4967f615d7541341e44d96b56bb4c9db1",
+        "scaleReferenceHeight": 205
+      },
+      "1,1": {
+        "region": [
+          218,
+          284,
+          208,
+          211
+        ],
+        "bounds": [
+          0,
+          6,
+          208,
+          205
+        ],
+        "anchor": [
+          104.0,
+          211
+        ],
+        "sha256": "9c2fdc13ba7e0e3398f88b02f48877743253d52eb538a56d26beba1cce6a332f",
+        "scaleReferenceHeight": 205
+      },
+      "2,1": {
+        "region": [
+          426,
+          284,
+          216,
+          211
+        ],
+        "bounds": [
+          1,
+          6,
+          206,
+          205
+        ],
+        "anchor": [
+          104.0,
+          211
+        ],
+        "sha256": "0406d5c592e0b65a0a9449318ee5799b8135fa53a6ae525c76dcbbb5be82740b",
+        "scaleReferenceHeight": 205
+      },
+      "3,1": {
+        "region": [
+          642,
+          284,
+          204,
+          211
+        ],
+        "bounds": [
+          0,
+          6,
+          204,
+          205
+        ],
+        "anchor": [
+          102.0,
+          211
+        ],
+        "sha256": "ce03ac6587391121c4f670b8384c6543c55d8c6ee9789a0b3b0f5bfeead9cc6e",
+        "scaleReferenceHeight": 205
+      },
+      "4,1": {
+        "region": [
+          846,
+          284,
+          214,
+          211
+        ],
+        "bounds": [
+          1,
+          2,
+          212,
+          209
+        ],
+        "anchor": [
+          107.0,
+          211
+        ],
+        "sha256": "fc6f8773c3d4f51801b425c9182d67f10ead7e71c8d790a85bc6641fedcc6901",
+        "scaleReferenceHeight": 209
+      },
+      "5,1": {
+        "region": [
+          1060,
+          284,
+          194,
+          211
+        ],
+        "bounds": [
+          10,
+          10,
+          164,
+          201
+        ],
+        "anchor": [
+          92.0,
+          211
+        ],
+        "sha256": "09a265474113799661eece798c7a3e7f90ad45d7274e4926ce46419d01cf7457",
+        "scaleReferenceHeight": 201
+      },
+      "0,2": {
+        "region": [
+          0,
+          495,
+          218,
+          206
+        ],
+        "bounds": [
+          28,
+          0,
+          187,
+          204
+        ],
+        "anchor": [
+          121.5,
+          204
+        ],
+        "sha256": "670365ff09aead00d1d04e2212700f7ec95f5e48d3a2f39823e6ed1f3c76fa1c",
+        "scaleReferenceHeight": 205
+      },
+      "1,2": {
+        "region": [
+          218,
+          495,
+          208,
+          206
+        ],
+        "bounds": [
+          2,
+          0,
+          206,
+          206
+        ],
+        "anchor": [
+          105.0,
+          206
+        ],
+        "sha256": "0a1cc9771c76d4c552319871ef4127cdf40712e9c718a080a7baf91654442264",
+        "scaleReferenceHeight": 205
+      },
+      "2,2": {
+        "region": [
+          426,
+          495,
+          216,
+          206
+        ],
+        "bounds": [
+          1,
+          0,
+          208,
+          206
+        ],
+        "anchor": [
+          105.0,
+          206
+        ],
+        "sha256": "b6af498c0078149f0d09a1431cb43957e6c4aa390282526a0a80049961b99d57",
+        "scaleReferenceHeight": 205
+      },
+      "3,2": {
+        "region": [
+          642,
+          495,
+          204,
+          206
+        ],
+        "bounds": [
+          4,
+          0,
+          200,
+          206
+        ],
+        "anchor": [
+          104.0,
+          206
+        ],
+        "sha256": "267a5976699f0e2ccaeabb3a298d15f621637be7341a1a3b55abfb2541f14675",
+        "scaleReferenceHeight": 205
+      },
+      "4,2": {
+        "region": [
+          846,
+          495,
+          214,
+          206
+        ],
+        "bounds": [
+          0,
+          0,
+          207,
+          206
+        ],
+        "anchor": [
+          103.5,
+          206
+        ],
+        "sha256": "ca942c46937ea342b45762fa95bcd188c6087803f729425448d5634d10907ac6",
+        "scaleReferenceHeight": 209
+      },
+      "5,2": {
+        "region": [
+          1060,
+          495,
+          194,
+          206
+        ],
+        "bounds": [
+          12,
+          0,
+          172,
+          206
+        ],
+        "anchor": [
+          98.0,
+          206
+        ],
+        "sha256": "b337ac19ff77e50740f02fd3edf0e6c5bf83c94fd42e4a53db419ea56c1bb672",
+        "scaleReferenceHeight": 201
+      },
+      "0,3": {
+        "region": [
+          0,
+          701,
+          218,
+          233
+        ],
+        "bounds": [
+          0,
+          1,
+          217,
+          232
+        ],
+        "anchor": [
+          108.5,
+          233
+        ],
+        "sha256": "0831cf9a63b073c6226edfd571a69224fd5a90d0f3b0c08a7453f6a355854571",
+        "scaleReferenceHeight": 205
+      },
+      "1,3": {
+        "region": [
+          218,
+          701,
+          208,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          208,
+          226
+        ],
+        "anchor": [
+          104.0,
+          226
+        ],
+        "sha256": "ba3ded189c2bf290ca65b72fafbad964b8f63f981ea38528661cfcb38a27e3c2",
+        "scaleReferenceHeight": 205
+      },
+      "2,3": {
+        "region": [
+          426,
+          701,
+          216,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          216,
+          233
+        ],
+        "anchor": [
+          108.0,
+          233
+        ],
+        "sha256": "772503fd1773ed8cdc07734c7231b9f76b3134d6d979da7d15c8f94416a2d726",
+        "scaleReferenceHeight": 205
+      },
+      "3,3": {
+        "region": [
+          642,
+          701,
+          204,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          204,
+          233
+        ],
+        "anchor": [
+          102.0,
+          233
+        ],
+        "sha256": "cda764194c9c840b5db9e9e2dbbcedd91a2529fd1c934289318d9e61d9c4870b",
+        "scaleReferenceHeight": 205
+      },
+      "4,3": {
+        "region": [
+          846,
+          701,
+          214,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          207,
+          233
+        ],
+        "anchor": [
+          103.5,
+          233
+        ],
+        "sha256": "e3f407fb2581d82cd3c52bf0265753586f3076f86c51128a73ae5edb9ce394f4",
+        "scaleReferenceHeight": 209
+      },
+      "5,3": {
+        "region": [
+          1060,
+          701,
+          194,
+          233
+        ],
+        "bounds": [
+          8,
+          0,
+          172,
+          233
+        ],
+        "anchor": [
+          94.0,
+          233
+        ],
+        "sha256": "5924db71fa028527165219c6715c2eb9190dbfaae997f6b1bb251c38bca71de1",
+        "scaleReferenceHeight": 201
+      },
+      "0,4": {
+        "region": [
+          0,
+          934,
+          218,
+          144
+        ],
+        "bounds": [
+          0,
+          1,
+          217,
+          143
+        ],
+        "anchor": [
+          108.5,
+          144
+        ],
+        "sha256": "1b60750f4262902fdb5980619bf1174a7ee1f7dd2653f4af1b1d15c52271709b",
+        "scaleReferenceHeight": 205
+      },
+      "1,4": {
+        "region": [
+          218,
+          934,
+          208,
+          144
+        ],
+        "bounds": [
+          0,
+          1,
+          208,
+          143
+        ],
+        "anchor": [
+          104.0,
+          144
+        ],
+        "sha256": "9025d1455a1a94e7a75188d3a5b40d6b66422f4bd202adbf671c5aa1dbc7e216",
+        "scaleReferenceHeight": 205
+      },
+      "2,4": {
+        "region": [
+          426,
+          934,
+          216,
+          144
+        ],
+        "bounds": [
+          0,
+          0,
+          216,
+          144
+        ],
+        "anchor": [
+          108.0,
+          144
+        ],
+        "sha256": "9f47c6dd9c7e0d2da0f29398e179fbd7efe17e5a9deb49abca886cb01255eefb",
+        "scaleReferenceHeight": 205
+      },
+      "3,4": {
+        "region": [
+          642,
+          934,
+          204,
+          144
+        ],
+        "bounds": [
+          0,
+          0,
+          204,
+          144
+        ],
+        "anchor": [
+          102.0,
+          144
+        ],
+        "sha256": "b7793a306d6182eea55f69ecf8219781cf3ee8be71b6c1f1a7d1fdd8b8c1f5b4",
+        "scaleReferenceHeight": 205
+      },
+      "4,4": {
+        "region": [
+          846,
+          934,
+          213,
+          144
+        ],
+        "bounds": [
+          0,
+          0,
+          213,
+          144
+        ],
+        "anchor": [
+          106.5,
+          144
+        ],
+        "sha256": "4555b2635d53e49acd75390bdc00e71a3b0666fe2409db1ce445921d1571d8b0",
+        "scaleReferenceHeight": 209
+      },
+      "5,4": {
+        "region": [
+          1059,
+          934,
+          195,
+          144
+        ],
+        "bounds": [
+          0,
+          0,
+          194,
+          144
+        ],
+        "anchor": [
+          97.0,
+          144
+        ],
+        "sha256": "fa5226a896f584d425d17c65641949c132044bb85cbd7babe5eedf6973fb8826",
+        "scaleReferenceHeight": 201
+      },
+      "0,5": {
+        "region": [
+          0,
+          1078,
+          218,
+          176
+        ],
+        "bounds": [
+          0,
+          0,
+          217,
+          176
+        ],
+        "anchor": [
+          108.5,
+          176
+        ],
+        "sha256": "42be7720cd1c4ccc728cbe54bef044051594e5d7ffc44d5b05c27ca50fe43305"
+      },
+      "1,5": {
+        "region": [
+          218,
+          1078,
+          208,
+          176
+        ],
+        "bounds": [
+          0,
+          0,
+          204,
+          176
+        ],
+        "anchor": [
+          102.0,
+          176
+        ],
+        "sha256": "2a0e4421f157983e734f9dd35191f29106106894b3b031c65186a6eca37d31eb"
+      },
+      "2,5": {
+        "region": [
+          426,
+          1078,
+          210,
+          176
+        ],
+        "bounds": [
+          1,
+          0,
+          209,
+          176
+        ],
+        "anchor": [
+          105.5,
+          176
+        ],
+        "sha256": "8419f4473a9364596f2651a84368060ea792bc9d6c693c7ea8366eb7d282d7c6"
+      },
+      "3,5": {
+        "region": [
+          636,
+          1078,
+          210,
+          176
+        ],
+        "bounds": [
+          0,
+          0,
+          210,
+          176
+        ],
+        "anchor": [
+          105.0,
+          176
+        ],
+        "sha256": "a3a2df43364a37a2291a29ba352f57c6a72e41cc16c670fc6123d20d21a287cc"
+      },
+      "4,5": {
+        "region": [
+          846,
+          1078,
+          214,
+          176
+        ],
+        "bounds": [
+          0,
+          0,
+          214,
+          176
+        ],
+        "anchor": [
+          107.0,
+          176
+        ],
+        "sha256": "818a16f282f3e14074eaa8b28f0a0e0815c1c218a3cd45bc31f23fbd67b2b670"
+      },
+      "5,5": {
+        "region": [
+          1060,
+          1078,
+          194,
+          176
+        ],
+        "bounds": [
+          0,
+          0,
+          178,
+          176
+        ],
+        "anchor": [
+          89.0,
+          176
+        ],
+        "sha256": "7d0b3372bd10488dcb43f98ce6cd213ee27e3db2f0482218afe31b45c4216555"
+      }
+    }
+  },
+  "terrain-trunk": {
+    "path": "/tmp/pigeon-v21-art/terrain-trunk.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      4,
+      4
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.3882396109165185,
+    "sha256": "9b71cbda74e9a035ac15d9e000869840a4cdc74239cb344353cdf8fe53ea1436",
+    "cells": {
+      "0,0": {
+        "region": [
+          1,
+          0,
+          311,
+          313
+        ],
+        "bounds": [
+          0,
+          0,
+          311,
+          313
+        ],
+        "anchor": [
+          155.5,
+          313
+        ],
+        "sha256": "11278aa9fb6d92d4607d6bdd121484b8e4051138dc86f7b6bf809c8789281cb2"
+      },
+      "1,0": {
+        "region": [
+          307,
+          39,
+          326,
+          276
+        ],
+        "bounds": [
+          0,
+          0,
+          326,
+          276
+        ],
+        "anchor": [
+          163.0,
+          276
+        ],
+        "sha256": "f5ddc9b35fd1e75764ccba5480b47bd006a99e08cb50ac5ed3d6caf03924176a"
+      },
+      "2,0": {
+        "region": [
+          625,
+          139,
+          319,
+          177
+        ],
+        "bounds": [
+          0,
+          0,
+          319,
+          177
+        ],
+        "anchor": [
+          159.5,
+          177
+        ],
+        "sha256": "ae101478a6e5b9d87bc897e3df697842051ff6a8346f80675c72b9dbb7954b2e"
+      },
+      "3,0": {
+        "region": [
+          1038,
+          0,
+          169,
+          317
+        ],
+        "bounds": [
+          0,
+          0,
+          169,
+          317
+        ],
+        "anchor": [
+          84.5,
+          317
+        ],
+        "sha256": "8a20b1c22daae6d498b6bfa019dd5dd3b3ee7d5436f3ce6b42bf2bc8eeb52926"
+      },
+      "0,1": {
+        "region": [
+          5,
+          310,
+          306,
+          322
+        ],
+        "bounds": [
+          1,
+          0,
+          305,
+          322
+        ],
+        "anchor": [
+          153.5,
+          322
+        ],
+        "sha256": "0e1b1a1e0c1c0bf5cf4ad7530d8d7f819ab299dde40f59eb6b1e27c441e1e94d"
+      },
+      "1,1": {
+        "region": [
+          334,
+          322,
+          278,
+          308
+        ],
+        "bounds": [
+          0,
+          0,
+          278,
+          308
+        ],
+        "anchor": [
+          139.0,
+          308
+        ],
+        "sha256": "6dc903c2d4a088d99778ef5cbdef3c863681204b6885ff94fce2de53a048869a"
+      },
+      "2,1": {
+        "region": [
+          646,
+          332,
+          286,
+          287
+        ],
+        "bounds": [
+          0,
+          0,
+          286,
+          287
+        ],
+        "anchor": [
+          143.0,
+          287
+        ],
+        "sha256": "726a45c246df1f3053c1bf34fbaf0812f9f2fa35a8d1ee82cd46b8f354f87f4f"
+      },
+      "3,1": {
+        "region": [
+          996,
+          317,
+          202,
+          319
+        ],
+        "bounds": [
+          0,
+          0,
+          201,
+          319
+        ],
+        "anchor": [
+          100.5,
+          319
+        ],
+        "sha256": "43c395fdbb2394f35abe38da253b56f3615d5eea7d78de4743e3fc254bac77b4"
+      },
+      "0,2": {
+        "region": [
+          5,
+          744,
+          207,
+          154
+        ],
+        "bounds": [
+          0,
+          0,
+          207,
+          154
+        ],
+        "anchor": [
+          103.5,
+          154
+        ],
+        "sha256": "92e5d9ff5cd59cffd6cd09c17ad69de0105788fd80206242b7c4a8a4f97ea5e3"
+      },
+      "1,2": {
+        "region": [
+          218,
+          735,
+          335,
+          160
+        ],
+        "bounds": [
+          0,
+          0,
+          335,
+          160
+        ],
+        "anchor": [
+          167.5,
+          160
+        ],
+        "sha256": "aa286edb9dadf90188cf32394aec57ef93a47ce47a753b145d5f359745902c47"
+      },
+      "2,2": {
+        "region": [
+          554,
+          735,
+          403,
+          163
+        ],
+        "bounds": [
+          0,
+          0,
+          403,
+          163
+        ],
+        "anchor": [
+          201.5,
+          163
+        ],
+        "sha256": "f66eb92c4f900c82ff2e2eb1f25c68f84d14f07a6e7ec99c2caf574453329504"
+      },
+      "3,2": {
+        "region": [
+          944,
+          749,
+          306,
+          187
+        ],
+        "bounds": [
+          0,
+          0,
+          306,
+          187
+        ],
+        "anchor": [
+          153.0,
+          187
+        ],
+        "sha256": "0a73a37a77c2af3a2bf67ef92f80ae8c273fb146f288a4aa4dbd1e19ecc80e72"
+      },
+      "0,3": {
+        "region": [
+          3,
+          944,
+          306,
+          295
+        ],
+        "bounds": [
+          0,
+          0,
+          306,
+          294
+        ],
+        "anchor": [
+          153.0,
+          294
+        ],
+        "sha256": "22e7dd1bc1c56f5f2c15583f76468408f40043580e44dd4ea4358b32e2babbc6"
+      },
+      "1,3": {
+        "region": [
+          365,
+          929,
+          249,
+          325
+        ],
+        "bounds": [
+          0,
+          0,
+          249,
+          325
+        ],
+        "anchor": [
+          124.5,
+          325
+        ],
+        "sha256": "f8667d13de3ea57a7f7ebd3dece5b1a7fce61213c01f2bc2561e50aac82c4992"
+      },
+      "2,3": {
+        "region": [
+          626,
+          931,
+          315,
+          323
+        ],
+        "bounds": [
+          0,
+          0,
+          315,
+          323
+        ],
+        "anchor": [
+          157.5,
+          323
+        ],
+        "sha256": "d393c4e1309eaf15a85c37d02962c93a532626a147035a68f6e84472d3b862b6"
+      },
+      "3,3": {
+        "region": [
+          933,
+          975,
+          321,
+          276
+        ],
+        "bounds": [
+          0,
+          0,
+          321,
+          276
+        ],
+        "anchor": [
+          160.5,
+          276
+        ],
+        "sha256": "a52faebe7e4c57cc5697530a1ebfecca295e7ecf4e198128ee944f7b72d9ca33"
+      }
+    }
+  },
+  "props-trunk": {
+    "path": "/tmp/pigeon-v21-art/props-trunk.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      6,
+      6
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.36047773122817195,
+    "sha256": "5ee8d4dbc0bebb574ba6a02cfc26cad9c5fb9703efa14fd472cbf7ff071c8830",
+    "cells": {
+      "0,0": {
+        "region": [
+          0,
+          0,
+          246,
+          299
+        ],
+        "bounds": [
+          0,
+          0,
+          246,
+          299
+        ],
+        "anchor": [
+          123.0,
+          299
+        ],
+        "sha256": "aec0686b6d040ff582a864544c9b77d3aab09cf4ac7fdd6dd2c0f316e3dbf744"
+      },
+      "1,0": {
+        "region": [
+          246,
+          0,
+          244,
+          299
+        ],
+        "bounds": [
+          0,
+          0,
+          244,
+          299
+        ],
+        "anchor": [
+          122.0,
+          299
+        ],
+        "sha256": "e1505dcada6aec82ff9f8ee24d693e4f414b28e2f4fef8008b89a6df27c268f0"
+      },
+      "2,0": {
+        "region": [
+          490,
+          0,
+          250,
+          299
+        ],
+        "bounds": [
+          0,
+          17,
+          250,
+          282
+        ],
+        "anchor": [
+          125.0,
+          299
+        ],
+        "sha256": "7ee05130330e40eb57c17bddf3c545b9df0a9d195c1c6812fd78ce7a729ea899"
+      },
+      "3,0": {
+        "region": [
+          740,
+          0,
+          203,
+          299
+        ],
+        "bounds": [
+          0,
+          41,
+          203,
+          258
+        ],
+        "anchor": [
+          101.5,
+          299
+        ],
+        "sha256": "bbe62a63387b8636f6ec57b80f26f21ad055bc6fc664d5b02b4c062da611bf6d"
+      },
+      "4,0": {
+        "region": [
+          943,
+          0,
+          121,
+          299
+        ],
+        "bounds": [
+          0,
+          46,
+          121,
+          253
+        ],
+        "anchor": [
+          60.5,
+          299
+        ],
+        "sha256": "b54fff94d15ecbe3ea9f23c81982010200ea867e605ee843c3b9bfa11cbddddf"
+      },
+      "5,0": {
+        "region": [
+          1064,
+          0,
+          190,
+          299
+        ],
+        "bounds": [
+          0,
+          19,
+          190,
+          280
+        ],
+        "anchor": [
+          95.0,
+          299
+        ],
+        "sha256": "cf713ce6b316785f1fb31e0b27d3a3b45922b21fc8fbe1b6501c95a7bffa5de5"
+      },
+      "0,1": {
+        "region": [
+          0,
+          299,
+          218,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          218,
+          210
+        ],
+        "anchor": [
+          109.0,
+          210
+        ],
+        "sha256": "8943f2c0cc7348863821a248711daf3f8d07844e757465c7db4cccc06d083e3c",
+        "scaleReferenceHeight": 210
+      },
+      "1,1": {
+        "region": [
+          218,
+          299,
+          208,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          208,
+          210
+        ],
+        "anchor": [
+          104.0,
+          210
+        ],
+        "sha256": "77c96417a62624b1458d3df8f2e01e8e7b795e99ffc64daf01b338538d7cfbb7",
+        "scaleReferenceHeight": 210
+      },
+      "2,1": {
+        "region": [
+          426,
+          299,
+          209,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          209,
+          210
+        ],
+        "anchor": [
+          104.5,
+          210
+        ],
+        "sha256": "aa40326bfed25d0f6a70489befc267c47b1fb0d88690066f1761f9fa4cca11c1",
+        "scaleReferenceHeight": 210
+      },
+      "3,1": {
+        "region": [
+          635,
+          299,
+          211,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          211,
+          210
+        ],
+        "anchor": [
+          105.5,
+          210
+        ],
+        "sha256": "a3b1be123f9f39310d4e33e4a35318191b0936b7edd7ec23fbfc309bc7aff8f3",
+        "scaleReferenceHeight": 210
+      },
+      "4,1": {
+        "region": [
+          846,
+          299,
+          214,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          214,
+          210
+        ],
+        "anchor": [
+          107.0,
+          210
+        ],
+        "sha256": "c6c53e74d2eeba50e3cbabbddf6dde62934f5cabce4b7658e4fa4ef781678b6f",
+        "scaleReferenceHeight": 210
+      },
+      "5,1": {
+        "region": [
+          1060,
+          299,
+          194,
+          210
+        ],
+        "bounds": [
+          0,
+          0,
+          178,
+          210
+        ],
+        "anchor": [
+          89.0,
+          210
+        ],
+        "sha256": "8c595b5b4949532cd51d290dbdb9301bb69e013a587c3a09b1c7904f16d0055e",
+        "scaleReferenceHeight": 210
+      },
+      "0,2": {
+        "region": [
+          0,
+          509,
+          218,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          218,
+          204
+        ],
+        "anchor": [
+          109.0,
+          204
+        ],
+        "sha256": "62c90a9b77c95f8145e6844c8fcbb0e3229c674ea245b790014d4c35483760a8",
+        "scaleReferenceHeight": 210
+      },
+      "1,2": {
+        "region": [
+          218,
+          509,
+          208,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          208,
+          204
+        ],
+        "anchor": [
+          104.0,
+          204
+        ],
+        "sha256": "9c9a185dde6389a5b59279f4b0cd3de18fee9e1bbe0de404e97156d781b27bd8",
+        "scaleReferenceHeight": 210
+      },
+      "2,2": {
+        "region": [
+          426,
+          509,
+          210,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          210,
+          204
+        ],
+        "anchor": [
+          105.0,
+          204
+        ],
+        "sha256": "e9fdb372d7a0a3cf5b3f0ebed0cc99b95e1027f0101bbdc4296bab44a95b5469",
+        "scaleReferenceHeight": 210
+      },
+      "3,2": {
+        "region": [
+          636,
+          509,
+          210,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          210,
+          204
+        ],
+        "anchor": [
+          105.0,
+          204
+        ],
+        "sha256": "3ec074784f745f93549b4ef6b0e24f6e98ea4f479f623e7cfbf9d3bab0f2dd87",
+        "scaleReferenceHeight": 210
+      },
+      "4,2": {
+        "region": [
+          846,
+          509,
+          214,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          213,
+          204
+        ],
+        "anchor": [
+          106.5,
+          204
+        ],
+        "sha256": "b0dd63e8d064ef40ec44e971fb659a1d07d0edfd7d6ee6c3a68819b838ac7a25",
+        "scaleReferenceHeight": 210
+      },
+      "5,2": {
+        "region": [
+          1060,
+          509,
+          194,
+          204
+        ],
+        "bounds": [
+          0,
+          0,
+          193,
+          204
+        ],
+        "anchor": [
+          96.5,
+          204
+        ],
+        "sha256": "054c7eae90e250f8a6fa5d69510f79302b1e912a6fedd03759b42e1bab091b28",
+        "scaleReferenceHeight": 210
+      },
+      "0,3": {
+        "region": [
+          0,
+          713,
+          217,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          217,
+          238
+        ],
+        "anchor": [
+          108.5,
+          238
+        ],
+        "sha256": "ae9f085063128ed80dc21c2a38f6aacc939340c0bf02ad41f7b7baa199965dc3",
+        "scaleReferenceHeight": 210
+      },
+      "1,3": {
+        "region": [
+          217,
+          713,
+          209,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          209,
+          238
+        ],
+        "anchor": [
+          104.5,
+          238
+        ],
+        "sha256": "19f33589c9112b02d75baa566262c5345665c0157fa9e8af7b7ab6e4c2a949e0",
+        "scaleReferenceHeight": 210
+      },
+      "2,3": {
+        "region": [
+          426,
+          713,
+          210,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          210,
+          238
+        ],
+        "anchor": [
+          105.0,
+          238
+        ],
+        "sha256": "7103e9d32576a3275db0c02e2fb204d1314b2dd5d40b84a796e190d9b99c7913",
+        "scaleReferenceHeight": 210
+      },
+      "3,3": {
+        "region": [
+          636,
+          713,
+          210,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          210,
+          238
+        ],
+        "anchor": [
+          105.0,
+          238
+        ],
+        "sha256": "85b6629766832843d8955e9fde1d79b1679dee587c8556f27fbe47f9b080bee4",
+        "scaleReferenceHeight": 210
+      },
+      "4,3": {
+        "region": [
+          846,
+          713,
+          214,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          214,
+          232
+        ],
+        "anchor": [
+          107.0,
+          232
+        ],
+        "sha256": "2761b2023a08104569617296474b70b73ad9c78478f239c5f0df3de5cdca831c",
+        "scaleReferenceHeight": 210
+      },
+      "5,3": {
+        "region": [
+          1060,
+          713,
+          194,
+          238
+        ],
+        "bounds": [
+          0,
+          0,
+          193,
+          238
+        ],
+        "anchor": [
+          96.5,
+          238
+        ],
+        "sha256": "e761d3b15df23d5094ba242d8724a204e728f3817905749b51a7421b044a2665",
+        "scaleReferenceHeight": 210
+      },
+      "0,4": {
+        "region": [
+          0,
+          951,
+          211,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          211,
+          146
+        ],
+        "anchor": [
+          105.5,
+          146
+        ],
+        "sha256": "469b3f47934d314692cab21f82e4520b410ed58e04e00a8eab86dea862edc96c",
+        "scaleReferenceHeight": 210
+      },
+      "1,4": {
+        "region": [
+          211,
+          951,
+          215,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          215,
+          147
+        ],
+        "anchor": [
+          107.5,
+          147
+        ],
+        "sha256": "6180b36403eddd9a324e33e8d1dec5d7a42ee92aba37c84010c221ef71ffe415",
+        "scaleReferenceHeight": 210
+      },
+      "2,4": {
+        "region": [
+          426,
+          951,
+          209,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          209,
+          151
+        ],
+        "anchor": [
+          104.5,
+          151
+        ],
+        "sha256": "2d05918c46047ddaf39fa2d4463ca44871925909314887961a3bc632e0d96e3f",
+        "scaleReferenceHeight": 210
+      },
+      "3,4": {
+        "region": [
+          635,
+          951,
+          208,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          208,
+          151
+        ],
+        "anchor": [
+          104.0,
+          151
+        ],
+        "sha256": "ecc7b4668a8e542217c9bbb2ba0f812ff48cfed4be99de4620fbbbeb541e1eba",
+        "scaleReferenceHeight": 210
+      },
+      "4,4": {
+        "region": [
+          843,
+          951,
+          217,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          217,
+          151
+        ],
+        "anchor": [
+          108.5,
+          151
+        ],
+        "sha256": "b7649556df217e8ea19259797518c800262a3c0b89f79b6ec78d5e419986d0b6",
+        "scaleReferenceHeight": 210
+      },
+      "5,4": {
+        "region": [
+          1060,
+          951,
+          194,
+          151
+        ],
+        "bounds": [
+          0,
+          0,
+          193,
+          151
+        ],
+        "anchor": [
+          96.5,
+          151
+        ],
+        "sha256": "e116991b85af8da61b50d31ec6af5440b4c834101ad63eaaac25a3deb69cd7b8",
+        "scaleReferenceHeight": 210
+      },
+      "0,5": {
+        "region": [
+          0,
+          1102,
+          216,
+          152
+        ],
+        "bounds": [
+          0,
+          8,
+          216,
+          144
+        ],
+        "anchor": [
+          108.0,
+          152
+        ],
+        "sha256": "b09b0d648eda6c584b566e79875036e2b38dc5f56af69131f2f7f971ea42d24e"
+      },
+      "1,5": {
+        "region": [
+          216,
+          1102,
+          210,
+          152
+        ],
+        "bounds": [
+          0,
+          6,
+          210,
+          146
+        ],
+        "anchor": [
+          105.0,
+          152
+        ],
+        "sha256": "38d0f5a1b46b667fbbb01d5ebda4b8c73a48410fa414db78b0c15566928873ec"
+      },
+      "2,5": {
+        "region": [
+          426,
+          1102,
+          205,
+          152
+        ],
+        "bounds": [
+          1,
+          0,
+          204,
+          152
+        ],
+        "anchor": [
+          103.0,
+          152
+        ],
+        "sha256": "0c34ffcc69c0706b787973e1a044dd9f3e9c95e188c3f6192c6b0126e668ee2b"
+      },
+      "3,5": {
+        "region": [
+          631,
+          1102,
+          215,
+          152
+        ],
+        "bounds": [
+          0,
+          0,
+          215,
+          152
+        ],
+        "anchor": [
+          107.5,
+          152
+        ],
+        "sha256": "29bc5c37ef4a01d6c2a8267c3f032dfbb1003cae28a2b2bcefec5f1e2d6b1733"
+      },
+      "4,5": {
+        "region": [
+          846,
+          1102,
+          214,
+          152
+        ],
+        "bounds": [
+          0,
+          0,
+          214,
+          152
+        ],
+        "anchor": [
+          107.0,
+          152
+        ],
+        "sha256": "bbcb0aea37c0f02b327937cd45c78c75bffd30ca4fbae2899b5f5c8077070366"
+      },
+      "5,5": {
+        "region": [
+          1060,
+          1102,
+          194,
+          152
+        ],
+        "bounds": [
+          0,
+          0,
+          182,
+          138
+        ],
+        "anchor": [
+          91.0,
+          138
+        ],
+        "sha256": "85502a71ed9c3a4286981ed122c923b5996e68d5c91eb1c14bb47534ff42bbcd"
+      }
+    }
+  },
+  "terrain-sky": {
+    "path": "/tmp/pigeon-v21-art/terrain-sky.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      4,
+      4
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.3633851738233506,
+    "sha256": "9942a34f9acffd5ae4fb52f26c1911905298bfe55cd2549dc1dc07e0b9a84918",
+    "cells": {
+      "0,0": {
+        "region": [
+          4,
+          4,
+          313,
+          311
+        ],
+        "bounds": [
+          0,
+          0,
+          313,
+          311
+        ],
+        "anchor": [
+          156.5,
+          311
+        ],
+        "sha256": "904a3209fa8a52dfa1581feaeff540b9a4045482115258440718d82e713b7db5"
+      },
+      "1,0": {
+        "region": [
+          315,
+          54,
+          313,
+          249
+        ],
+        "bounds": [
+          0,
+          0,
+          313,
+          249
+        ],
+        "anchor": [
+          156.5,
+          249
+        ],
+        "sha256": "6c65986a64101d0a4ddf4aaf763b79b9feebdc3984f09add026832d10dac5be4"
+      },
+      "2,0": {
+        "region": [
+          627,
+          101,
+          338,
+          239
+        ],
+        "bounds": [
+          0,
+          0,
+          338,
+          239
+        ],
+        "anchor": [
+          169.0,
+          239
+        ],
+        "sha256": "de5ce91813d6e091e005f08d5397fc6560f8612240fc3d7ee9c23e0ccee7e9e3"
+      },
+      "3,0": {
+        "region": [
+          1009,
+          0,
+          191,
+          313
+        ],
+        "bounds": [
+          0,
+          0,
+          191,
+          313
+        ],
+        "anchor": [
+          95.5,
+          313
+        ],
+        "sha256": "5b94db2da9dccf03ce31866bc15997f0bf5b92f111aef43cd8b00205eb623f27"
+      },
+      "0,1": {
+        "region": [
+          11,
+          313,
+          291,
+          320
+        ],
+        "bounds": [
+          0,
+          0,
+          291,
+          320
+        ],
+        "anchor": [
+          145.5,
+          320
+        ],
+        "sha256": "a38682bbf06966304ebb9c9267e684d8b0f4688421a8826c1a06fd0f453c570b"
+      },
+      "1,1": {
+        "region": [
+          360,
+          324,
+          254,
+          306
+        ],
+        "bounds": [
+          0,
+          0,
+          254,
+          306
+        ],
+        "anchor": [
+          127.0,
+          306
+        ],
+        "sha256": "530a110285ce26e8dee508f455fa10f779cdfd2e6d7e7b32505fcef361395f8f"
+      },
+      "2,1": {
+        "region": [
+          669,
+          344,
+          228,
+          289
+        ],
+        "bounds": [
+          0,
+          0,
+          228,
+          289
+        ],
+        "anchor": [
+          114.0,
+          289
+        ],
+        "sha256": "0ae190c444025b9d7e4deab79129fe43883253c84abd6e272aa3df1b606049a5"
+      },
+      "3,1": {
+        "region": [
+          1000,
+          313,
+          205,
+          320
+        ],
+        "bounds": [
+          0,
+          0,
+          205,
+          320
+        ],
+        "anchor": [
+          102.5,
+          320
+        ],
+        "sha256": "d2d8f28a45b8896db7e947d01103a6753f7e85f699e583b38374ea95b4447662"
+      },
+      "0,2": {
+        "region": [
+          35,
+          727,
+          223,
+          127
+        ],
+        "bounds": [
+          0,
+          0,
+          223,
+          127
+        ],
+        "anchor": [
+          111.5,
+          127
+        ],
+        "sha256": "93d84be462fd983e83e11a0b2d2ff80b0f8c2a2b53814eabcad66a3422861c3f"
+      },
+      "1,2": {
+        "region": [
+          277,
+          718,
+          257,
+          172
+        ],
+        "bounds": [
+          0,
+          0,
+          257,
+          172
+        ],
+        "anchor": [
+          128.5,
+          172
+        ],
+        "sha256": "dd6f3e5ca3c95ac98e910cf299fa6683d8c6c6db886bb83c06b76970205bd972"
+      },
+      "2,2": {
+        "region": [
+          540,
+          699,
+          443,
+          174
+        ],
+        "bounds": [
+          0,
+          0,
+          443,
+          174
+        ],
+        "anchor": [
+          221.5,
+          174
+        ],
+        "sha256": "a72611bf50c0db61a6d7cf3f827c8f81e9c2916930b059ea8013088aea3bbfb2"
+      },
+      "3,2": {
+        "region": [
+          957,
+          728,
+          287,
+          175
+        ],
+        "bounds": [
+          0,
+          0,
+          287,
+          175
+        ],
+        "anchor": [
+          143.5,
+          175
+        ],
+        "sha256": "8a3026a3b92f014d969321692a74cdb6cd9f22dba7c97db07e031555abcaaa1e"
+      },
+      "0,3": {
+        "region": [
+          7,
+          926,
+          313,
+          303
+        ],
+        "bounds": [
+          0,
+          0,
+          313,
+          303
+        ],
+        "anchor": [
+          156.5,
+          303
+        ],
+        "sha256": "4f7f4f32779490be588e2b65e8c103e6210f155bea05e35257168fae53dd8ee5"
+      },
+      "1,3": {
+        "region": [
+          345,
+          925,
+          232,
+          323
+        ],
+        "bounds": [
+          0,
+          0,
+          232,
+          323
+        ],
+        "anchor": [
+          116.0,
+          323
+        ],
+        "sha256": "c7a3a5d5a9700e457014f089f0ec2bf30ddad31600a2bb30c70f9960f71ecbc3"
+      },
+      "2,3": {
+        "region": [
+          621,
+          924,
+          321,
+          324
+        ],
+        "bounds": [
+          0,
+          0,
+          321,
+          324
+        ],
+        "anchor": [
+          160.5,
+          324
+        ],
+        "sha256": "cb19f24b694803f24bcdd85f2607e3267de7d052d8ce875d860a070c7e2517f8"
+      },
+      "3,3": {
+        "region": [
+          939,
+          995,
+          312,
+          237
+        ],
+        "bounds": [
+          0,
+          0,
+          312,
+          237
+        ],
+        "anchor": [
+          156.0,
+          237
+        ],
+        "sha256": "c2c39775d5bc03291a5e1e7ced9780c843d4addc883ddb02a0cd48c52d9c7487"
+      }
+    }
+  },
+  "props-sky": {
+    "path": "/tmp/pigeon-v21-art/props-sky.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "grid": [
+      6,
+      6
+    ],
+    "layout": "metadata.region is authoritative; generated cells are nonuniform; no image pixels have been edited",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "fully_transparent_fraction": 0.43505630467352957,
+    "sha256": "bcd1c855ca784992e00655ce307838c6e0150f5e07857134cae4922c48ed0068",
+    "cells": {
+      "0,0": {
+        "region": [
+          0,
+          0,
+          258,
+          300
+        ],
+        "bounds": [
+          0,
+          0,
+          258,
+          300
+        ],
+        "anchor": [
+          129.0,
+          300
+        ],
+        "sha256": "742dc1b6824101095e61079e7642e25233dd3c450862a6c25d2314d3c0bec3f2"
+      },
+      "1,0": {
+        "region": [
+          258,
+          0,
+          189,
+          300
+        ],
+        "bounds": [
+          0,
+          31,
+          189,
+          269
+        ],
+        "anchor": [
+          94.5,
+          300
+        ],
+        "sha256": "457cd5d20bb2a79cf01aa92ceaba45870dff3da81214398b23958b394f8d6ee5"
+      },
+      "2,0": {
+        "region": [
+          447,
+          0,
+          243,
+          300
+        ],
+        "bounds": [
+          0,
+          21,
+          243,
+          279
+        ],
+        "anchor": [
+          121.5,
+          300
+        ],
+        "sha256": "399ff276b52c23d2b6ea0d6f9f3aa0b4eb482a187d0dc26e5fcf07f3178349fa"
+      },
+      "3,0": {
+        "region": [
+          690,
+          0,
+          163,
+          300
+        ],
+        "bounds": [
+          0,
+          19,
+          163,
+          281
+        ],
+        "anchor": [
+          81.5,
+          300
+        ],
+        "sha256": "ac67f3215e28f75278591ce36e8f3c26a09e3b0496efc0bf52fff23e6f6f5a63"
+      },
+      "4,0": {
+        "region": [
+          853,
+          0,
+          217,
+          300
+        ],
+        "bounds": [
+          0,
+          17,
+          217,
+          283
+        ],
+        "anchor": [
+          108.5,
+          300
+        ],
+        "sha256": "726b6d0a0a966847c2fbfa6abc6e53419655f0c0ad4d5ee0f8a30d3613d1fd2e"
+      },
+      "5,0": {
+        "region": [
+          1070,
+          0,
+          184,
+          300
+        ],
+        "bounds": [
+          0,
+          31,
+          184,
+          269
+        ],
+        "anchor": [
+          92.0,
+          300
+        ],
+        "sha256": "e8d118f1508cf0a57dc068b65f929942239d4e24716d21c3d2551541dd6672c5"
+      },
+      "0,1": {
+        "region": [
+          0,
+          300,
+          218,
+          216
+        ],
+        "bounds": [
+          0,
+          0,
+          218,
+          216
+        ],
+        "anchor": [
+          109.0,
+          216
+        ],
+        "sha256": "05e6ec50cc3c712b51fdd6695ba987595928de499979b676ae5620f0a579b5b1",
+        "scaleReferenceHeight": 216
+      },
+      "1,1": {
+        "region": [
+          218,
+          300,
+          211,
+          216
+        ],
+        "bounds": [
+          0,
+          0,
+          211,
+          216
+        ],
+        "anchor": [
+          105.5,
+          216
+        ],
+        "sha256": "09eaf3312da33f28f76b766127e1355cdd874e992c5b288d99f007a176b29a12",
+        "scaleReferenceHeight": 216
+      },
+      "2,1": {
+        "region": [
+          429,
+          300,
+          216,
+          216
+        ],
+        "bounds": [
+          0,
+          0,
+          216,
+          216
+        ],
+        "anchor": [
+          108.0,
+          216
+        ],
+        "sha256": "8b8b69f4007d7a744f6fd74db06c21dd3b3a786fc1beb7e360ad1cd4928041d4",
+        "scaleReferenceHeight": 216
+      },
+      "3,1": {
+        "region": [
+          645,
+          300,
+          201,
+          216
+        ],
+        "bounds": [
+          0,
+          0,
+          201,
+          216
+        ],
+        "anchor": [
+          100.5,
+          216
+        ],
+        "sha256": "f8b594ce2813bc29e8f907635e1d3829fcc3dff90a08acc61e78fb17ccfd0ae4",
+        "scaleReferenceHeight": 216
+      },
+      "4,1": {
+        "region": [
+          846,
+          300,
+          214,
+          216
+        ],
+        "bounds": [
+          0,
+          0,
+          209,
+          216
+        ],
+        "anchor": [
+          104.5,
+          216
+        ],
+        "sha256": "4df120756ca2f18a03ab7e86789c5e5384924f0c4faac8af1669a0237ce0128d",
+        "scaleReferenceHeight": 216
+      },
+      "5,1": {
+        "region": [
+          1060,
+          300,
+          194,
+          216
+        ],
+        "bounds": [
+          6,
+          0,
+          188,
+          216
+        ],
+        "anchor": [
+          100.0,
+          216
+        ],
+        "sha256": "6dd645a683d60c3c937ff7858b3c2f109e42cbd6e757e2061902c4dad4805d0c",
+        "scaleReferenceHeight": 216
+      },
+      "0,2": {
+        "region": [
+          0,
+          516,
+          218,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          218,
+          195
+        ],
+        "anchor": [
+          109.0,
+          195
+        ],
+        "sha256": "c7fd6f2477885dc71ed5700c875c34b035615c46c2081f0947ecdaa0b5bb9cca",
+        "scaleReferenceHeight": 216
+      },
+      "1,2": {
+        "region": [
+          218,
+          516,
+          223,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          223,
+          195
+        ],
+        "anchor": [
+          111.5,
+          195
+        ],
+        "sha256": "1403c440b9b0f1dedd7fac054d0528467833f74856e6f37cdb1ec50ddaeebe89",
+        "scaleReferenceHeight": 216
+      },
+      "2,2": {
+        "region": [
+          441,
+          516,
+          211,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          211,
+          195
+        ],
+        "anchor": [
+          105.5,
+          195
+        ],
+        "sha256": "d035e49d04e30161b974dd881c638352fcfc3865aead66f7d92a612924f01305",
+        "scaleReferenceHeight": 216
+      },
+      "3,2": {
+        "region": [
+          652,
+          516,
+          194,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          194,
+          195
+        ],
+        "anchor": [
+          97.0,
+          195
+        ],
+        "sha256": "d108f6663b2e830ab404824337946ad09d2ec5209ca51508ab838527d5491019",
+        "scaleReferenceHeight": 216
+      },
+      "4,2": {
+        "region": [
+          846,
+          516,
+          217,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          217,
+          195
+        ],
+        "anchor": [
+          108.5,
+          195
+        ],
+        "sha256": "0e05a2dc6fd9be8171b1e73c124878dd1d60d9a6f105eaf8eaec33703c87a432",
+        "scaleReferenceHeight": 216
+      },
+      "5,2": {
+        "region": [
+          1063,
+          516,
+          191,
+          195
+        ],
+        "bounds": [
+          0,
+          0,
+          191,
+          195
+        ],
+        "anchor": [
+          95.5,
+          195
+        ],
+        "sha256": "fa2cffc90d0bbac56072985390433f262866b80ff79b276ef2f14ce201b96e68",
+        "scaleReferenceHeight": 216
+      },
+      "0,3": {
+        "region": [
+          0,
+          711,
+          220,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          220,
+          232
+        ],
+        "anchor": [
+          110.0,
+          232
+        ],
+        "sha256": "6353dbbecdbdcc58c003cb562f9aa95f871eed5b526ead8a554e1117282ba00b",
+        "scaleReferenceHeight": 216
+      },
+      "1,3": {
+        "region": [
+          220,
+          711,
+          221,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          221,
+          233
+        ],
+        "anchor": [
+          110.5,
+          233
+        ],
+        "sha256": "78eba209a2e1f4e55310200f20bdcac82a46b8f3140b2cb230b3bfc7b052abe2",
+        "scaleReferenceHeight": 216
+      },
+      "2,3": {
+        "region": [
+          441,
+          711,
+          215,
+          233
+        ],
+        "bounds": [
+          0,
+          1,
+          215,
+          232
+        ],
+        "anchor": [
+          107.5,
+          233
+        ],
+        "sha256": "f82305868b0cf9f46173055ad3ba9e22f27fcbaa20e96f7c58f45d09ca3b61ec",
+        "scaleReferenceHeight": 216
+      },
+      "3,3": {
+        "region": [
+          656,
+          711,
+          200,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          200,
+          233
+        ],
+        "anchor": [
+          100.0,
+          233
+        ],
+        "sha256": "e7ccd26b6588198c858a91fa78d7597b7ed6d445f6d0ca7f391cea5a5118cd05",
+        "scaleReferenceHeight": 216
+      },
+      "4,3": {
+        "region": [
+          856,
+          711,
+          220,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          220,
+          233
+        ],
+        "anchor": [
+          110.0,
+          233
+        ],
+        "sha256": "7de4cb7739a172268073b98e51822ab3890686c7e9e3cb1ecbc3fcc5533e025a",
+        "scaleReferenceHeight": 216
+      },
+      "5,3": {
+        "region": [
+          1076,
+          711,
+          178,
+          233
+        ],
+        "bounds": [
+          0,
+          0,
+          178,
+          233
+        ],
+        "anchor": [
+          89.0,
+          233
+        ],
+        "sha256": "09498c06f42adbf4957573fef330c959c18629269704ba06b07fdc9abf03255d",
+        "scaleReferenceHeight": 216
+      },
+      "0,4": {
+        "region": [
+          0,
+          944,
+          223,
+          137
+        ],
+        "bounds": [
+          0,
+          0,
+          223,
+          137
+        ],
+        "anchor": [
+          111.5,
+          137
+        ],
+        "sha256": "b4b84f7dbc9fc9b64ddbf73f9a0f9430a17a4fa4c6025b35a17231aaa3f2002a",
+        "scaleReferenceHeight": 216
+      },
+      "1,4": {
+        "region": [
+          223,
+          944,
+          203,
+          137
+        ],
+        "bounds": [
+          0,
+          3,
+          203,
+          134
+        ],
+        "anchor": [
+          101.5,
+          137
+        ],
+        "sha256": "d3f2cba043946780b09121f2539049af373fa67609af554ac3ea5c0c6b163ea5",
+        "scaleReferenceHeight": 216
+      },
+      "2,4": {
+        "region": [
+          426,
+          944,
+          216,
+          137
+        ],
+        "bounds": [
+          0,
+          0,
+          216,
+          137
+        ],
+        "anchor": [
+          108.0,
+          137
+        ],
+        "sha256": "22bbb4466316b2e86954da33bc186c893b93c83b598ebb9ef97715c16a1ae96f",
+        "scaleReferenceHeight": 216
+      },
+      "3,4": {
+        "region": [
+          642,
+          944,
+          204,
+          137
+        ],
+        "bounds": [
+          0,
+          0,
+          204,
+          137
+        ],
+        "anchor": [
+          102.0,
+          137
+        ],
+        "sha256": "5d96c786230242ef968415da4abf742cf6f3b2743a30bad0f947001e70b994bb",
+        "scaleReferenceHeight": 216
+      },
+      "4,4": {
+        "region": [
+          846,
+          944,
+          214,
+          137
+        ],
+        "bounds": [
+          0,
+          0,
+          214,
+          137
+        ],
+        "anchor": [
+          107.0,
+          137
+        ],
+        "sha256": "e15cf6e4ea48bf616b2c5568df9730386c81c5894e247b32aa0d3d5a84e96888",
+        "scaleReferenceHeight": 216
+      },
+      "5,4": {
+        "region": [
+          1060,
+          944,
+          194,
+          137
+        ],
+        "bounds": [
+          0,
+          0,
+          194,
+          137
+        ],
+        "anchor": [
+          97.0,
+          137
+        ],
+        "sha256": "9522fe9784049e7c6b0497a623a1c127fcb691354b16cbd52574d62c24d5eb05",
+        "scaleReferenceHeight": 216
+      },
+      "0,5": {
+        "region": [
+          0,
+          1081,
+          218,
+          173
+        ],
+        "bounds": [
+          0,
+          0,
+          218,
+          173
+        ],
+        "anchor": [
+          109.0,
+          173
+        ],
+        "sha256": "732573d657253df012dbc6057b5fb256976644282cfe8467f265e048b1306243"
+      },
+      "1,5": {
+        "region": [
+          218,
+          1081,
+          208,
+          173
+        ],
+        "bounds": [
+          0,
+          0,
+          206,
+          173
+        ],
+        "anchor": [
+          103.0,
+          173
+        ],
+        "sha256": "25546498c79b2d37825aa396acff740a0bc54fde90dca5114386335915a0be20"
+      },
+      "2,5": {
+        "region": [
+          426,
+          1081,
+          206,
+          173
+        ],
+        "bounds": [
+          3,
+          0,
+          203,
+          173
+        ],
+        "anchor": [
+          104.5,
+          173
+        ],
+        "sha256": "7399b47d540038239789b010d147ba4e42f0a98710aa96c48b4a10ebf4e6787f"
+      },
+      "3,5": {
+        "region": [
+          632,
+          1081,
+          214,
+          173
+        ],
+        "bounds": [
+          0,
+          0,
+          208,
+          173
+        ],
+        "anchor": [
+          104.0,
+          173
+        ],
+        "sha256": "d2b698ce9747abaad84e72ea6a071cabd00ddfc70e920217239ba0578331b4f9"
+      },
+      "4,5": {
+        "region": [
+          846,
+          1081,
+          221,
+          173
+        ],
+        "bounds": [
+          15,
+          6,
+          206,
+          167
+        ],
+        "anchor": [
+          118.0,
+          173
+        ],
+        "sha256": "1e78f0a8a0e9b8704d005054c6753a4df051dc75525d04989f9401d89c5595d1"
+      },
+      "5,5": {
+        "region": [
+          1067,
+          1081,
+          187,
+          173
+        ],
+        "bounds": [
+          0,
+          0,
+          187,
+          173
+        ],
+        "anchor": [
+          93.5,
+          173
+        ],
+        "sha256": "1be0bc57572c16d5b8628ee196e095522d8acde3a21c317782bb3c41678f4cdc"
+      }
+    }
+  }
+}

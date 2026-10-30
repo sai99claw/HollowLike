@@ -1,0 +1,13 @@
+{
+  "version": 19,
+  "mode": "built-in imagegen",
+  "reference": "assets/walk_v2/common/pigeon/walk_00.png",
+  "assets": [
+    "pigeon-idle.png",
+    "pigeon-rest.png"
+  ],
+  "prompts": {
+    "idle": "Use case: stylized-concept. Asset type: 2D handpainted game character animation spritesheet. Reference image 1 defines EXACT original pigeon identity, greyblue feathers, amber eyes, charcoal beak, iridescent aqua-purple neck, two pink bird feet, long split midnight-blue scarf. Preserve its anatomy and painterly linework, facing RIGHT. Transparent RGBA background, no checkerboard, no text, no grid lines. Precisely four columns by two rows, 8 equally sized square cells in a wide 2:1 sheet, one complete pigeon per cell with generous clear gutters. Same anatomical scale in all frames, no camera movement. Primary request: eight sequential subtle standing idle breathing frames, complete seamless cycle. Both feet remain planted at the exact same baseline. Soft slight chest rise, scarf tiny settling movement, one calm blink in frame5, no walking, no swaying sideways. Start/end almost same posture. This is a quiet 8fps idle loop.",
+    "rest": "Use case: stylized-concept. Asset type: 2D handpainted game character animation spritesheet. Reference image 1 defines EXACT original pigeon identity, greyblue feathers, amber eyes, charcoal beak, iridescent aqua-purple neck, two pink bird feet, long split midnight-blue scarf. Preserve its anatomy and painterly linework, facing RIGHT. Transparent RGBA background, no checkerboard, no text, no grid lines. Precisely four columns by two rows, 8 equally sized square cells in a wide 2:1 sheet, one complete pigeon per cell with generous clear gutters. Same anatomical scale in all frames, no camera movement. Primary request: eight sequential frames of a pigeon settling into a cozy loaf REST ON THE GROUND, NOT IN A NEST. Frame1 standing tall like reference. Frame2 knee tuck, frame3 lowering, frame4 belly close to ground, frame5 feet hidden tucked under body, frame6 fully cozy loaf belly on ground eyes halfclosed, frame7 eyes closed, frame8 softly settled sleepy loaf. Scarf rests behind and along ground. Head anatomy and eye size same as reference. Body changes pose, never shrink character into a miniature; same ground baseline for all frames. No ground drawn. Final pose should hold and subtly breathe. This is an 8fps settle sequence."
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "version": 23,
+  "biomes": {
+    "sky": {
+      "1": {
+        "path": "res://assets/v21/terrain-sky.png",
+        "source_rect": [
+          35,
+          727,
+          223,
+          127
+        ],
+        "surface_y": 22,
+        "body_span": [
+          16,
+          209
+        ],
+        "asset_id": "v21:terrain:sky:8"
+      },
+      "2": {
+        "path": "res://assets/v21/terrain-sky.png",
+        "source_rect": [
+          277,
+          718,
+          257,
+          172
+        ],
+        "surface_y": 33,
+        "body_span": [
+          14,
+          245
+        ],
+        "asset_id": "v21:terrain:sky:9"
+      },
+      "3": {
+        "path": "res://assets/v21/terrain-sky.png",
+        "source_rect": [
+          540,
+          699,
+          443,
+          174
+        ],
+        "surface_y": 51,
+        "body_span": [
+          15,
+          427
+        ],
+        "asset_id": "v21:terrain:sky:10"
+      }
+    },
+    "trunk": {
+      "1": {
+        "path": "res://assets/v21/terrain-trunk.png",
+        "source_rect": [
+          5,
+          744,
+          207,
+          154
+        ],
+        "surface_y": 30,
+        "body_span": [
+          19,
+          185
+        ],
+        "asset_id": "v21:terrain:trunk:8"
+      },
+      "2": {
+        "path": "res://assets/v21/terrain-trunk.png",
+        "source_rect": [
+          218,
+          735,
+          335,
+          160
+        ],
+        "surface_y": 37,
+        "body_span": [
+          15,
+          316
+        ],
+        "asset_id": "v21:terrain:trunk:9"
+      },
+      "3": {
+        "path": "res://assets/v21/terrain-trunk.png",
+        "source_rect": [
+          554,
+          735,
+          403,
+          163
+        ],
+        "surface_y": 37,
+        "body_span": [
+          18,
+          391
+        ],
+        "asset_id": "v21:terrain:trunk:10"
+      }
+    },
+    "underground": {
+      "1": {
+        "path": "res://assets/v21/terrain-underground.png",
+        "source_rect": [
+          32,
+          714,
+          233,
+          158
+        ],
+        "surface_y": 34,
+        "body_span": [
+          23,
+          213
+        ],
+        "asset_id": "v21:terrain:underground:8"
+      },
+      "2": {
+        "path": "res://assets/v21/terrain-underground.png",
+        "source_rect": [
+          276,
+          714,
+          311,
+          173
+        ],
+        "surface_y": 35,
+        "body_span": [
+          43,
+          292
+        ],
+        "asset_id": "v21:terrain:underground:9"
+      },
+      "3": {
+        "path": "res://assets/v21/terrain-underground.png",
+        "source_rect": [
+          595,
+          712,
+          411,
+          178
+        ],
+        "surface_y": 38,
+        "body_span": [
+          21,
+          390
+        ],
+        "asset_id": "v21:terrain:underground:10"
+      }
+    }
+  }
+}

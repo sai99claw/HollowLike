@@ -1,0 +1,775 @@
+{
+  "version": 22,
+  "generator": "built-in image_gen",
+  "note": "Source frames are cells from original generated alpha sheets. Scale is fixed from mature frame width for the entire clip, never resized per frame. Each frame pivot rests at measured planted moss/pebble base; installation uses frames0..4, armed animation frames5..7.",
+  "clips": {
+    "pollen_flower": {
+      "path": "trap-pollen_flower.png",
+      "fps": 8,
+      "reference_width": 412,
+      "world_width": 64,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            222.0,
+            431
+          ],
+          "visible_bounds": [
+            44,
+            219,
+            356,
+            212
+          ],
+          "phase": "install",
+          "sha256": "d69a0d61ee6bcd5f325598ba2637884564a370ca5e43e0febeacc6ae4a9a8ee8"
+        },
+        {
+          "source_rect": [
+            444,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            220.0,
+            432
+          ],
+          "visible_bounds": [
+            42,
+            159,
+            357,
+            273
+          ],
+          "phase": "install",
+          "sha256": "dbba4a3251b093f890875d898d8cfe24e961f1f7c3a3183a2250b536540c47a1"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            217.5,
+            432
+          ],
+          "visible_bounds": [
+            40,
+            123,
+            355,
+            309
+          ],
+          "phase": "install",
+          "sha256": "4e12057d07ad22b1ca069175f065fa860a9ce79cf3fe17a7e053bea90edac220"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            216.0,
+            432
+          ],
+          "visible_bounds": [
+            7,
+            90,
+            412,
+            342
+          ],
+          "phase": "install",
+          "sha256": "67277cc1c93d00d1dd79ede74ef150835a285ece7f5733aa0306916761f28c58"
+        },
+        {
+          "source_rect": [
+            0,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            222.0,
+            394
+          ],
+          "visible_bounds": [
+            27,
+            84,
+            412,
+            310
+          ],
+          "phase": "install",
+          "sha256": "36bdacc0731a81112846d2c0b491361a3cc0f7e8e1ba8a1853d5f1af7cab45d0"
+        },
+        {
+          "source_rect": [
+            444,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            219.5,
+            394
+          ],
+          "visible_bounds": [
+            33,
+            74,
+            390,
+            320
+          ],
+          "phase": "armed",
+          "sha256": "29aee95aac0be0c0de512e95659af6a6e370cc465ccb85fc6cf8d6fb0f1a2171"
+        },
+        {
+          "source_rect": [
+            887,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            217.5,
+            394
+          ],
+          "visible_bounds": [
+            39,
+            96,
+            383,
+            298
+          ],
+          "phase": "armed",
+          "sha256": "ada2eac778d243334c4ebbc517dc1b8fb1bc92a533771efc05f5ef54e33ca93f"
+        },
+        {
+          "source_rect": [
+            1330,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            215.5,
+            394
+          ],
+          "visible_bounds": [
+            38,
+            99,
+            373,
+            295
+          ],
+          "phase": "armed",
+          "sha256": "3544beb2606e7c1c2a5efa3fc2426cd7793e960473ee4711ced7d4ce6e97c0d8"
+        }
+      ],
+      "body_bounds": [
+        -195.0,
+        -310,
+        412,
+        310
+      ],
+      "attack_bounds": [
+        -174.4,
+        -294.5,
+        370.8,
+        294.5
+      ],
+      "arming_frames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "armed_frames": [
+        5,
+        6,
+        7
+      ]
+    },
+    "moss_thorns": {
+      "path": "trap-moss_thorns.png",
+      "fps": 8,
+      "reference_width": 364,
+      "world_width": 64,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            225.0,
+            424
+          ],
+          "visible_bounds": [
+            88,
+            302,
+            274,
+            122
+          ],
+          "phase": "install",
+          "sha256": "c205a24ad03bfaf80a220b381e99e7cb1dee04ffa9da49bf0ad794c48d70ff8f"
+        },
+        {
+          "source_rect": [
+            444,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            228.0,
+            424
+          ],
+          "visible_bounds": [
+            82,
+            225,
+            292,
+            199
+          ],
+          "phase": "install",
+          "sha256": "9d140659ead52af14f32ecea6316ff6c4744bbe406d366d491d9dabaed5bf530"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            210.0,
+            424
+          ],
+          "visible_bounds": [
+            48,
+            176,
+            324,
+            248
+          ],
+          "phase": "install",
+          "sha256": "c5751eeaca38b33c08f31777b2610696e57fce39b1fa557bfb0ffeb6629b4854"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            224.5,
+            424
+          ],
+          "visible_bounds": [
+            49,
+            137,
+            351,
+            287
+          ],
+          "phase": "install",
+          "sha256": "20206f87472652c6c4e28a73c2c0bb24ddc6cd871dc060f2911ed12b166ea4d4"
+        },
+        {
+          "source_rect": [
+            0,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            226.0,
+            379
+          ],
+          "visible_bounds": [
+            44,
+            111,
+            364,
+            268
+          ],
+          "phase": "install",
+          "sha256": "f990eb25b60639e9145d325313071e0f19e41f4f696f9ad46eaedfd2e7845a54"
+        },
+        {
+          "source_rect": [
+            444,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            233.0,
+            381
+          ],
+          "visible_bounds": [
+            48,
+            92,
+            376,
+            289
+          ],
+          "phase": "armed",
+          "sha256": "702875b2c2719d853498571efb81f4163d27450d8c18dc803f702f8b5164bf39"
+        },
+        {
+          "source_rect": [
+            887,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            213.0,
+            381
+          ],
+          "visible_bounds": [
+            30,
+            112,
+            367,
+            269
+          ],
+          "phase": "armed",
+          "sha256": "106376e009b37476c0131be4a2e5c169705b33e2a925ad180ba3968be33af0b7"
+        },
+        {
+          "source_rect": [
+            1330,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            223.0,
+            381
+          ],
+          "visible_bounds": [
+            28,
+            118,
+            386,
+            263
+          ],
+          "phase": "armed",
+          "sha256": "011f8965f5b0973d387be8a9ef519086f68867c049f178d1a4092395e583ae05"
+        }
+      ],
+      "body_bounds": [
+        -182.0,
+        -268,
+        364,
+        268
+      ],
+      "attack_bounds": [
+        -163.8,
+        -254.6,
+        327.6,
+        254.6
+      ],
+      "arming_frames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "armed_frames": [
+        5,
+        6,
+        7
+      ]
+    },
+    "silk_web": {
+      "path": "trap-silk_web.png",
+      "fps": 8,
+      "reference_width": 397,
+      "world_width": 64,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            225.0,
+            441
+          ],
+          "visible_bounds": [
+            30,
+            299,
+            390,
+            142
+          ],
+          "phase": "install",
+          "sha256": "b952dba539e9e7ac99f0f9070d121b7e4d314dddec9af2c884c53638edd97c2c"
+        },
+        {
+          "source_rect": [
+            444,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            226.0,
+            441
+          ],
+          "visible_bounds": [
+            33,
+            258,
+            389,
+            183
+          ],
+          "phase": "install",
+          "sha256": "ce8f95ab231f3803ea9226ff860bfb2cc34ef800ad6b713f71f3627dfffe4e02"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            444
+          ],
+          "pivot": [
+            217.0,
+            440
+          ],
+          "visible_bounds": [
+            27,
+            200,
+            392,
+            240
+          ],
+          "phase": "install",
+          "sha256": "967d1bf6cf0252375e05d5d3e3f37868f116a258dbf5a16f87556f966523c2bf"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            444
+          ],
+          "pivot": [
+            216.5,
+            440
+          ],
+          "visible_bounds": [
+            24,
+            177,
+            391,
+            263
+          ],
+          "phase": "install",
+          "sha256": "fbbdc6a670531c04d43a4704039c52fb0912ca15fbe09d1cd486984d2704b52e"
+        },
+        {
+          "source_rect": [
+            0,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            224.0,
+            370
+          ],
+          "visible_bounds": [
+            28,
+            139,
+            397,
+            231
+          ],
+          "phase": "install",
+          "sha256": "5d129e301a08551a0a0d08375716da87ee7fb77256309b30758517ad3404f0e6"
+        },
+        {
+          "source_rect": [
+            444,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            223.5,
+            370
+          ],
+          "visible_bounds": [
+            28,
+            139,
+            395,
+            231
+          ],
+          "phase": "armed",
+          "sha256": "8ad6b2c9bc67f4d93eae0c7177cbf5fe5237cb6149ad968a82f39fb2f9b13917"
+        },
+        {
+          "source_rect": [
+            887,
+            444,
+            443,
+            443
+          ],
+          "pivot": [
+            223.5,
+            370
+          ],
+          "visible_bounds": [
+            28,
+            140,
+            396,
+            230
+          ],
+          "phase": "armed",
+          "sha256": "67519ce1f9abdf0a1bed9be2a2da5ba167dae4f1038be1c7619418c3e7fc2a3f"
+        },
+        {
+          "source_rect": [
+            1330,
+            444,
+            444,
+            443
+          ],
+          "pivot": [
+            224.0,
+            370
+          ],
+          "visible_bounds": [
+            29,
+            139,
+            395,
+            231
+          ],
+          "phase": "armed",
+          "sha256": "b6c1eb03e2a61783cd0fbbc7f4bcee0434d3b17b13f6d86c7d15b16711ae5d57"
+        }
+      ],
+      "body_bounds": [
+        -196.0,
+        -231,
+        397,
+        231
+      ],
+      "attack_bounds": [
+        -176.15,
+        -219.45,
+        357.3,
+        219.45
+      ],
+      "arming_frames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "armed_frames": [
+        5,
+        6,
+        7
+      ]
+    },
+    "dew_pool": {
+      "path": "trap-dew_pool.png",
+      "fps": 8,
+      "reference_width": 397,
+      "world_width": 64,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            444,
+            515
+          ],
+          "pivot": [
+            218.0,
+            458
+          ],
+          "visible_bounds": [
+            96,
+            234,
+            250,
+            224
+          ],
+          "phase": "install",
+          "sha256": "e9ef746e6c383d568aadb4202a1355c61ee44c023cfef1af3bd705ddc759e571"
+        },
+        {
+          "source_rect": [
+            444,
+            0,
+            443,
+            515
+          ],
+          "pivot": [
+            210.5,
+            460
+          ],
+          "visible_bounds": [
+            54,
+            236,
+            331,
+            224
+          ],
+          "phase": "install",
+          "sha256": "3c7b36199cc9dac3918a5700cc9afbfa08b2802786bcecbc8608eaa6d27836b8"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            515
+          ],
+          "pivot": [
+            225.0,
+            463
+          ],
+          "visible_bounds": [
+            43,
+            218,
+            367,
+            245
+          ],
+          "phase": "install",
+          "sha256": "6329b26ba80461d2b3450691dae50ade81175fa22e5710f16e82b7a4a700ff53"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            515
+          ],
+          "pivot": [
+            227.0,
+            467
+          ],
+          "visible_bounds": [
+            20,
+            193,
+            393,
+            274
+          ],
+          "phase": "install",
+          "sha256": "2516e7213d18f6c63db051e2f3b0f0d419b24229c83762fc0ec9834e368c3572"
+        },
+        {
+          "source_rect": [
+            0,
+            515,
+            444,
+            372
+          ],
+          "pivot": [
+            228.0,
+            331
+          ],
+          "visible_bounds": [
+            23,
+            60,
+            397,
+            271
+          ],
+          "phase": "install",
+          "sha256": "899e89c1220634f004c1515ffd5a4dbdc7962fed7d2ab3f37e9d82877efcfe27"
+        },
+        {
+          "source_rect": [
+            444,
+            515,
+            443,
+            372
+          ],
+          "pivot": [
+            233.5,
+            329
+          ],
+          "visible_bounds": [
+            24,
+            60,
+            408,
+            269
+          ],
+          "phase": "armed",
+          "sha256": "d0e3731666c89811f4b806d1a599f372cfa171c9244ebf1e417b969664ba9ef4"
+        },
+        {
+          "source_rect": [
+            887,
+            515,
+            443,
+            372
+          ],
+          "pivot": [
+            229.0,
+            329
+          ],
+          "visible_bounds": [
+            22,
+            48,
+            405,
+            281
+          ],
+          "phase": "armed",
+          "sha256": "027561acb736bc9d4836b6203966846a4a624694ca03f8c50f909aaf5cff5c2a"
+        },
+        {
+          "source_rect": [
+            1330,
+            515,
+            444,
+            372
+          ],
+          "pivot": [
+            227.0,
+            329
+          ],
+          "visible_bounds": [
+            14,
+            60,
+            411,
+            269
+          ],
+          "phase": "armed",
+          "sha256": "cd12621055e83f46ded90a565e08b9974de80f02d1b62f63979e7863252a6c63"
+        }
+      ],
+      "body_bounds": [
+        -205.0,
+        -271,
+        397,
+        271
+      ],
+      "attack_bounds": [
+        -185.15,
+        -257.45,
+        357.3,
+        257.45
+      ],
+      "arming_frames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "armed_frames": [
+        5,
+        6,
+        7
+      ]
+    }
+  }
+}

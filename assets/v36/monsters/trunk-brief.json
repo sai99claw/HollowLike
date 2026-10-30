@@ -1,0 +1,143 @@
+{
+  "biome": "trunk",
+  "palette": "emerald jade ivory dark bark",
+  "regular": [
+    [
+      "bark_mantis",
+      "樹皮短鐮",
+      "walk",
+      "slash",
+      "bark armored mantis with leaf edged scythe",
+      "draws back leaf scythe then sweeps forward",
+      "leaf_slash",
+      null
+    ],
+    [
+      "acorn_hopper",
+      "橡盔跳鼠",
+      "jump",
+      "arc",
+      "leaf tailed hopping rodent with acorn helmet and vine sling",
+      "crouches pulls vine sling then throws acorn",
+      "acorn",
+      "counterclockwise tumble"
+    ],
+    [
+      "pollen_wasp",
+      "花粉懸蜂",
+      "hover",
+      "linear",
+      "emerald wasp with pollen bulb abdomen and seed proboscis",
+      "arches proboscis back then spits long seed needle",
+      "seed_needle",
+      "axial counterclockwise roll"
+    ],
+    [
+      "silk_lantern",
+      "絲燈漂蛛",
+      "drift",
+      "trap",
+      "lantern spider suspended from silk balloon with seed sacs",
+      "contracts balloon then drops wrapped web seed",
+      "web_seed",
+      "clockwise tumble"
+    ],
+    [
+      "thorn_boar",
+      "棘背衝豚",
+      "walk",
+      "ram",
+      "bark boar with ivy tusks thorn spine and short powerful legs",
+      "braces hooves lowers tusks then shoulder charges",
+      "ram",
+      null
+    ]
+  ],
+  "elite": [
+    [
+      "thorn_duelist",
+      "棘鐮決鬥者",
+      "jump",
+      "mantis knight with hooked thorn scythes and leaf cape",
+      "crosses scythes overhead then cuts twice",
+      "leaf_slash",
+      null,
+      "draws leaf blade behind shoulder then throws crescent leaf",
+      "leaf_crescent",
+      "clockwise tumble"
+    ],
+    [
+      "loom_matron",
+      "織巢看守",
+      "walk",
+      "bark silk armored spider with fang forelegs and woven abdominal spindle",
+      "rears fang forelegs then bites forward",
+      "fang",
+      null,
+      "winds spindle then lobs wrapped web seed",
+      "web_seed",
+      "clockwise tumble"
+    ]
+  ],
+  "actor_grid": {
+    "columns": 12,
+    "regular_rows": 5,
+    "elite_rows": 4,
+    "phases": {
+      "move": [
+        0,
+        1,
+        2
+      ],
+      "windup": [
+        3,
+        4,
+        5
+      ],
+      "active": [
+        6,
+        7,
+        8
+      ],
+      "recovery": [
+        9,
+        10,
+        11
+      ]
+    },
+    "facing": "right",
+    "cell_foot_anchor": [
+      0.5,
+      0.88
+    ],
+    "padding": 0.1
+  },
+  "projectile_rows": [
+    {
+      "id": "acorn",
+      "rotation": "counterclockwise tumble"
+    },
+    {
+      "id": "seed_needle",
+      "rotation": "axial counterclockwise roll"
+    },
+    {
+      "id": "web_seed",
+      "rotation": "clockwise tumble"
+    },
+    {
+      "id": "leaf_crescent",
+      "rotation": "clockwise tumble"
+    }
+  ],
+  "effect_rows": [
+    {
+      "id": "melee_fx",
+      "description": "eight frame bright crescent swipe buildup slash dissolve"
+    },
+    {
+      "id": "trap_fx",
+      "description": "eight frame planted organic trap growing from fixed floor base"
+    }
+  ]
+}

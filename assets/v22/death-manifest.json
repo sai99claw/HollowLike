@@ -1,0 +1,2022 @@
+{
+  "version": 22,
+  "method": "Built-in image_gen, individual own-species references; alpha inspected and nonuniform atlas gutters recorded without pixel editing",
+  "clips": {
+    "walk": {
+      "path": "death-walk.png",
+      "label": "苔甲步蟲 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 267.25926,
+      "reference_width": 410.0,
+      "world_height": 57,
+      "world_width": 87.44318,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-walk.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            482
+          ],
+          "visible_bounds": [
+            56,
+            117,
+            359,
+            341
+          ],
+          "pivot": [
+            235.5,
+            458
+          ],
+          "sha256": "a1a7f1c7646387c992ef71fb3d20b5f02f314ae0619df917fdd39570873b22aa"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            482
+          ],
+          "visible_bounds": [
+            54,
+            152,
+            382,
+            272
+          ],
+          "pivot": [
+            245.0,
+            424
+          ],
+          "sha256": "567feb7996f33484da5b9a95a82bdac896d49dfb37adbb1777d5c26ffce5e661"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            482
+          ],
+          "visible_bounds": [
+            43,
+            204,
+            387,
+            276
+          ],
+          "pivot": [
+            236.5,
+            480
+          ],
+          "sha256": "68b67529e31310acbda6443bf141dd079f59acf209b8e54ab206481d134444ab"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            482
+          ],
+          "visible_bounds": [
+            9,
+            285,
+            410,
+            197
+          ],
+          "pivot": [
+            214.0,
+            482
+          ],
+          "sha256": "63203bf982e522bc008d6f3ba248f596f49414a2241b6cf7fc72125328c61b25"
+        },
+        {
+          "source_rect": [
+            0,
+            482,
+            456,
+            405
+          ],
+          "visible_bounds": [
+            30,
+            160,
+            426,
+            184
+          ],
+          "pivot": [
+            243.0,
+            344
+          ],
+          "sha256": "f32459b8938fc8ac805316aea28dadd0a370409acd07833a799f2573ba2b4aed"
+        },
+        {
+          "source_rect": [
+            456,
+            482,
+            431,
+            405
+          ],
+          "visible_bounds": [
+            9,
+            169,
+            418,
+            177
+          ],
+          "pivot": [
+            218.0,
+            346
+          ],
+          "sha256": "6b5d2de1702e9317ea84f645d6a5cb27c6ecd998e5e1aa14f5cb90a071458c09"
+        },
+        {
+          "source_rect": [
+            887,
+            482,
+            441,
+            405
+          ],
+          "visible_bounds": [
+            9,
+            175,
+            425,
+            171
+          ],
+          "pivot": [
+            221.5,
+            346
+          ],
+          "sha256": "9d3fd8eefe2196ae4a7b3cabe25a5f8a0a00a853eaf4857e59a813a6c55c958c"
+        },
+        {
+          "source_rect": [
+            1328,
+            482,
+            446,
+            405
+          ],
+          "visible_bounds": [
+            1,
+            183,
+            421,
+            165
+          ],
+          "pivot": [
+            211.5,
+            348
+          ],
+          "sha256": "c093f5c4829eb84b94d6f1b63de617b7037c1659bb8513c4a0d1adac508371dc"
+        }
+      ]
+    },
+    "jump": {
+      "path": "death-jump.png",
+      "label": "彈枝跳蟲 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 361.33546,
+      "reference_width": 386.0,
+      "world_height": 57,
+      "world_width": 60.89078,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-jump.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            508
+          ],
+          "visible_bounds": [
+            88,
+            124,
+            292,
+            350
+          ],
+          "pivot": [
+            234.0,
+            474
+          ],
+          "sha256": "007b7929411b8a3b9e3b332861b5e41bd57e3ca593e173caf751928d1e71e899"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            508
+          ],
+          "visible_bounds": [
+            78,
+            150,
+            306,
+            277
+          ],
+          "pivot": [
+            231.0,
+            427
+          ],
+          "sha256": "960fa274d2671593b6eb7dfe7cce3d76a3410222dfaaf3f7efde2be6478781dd"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            434,
+            508
+          ],
+          "visible_bounds": [
+            26,
+            211,
+            352,
+            263
+          ],
+          "pivot": [
+            202.0,
+            474
+          ],
+          "sha256": "9bf987b5ffc4c5b42a87c526056f16a3af6585be5e32615f27d1a46e0be77e46"
+        },
+        {
+          "source_rect": [
+            1321,
+            0,
+            453,
+            508
+          ],
+          "visible_bounds": [
+            1,
+            337,
+            386,
+            171
+          ],
+          "pivot": [
+            194.0,
+            508
+          ],
+          "sha256": "4223d8477fed921dd8d1affd19628c1e892259fac8e11b308c7c04af0419f89c"
+        },
+        {
+          "source_rect": [
+            0,
+            508,
+            448,
+            379
+          ],
+          "visible_bounds": [
+            46,
+            136,
+            402,
+            176
+          ],
+          "pivot": [
+            247.0,
+            312
+          ],
+          "sha256": "604a91c289294dfbd4a66e4c0d2f6379911e68f14e819003538977a7f37f2ffb"
+        },
+        {
+          "source_rect": [
+            448,
+            508,
+            439,
+            379
+          ],
+          "visible_bounds": [
+            31,
+            156,
+            382,
+            157
+          ],
+          "pivot": [
+            222.0,
+            313
+          ],
+          "sha256": "a8b0c4ebbad82f2c915f9fd5144a53845d847867e7e201a9ce8025a289ad2722"
+        },
+        {
+          "source_rect": [
+            887,
+            508,
+            435,
+            379
+          ],
+          "visible_bounds": [
+            8,
+            158,
+            395,
+            155
+          ],
+          "pivot": [
+            205.5,
+            313
+          ],
+          "sha256": "9d593f55441bae36a122da6cacd9cd4b4070f7029a64a8b0c6560be93e9568e5"
+        },
+        {
+          "source_rect": [
+            1322,
+            508,
+            452,
+            379
+          ],
+          "visible_bounds": [
+            1,
+            155,
+            408,
+            158
+          ],
+          "pivot": [
+            205.0,
+            313
+          ],
+          "sha256": "9011edd6d0ff57745cd5af4f0140c439819d1fe73b087d7ac5b8e1ab66884d03"
+        }
+      ]
+    },
+    "hover": {
+      "path": "death-hover.png",
+      "label": "守燈懸蛾 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 495.16914,
+      "reference_width": 409.0,
+      "world_height": 57,
+      "world_width": 47.08088,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-hover.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            455,
+            523
+          ],
+          "visible_bounds": [
+            59,
+            34,
+            396,
+            431
+          ],
+          "pivot": [
+            257.0,
+            465
+          ],
+          "sha256": "63007d4bbdffcb6df7b50f5422f52ba1b39299db49ee168fe7d7354c876ab0dd"
+        },
+        {
+          "source_rect": [
+            455,
+            0,
+            443,
+            523
+          ],
+          "visible_bounds": [
+            45,
+            134,
+            398,
+            308
+          ],
+          "pivot": [
+            244.0,
+            442
+          ],
+          "sha256": "5913e1655ae8eebe3653e423cedc41eaf94df28bf7e250d07faadc20923ff342"
+        },
+        {
+          "source_rect": [
+            898,
+            0,
+            432,
+            523
+          ],
+          "visible_bounds": [
+            30,
+            172,
+            383,
+            344
+          ],
+          "pivot": [
+            221.5,
+            516
+          ],
+          "sha256": "2888039dbb759159e424b62ffa14dbc3620846356f0e8305f893b4c452ee2770"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            523
+          ],
+          "visible_bounds": [
+            2,
+            280,
+            409,
+            243
+          ],
+          "pivot": [
+            206.5,
+            523
+          ],
+          "sha256": "35004973a23872e00c8d49af324806e88826e7301bba8860c43f71869fe428b0"
+        },
+        {
+          "source_rect": [
+            0,
+            523,
+            453,
+            364
+          ],
+          "visible_bounds": [
+            33,
+            92,
+            420,
+            229
+          ],
+          "pivot": [
+            243.0,
+            321
+          ],
+          "sha256": "72264c63f16df5fdbb3936553f17f09b9218900ec5c553baf3cb523704ceb309"
+        },
+        {
+          "source_rect": [
+            453,
+            523,
+            434,
+            364
+          ],
+          "visible_bounds": [
+            15,
+            148,
+            410,
+            168
+          ],
+          "pivot": [
+            220.0,
+            316
+          ],
+          "sha256": "6a287711c1ab182d9d681cbb6528b42b31ebddcde2648213e29e377ceecb4ac5"
+        },
+        {
+          "source_rect": [
+            887,
+            523,
+            443,
+            364
+          ],
+          "visible_bounds": [
+            17,
+            172,
+            411,
+            140
+          ],
+          "pivot": [
+            222.5,
+            312
+          ],
+          "sha256": "dd8685145773e818e8a7cea4604036bf3b009032e9bd343252b23801b6bdf6d2"
+        },
+        {
+          "source_rect": [
+            1330,
+            523,
+            444,
+            364
+          ],
+          "visible_bounds": [
+            7,
+            173,
+            412,
+            134
+          ],
+          "pivot": [
+            213.0,
+            307
+          ],
+          "sha256": "0659864a8b5aa395cc88869e652fef4acb206487841324e6e1dd9689f67b4546"
+        }
+      ]
+    },
+    "drift": {
+      "path": "death-drift.png",
+      "label": "流霧漂蛾 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 465.16438,
+      "reference_width": 441.0,
+      "world_height": 57,
+      "world_width": 54.03896,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-drift.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            470,
+            501
+          ],
+          "visible_bounds": [
+            85,
+            58,
+            385,
+            363
+          ],
+          "pivot": [
+            277.5,
+            421
+          ],
+          "sha256": "8a105f1995c4222be249910dc11de5f00094ae303eccd97a2e55646275c592ee"
+        },
+        {
+          "source_rect": [
+            470,
+            0,
+            417,
+            501
+          ],
+          "visible_bounds": [
+            6,
+            68,
+            379,
+            372
+          ],
+          "pivot": [
+            195.5,
+            440
+          ],
+          "sha256": "0a4db442ce37aefa51411f81581f0c8c74617bbe94cabc9796b4783b70d8f103"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            409,
+            501
+          ],
+          "visible_bounds": [
+            3,
+            196,
+            402,
+            297
+          ],
+          "pivot": [
+            204.0,
+            493
+          ],
+          "sha256": "564ae6aa4ea434b91d69f97586edabfcb3fed29a15902d1680fbeba646062474"
+        },
+        {
+          "source_rect": [
+            1296,
+            0,
+            478,
+            501
+          ],
+          "visible_bounds": [
+            1,
+            343,
+            441,
+            158
+          ],
+          "pivot": [
+            221.5,
+            501
+          ],
+          "sha256": "30b40218422d5ec6eab577194b9a79e6cd15121f83b57c1883b4b354c1417f91"
+        },
+        {
+          "source_rect": [
+            0,
+            501,
+            453,
+            386
+          ],
+          "visible_bounds": [
+            18,
+            149,
+            435,
+            162
+          ],
+          "pivot": [
+            235.5,
+            311
+          ],
+          "sha256": "4d22b3438399af46a06609d5f82515c62e9e6ab3f1ea2f1679392e366f595bbf"
+        },
+        {
+          "source_rect": [
+            453,
+            501,
+            434,
+            386
+          ],
+          "visible_bounds": [
+            9,
+            149,
+            408,
+            161
+          ],
+          "pivot": [
+            213.0,
+            310
+          ],
+          "sha256": "ac723494d3dcabc867459bbf0c8afd4fcf3f65dc06c55a7aa3813570b64abccd"
+        },
+        {
+          "source_rect": [
+            887,
+            501,
+            429,
+            386
+          ],
+          "visible_bounds": [
+            7,
+            167,
+            414,
+            143
+          ],
+          "pivot": [
+            214.0,
+            310
+          ],
+          "sha256": "92f857b0d2b14bfa76ccec55fca9c6f78a37195cba228a40f4f9c4fe84e23918"
+        },
+        {
+          "source_rect": [
+            1316,
+            501,
+            458,
+            386
+          ],
+          "visible_bounds": [
+            1,
+            170,
+            440,
+            137
+          ],
+          "pivot": [
+            221.0,
+            307
+          ],
+          "sha256": "3f5933ec0d2e8901df39bba5ac9c3c3ddd696a6d29628d68c27b0247527108e1"
+        }
+      ]
+    },
+    "dash": {
+      "path": "death-dash.png",
+      "label": "疾根衝蟲 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 180.72947,
+      "reference_width": 418.0,
+      "world_height": 57,
+      "world_width": 131.8324,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-dash.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            496
+          ],
+          "visible_bounds": [
+            63,
+            139,
+            344,
+            328
+          ],
+          "pivot": [
+            235.0,
+            467
+          ],
+          "sha256": "026818774b8cdeef9206ab6944b9f0c04f8b8426236109d26112e0b2a7406186"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            496
+          ],
+          "visible_bounds": [
+            76,
+            135,
+            286,
+            317
+          ],
+          "pivot": [
+            219.0,
+            452
+          ],
+          "sha256": "372a1cec79932cf95535d93961bab6a4bb4ecd8d6d0d68c2317721bf1cc2584f"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            496
+          ],
+          "visible_bounds": [
+            17,
+            237,
+            396,
+            250
+          ],
+          "pivot": [
+            215.0,
+            487
+          ],
+          "sha256": "5453c735b7339b13703c7780b56ca0f9cee6d01b78e9e036a6608ac635705715"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            496
+          ],
+          "visible_bounds": [
+            10,
+            341,
+            418,
+            155
+          ],
+          "pivot": [
+            219.0,
+            496
+          ],
+          "sha256": "09275ed0c0a70e79123bbd13458a5ce42fd7b00dea90156f3dcccab7f2340381"
+        },
+        {
+          "source_rect": [
+            0,
+            496,
+            443,
+            391
+          ],
+          "visible_bounds": [
+            40,
+            185,
+            403,
+            150
+          ],
+          "pivot": [
+            241.5,
+            335
+          ],
+          "sha256": "c3c3e024aa8192b69983777eb31df1431639a7b2fcd58e2529f9bb0f80e17a3c"
+        },
+        {
+          "source_rect": [
+            443,
+            496,
+            444,
+            391
+          ],
+          "visible_bounds": [
+            12,
+            193,
+            430,
+            144
+          ],
+          "pivot": [
+            227.0,
+            337
+          ],
+          "sha256": "da00125251b8dd24f0a5508c0c32cac97bce29862924a53bff1bb83b6e4a356f"
+        },
+        {
+          "source_rect": [
+            887,
+            496,
+            443,
+            391
+          ],
+          "visible_bounds": [
+            1,
+            191,
+            441,
+            141
+          ],
+          "pivot": [
+            221.5,
+            332
+          ],
+          "sha256": "78ab2828937f05b4d743a929928fbd00242d9086f70a33c5730eaa4f45cd2569"
+        },
+        {
+          "source_rect": [
+            1330,
+            496,
+            444,
+            391
+          ],
+          "visible_bounds": [
+            4,
+            191,
+            425,
+            142
+          ],
+          "pivot": [
+            216.5,
+            333
+          ],
+          "sha256": "056042c4c9c7ce4277383aa9af6a75060ede0cd80ed16e32ef3583f7a928aaf4"
+        }
+      ]
+    },
+    "pillbug": {
+      "path": "death-pillbug.png",
+      "label": "葉帽糯糯蟲 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 319.68947,
+      "reference_width": 397.0,
+      "world_height": 57,
+      "world_width": 70.78431,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-pillbug.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            57,
+            82,
+            343,
+            363
+          ],
+          "pivot": [
+            228.5,
+            445
+          ],
+          "sha256": "71798733b69023ddb95b420aa1947a3946829bcb81bffa927f191aa967c26f82"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            36,
+            99,
+            368,
+            303
+          ],
+          "pivot": [
+            220.0,
+            402
+          ],
+          "sha256": "2a193e26c3413fcd4ea0fd9f61f32a30e69580d0b61d502b6b5ed37b494e9f32"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            28,
+            120,
+            404,
+            314
+          ],
+          "pivot": [
+            230.0,
+            434
+          ],
+          "sha256": "8262f4298e4f8e0b692b8ede470f4e1fa34269da1041026cc4a22ffc07086309"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            17,
+            185,
+            397,
+            262
+          ],
+          "pivot": [
+            215.5,
+            447
+          ],
+          "sha256": "0f59c0d96a3faf3dec69d643516a4f44252a75089c5eef5e3ec62f5668a715ea"
+        },
+        {
+          "source_rect": [
+            0,
+            461,
+            443,
+            426
+          ],
+          "visible_bounds": [
+            17,
+            128,
+            416,
+            223
+          ],
+          "pivot": [
+            225.0,
+            351
+          ],
+          "sha256": "8574e58d062eda4d2654f115f3794e75e9aad555094ca9cc06c539e013f335a1"
+        },
+        {
+          "source_rect": [
+            443,
+            461,
+            444,
+            426
+          ],
+          "visible_bounds": [
+            20,
+            147,
+            421,
+            199
+          ],
+          "pivot": [
+            230.5,
+            346
+          ],
+          "sha256": "98c23d926b51887c98eabd75e4d7e255c2bd78f2825aa9512f42d2b77fafffdb"
+        },
+        {
+          "source_rect": [
+            887,
+            461,
+            432,
+            426
+          ],
+          "visible_bounds": [
+            3,
+            154,
+            428,
+            192
+          ],
+          "pivot": [
+            217.0,
+            346
+          ],
+          "sha256": "4be7f0742a9185aacd431bbd01e9e10ea7fc519c3dfa5a615fc6c2cc1e709918"
+        },
+        {
+          "source_rect": [
+            1319,
+            461,
+            455,
+            426
+          ],
+          "visible_bounds": [
+            1,
+            163,
+            439,
+            182
+          ],
+          "pivot": [
+            220.5,
+            345
+          ],
+          "sha256": "8cf5896b02eff3a4ea41547e3c2a2f629cda876570a5942133a13235bb6d5e86"
+        }
+      ]
+    },
+    "sky": {
+      "path": "death-sky.png",
+      "label": "天空雷羽首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 457.5641,
+      "reference_width": 430.0,
+      "world_height": 168,
+      "world_width": 157.87952,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-sky.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            517
+          ],
+          "visible_bounds": [
+            26,
+            68,
+            414,
+            437
+          ],
+          "pivot": [
+            233.0,
+            505
+          ],
+          "sha256": "5199999e2a948ccf0e36bfe597a8ced85b186121fe7d1893f7c1e4698bd7a056"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            517
+          ],
+          "visible_bounds": [
+            3,
+            77,
+            428,
+            410
+          ],
+          "pivot": [
+            217.0,
+            487
+          ],
+          "sha256": "fd4eaa785a4e0faf1b7a5110d6f47392960c588fb5af3925b17e37291e1aeb02"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            426,
+            517
+          ],
+          "visible_bounds": [
+            1,
+            161,
+            422,
+            338
+          ],
+          "pivot": [
+            212.0,
+            499
+          ],
+          "sha256": "da04313030a1b6e8bb3327c3af131ac3a9e2c2d4df36c3b94a072f8aed5100b8"
+        },
+        {
+          "source_rect": [
+            1313,
+            0,
+            461,
+            517
+          ],
+          "visible_bounds": [
+            1,
+            208,
+            430,
+            309
+          ],
+          "pivot": [
+            216.0,
+            517
+          ],
+          "sha256": "5df2db12d9a3448a0f038b5d32b3ae7ff2d925478f3d0bd95302c037680e857c"
+        },
+        {
+          "source_rect": [
+            0,
+            517,
+            443,
+            370
+          ],
+          "visible_bounds": [
+            24,
+            97,
+            411,
+            200
+          ],
+          "pivot": [
+            229.5,
+            297
+          ],
+          "sha256": "092ec3e72c23e29a836a9ff8982cee3fee9c95d0f37692578c635330e3216a12"
+        },
+        {
+          "source_rect": [
+            443,
+            517,
+            444,
+            370
+          ],
+          "visible_bounds": [
+            31,
+            118,
+            400,
+            182
+          ],
+          "pivot": [
+            231.0,
+            300
+          ],
+          "sha256": "cf6ec1c9a63f40b5ce179a7e1d7417ff12a9507ceb63f8b585800af996185a8b"
+        },
+        {
+          "source_rect": [
+            887,
+            517,
+            442,
+            370
+          ],
+          "visible_bounds": [
+            16,
+            137,
+            398,
+            157
+          ],
+          "pivot": [
+            215.0,
+            294
+          ],
+          "sha256": "85014dc0e5639efb339ac9e4d3f9af7d7e44e703d1ac43384f44bd04cdee3404"
+        },
+        {
+          "source_rect": [
+            1329,
+            517,
+            445,
+            370
+          ],
+          "visible_bounds": [
+            1,
+            148,
+            414,
+            149
+          ],
+          "pivot": [
+            208.0,
+            297
+          ],
+          "sha256": "0af8d6b14f9bea22f825b85187d5505e907c7bb57f20912dd1e9d4cb3667d553"
+        }
+      ]
+    },
+    "canopy": {
+      "path": "death-canopy.png",
+      "label": "葉鐮首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 398.7757,
+      "reference_width": 431.0,
+      "world_height": 122,
+      "world_width": 131.85859,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-canopy.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            486
+          ],
+          "visible_bounds": [
+            41,
+            105,
+            364,
+            366
+          ],
+          "pivot": [
+            223.0,
+            471
+          ],
+          "sha256": "6f0ae69c19ccdecd963640107a60a60132a8cb9edc14762584a0be6f3cb8a787"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            486
+          ],
+          "visible_bounds": [
+            24,
+            139,
+            379,
+            323
+          ],
+          "pivot": [
+            213.5,
+            462
+          ],
+          "sha256": "50c7bad155697f3a247abf92cc3a723b195d52616f8c227171af4400e3365ec0"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            441,
+            486
+          ],
+          "visible_bounds": [
+            17,
+            219,
+            396,
+            265
+          ],
+          "pivot": [
+            215.0,
+            484
+          ],
+          "sha256": "4bd95075a5836dfc0ad4de2b6ed3c1fd01da751c6f6da18272c1d3898b082b46"
+        },
+        {
+          "source_rect": [
+            1328,
+            0,
+            446,
+            486
+          ],
+          "visible_bounds": [
+            1,
+            327,
+            431,
+            159
+          ],
+          "pivot": [
+            216.5,
+            486
+          ],
+          "sha256": "27cf0fd9f4bdf8061ea99e562bb3c7fa096a7e4bebb8a5c1b2e4eaadd3ef7a3b"
+        },
+        {
+          "source_rect": [
+            0,
+            486,
+            446,
+            401
+          ],
+          "visible_bounds": [
+            29,
+            151,
+            417,
+            175
+          ],
+          "pivot": [
+            237.5,
+            326
+          ],
+          "sha256": "58561f8a48c56bfc80ed2e0a79b66698825bb028d57acdd8222f197f2b4ece9a"
+        },
+        {
+          "source_rect": [
+            446,
+            486,
+            441,
+            401
+          ],
+          "visible_bounds": [
+            24,
+            168,
+            415,
+            157
+          ],
+          "pivot": [
+            231.5,
+            325
+          ],
+          "sha256": "3b52d800c8f202fbc8dbb51467d131d66962959224c407a5f1e4c33f98401e8d"
+        },
+        {
+          "source_rect": [
+            887,
+            486,
+            443,
+            401
+          ],
+          "visible_bounds": [
+            8,
+            181,
+            423,
+            145
+          ],
+          "pivot": [
+            219.5,
+            326
+          ],
+          "sha256": "fd0f63e28746c5c58146a7328122f6c16421cd328de6662c928196c492687996"
+        },
+        {
+          "source_rect": [
+            1330,
+            486,
+            444,
+            401
+          ],
+          "visible_bounds": [
+            4,
+            185,
+            425,
+            141
+          ],
+          "pivot": [
+            216.5,
+            326
+          ],
+          "sha256": "0711a0a59e7a3fffbd6509fb33cec853af1b90875e3ae79435fc75b3afee1410"
+        }
+      ]
+    },
+    "branches": {
+      "path": "death-branches.png",
+      "label": "織絲首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 293.56404,
+      "reference_width": 369.0,
+      "world_height": 105,
+      "world_width": 131.98142,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-branches.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            62,
+            162,
+            346,
+            267
+          ],
+          "pivot": [
+            235.0,
+            429
+          ],
+          "sha256": "de4c73a60aa9ec160b3fe8245271448a4af0181b1ff322bf4eef8e64ddc61754"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            50,
+            123,
+            346,
+            280
+          ],
+          "pivot": [
+            223.0,
+            403
+          ],
+          "sha256": "dd0b9360f9c0f366c92931f5c04860138b015cff146067f206ad34873d3111f2"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            29,
+            207,
+            370,
+            228
+          ],
+          "pivot": [
+            214.0,
+            435
+          ],
+          "sha256": "0bec41108da701cfddbf723e86040b23108555e9a96e78d0e24ca1cda6a818a2"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            24,
+            245,
+            369,
+            188
+          ],
+          "pivot": [
+            208.5,
+            433
+          ],
+          "sha256": "e73b6c675424a9bce75f48610459d72e24d65c542184341e177c362789f28c6f"
+        },
+        {
+          "source_rect": [
+            0,
+            461,
+            443,
+            426
+          ],
+          "visible_bounds": [
+            44,
+            147,
+            376,
+            193
+          ],
+          "pivot": [
+            232.0,
+            340
+          ],
+          "sha256": "41c723917e5255e598c749d0da1776c00bae63c5e213977d564b1f5b25b47b0c"
+        },
+        {
+          "source_rect": [
+            443,
+            461,
+            444,
+            426
+          ],
+          "visible_bounds": [
+            46,
+            153,
+            369,
+            187
+          ],
+          "pivot": [
+            230.5,
+            340
+          ],
+          "sha256": "9673abc4843108e571cc8d93fc2b0c65aab11a2b32dad847b6628f4cdd12f50e"
+        },
+        {
+          "source_rect": [
+            887,
+            461,
+            443,
+            426
+          ],
+          "visible_bounds": [
+            39,
+            157,
+            368,
+            182
+          ],
+          "pivot": [
+            223.0,
+            339
+          ],
+          "sha256": "11b1f60fdfcffb5dbc61a5defd25d26d61809eb88c7c307567ec2dd52d629c03"
+        },
+        {
+          "source_rect": [
+            1330,
+            461,
+            444,
+            426
+          ],
+          "visible_bounds": [
+            37,
+            167,
+            366,
+            172
+          ],
+          "pivot": [
+            220.0,
+            339
+          ],
+          "sha256": "0cd324ddeece845bbe8881c068f6fdb7f1dd11f2cf9be722e2a0be76eaf96714"
+        }
+      ]
+    },
+    "trunk": {
+      "path": "death-trunk.png",
+      "label": "琥珀鍬甲首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 237.82658,
+      "reference_width": 431.0,
+      "world_height": 86,
+      "world_width": 155.85306,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-trunk.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            494
+          ],
+          "visible_bounds": [
+            50,
+            122,
+            383,
+            345
+          ],
+          "pivot": [
+            241.5,
+            467
+          ],
+          "sha256": "7b136bf2cb0acc6ec118b3b8440a3a5dee086d34420bad1147465efbc4a4874a"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            494
+          ],
+          "visible_bounds": [
+            56,
+            138,
+            377,
+            275
+          ],
+          "pivot": [
+            244.5,
+            413
+          ],
+          "sha256": "3dab8d17631324112742958d5428ce48b3ea4af785119263c445b86f5092b015"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            441,
+            494
+          ],
+          "visible_bounds": [
+            7,
+            211,
+            403,
+            254
+          ],
+          "pivot": [
+            208.5,
+            465
+          ],
+          "sha256": "2823cf7de6a423b490e5cec4541d50c826b232877df3826f388cdd8556c23c20"
+        },
+        {
+          "source_rect": [
+            1328,
+            0,
+            446,
+            494
+          ],
+          "visible_bounds": [
+            1,
+            300,
+            431,
+            194
+          ],
+          "pivot": [
+            216.5,
+            494
+          ],
+          "sha256": "db728d251974c4bcff054e5ddab34260f0d39dc0d312075ecdb6a32d0ed8f52d"
+        },
+        {
+          "source_rect": [
+            0,
+            494,
+            451,
+            393
+          ],
+          "visible_bounds": [
+            16,
+            166,
+            435,
+            168
+          ],
+          "pivot": [
+            233.5,
+            334
+          ],
+          "sha256": "13a09f1d51067fff2d6f02d034478a8a8ef804b2b1b2a18a62921e729dc5a9b2"
+        },
+        {
+          "source_rect": [
+            451,
+            494,
+            436,
+            393
+          ],
+          "visible_bounds": [
+            8,
+            168,
+            427,
+            165
+          ],
+          "pivot": [
+            221.5,
+            333
+          ],
+          "sha256": "fd9ebaead72e86a91318c292e0cf5080b6c3195d408f9d7cb7a3c88fdb55728f"
+        },
+        {
+          "source_rect": [
+            887,
+            494,
+            443,
+            393
+          ],
+          "visible_bounds": [
+            8,
+            175,
+            434,
+            161
+          ],
+          "pivot": [
+            225.0,
+            336
+          ],
+          "sha256": "2d2109f6478917ec0522fb8b6511aaff034cf8ab0259e80484cd247aa3e321cf"
+        },
+        {
+          "source_rect": [
+            1330,
+            494,
+            444,
+            393
+          ],
+          "visible_bounds": [
+            8,
+            174,
+            427,
+            159
+          ],
+          "pivot": [
+            221.5,
+            333
+          ],
+          "sha256": "4c60f428f34a988fbf831aa3b813a20e4d4a160457a0ed4d2974f08b191b4150"
+        }
+      ]
+    },
+    "grass": {
+      "path": "death-grass.png",
+      "label": "苔露蛙首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 278.69624,
+      "reference_width": 377.0,
+      "world_height": 99,
+      "world_width": 133.92,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-grass.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            101,
+            145,
+            296,
+            311
+          ],
+          "pivot": [
+            249.0,
+            456
+          ],
+          "sha256": "db3f9d8ecc12a39db70fcfc3ba280b4629dac36e3bea80d3f580974bacf61010"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            71,
+            151,
+            301,
+            274
+          ],
+          "pivot": [
+            221.5,
+            425
+          ],
+          "sha256": "b97125cd75db6044e50eb9643c874df9e324ee0f485571565c52b23d548835db"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            461
+          ],
+          "visible_bounds": [
+            19,
+            191,
+            356,
+            242
+          ],
+          "pivot": [
+            197.0,
+            433
+          ],
+          "sha256": "929b384d300b6f7a8bfa88522904540b11a30951a4bf373771450e7cdbe568c1"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            461
+          ],
+          "visible_bounds": [
+            7,
+            246,
+            377,
+            202
+          ],
+          "pivot": [
+            195.5,
+            448
+          ],
+          "sha256": "40d41e291934ef57ac611f830e968e51afd5d63f74c4c25d708bb2f92b323773"
+        },
+        {
+          "source_rect": [
+            0,
+            461,
+            443,
+            426
+          ],
+          "visible_bounds": [
+            62,
+            142,
+            374,
+            200
+          ],
+          "pivot": [
+            249.0,
+            342
+          ],
+          "sha256": "5fd7cf540e20c6779fc0ca4a6a7d6f3b32529b844da519140875e4fc873dd799"
+        },
+        {
+          "source_rect": [
+            443,
+            461,
+            444,
+            426
+          ],
+          "visible_bounds": [
+            55,
+            147,
+            361,
+            192
+          ],
+          "pivot": [
+            235.5,
+            339
+          ],
+          "sha256": "d69990f056a8114f3723125eb2fb5d7ba604b1f39644bb6aa92f8fbb0cc1a1ff"
+        },
+        {
+          "source_rect": [
+            887,
+            461,
+            443,
+            426
+          ],
+          "visible_bounds": [
+            25,
+            152,
+            365,
+            188
+          ],
+          "pivot": [
+            207.5,
+            340
+          ],
+          "sha256": "982637df8305818301a4ea49fefa5a6aae261235076246bc1fae32eaec0013c2"
+        },
+        {
+          "source_rect": [
+            1330,
+            461,
+            444,
+            426
+          ],
+          "visible_bounds": [
+            12,
+            153,
+            376,
+            188
+          ],
+          "pivot": [
+            200.0,
+            341
+          ],
+          "sha256": "9c2319d039e57ec57c361725b7d62c9526f8e2c04308e844e01c6573c3f5b96b"
+        }
+      ]
+    },
+    "underground": {
+      "path": "death-underground.png",
+      "label": "根鑽首領 · 八幀死亡",
+      "fps": 8,
+      "reference_height": 261.67907,
+      "reference_width": 443.0,
+      "world_height": 99,
+      "world_width": 167.59843,
+      "dimensions": [
+        1774,
+        887
+      ],
+      "identity_reference": "res://assets/v18/monster-motion-underground.png",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            454,
+            493
+          ],
+          "visible_bounds": [
+            29,
+            114,
+            425,
+            337
+          ],
+          "pivot": [
+            241.5,
+            451
+          ],
+          "sha256": "040b29ae57113734167af03f61092765d582c49de1593764d2d6e5f665668728"
+        },
+        {
+          "source_rect": [
+            454,
+            0,
+            433,
+            493
+          ],
+          "visible_bounds": [
+            35,
+            112,
+            359,
+            323
+          ],
+          "pivot": [
+            214.5,
+            435
+          ],
+          "sha256": "2701abb1d49552074ecdf64b277651379006fe4d2e57d716b844c012087c0692"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            431,
+            493
+          ],
+          "visible_bounds": [
+            1,
+            173,
+            411,
+            295
+          ],
+          "pivot": [
+            206.5,
+            468
+          ],
+          "sha256": "257e8c39648ba000e484a45b3238b9ea938a766eb3206a6a7a9696340600e506"
+        },
+        {
+          "source_rect": [
+            1318,
+            0,
+            456,
+            493
+          ],
+          "visible_bounds": [
+            1,
+            241,
+            443,
+            252
+          ],
+          "pivot": [
+            222.5,
+            493
+          ],
+          "sha256": "a13f867ca6c55ba568213e18151e27a4bb805e7a86240563065d804d62f3ece7"
+        },
+        {
+          "source_rect": [
+            0,
+            493,
+            466,
+            394
+          ],
+          "visible_bounds": [
+            10,
+            127,
+            456,
+            211
+          ],
+          "pivot": [
+            238.0,
+            338
+          ],
+          "sha256": "bbf5ee6bca5d0fae0ac0ce303fe7ed2d9a28c94ab841b03e5072d6487fadb191"
+        },
+        {
+          "source_rect": [
+            466,
+            493,
+            421,
+            394
+          ],
+          "visible_bounds": [
+            0,
+            130,
+            420,
+            205
+          ],
+          "pivot": [
+            210.0,
+            335
+          ],
+          "sha256": "1f1625ab81458c56f7dec2d341f0928c238c60fab84aa8ccbdd6386c59c5c0d3"
+        },
+        {
+          "source_rect": [
+            887,
+            493,
+            441,
+            394
+          ],
+          "visible_bounds": [
+            5,
+            130,
+            430,
+            208
+          ],
+          "pivot": [
+            220.0,
+            338
+          ],
+          "sha256": "4b7d5bc32c97e849e2345c112fa1974312d4becf1dfc4132502ab3abc6abb5c8"
+        },
+        {
+          "source_rect": [
+            1328,
+            493,
+            446,
+            394
+          ],
+          "visible_bounds": [
+            1,
+            138,
+            436,
+            200
+          ],
+          "pivot": [
+            219.0,
+            338
+          ],
+          "sha256": "b1a53d8156aa5a82123de22beaedec3186b350b36e06394fe40d6012d5dd1ecf"
+        }
+      ]
+    }
+  }
+}

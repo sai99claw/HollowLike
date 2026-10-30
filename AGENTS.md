@@ -1,0 +1,1 @@
+Before generating code in a new session, read `.codex/MEMORY.md` and `.codex/skills/memory-adr-sync/SKILL.md`. Record persistent user rules using Context, Decision, and Status. Latest explicit decisions supersede older conflicting rules. Accepted design is not evidence of completed implementation.

@@ -1,0 +1,13 @@
+# v0.30
+
+- Feedback: game menu opens a screen-space form with optional nickname, category and a 3–2000-character message. Same-origin POST writes to shared D1 `player_feedback`; rows include version and UTC timestamp. No public read endpoint; the owner can later use Sites database tools to read and summarize. UUID retries are idempotent; failed or timed-out sends preserve text. Schema migrations are generated and committed under drizzle/.
+- Hosting: migrate the existing public Site from static-only output to an ESM Worker with `ASSETS` and `DB`. Game files remain static client assets; `/api/feedback` handles submissions and `/feedback` provides the same form independently of WebGL. Existing URL and local Godot save path remain.
+- Audio: primary attack is a short rounded blade swipe; single dash is longer, dark airflow. High frequencies reduced and envelopes differentiated. Separate original charge buildup/release and normal/heavy hit Foley. Generators preserve reproducibility.
+- Double jump: four restrained short wing-puff strokes, 0.20seconds, replacing the large downward plume.
+- Cloaks: redraw four compact bird shoulder mantles without human tube collars. Per-frame measured clasps, stable style scale capped36px wide/22px tall, pose-specific nape anchors. Original skin remains unchanged.
+- Secondary projectile baseline: longest visual side equals canonical pigeon height50.9375/5=10.1875worldpx. Keep aspect ratio. `sub_volume` rune adds5% size per copy (existing adjacency bonuses still apply). Physical radius follows half that size; trails remain visible. Explosion range also uses the rune's5% effect.
+- Death: any lethal hit plays the fall/death animation then starts a new run in the same mode with a new map seed. Carried money, items, runes, equipped runes, secondary weapons, growth and room states reset. Warehouse possessions and existing permanent profile unlocks remain, matching a normal new run. No rune-choice or recoverable loot cache is opened. Falling feathers are now purely death animation art.
+
+Artwork prompts and provenance: v30-cloak-art.md, v30-wing-puff-art.md. Audio notes: v30-audio.md. New tests cover death inventory boundaries, projectile size/rune scaling, assets and feedback request validation.
+
+Validation: exported-resource game regression suite30/30 passed; browser form submitted successfully into the local D1 database. Worker request tests and multi-touch JavaScript regression passed. Four cloak styles were composited with the actual idle sprite and visually checked facing both directions (docs/v30-cloak-review.jpg). Full live gameplay/GPU validation remains unavailable in the cloud browser because WebGL2 is missing.

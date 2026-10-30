@@ -1,0 +1,228 @@
+{
+  "version": 24,
+  "source_pixels_per_world": 2.0,
+  "biomes": {
+    "underground": [
+      {
+        "id": "underground:pebbles",
+        "path": "underground-pebbles.png",
+        "pivot": [
+          72.6,
+          44.0
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "corner_only": false
+      },
+      {
+        "id": "underground:grass",
+        "path": "underground-grass.png",
+        "pivot": [
+          75.42857142857143,
+          88.0
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "corner_only": false
+      },
+      {
+        "id": "underground:root_cluster",
+        "path": "underground-root_cluster.png",
+        "pivot": [
+          116.37158469945355,
+          176.0
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "corner_only": false
+      },
+      {
+        "id": "underground:hanging_roots",
+        "path": "underground-hanging_roots.png",
+        "pivot": [
+          98.97310513447434,
+          0.0
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "corner_only": false
+      },
+      {
+        "id": "underground:wall_growth",
+        "path": "underground-wall_growth.png",
+        "pivot": [
+          0.0,
+          64.0
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "corner_only": false
+      },
+      {
+        "id": "underground:wall_roots",
+        "path": "underground-wall_roots.png",
+        "pivot": [
+          125.12746858168762,
+          96.0
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "corner_only": false
+      }
+    ],
+    "trunk": [
+      {
+        "id": "trunk:pebbles",
+        "path": "trunk-pebbles.png",
+        "pivot": [
+          54.43428571428572,
+          44.0
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "corner_only": false
+      },
+      {
+        "id": "trunk:grass",
+        "path": "trunk-grass.png",
+        "pivot": [
+          82.92307692307693,
+          88.0
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "corner_only": false
+      },
+      {
+        "id": "trunk:root_cluster",
+        "path": "trunk-root_cluster.png",
+        "pivot": [
+          105.95024875621891,
+          176.0
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "corner_only": false
+      },
+      {
+        "id": "trunk:hanging_roots",
+        "path": "trunk-hanging_roots.png",
+        "pivot": [
+          92.29398663697104,
+          0.0
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "corner_only": false
+      },
+      {
+        "id": "trunk:wall_growth",
+        "path": "trunk-wall_growth.png",
+        "pivot": [
+          0.0,
+          64.0
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "corner_only": false
+      },
+      {
+        "id": "trunk:wall_roots",
+        "path": "trunk-wall_roots.png",
+        "pivot": [
+          128.35555555555555,
+          96.0
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "corner_only": false
+      }
+    ],
+    "sky": [
+      {
+        "id": "sky:pebbles",
+        "path": "sky-pebbles.png",
+        "pivot": [
+          58.853503184713375,
+          44.0
+        ],
+        "attach": "bottom",
+        "size_class": "small",
+        "world_height": 22,
+        "corner_only": false
+      },
+      {
+        "id": "sky:grass",
+        "path": "sky-grass.png",
+        "pivot": [
+          65.03649635036496,
+          88.0
+        ],
+        "attach": "bottom",
+        "size_class": "medium",
+        "world_height": 44,
+        "corner_only": false
+      },
+      {
+        "id": "sky:root_cluster",
+        "path": "sky-root_cluster.png",
+        "pivot": [
+          119.04622871046229,
+          176.0
+        ],
+        "attach": "bottom",
+        "size_class": "large",
+        "world_height": 88,
+        "corner_only": false
+      },
+      {
+        "id": "sky:hanging_roots",
+        "path": "sky-hanging_roots.png",
+        "pivot": [
+          93.36561743341404,
+          0.0
+        ],
+        "attach": "top",
+        "size_class": "large",
+        "world_height": 80,
+        "corner_only": false
+      },
+      {
+        "id": "sky:wall_growth",
+        "path": "sky-wall_growth.png",
+        "pivot": [
+          0.0,
+          63.99999999999999
+        ],
+        "attach": "left",
+        "size_class": "medium",
+        "world_height": 64,
+        "corner_only": false
+      },
+      {
+        "id": "sky:wall_roots",
+        "path": "sky-wall_roots.png",
+        "pivot": [
+          165.75280898876403,
+          96.0
+        ],
+        "attach": "right",
+        "size_class": "large",
+        "world_height": 96,
+        "corner_only": false
+      }
+    ]
+  }
+}

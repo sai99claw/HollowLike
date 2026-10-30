@@ -1,0 +1,39 @@
+{
+  "version": 33,
+  "biome": "sky",
+  "path": "sky.png",
+  "original_size": [
+    1774,
+    887
+  ],
+  "body_bounds": [
+    258,
+    312,
+    1257,
+    423
+  ],
+  "alpha_bounds_threshold": 20,
+  "pivot_source": [
+    886.5,
+    734
+  ],
+  "water_rect_source": [
+    350,
+    430,
+    1084,
+    112
+  ],
+  "water_surface_source": [
+    892.0,
+    486.0
+  ],
+  "world_body_width": 180,
+  "world_body_height": 60.57279,
+  "world_scale": 0.1431980906921241,
+  "water_offset_world": [
+    0.7875894988066826,
+    -35.51312649164678
+  ],
+  "render": "Keep complete original canvas; scale uniformly by world_body_width/body_bounds.width and anchor pivot_source at ground. Water effects are native droplets, never sprite splash textures.",
+  "sha256": "512b5303b2e21f983dbabc76bdaee69d54bf87102db59429a48b63998a756964"
+}

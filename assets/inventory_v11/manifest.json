@@ -1,0 +1,228 @@
+{
+  "version": 11,
+  "source": "Built-in imagegen; original transparent PNG atlases; no pixel processing",
+  "runes": {
+    "gale": [
+      64,
+      35,
+      186,
+      245
+    ],
+    "reach": [
+      333,
+      35,
+      187,
+      245
+    ],
+    "soul": [
+      602,
+      27,
+      186,
+      253
+    ],
+    "guard": [
+      881,
+      30,
+      194,
+      250
+    ],
+    "midas": [
+      60,
+      280,
+      188,
+      280
+    ],
+    "leech": [
+      334,
+      280,
+      191,
+      280
+    ],
+    "wing": [
+      599,
+      280,
+      197,
+      280
+    ],
+    "pierce": [
+      877,
+      280,
+      199,
+      280
+    ],
+    "dewflow": [
+      44,
+      560,
+      212,
+      281
+    ],
+    "swarm": [
+      312,
+      560,
+      222,
+      281
+    ],
+    "multishot": [
+      594,
+      560,
+      206,
+      281
+    ],
+    "reflect": [
+      850,
+      560,
+      251,
+      281
+    ],
+    "longblade": [
+      23,
+      841,
+      253,
+      280
+    ],
+    "swiftblade": [
+      301,
+      841,
+      253,
+      280
+    ],
+    "sanctuary": [
+      569,
+      841,
+      255,
+      280
+    ],
+    "orbit_shield": [
+      848,
+      841,
+      257,
+      280
+    ],
+    "orbit_bee": [
+      20,
+      1121,
+      258,
+      233
+    ],
+    "motion_energy": [
+      299,
+      1121,
+      258,
+      237
+    ],
+    "bloodblade": [
+      569,
+      1121,
+      260,
+      239
+    ],
+    "heartplus": [
+      845,
+      1121,
+      260,
+      237
+    ]
+  },
+  "items": {
+    "secondary_needle": [
+      21,
+      15,
+      337,
+      254
+    ],
+    "secondary_scatter": [
+      398,
+      8,
+      305,
+      262
+    ],
+    "secondary_stone": [
+      757,
+      9,
+      329,
+      258
+    ],
+    "secondary_moonblade": [
+      1123,
+      8,
+      314,
+      262
+    ],
+    "secondary_ricochet": [
+      26,
+      303,
+      326,
+      215
+    ],
+    "secondary_sunray": [
+      385,
+      275,
+      330,
+      261
+    ],
+    "secondary_multibounce": [
+      754,
+      286,
+      298,
+      253
+    ],
+    "secondary_impact_bomb": [
+      1086,
+      287,
+      351,
+      243
+    ],
+    "secondary_piercing_laser": [
+      12,
+      551,
+      346,
+      263
+    ],
+    "secondary_shockwave": [
+      385,
+      543,
+      329,
+      271
+    ],
+    "secondary_chain_staff": [
+      741,
+      543,
+      331,
+      271
+    ],
+    "items_heal": [
+      1108,
+      558,
+      330,
+      249
+    ],
+    "items_energy": [
+      75,
+      814,
+      235,
+      263
+    ],
+    "items_bomb": [
+      398,
+      814,
+      305,
+      249
+    ],
+    "items_shield": [
+      765,
+      814,
+      293,
+      260
+    ],
+    "items_freeze": [
+      1125,
+      817,
+      292,
+      255
+    ]
+  },
+  "prompts": [
+    "20 individual purple small and gold greater engraved forest rune jewels in 4x5 uniform atlas; wind feather, long feather, dewdrop, moss shield, wheat, red sprout, cloud, pierced leaf, spring, bee, triple feathers; reflective feather, sky blade, swift mint wings, healing sanctuary, orbital shield, crowned bee, energy feather, blood heart blade, winged heart. Genuine alpha, soft hand-painted gouache, no text.",
+    "16 individual hand-painted forest weapons and supplies in 4x4 atlas: needle launcher, acorn spread sling, meteor fruit, moon feather blade, ricochet marble, sun wand, five-star seed launcher, explosive fruit cannon, laser staff, shockwave blade, chain lightning staff; berries, dew bottle, bomb acorn, feather shield, ice leaf. Genuine alpha, no text."
+  ]
+}

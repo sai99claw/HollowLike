@@ -1,0 +1,387 @@
+{
+  "version": 23,
+  "mode": "built-in image_gen",
+  "notes": [
+    "Source rectangles are authoritative. Top row y0..485; lower row y485..887. Original generated PNG pixels are unedited.",
+    "Air pivots are feet local anchors. Wall pivot is the lower foot contact, not body centre or lowest tail pixel. Both upper/lower footsoles share the rightmost verticalcontact plane.",
+    "Wall pose should be rendered with contact anchor at physical wall x (body center+wallside*17), y at collision feet. Mirror whole local art/contact together for left wall; do not shift physical body.",
+    "Body landmarks are manually inspected approximate anatomy, not runtime scale targets. Wings, tail and tucked legs legitimately change silhouette.",
+    "Walking master remains authoritative at80/256; its visible standingheight50.9375. Fixed scale here0.192945 gives approx21px head diameter and50.94pxstanding reference."
+  ],
+  "animations": {
+    "air": {
+      "path": "pigeon-air-wall.png",
+      "fps": 8,
+      "loop": false,
+      "reference_height": 264,
+      "world_height": 50.9375,
+      "pixel_factor": 0.19294507575757575,
+      "poses": [
+        "ascent",
+        "apex",
+        "descent",
+        "landing"
+      ],
+      "calibration": "One fixed50.9375/264 scale for all eight poses. Measured head diameter/body torso from walking master, not expanded wings or tail silhouette. Do not independently fit frames.",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            443,
+            485
+          ],
+          "size": [
+            443,
+            485
+          ],
+          "visible_bounds": [
+            65,
+            91,
+            334,
+            266
+          ],
+          "pivot": [
+            248,
+            357
+          ],
+          "body_landmarks": {
+            "head_center": [
+              329,
+              151
+            ],
+            "neck": [
+              322,
+              219
+            ],
+            "hip": [
+              249,
+              299
+            ]
+          },
+          "sha256": "ddee61cdb8d821f679ff0e846c8cbdf7eb895f23ba95ad6389bfcdae50daf22c"
+        },
+        {
+          "source_rect": [
+            443,
+            0,
+            444,
+            485
+          ],
+          "size": [
+            444,
+            485
+          ],
+          "visible_bounds": [
+            67,
+            110,
+            340,
+            245
+          ],
+          "pivot": [
+            223,
+            355
+          ],
+          "body_landmarks": {
+            "head_center": [
+              335,
+              170
+            ],
+            "neck": [
+              320,
+              237
+            ],
+            "hip": [
+              222,
+              310
+            ]
+          },
+          "sha256": "9267428869fbaaad4d1cc34a547e8a262d3fc6c4459d7f54512d0debcb77c598"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            485
+          ],
+          "size": [
+            443,
+            485
+          ],
+          "visible_bounds": [
+            55,
+            165,
+            335,
+            289
+          ],
+          "pivot": [
+            280,
+            454
+          ],
+          "body_landmarks": {
+            "head_center": [
+              326,
+              218
+            ],
+            "neck": [
+              312,
+              287
+            ],
+            "hip": [
+              241,
+              358
+            ]
+          },
+          "sha256": "7b4e276d71f4af7510156b1611356970d3982c73acc27ebf21d1912fa99afdca"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            485
+          ],
+          "size": [
+            444,
+            485
+          ],
+          "visible_bounds": [
+            51,
+            192,
+            338,
+            264
+          ],
+          "pivot": [
+            257,
+            456
+          ],
+          "body_landmarks": {
+            "head_center": [
+              324,
+              246
+            ],
+            "neck": [
+              307,
+              315
+            ],
+            "hip": [
+              239,
+              393
+            ]
+          },
+          "sha256": "81452a0cb3eddda95ae82b69513fdeff67a4e33255df0161304cb5945e92266d"
+        }
+      ]
+    },
+    "wall": {
+      "path": "pigeon-air-wall.png",
+      "fps": 8,
+      "loop": true,
+      "reference_height": 264,
+      "world_height": 50.9375,
+      "pixel_factor": 0.19294507575757575,
+      "poses": [
+        "brace_a",
+        "breathe_up",
+        "brace_b",
+        "breathe_down"
+      ],
+      "calibration": "One fixed50.9375/264 scale for all eight poses. Measured head diameter/body torso from walking master, not expanded wings or tail silhouette. Do not independently fit frames.",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            485,
+            443,
+            402
+          ],
+          "size": [
+            443,
+            402
+          ],
+          "visible_bounds": [
+            56,
+            63,
+            311,
+            275
+          ],
+          "pivot": [
+            367,
+            319
+          ],
+          "body_landmarks": {
+            "head_center": [
+              280,
+              118
+            ],
+            "neck": [
+              281,
+              178
+            ],
+            "hip": [
+              256,
+              271
+            ]
+          },
+          "sha256": "bd52114ba84a28e24283d5f3a8eae1c580f1ddef5ec15907b0ca45605472b725",
+          "wall_contact": [
+            367,
+            319
+          ],
+          "contact_plane_x": 367,
+          "feet_bounds": [
+            300,
+            95,
+            67,
+            224
+          ]
+        },
+        {
+          "source_rect": [
+            443,
+            485,
+            444,
+            402
+          ],
+          "size": [
+            444,
+            402
+          ],
+          "visible_bounds": [
+            61,
+            45,
+            305,
+            285
+          ],
+          "pivot": [
+            366,
+            319
+          ],
+          "body_landmarks": {
+            "head_center": [
+              306,
+              100
+            ],
+            "neck": [
+              304,
+              166
+            ],
+            "hip": [
+              269,
+              267
+            ]
+          },
+          "sha256": "df05c81365cd081d5d95689c7dbc719ea45a174fc0b5fa3c43f678700b753a62",
+          "wall_contact": [
+            366,
+            319
+          ],
+          "contact_plane_x": 366,
+          "feet_bounds": [
+            300,
+            95,
+            66,
+            224
+          ]
+        },
+        {
+          "source_rect": [
+            887,
+            485,
+            443,
+            402
+          ],
+          "size": [
+            443,
+            402
+          ],
+          "visible_bounds": [
+            68,
+            60,
+            306,
+            268
+          ],
+          "pivot": [
+            374,
+            319
+          ],
+          "body_landmarks": {
+            "head_center": [
+              304,
+              113
+            ],
+            "neck": [
+              302,
+              182
+            ],
+            "hip": [
+              270,
+              272
+            ]
+          },
+          "sha256": "2d7a671f09abd782945ba8ac2cfc46bbcf98b20103eb20ef032b4e61f06a34de",
+          "wall_contact": [
+            374,
+            319
+          ],
+          "contact_plane_x": 374,
+          "feet_bounds": [
+            300,
+            95,
+            74,
+            224
+          ]
+        },
+        {
+          "source_rect": [
+            1330,
+            485,
+            444,
+            402
+          ],
+          "size": [
+            444,
+            402
+          ],
+          "visible_bounds": [
+            61,
+            46,
+            307,
+            284
+          ],
+          "pivot": [
+            368,
+            319
+          ],
+          "body_landmarks": {
+            "head_center": [
+              295,
+              101
+            ],
+            "neck": [
+              293,
+              173
+            ],
+            "hip": [
+              261,
+              271
+            ]
+          },
+          "sha256": "1cbd26c0b586a4ad3354c648e83378bfd4127d633761a0e3932fdda319f37841",
+          "wall_contact": [
+            368,
+            319
+          ],
+          "contact_plane_x": 368,
+          "feet_bounds": [
+            300,
+            95,
+            68,
+            224
+          ]
+        }
+      ]
+    }
+  }
+}

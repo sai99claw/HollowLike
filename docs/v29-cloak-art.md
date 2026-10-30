@@ -1,0 +1,48 @@
+# v0.29 披風素材
+
+Mode: built-in `image_gen.imagegen`; transparent_background=true. New cloak-only art. Existing pigeon body, head, feet, scarf, and gameplay animations are unchanged. Each style has three discrete breeze poses; canvas 2172 × 724, three 724 × 724 cells. Real RGBA alpha verified (range 0–255); no baked backdrop. Collar attachment pivots measured per pose and specified in `assets/v29/cloaks/catalog.json` relative to the full frame. All files are project-bound copies of generated output.
+
+Index order: original, street, future, medieval, cute. Original uses slate-indigo with ivory trim to match the existing pigeon scarf. At ~42 world pixels garment height, keep fixed scale per style across animation frames; derive scale from maximum visible bounds height within the style, rather than rescaling every pose. Mirror around the collar pivot for left-facing birds. Use pose 0 for idle, poses 0/1/2 for moving breeze; preserve cloak height and position on all body animation frames.
+
+Original source paths:
+
+- original: exec-5e97277c-0937-42eb-a5f2-3baf582d3113.png
+- street: exec-2cad6de8-b599-4e0e-8fb7-41be5a7e2d04.png
+- future: exec-3ec2758a-7410-4f08-a9aa-451fafcae2ce.png
+- medieval: exec-2f18daee-8a8d-4c1e-b607-624b22bc287f.png
+- cute: exec-af361711-4c35-4e24-aacb-d6421b9fb9c5.png
+
+## Exact generation prompts
+
+### classic
+
+```text
+Use case: stylized-concept. Asset type: transparent 2D side-view cloak-only animation sprite strip for a small pigeon action-platformer. Create one horizontal row of EXACTLY THREE equal square cells, total canvas 1536x512, no dividing lines. Subject: Original classic: slate indigo-blue scarf-cape with simple ivory hem and a little silver neck clasp, no pattern, elegant original costume. The ONLY subject is a lightweight small CLOAK/SCARF-CAPE garment, no person, no pigeon, no animal, no body, no mannequin, no head, no arms, no armor, no weapons. All three frames show the same garment from strict side view, neck attachment at upper-right, fabric extends mostly LEFT and downward behind a bird facing right. The neck attachment/clasp stays at local cell coordinate about x=390,y=140, with trailing cape reaching x=90,y=390. Frame 1 gently hanging/trailing left; frame 2 tail lifts in breeze; frame 3 tail folds slightly downward in breeze. Keep same physical size, attachment position, materials, colors, silhouette weight. Handpainted gothic dark fantasy platformer art, fine black ink contours and subtle gouache brush texture, high readability at small game scale, saturated main accent restrained with charcoal shadows. Short cape silhouette with graceful folds and a twin trailing edge. Keep garment entirely inside each cell with at least 48 pixels transparent margin on all sides. Truly transparent alpha background, no background, no shadow on floor, no UI, no text, no labels, no grid, no watermark. Do not paint the bird itself.
+```
+
+### street
+
+```text
+Use case: stylized-concept. Asset type: transparent 2D side-view cloak-only animation sprite strip for a small pigeon action-platformer. Create one horizontal row of EXACTLY THREE equal square cells, total canvas 1536x512, no dividing lines. Subject: Trendy streetwear: rich vermilion red and charcoal-black short cape, a single restrained antique-gold diagonal stripe and small silver fastener; modern high-fashion fabric. The ONLY subject is a lightweight small CLOAK/SCARF-CAPE garment, no person, no pigeon, no animal, no body, no mannequin, no head, no arms, no armor, no weapons. All three frames show the same garment from strict side view, neck attachment at upper-right, fabric extends mostly LEFT and downward behind a bird facing right. The neck attachment/clasp stays at local cell coordinate about x=390,y=140, with trailing cape reaching x=90,y=390. Frame 1 gently hanging/trailing left; frame 2 tail lifts in breeze; frame 3 tail folds slightly downward in breeze. Keep same physical size, attachment position, materials, colors, silhouette weight. Handpainted gothic dark fantasy platformer art, fine black ink contours and subtle gouache brush texture, high readability at small game scale, saturated main accent restrained with charcoal shadows. Short cape silhouette with graceful folds and a twin trailing edge. Keep garment entirely inside each cell with at least 48 pixels transparent margin on all sides. Truly transparent alpha background, no background, no shadow on floor, no UI, no text, no labels, no grid, no watermark. Do not paint the bird itself.
+```
+
+### future
+
+```text
+Use case: stylized-concept. Asset type: transparent 2D side-view cloak-only animation sprite strip for a small pigeon action-platformer. Create one horizontal row of EXACTLY THREE equal square cells, total canvas 1536x512, no dividing lines. Subject: Future technology: dark navy short cape with restrained cyan luminous circuit-like seam piping, angular split hem, compact cool-metal clasp; still painterly fabric, not armor. The ONLY subject is a lightweight small CLOAK/SCARF-CAPE garment, no person, no pigeon, no animal, no body, no mannequin, no head, no arms, no armor, no weapons. All three frames show the same garment from strict side view, neck attachment at upper-right, fabric extends mostly LEFT and downward behind a bird facing right. The neck attachment/clasp stays at local cell coordinate about x=390,y=140, with trailing cape reaching x=90,y=390. Frame 1 gently hanging/trailing left; frame 2 tail lifts in breeze; frame 3 tail folds slightly downward in breeze. Keep same physical size, attachment position, materials, colors, silhouette weight. Handpainted gothic dark fantasy platformer art, fine black ink contours and subtle gouache brush texture, high readability at small game scale, saturated main accent restrained with charcoal shadows. Short cape silhouette with graceful folds and a twin trailing edge. Keep garment entirely inside each cell with at least 48 pixels transparent margin on all sides. Truly transparent alpha background, no background, no shadow on floor, no UI, no text, no labels, no grid, no watermark. Do not paint the bird itself.
+```
+
+### medieval
+
+```text
+Use case: stylized-concept. Asset type: transparent 2D side-view cloak-only animation sprite strip for a small pigeon action-platformer. Create one horizontal row of EXACTLY THREE equal square cells, total canvas 1536x512, no dividing lines. Subject: Medieval: deep burgundy short cape, antique-gold embroidered vine hem and tiny heraldic clasp, elegant aged velvet. The ONLY subject is a lightweight small CLOAK/SCARF-CAPE garment, no person, no pigeon, no animal, no body, no mannequin, no head, no arms, no armor, no weapons. All three frames show the same garment from strict side view, neck attachment at upper-right, fabric extends mostly LEFT and downward behind a bird facing right. The neck attachment/clasp stays at local cell coordinate about x=390,y=140, with trailing cape reaching x=90,y=390. Frame 1 gently hanging/trailing left; frame 2 tail lifts in breeze; frame 3 tail folds slightly downward in breeze. Keep same physical size, attachment position, materials, colors, silhouette weight. Handpainted gothic dark fantasy platformer art, fine black ink contours and subtle gouache brush texture, high readability at small game scale, saturated main accent restrained with charcoal shadows. Short cape silhouette with graceful folds and a twin trailing edge. Keep garment entirely inside each cell with at least 48 pixels transparent margin on all sides. Truly transparent alpha background, no background, no shadow on floor, no UI, no text, no labels, no grid, no watermark. Do not paint the bird itself.
+```
+
+### cute
+
+```text
+Use case: stylized-concept. Asset type: transparent 2D side-view cloak-only animation sprite strip for a small pigeon action-platformer. Create one horizontal row of EXACTLY THREE equal square cells, total canvas 1536x512, no dividing lines. Subject: Cute girl: dusty rose-pink and cream short cape, delicate cream ruffled hem, one small bow at attachment, refined and charming rather than toy-like. The ONLY subject is a lightweight small CLOAK/SCARF-CAPE garment, no person, no pigeon, no animal, no body, no mannequin, no head, no arms, no armor, no weapons. All three frames show the same garment from strict side view, neck attachment at upper-right, fabric extends mostly LEFT and downward behind a bird facing right. The neck attachment/clasp stays at local cell coordinate about x=390,y=140, with trailing cape reaching x=90,y=390. Frame 1 gently hanging/trailing left; frame 2 tail lifts in breeze; frame 3 tail folds slightly downward in breeze. Keep same physical size, attachment position, materials, colors, silhouette weight. Handpainted gothic dark fantasy platformer art, fine black ink contours and subtle gouache brush texture, high readability at small game scale, saturated main accent restrained with charcoal shadows. Short cape silhouette with graceful folds and a twin trailing edge. Keep garment entirely inside each cell with at least 48 pixels transparent margin on all sides. Truly transparent alpha background, no background, no shadow on floor, no UI, no text, no labels, no grid, no watermark. Do not paint the bird itself.
+```
+
+
+Final integration: runtime import limit is1024px for each strip; full-resolution source PNGs remain tracked. Original skin keeps the preexisting scarf without drawing an added cloak. Four additional styles draw only cloak overlays. Runtime uses42/visible_height, imported/original texture ratio, and per-frame collar pivots. The wardrobe shows the cosmetics on the original pigeon body.

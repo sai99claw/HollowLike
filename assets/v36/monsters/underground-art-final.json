@@ -1,0 +1,38 @@
+{
+  "generation_mode": "builtin image_gen",
+  "source_grid": {
+    "regular": [
+      6,
+      10
+    ],
+    "elite": [
+      6,
+      8
+    ]
+  },
+  "regular": {
+    "path": "source/underground-regular.png",
+    "original_path": "/workspace/scratch/04706064e0ec/generated_images/exec-0d17826f-1e66-42f8-8025-13d9406ee5ca.png",
+    "size": [
+      971,
+      1619
+    ],
+    "prompt": "Use case: stylized-concept. Asset type: production transparent 2D game CHARACTER ONLY sprite sheet. Create exactly 6 columns and exactly 10 rows, evenly spaced invisible cells, 60 complete separate miniature creatures. Portrait aspect 3:5 (target1024x1707). Every creature must be SMALL: its entire body including every leg, pincer, wing, horn and tendril occupies at most HALF the width and HALF the height of its cell. Huge clear transparent gaps between every sprite. No grids or text. Each sprite faces RIGHT and keeps identical anatomy and scale across its two rows. Hand-painted finely detailed gothic dark fantasy, amber ochre single main accent, bone ivory, charcoal outlines, luminous minerals, NOT pixel art. True transparent background. ABSOLUTELY NO projectiles, no slashes, no glowing arcs, no motion streaks, no particles, no ground, no shadows, no decorative props. Only full character bodies in meaningful anatomical poses. Five species, each spans TWO consecutive rows: row1 cave crab charcoal shell amber crystal pincer: columns1-3 walking steps,4-6 slowly raising pincer for attack; row2 SAME crab: columns1-3 snapping its pincer horizontally without extending beyond body footprint,4-6 returning to idle. Row3 squat cave toad amber resin cheeks and throat sac: cols1-3 hopping preparation/air/landing,4-6 inflating throat; row4 SAMEtoad: cols1-3 open mouth recoil of spit but NOTHING emitted,4-6 deflate/recover. Row5 cave moth lantern abdomen mineral wings: cols1-3 wingbeat cycle,4-6 draw abdomen backward aiming; row6 SAMEmoth: cols1-3 abdomen forward firing pose without anything emitted,4-6 relax. Row7 floating mushroom jellyfish amber bell and root tendrils: cols1-3 drifting bell pulse,4-6 open underside; row8 SAMEjellyfish: cols1-3 contracting bell to drop a pod but no separate pod,4-6 closing bell. Row9 blind root armored beetle broad ram horn heavy forelegs: cols1-3 walking steps,4-6 brace legs lower horn; row10 SAMEbeetle: cols1-3 leaning naturally into body ram, NEVER elongate or stretch its body,4-6 braking to idle. Important: exactly six isolated complete characters on EVERY row. All limbs stay inside central HALF of every cell; preserve large transparent margins."
+  },
+  "elite": {
+    "path": "source/underground-elite.png",
+    "original_path": "/workspace/scratch/04706064e0ec/generated_images/exec-0144320b-0415-4e77-af76-d849a99f76fe.png",
+    "size": [
+      1086,
+      1448
+    ],
+    "prompt": "Use case: stylized-concept. Production transparent 2D game CHARACTER ONLY sprite atlas, exact6columns by8rows, 48 complete miniature creatures. Portrait3:4target1086x1448. Every entire character including all limbs/horns/pincers must fit within CENTRAL HALF of its invisible cell, huge empty transparent gaps all sides. RIGHTfacing, sameidentityandbodyscale acrossrows. Hand-painted finely detailed gothic darkfantasy, amberochre dominant, boneivory, charcoal cleancontours. NOtext,labels,grid,background,ground,castshadow. ABSOLUTELY NOprojectiles,slashingarcs,magicaleffects,particles,motionstreaks,detachedobjects: ONLYfullanatomicalcharacterposes. Two elite species each twoattacks. Rows1-4 SAME giant geodecrab knight with charcoal armored shell, two amber crystal claws and openable crystal chest: row1 cols1-3walksteps cols4-6raisingbothclaws; row2 cols1-3crossclawscrushingstrike CLOSE TO BODY (do not elongate arms) cols4-6recovery. Row3 cols1-3walksteps cols4-6unfoldingcrystalchest andaiming; row4 cols1-3chestforwardfiringpose withnothing emitted cols4-6chestclosing/recover. Rows5-8 SAMEheavybeetle with amber censerabdomen, blunt horn, articulatedthrowingforearm: row5 cols1-3walksteps cols4-6coillegsandlowerhorn; row6 cols1-3naturalbodyleanintoRAM withnormalproportions NEVERstretchingbody cols4-6braketorest. Row7 cols1-3walksteps cols4-6cockthrowingarmback; row8 cols1-3throwingarmfollowthrough EMPTY hand withnothing emitted cols4-6recoverarm. Exact6 isolatedcompletecharacters EVERYrow. SMALL sprites withatleast20%transparentpadding eachside. No creature or limb touches its cell boundaries."
+  },
+  "qa": [
+    "Six complete characters per row, correct six-column source mapping",
+    "Actor-only sheets have no embedded projectiles, slashes or motion streaks",
+    "All anatomy remains natural during ram",
+    "Some horn/pincer poses occupy more than requested half cell; runtime must use proportional cells and add transparent padding rather than assume fixed authored margins",
+    "Original 12-column sheets preserved as -v1.png"
+  ]
+}

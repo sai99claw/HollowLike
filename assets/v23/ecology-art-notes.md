@@ -1,0 +1,9 @@
+# v23 ecological props and edge art
+
+All seven PNGs were generated with the built-in image_gen tool, with genuine alpha transparency. They are the native generated source images; no pixel upscaling, recoloring, or background removal was used. Exact prompts are retained in ecology-prompts.json.
+
+- launcher-manifest.json: 3 biome clips, 8 poses each, 8 FPS, one uniform world-width calibration of96px perclip. Frame0/rest and frame7/rest; 1–2compression;3–4launch;5–6recovery. Each measured pivot is at the compactstone/rootbase, so varying cap height cannot pull the base away from the ground. Use a compact collisionbox around the resting cap/base rather than the launchstreaks.
+- edge-decor-manifest.json:18 distinct pieces,6 perbiome. Fixed authored size classes22/44/88px forgroundpieces,80pxhangingroots,64/96pxsidegrowth. Render exact source rectangles, groundpivotatbottom, hangingat top, sidesat left/right; do not randomly scale eachinstance. Large pieces should be placed away fromdoor mouths and central route landingzones. Visible bounds ignore neartransparent antialias RGB so only the solidshape governs density.
+- platform-four-manifest.json:3 native long4cell shelves, each384worldpixels. They match v21 suspendedrock/rootstyle withownnewdetails, rather thanstretching a shorter platform. Align sourcebody_span[0],surface_y tocollisiontop-left, scale uniformly384/reference_width. Sourcebodyspan is[left,right-exclusive], allalpha≥240acrossphysicalsurface. Tiny grass above and roots below remain outside the walkable top as decorative silhouettes.
+
+Source rectangles were inspected visually and measured individually. Original PNG alpha includes fully clear canvas with fine edge antialiasing; the RGB of fully transparent pixels may be darkcolored and should not be rendered without alpha. Noopaquebackgrounds or visiblegridlabels are present.

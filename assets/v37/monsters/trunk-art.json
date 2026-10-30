@@ -1,0 +1,63 @@
+{
+  "version": 37,
+  "biome": "trunk",
+  "generator": "built-in image_gen",
+  "source": "source/trunk-regular.png",
+  "source_grid": [
+    6,
+    10
+  ],
+  "logical_phases": {
+    "move": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "windup": [
+      6,
+      7
+    ],
+    "active": [
+      8,
+      9
+    ],
+    "recovery": [
+      10,
+      11
+    ]
+  },
+  "prompts": [
+    {
+      "kind": "identity-reference-draft-rejected",
+      "prompt": "Use case: stylized-concept. Production transparent RGBA game sprite atlas, hand-painted gothic dark fantasy with strong dark ink outlines, luminous restrained emerald-jade dominant accents, ivory highlights, dark bark brown. EXACTLY SIX COLUMNS and TEN ROWS of evenly spaced cells, portrait canvas width:height = 3:5 (about 972x1620). 60 separate complete small sprites. No words, no grid lines, no background, no floor, no shadows outside bodies, no projectile or effect. All face RIGHT. Leave 20% transparent gutter inside EACH cell, especially scythe tips; every extremity entirely inside its own cell. Five species each uses TWO CONSECUTIVE ROWS. Within each pair preserve EXACT SAME body shape, proportions, armor, colors, head and appendages. All poses same scale, grounded foot baseline fixed.\nFor EVERY species, FIRST row is SIX TRUE MOVEMENT CYCLE KEYFRAMES ONLY, not anticipation: alternating six different footfall leg positions for ground creatures, or six wing/fin stroke positions for flyers, body translated nowhere. SECOND row is SIX ATTACK keyframes: col1 crouch/draw back, col2 strong tense windup silhouette, col3 explosive action/extension, col4 followthrough, col5 recoil/settle, col6 neutral recovery. No attack poses in the first movement row.\nRows1-2: bark-armored lean mantis with leaf-edged forearm scythes, brown carapace emerald foliage, long narrow triangular head. Row1 scythes stay lowered/relaxed all six steps; row2 draws scythe back, holds it high, sweeps forward, follows through, then recovers. Keep all scythes tucked within own cell, no blade touches another sprite.\nRows3-4: compact leaf-tailed hopping brown mouse wearing an acorn-cap helmet and carrying a vine sling. Six stages of hop/run legs, same mouse size. Attack crouches, pulls sling, releases empty sling, follows through, settles, neutral. Do not draw acorn projectile.\nRows5-6: emerald wasp with pollen bulb abdomen, translucent ivory wings, seed-shooting proboscis. Six distinct wing stroke positions: high, halfdown, low, halfup, high sweptback, forward. Attack arches proboscis back, aim, straight extension/spit with empty mouth, followthrough, recoil, recover. No needle projectile.\nRows7-8: lantern spider hanging beneath an emerald ivory translucent silk balloon; small dangling spider body and seed sacs. Six gently swaying leg and balloon motion poses. Attack contracts balloon, tense hold, drops sac with EMPTY SPACE below, followthrough, reinflate, recover. No seed object or detached parts.\nRows9-10: compact broad bark boar, ivy tusks, thorn spine, sturdy short powerful legs. Six clear alternating walking footfalls, tusks neutral level, same body silhouette. Attack braces hooves, lowers tusks, charges by forward body posture, followthrough, brakes, recovers.\nThe existing referenced image establishes species identities and paint style ONLY; ignore its animation timing/layout. This NEW atlas must use 6 movement then 6 attack poses per species as stated, unlike the old sheet. Each six-frame movement cycle should visibly show meaningful limb motion yet consistent torso shape.",
+      "source": "source/trunk-regular-rejected-v1.png",
+      "reason": "Reference repeated old movement/anticipation arrangement."
+    },
+    {
+      "kind": "fresh-full-sequence",
+      "prompt": "Use case: stylized-concept. Production transparent RGBA game sprite atlas, hand-painted gothic dark fantasy with strong dark ink outlines, luminous restrained emerald-jade dominant accents, ivory highlights, dark bark brown. EXACTLY SIX COLUMNS and TEN ROWS of evenly spaced cells, portrait canvas width:height = 3:5 (about 972x1620). 60 separate complete small sprites. No words, no grid lines, no background, no floor, no shadows outside bodies, no projectile or effect. All face RIGHT. Leave 20% transparent gutter inside EACH cell, especially scythe tips; every extremity entirely inside its own cell. Five species each uses TWO CONSECUTIVE ROWS. Within each pair preserve EXACT SAME body shape, proportions, armor, colors, head and appendages. All poses same scale, grounded foot baseline fixed.\nFor EVERY species, FIRST row is SIX TRUE MOVEMENT CYCLE KEYFRAMES ONLY, not anticipation: alternating six different footfall leg positions for ground creatures, or six wing/fin stroke positions for flyers, body translated nowhere. SECOND row is SIX ATTACK keyframes: col1 crouch/draw back, col2 strong tense windup silhouette, col3 explosive action/extension, col4 followthrough, col5 recoil/settle, col6 neutral recovery. No attack poses in the first movement row.\nRows1-2: bark-armored lean mantis with leaf-edged forearm scythes, brown carapace emerald foliage, long narrow triangular head. Row1 scythes stay lowered/relaxed all six steps; row2 draws scythe back, holds it high, sweeps forward, follows through, then recovers. Keep all scythes tucked within own cell, no blade touches another sprite.\nRows3-4: compact leaf-tailed hopping brown mouse wearing an acorn-cap helmet and carrying a vine sling. Six stages of hop/run legs, same mouse size. Attack crouches, pulls sling, releases empty sling, follows through, settles, neutral. Do not draw acorn projectile.\nRows5-6: emerald wasp with pollen bulb abdomen, translucent ivory wings, seed-shooting proboscis. Six distinct wing stroke positions: high, halfdown, low, halfup, high sweptback, forward. Attack arches proboscis back, aim, straight extension/spit with empty mouth, followthrough, recoil, recover. No needle projectile.\nRows7-8: lantern spider hanging beneath an emerald ivory translucent silk balloon; small dangling spider body and seed sacs. Six gently swaying leg and balloon motion poses. Attack contracts balloon, tense hold, drops sac with EMPTY SPACE below, followthrough, reinflate, recover. No seed object or detached parts.\nRows9-10: compact broad bark boar, ivy tusks, thorn spine, sturdy short powerful legs. Six clear alternating walking footfalls, tusks neutral level, same body silhouette. Attack braces hooves, lowers tusks, charges by forward body posture, followthrough, brakes, recovers.\n\nImportant: all odd-numbered rows (1,3,5,7,9) are uninterrupted six-frame locomotion loops; no attack anticipation at all in those rows. Draw same character silhouettes in every cell. Exact60spritecount. Gutter30pixels allaroundeachsprite.",
+      "source": "source/trunk-regular-unpadded.png"
+    },
+    {
+      "kind": "padding-refinement",
+      "prompt": "Precise sprite atlas spacing edit. Preserve all 60 poses, anatomy, color, identity, drawing style, and exact six-column by ten-row arrangement from the input. Change ONLY spacing/scale: make each individual creature approximately 25 percent smaller inside its OWN grid cell, with no separate body part moved to any other cell. Recenter every complete creature in its cell so there is at least 20 pixels transparent padding on all four sides, including the top row mantis antennae. The two attacking mantis long green scythes in row2 columns3/4 must fit wholly inside their own cells, NO touching adjacent mantis. Same for mouse sling row4 and wasp proboscis row6. All60 complete sprites retain body and weapon proportions and common scale within each species. Do not add, delete, morph, merge, or clip any creature. Exactly6 columns10 rows, transparent RGBA background, portrait3:5 canvas. No gridlines no labels no backdrop.",
+      "source": "source/trunk-regular.png"
+    }
+  ],
+  "qa": {
+    "size": [
+      971,
+      1619
+    ],
+    "rgba": true,
+    "true_alpha": true,
+    "extractor": "scripts/prepare_monster_art_v36.py actor_pieces(image,5)",
+    "extracted_cells": 60,
+    "complete_silhouettes": true,
+    "neighbor_fragments": false,
+    "notes": "Inspected full source and all60 extractedposes on darkgreen contact sheet. Active mantis scythe overhangs nominalcolumn but remains attachedtoits own body and wholecomponentextraction retainsallblade; no neighboringbody fragments. Same torsoidentity across six locomotion andsixattackposes. Wingstrokes sixdistinct orientations; noVFX orprojectiles."
+  }
+}

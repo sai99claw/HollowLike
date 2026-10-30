@@ -1,0 +1,105 @@
+{
+  "version": 28,
+  "path": "heavy-landing.png",
+  "original_size": [
+    2048,
+    768
+  ],
+  "cell_size": [
+    512,
+    768
+  ],
+  "duration": 0.5,
+  "loop": false,
+  "world_height": 50.9375,
+  "reference_height": 323,
+  "pixel_factor": 0.15770123839009287,
+  "import_size_limit": 1024,
+  "timing_seconds": [
+    0,
+    0.08,
+    0.34,
+    0.44,
+    0.5
+  ],
+  "calibration": "One shared50.9375/323 scale for every pose. Crouch lowers torso by knee articulation. Never fit each frame independently. Per-frame feet pivots align the source soles.",
+  "frames": [
+    {
+      "pose": "impact_compression",
+      "source_rect": [
+        0,
+        0,
+        512,
+        768
+      ],
+      "pivot": [
+        317,
+        643
+      ],
+      "visible_bounds": [
+        41,
+        321,
+        452,
+        323
+      ]
+    },
+    {
+      "pose": "low_crouch",
+      "source_rect": [
+        512,
+        0,
+        512,
+        768
+      ],
+      "pivot": [
+        280,
+        641
+      ],
+      "visible_bounds": [
+        53,
+        406,
+        457,
+        236
+      ]
+    },
+    {
+      "pose": "crouch_hold",
+      "source_rect": [
+        1024,
+        0,
+        512,
+        768
+      ],
+      "pivot": [
+        277,
+        642
+      ],
+      "visible_bounds": [
+        40,
+        389,
+        468,
+        254
+      ]
+    },
+    {
+      "pose": "half_rise",
+      "source_rect": [
+        1536,
+        0,
+        512,
+        768
+      ],
+      "pivot": [
+        293,
+        640
+      ],
+      "visible_bounds": [
+        40,
+        326,
+        429,
+        315
+      ]
+    }
+  ],
+  "sha256": "6744cc72bfd5336ca7b3a839ba48df62c1cd803e62bd1f1e718761eca0cabfce"
+}

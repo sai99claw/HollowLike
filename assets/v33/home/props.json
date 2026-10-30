@@ -1,0 +1,86 @@
+{
+  "original_size": [
+    1254,
+    1254
+  ],
+  "frames": [
+    {
+      "id": "musou",
+      "rect": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "pivot": [
+        326.5,
+        608
+      ],
+      "bounds": [
+        52,
+        57,
+        549,
+        551
+      ]
+    },
+    {
+      "id": "rogue",
+      "rect": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "pivot": [
+        300.5,
+        608
+      ],
+      "bounds": [
+        26,
+        58,
+        549,
+        550
+      ]
+    },
+    {
+      "id": "records",
+      "rect": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "pivot": [
+        340.5,
+        560
+      ],
+      "bounds": [
+        139,
+        69,
+        403,
+        491
+      ]
+    },
+    {
+      "id": "bounce",
+      "rect": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "pivot": [
+        299.0,
+        546
+      ],
+      "bounds": [
+        29,
+        153,
+        540,
+        393
+      ]
+    }
+  ],
+  "source_density": 2,
+  "notes": "Per-frame pivots are local to source rect and anchor the bottom of full rooted silhouette."
+}

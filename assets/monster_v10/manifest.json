@@ -1,0 +1,174 @@
+{
+  "version": "0.10",
+  "generator": "built-in imagegen",
+  "file": "projectile-atlas.png",
+  "columns": 4,
+  "rows": 4,
+  "transparent": true,
+  "cells": {
+    "moss_shard": {
+      "column": 0,
+      "row": 0
+    },
+    "spring_seed": {
+      "column": 1,
+      "row": 0
+    },
+    "lamp_pollen": {
+      "column": 2,
+      "row": 0
+    },
+    "mist_spore": {
+      "column": 3,
+      "row": 0
+    },
+    "root_spear": {
+      "column": 0,
+      "row": 1
+    },
+    "storm_feather": {
+      "column": 1,
+      "row": 1
+    },
+    "leaf_moon": {
+      "column": 2,
+      "row": 1
+    },
+    "silk_cocoon": {
+      "column": 3,
+      "row": 1
+    },
+    "amber_resin": {
+      "column": 0,
+      "row": 2
+    },
+    "dew_bubble": {
+      "column": 1,
+      "row": 2
+    },
+    "root_wave": {
+      "column": 2,
+      "row": 2
+    },
+    "cute_pillbug": {
+      "column": 3,
+      "row": 2
+    },
+    "moss_thorns": {
+      "column": 0,
+      "row": 3
+    },
+    "pollen_flower": {
+      "column": 1,
+      "row": 3
+    },
+    "silk_web": {
+      "column": 2,
+      "row": 3
+    },
+    "dew_pool": {
+      "column": 3,
+      "row": 3
+    }
+  },
+  "prompt": "Use case: stylized-concept. Asset type: one production game projectile sprite atlas on transparent background. A polished hand-painted watercolor/ink fantasy forest side-view game, soft storybook textures, warm organic charm, coherent readable silhouettes. EXACTLY a 4-column by 4-row uniform grid with 16 isolated individual projectile objects, each centered well inside its own equal square cell, plenty of transparent padding, no grid lines, no shadows outside sprites, no labels or text. All moving projectiles point RIGHT and have no long trails. Row1 left-to-right: green moss beetle's jagged leafy shell shard; reddish jumping seedbug's round spring seed with two tiny leaf fins; golden lamp moth's small radiant pollen comet; lavender mist moth's translucent clustered spore. Row2: root beetle's pointed woody thorn spear; blue falcon king's elongated white-blue lightning feather; mantis queen's elegant curved green leaf sickle; spider queen's tightly spun violet silk cocoon projectile. Row3: amber stag beetle king's honey amber resin glob; dew toad king's translucent round aqua dewdrop bubble; mole king's jagged slate earth/root spike; cute wandering small cream pillbug curled into round sleepy shell (NOT projectile, full creature side view, black dot eyes pink cheeks two small leaf antennae). Row4: small mossy ground thorn cluster anchored at bottom of cell; small golden glowing pollen flower trap anchored at bottom; small purple silk web net anchored at bottom; small aqua puddle with reeds anchored at bottom. Distinct tactile authored raster sprites, crisp inner highlights and soft feathered edges, no solid background, no pixel art, no UI.",
+  "regions": {
+    "moss_shard": [
+      28,
+      60,
+      325,
+      179
+    ],
+    "spring_seed": [
+      407,
+      68,
+      274,
+      155
+    ],
+    "lamp_pollen": [
+      742,
+      50,
+      295,
+      176
+    ],
+    "mist_spore": [
+      1113,
+      72,
+      302,
+      163
+    ],
+    "root_spear": [
+      19,
+      316,
+      335,
+      172
+    ],
+    "storm_feather": [
+      394,
+      304,
+      339,
+      204
+    ],
+    "leaf_moon": [
+      762,
+      293,
+      287,
+      241
+    ],
+    "silk_cocoon": [
+      1102,
+      322,
+      313,
+      164
+    ],
+    "amber_resin": [
+      20,
+      579,
+      322,
+      190
+    ],
+    "dew_bubble": [
+      397,
+      580,
+      287,
+      196
+    ],
+    "root_wave": [
+      738,
+      581,
+      365,
+      198
+    ],
+    "cute_pillbug": [
+      1138,
+      572,
+      260,
+      206
+    ],
+    "moss_thorns": [
+      22,
+      809,
+      313,
+      244
+    ],
+    "pollen_flower": [
+      370,
+      818,
+      340,
+      236
+    ],
+    "silk_web": [
+      732,
+      830,
+      347,
+      225
+    ],
+    "dew_pool": [
+      1101,
+      824,
+      328,
+      231
+    ]
+  },
+  "region_note": "Curated source object regions, trimmed at alpha >80 for anchored foot and planted-floor baselines; avoids neighboring atlas glow bleed."
+}

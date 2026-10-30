@@ -1,0 +1,39 @@
+{
+  "version": 33,
+  "biome": "underground",
+  "path": "underground.png",
+  "original_size": [
+    1774,
+    887
+  ],
+  "body_bounds": [
+    183,
+    168,
+    1408,
+    554
+  ],
+  "alpha_bounds_threshold": 20,
+  "pivot_source": [
+    887.0,
+    721
+  ],
+  "water_rect_source": [
+    275,
+    374,
+    1224,
+    137
+  ],
+  "water_surface_source": [
+    887.0,
+    442.5
+  ],
+  "world_body_width": 180,
+  "world_body_height": 70.82386,
+  "world_scale": 0.1278409090909091,
+  "water_offset_world": [
+    0.0,
+    -35.60369318181818
+  ],
+  "render": "Keep complete original canvas; scale uniformly by world_body_width/body_bounds.width and anchor pivot_source at ground. Water effects are native droplets, never sprite splash textures.",
+  "sha256": "eba548a0c2017770c872b2bac3c1543dbf25ee5580495dccfa911b403038ca7a"
+}

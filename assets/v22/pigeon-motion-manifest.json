@@ -1,0 +1,464 @@
+{
+  "version": 22,
+  "world_height": 57,
+  "notes": [
+    "New built-in image_gen artwork matching own pigeon walkmaster and v19rest references. Original PNG pixels unedited.",
+    "Metadata source_rect authoritative; air/wall atlas is NOT an exact equalcellgrid.",
+    "One fixed calibrated scale per clip; no frame-specific auto-fit or character-position compensation. Pivot is a local foot/groundanchor.",
+    "world_height is standing-reference calibration, not the visible height of crouched, flying-wing or wall poses."
+  ],
+  "animations": {
+    "drowsy": {
+      "path": "pigeon-drowsy.png",
+      "fps": 8,
+      "loop": true,
+      "reference_height": 317,
+      "world_height": 50.9375,
+      "calibration": "One fixed50.9375/317 scale matches the preceding v19 loaf pose body width; no perframe fitting.",
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            444,
+            444
+          ],
+          "size": [
+            444,
+            444
+          ],
+          "pivot": [
+            304.0,
+            440
+          ],
+          "visible_bounds": [
+            28,
+            201,
+            400,
+            239
+          ],
+          "sha256": "3ce10d1d71817dee2e0a9134956f88601a7afaf71da425a55a60a696858fbf5e"
+        },
+        {
+          "source_rect": [
+            444,
+            0,
+            443,
+            444
+          ],
+          "size": [
+            443,
+            444
+          ],
+          "pivot": [
+            300.24,
+            440
+          ],
+          "visible_bounds": [
+            27,
+            214,
+            396,
+            226
+          ],
+          "sha256": "52bb06a4e75d9dba18a8ab63654b03540723d219de5b6f8b533f15d90b8de4e9"
+        },
+        {
+          "source_rect": [
+            887,
+            0,
+            443,
+            444
+          ],
+          "size": [
+            443,
+            444
+          ],
+          "pivot": [
+            306.76,
+            440
+          ],
+          "visible_bounds": [
+            28,
+            224,
+            404,
+            216
+          ],
+          "sha256": "4324fe18f898389b9827c81adcf3ea81a24ed7180b907b89d3b17ec865d2d187"
+        },
+        {
+          "source_rect": [
+            1330,
+            0,
+            444,
+            444
+          ],
+          "size": [
+            444,
+            444
+          ],
+          "pivot": [
+            298.31,
+            441
+          ],
+          "visible_bounds": [
+            23,
+            243,
+            399,
+            198
+          ],
+          "sha256": "f19cecc972bc09d46af738eb7956d404680c3a79a2216d8862d7ce42adc36488"
+        },
+        {
+          "source_rect": [
+            0,
+            444,
+            444,
+            443
+          ],
+          "size": [
+            444,
+            443
+          ],
+          "pivot": [
+            304.45,
+            406
+          ],
+          "visible_bounds": [
+            25,
+            203,
+            405,
+            203
+          ],
+          "sha256": "309567d532a9ff01899ed18f4f2caacd91132b7299f0b73b21a28ca358c31429"
+        },
+        {
+          "source_rect": [
+            444,
+            444,
+            443,
+            443
+          ],
+          "size": [
+            443,
+            443
+          ],
+          "pivot": [
+            302.45,
+            403
+          ],
+          "visible_bounds": [
+            23,
+            181,
+            405,
+            222
+          ],
+          "sha256": "07edca02833c45627f22f43bbc3d03602116567278e9153ae1f6b0d93743628b"
+        },
+        {
+          "source_rect": [
+            887,
+            444,
+            443,
+            443
+          ],
+          "size": [
+            443,
+            443
+          ],
+          "pivot": [
+            300.24,
+            403
+          ],
+          "visible_bounds": [
+            27,
+            169,
+            396,
+            234
+          ],
+          "sha256": "fa383263a1c14c8a8ab1c6f4d925f707d7b90cd841236eee6bb7e4e598945dbc"
+        },
+        {
+          "source_rect": [
+            1330,
+            444,
+            444,
+            443
+          ],
+          "size": [
+            444,
+            443
+          ],
+          "pivot": [
+            299.62,
+            403
+          ],
+          "visible_bounds": [
+            25,
+            165,
+            398,
+            238
+          ],
+          "sha256": "0ad050bc2b0ebe057af6ff0de3fb5ff90be7c2471f7cf145ccb579b98882febe"
+        }
+      ]
+    },
+    "air": {
+      "path": "pigeon-air-wall.png",
+      "fps": 8,
+      "loop": false,
+      "reference_height": 239,
+      "world_height": 50.9375,
+      "poses": [
+        "ascent",
+        "apex",
+        "descent",
+        "landing"
+      ],
+      "calibration": "Fixed factor57/239 from authored landing pose visible head-to-foot reference; wings are allowed to extend beyond bodyheight.",
+      "frames": [
+        {
+          "source_rect": [
+            34,
+            23,
+            426,
+            369
+          ],
+          "size": [
+            426,
+            369
+          ],
+          "pivot": [
+            293.0,
+            346
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            418,
+            361
+          ],
+          "feet_bounds": [
+            254,
+            297,
+            78,
+            49
+          ],
+          "sha256": "32c74b84ad5fcd705f34620e83fe0c8974b3fb648e1c9d61cb3a5d11de4168e3"
+        },
+        {
+          "source_rect": [
+            491,
+            115,
+            400,
+            250
+          ],
+          "size": [
+            400,
+            250
+          ],
+          "pivot": [
+            260.0,
+            241
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            392,
+            242
+          ],
+          "feet_bounds": [
+            230,
+            201,
+            60,
+            40
+          ],
+          "sha256": "7dede1728f32db44897918d37d8e0cbe4daea9f866e916fa2c8084159569f0a9"
+        },
+        {
+          "source_rect": [
+            943,
+            81,
+            366,
+            371
+          ],
+          "size": [
+            366,
+            371
+          ],
+          "pivot": [
+            257.5,
+            351
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            358,
+            363
+          ],
+          "feet_bounds": [
+            204,
+            293,
+            107,
+            58
+          ],
+          "sha256": "7655d3f813eeef75a1a27af7f8e5755458cf34a6c5dfe89de9032528cf971f34"
+        },
+        {
+          "source_rect": [
+            1376,
+            197,
+            363,
+            247
+          ],
+          "size": [
+            363,
+            247
+          ],
+          "pivot": [
+            235.0,
+            235
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            355,
+            239
+          ],
+          "feet_bounds": [
+            148,
+            202,
+            174,
+            33
+          ],
+          "sha256": "03996fc424c71cd10787500aac0968c2bd50230d2e7d1e2e29a3852f686417be"
+        }
+      ]
+    },
+    "wall": {
+      "path": "pigeon-air-wall.png",
+      "fps": 8,
+      "loop": true,
+      "reference_height": 239,
+      "world_height": 50.9375,
+      "calibration": "Samefixedscaleasair; pinkfeetsoleanchor, tailmayextendbelowfeet. No directionaloffset.",
+      "frames": [
+        {
+          "source_rect": [
+            74,
+            433,
+            338,
+            409
+          ],
+          "size": [
+            338,
+            409
+          ],
+          "pivot": [
+            281.0,
+            320
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            330,
+            401
+          ],
+          "feet_bounds": [
+            244,
+            166,
+            74,
+            154
+          ],
+          "sha256": "60ca23b4be148157972ca29889b0faddc380bec637b9d3fc56ff18a488a575c2"
+        },
+        {
+          "source_rect": [
+            531,
+            455,
+            323,
+            393
+          ],
+          "size": [
+            323,
+            393
+          ],
+          "pivot": [
+            260.5,
+            319
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            315,
+            385
+          ],
+          "feet_bounds": [
+            219,
+            161,
+            83,
+            158
+          ],
+          "sha256": "0338dbafe6e038b4e874053e950e4564763192385e344c5bd5f03e933a5717b0"
+        },
+        {
+          "source_rect": [
+            966,
+            461,
+            325,
+            386
+          ],
+          "size": [
+            325,
+            386
+          ],
+          "pivot": [
+            264.5,
+            321
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            317,
+            378
+          ],
+          "feet_bounds": [
+            222,
+            180,
+            85,
+            141
+          ],
+          "sha256": "c25621c3c8e935ffc6611e05b30bd953c2b25cfb6900813ba05c3a86c655e568"
+        },
+        {
+          "source_rect": [
+            1409,
+            508,
+            322,
+            355
+          ],
+          "size": [
+            322,
+            355
+          ],
+          "pivot": [
+            256.5,
+            294
+          ],
+          "visible_bounds": [
+            4,
+            4,
+            314,
+            347
+          ],
+          "feet_bounds": [
+            215,
+            147,
+            83,
+            147
+          ],
+          "sha256": "d8a4756f2d6c7bf32f6653e244cae752c46230b2489553fa821a5a855f848420"
+        }
+      ]
+    }
+  }
+}

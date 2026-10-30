@@ -1,0 +1,17 @@
+﻿clip,frames,first_path,width,height,pivot_x,pivot_y,loop_start,loop_end
+claw_short,4,common/fx_claw/claw_short_00.png,512,512,256,256,,
+claw_charge,10,common/fx_claw/claw_charge_00.png,512,512,256,256,2,7
+feather_left,6,common/fx_feather/feather_left_00.png,512,512,256,256,,
+feather_right,6,common/fx_feather/feather_right_00.png,512,512,256,256,,
+feather_thrust,4,common/fx_feather/feather_thrust_00.png,512,512,256,256,,
+feather_charge,12,common/fx_feather/feather_charge_00.png,768,768,384,384,2,9
+great_front,8,common/fx_great/great_front_00.png,512,512,256,256,,
+great_side,8,common/fx_great/great_side_00.png,512,512,256,256,,
+great_spin,10,common/fx_great/great_spin_00.png,768,768,384,384,,
+great_charge,14,common/fx_great/great_charge_00.png,768,768,384,600,3,10
+hit_light,6,common/fx_hits/hit_light_00.png,512,512,256,256,,
+hit_medium,6,common/fx_hits/hit_medium_00.png,512,512,256,256,,
+hit_heavy,8,common/fx_hits/hit_heavy_00.png,768,768,384,384,,
+parry,6,common/fx_contact/parry_00.png,512,512,256,256,,
+block,6,common/fx_contact/block_00.png,512,512,256,256,,
+reflect,6,common/fx_contact/reflect_00.png,512,512,256,256,,

@@ -1,0 +1,89 @@
+{
+  "version": 30,
+  "original_size": [
+    2172,
+    724
+  ],
+  "frames": [
+    {
+      "source_rect": [
+        129,
+        329,
+        278,
+        64
+      ],
+      "pivot": [
+        139.0,
+        0
+      ],
+      "visible_bounds": [
+        129,
+        329,
+        278,
+        64
+      ]
+    },
+    {
+      "source_rect": [
+        617,
+        331,
+        393,
+        70
+      ],
+      "pivot": [
+        196.5,
+        0
+      ],
+      "visible_bounds": [
+        617,
+        331,
+        393,
+        70
+      ]
+    },
+    {
+      "source_rect": [
+        1141,
+        341,
+        440,
+        65
+      ],
+      "pivot": [
+        220.0,
+        0
+      ],
+      "visible_bounds": [
+        1141,
+        341,
+        440,
+        65
+      ]
+    },
+    {
+      "source_rect": [
+        1719,
+        354,
+        360,
+        41
+      ],
+      "pivot": [
+        180.0,
+        0
+      ],
+      "visible_bounds": [
+        1719,
+        354,
+        360,
+        41
+      ]
+    }
+  ],
+  "duration": 0.2,
+  "suggested_max_world_size": [
+    36,
+    17
+  ],
+  "suggested_scale": 0.08181818181818182,
+  "pivot_space": "local to source_rect",
+  "note": "Use one fixed scale across frames; fade at end. No raster transformations applied to generated source."
+}

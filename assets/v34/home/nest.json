@@ -1,0 +1,21 @@
+{
+  "original_size": [
+    2025,
+    777
+  ],
+  "bounds": [
+    18,
+    27,
+    1992,
+    712
+  ],
+  "pivot": [
+    1014.0,
+    739
+  ],
+  "front_fraction": 0.7,
+  "recommended_world_width": 260,
+  "generated_with": "builtin imagegen",
+  "source_sha256": "8430793ec94e08f1a865e5f6c768edd8b9f9f33bf4009cfac392b2fd8eeca2e3",
+  "notes": "Original generated RGBA preserved unchanged. Outer border alpha at most1, visible silhouette threshold8 is complete. Front lower30% may be rendered over resting pigeon."
+}

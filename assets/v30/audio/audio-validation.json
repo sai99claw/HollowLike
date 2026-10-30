@@ -1,0 +1,38 @@
+[
+  {
+    "file": "charge_build.wav",
+    "duration_seconds": 0.78,
+    "sample_rate": 44100,
+    "peak": 0.71997,
+    "power_centroid_hz": 672.6,
+    "power_above_5khz_percent": 0.0,
+    "seed": 3001
+  },
+  {
+    "file": "charge_release.wav",
+    "duration_seconds": 0.48,
+    "sample_rate": 44100,
+    "peak": 0.71997,
+    "power_centroid_hz": 622.8,
+    "power_above_5khz_percent": 0.0,
+    "seed": 3002
+  },
+  {
+    "file": "impact_hit.wav",
+    "duration_seconds": 0.16,
+    "sample_rate": 44100,
+    "peak": 0.71997,
+    "power_centroid_hz": 887.1,
+    "power_above_5khz_percent": 0.0001,
+    "seed": 3003
+  },
+  {
+    "file": "impact_heavy.wav",
+    "duration_seconds": 0.32,
+    "sample_rate": 44100,
+    "peak": 0.71997,
+    "power_centroid_hz": 367.0,
+    "power_above_5khz_percent": 1e-05,
+    "seed": 3004
+  }
+]

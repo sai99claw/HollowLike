@@ -1,0 +1,11 @@
+{
+  "version": 18,
+  "mode": "built-in imagegen",
+  "asset": "slash-smear.png",
+  "grid": [
+    4,
+    2
+  ],
+  "frame_count": 8,
+  "prompt": "Use case: stylized-concept. Asset type: transparent 2D game slash VFX sprite sheet for a hand-painted pigeon forest platformer. New asset, no character, weapon or UI. Precisely FOUR columns by TWO rows, eight equally sized cells, read left-to-right top-to-bottom. Each cell is its own frame of ONE right-facing sword slash animation centered in identical canvas. Frame1 immediate huge bright ivory crescent smear sweeping through 160 degrees, frame2 wider elongated razor-pointed crescent with bright opaque white center, soft pale violet secondary ribbon, thin warm amber sparks, frame3 breaking into sharp trailing feather-like streaks, frame4 short fading sharp wisps, frames5-8 progressively fading handful of tiny wisps to almost nothing. Strong directional speed, curved organic painted gouache edges, crisp readable core and translucent fringes, clean tips, restrained glow, no thick dark outline. The largest crescent fits each cell with 10 percent transparent margin. All animation anchored to same center, attack points right, no movement of the cell. Transparent RGBA background absolutely no checkerboard, no backdrop, no panels, no lines, no text/numbers, no ground, no burst circles. Wide 2:1 sheet, square cells. This is eight distinct sequential animation drawings, not eight copies or separate icons."
+}

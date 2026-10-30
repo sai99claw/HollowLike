@@ -1,0 +1,278 @@
+{
+  "grid": [
+    3,
+    3
+  ],
+  "assets": [
+    {
+      "kind": "weapon",
+      "effect": "straight",
+      "file": "weapon_straight.png",
+      "size": [
+        538,
+        330
+      ],
+      "source_box": [
+        7,
+        5,
+        545,
+        335
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "lightning",
+      "file": "weapon_lightning.png",
+      "size": [
+        599,
+        354
+      ],
+      "source_box": [
+        487,
+        0,
+        1086,
+        354
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "explosive",
+      "file": "weapon_explosive.png",
+      "size": [
+        489,
+        299
+      ],
+      "source_box": [
+        1041,
+        21,
+        1530,
+        320
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "ricochet",
+      "file": "weapon_ricochet.png",
+      "size": [
+        507,
+        339
+      ],
+      "source_box": [
+        13,
+        329,
+        520,
+        668
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "homing",
+      "file": "weapon_homing.png",
+      "size": [
+        571,
+        339
+      ],
+      "source_box": [
+        513,
+        342,
+        1084,
+        681
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "trap",
+      "file": "weapon_trap.png",
+      "size": [
+        509,
+        369
+      ],
+      "source_box": [
+        1027,
+        307,
+        1536,
+        676
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "slash",
+      "file": "weapon_slash.png",
+      "size": [
+        540,
+        338
+      ],
+      "source_box": [
+        0,
+        674,
+        540,
+        1012
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "fire",
+      "file": "weapon_fire.png",
+      "size": [
+        459,
+        371
+      ],
+      "source_box": [
+        541,
+        653,
+        1000,
+        1024
+      ]
+    },
+    {
+      "kind": "weapon",
+      "effect": "laser",
+      "file": "weapon_laser.png",
+      "size": [
+        550,
+        288
+      ],
+      "source_box": [
+        986,
+        694,
+        1536,
+        982
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "straight",
+      "file": "projectile_straight.png",
+      "size": [
+        510,
+        188
+      ],
+      "source_box": [
+        22,
+        105,
+        532,
+        293
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "lightning",
+      "file": "projectile_lightning.png",
+      "size": [
+        557,
+        214
+      ],
+      "source_box": [
+        543,
+        85,
+        1100,
+        299
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "explosive",
+      "file": "projectile_explosive.png",
+      "size": [
+        339,
+        265
+      ],
+      "source_box": [
+        1152,
+        44,
+        1491,
+        309
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "ricochet",
+      "file": "projectile_ricochet.png",
+      "size": [
+        418,
+        309
+      ],
+      "source_box": [
+        44,
+        351,
+        462,
+        660
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "homing",
+      "file": "projectile_homing.png",
+      "size": [
+        471,
+        278
+      ],
+      "source_box": [
+        530,
+        370,
+        1001,
+        648
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "trap",
+      "file": "projectile_trap.png",
+      "size": [
+        432,
+        239
+      ],
+      "source_box": [
+        1066,
+        390,
+        1498,
+        629
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "slash",
+      "file": "projectile_slash.png",
+      "size": [
+        456,
+        283
+      ],
+      "source_box": [
+        45,
+        700,
+        501,
+        983
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "fire",
+      "file": "projectile_fire.png",
+      "size": [
+        404,
+        251
+      ],
+      "source_box": [
+        560,
+        711,
+        964,
+        962
+      ]
+    },
+    {
+      "kind": "projectile",
+      "effect": "laser",
+      "file": "projectile_laser.png",
+      "size": [
+        527,
+        194
+      ],
+      "source_box": [
+        997,
+        743,
+        1524,
+        937
+      ]
+    }
+  ]
+}

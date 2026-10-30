@@ -1,0 +1,15 @@
+{
+  "original_size": [
+    1536,
+    1024
+  ],
+  "authored_floor_y": 730,
+  "floor_band": [
+    724,
+    740
+  ],
+  "screen_floor_y": 600,
+  "recommended_width": 1280,
+  "recommended_origin_y": -8.333333333333371,
+  "notes": "Preserve3:2. The organic top edge varies a few source pixels around this central foot plane."
+}

@@ -1,0 +1,352 @@
+{
+  "version": 30,
+  "description": "Short bird mantles, no upright tube collars. Pivots are locally measured flat clasp centers. Use pose-specific nape attachment and cap36x22px. Original appearance has no overlay.",
+  "styles": [
+    {
+      "id": "original",
+      "file": "../../v29/cloaks/original.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            682,
+            219
+          ],
+          "visible_bounds": [
+            60,
+            160,
+            646,
+            409
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            672,
+            219
+          ],
+          "visible_bounds": [
+            36,
+            158,
+            660,
+            357
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            646,
+            218
+          ],
+          "visible_bounds": [
+            54,
+            158,
+            616,
+            399
+          ]
+        }
+      ],
+      "visible_height": 409,
+      "recommended_world_height": 42
+    },
+    {
+      "id": "street",
+      "file": "street.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            550,
+            354
+          ],
+          "visible_bounds": [
+            131,
+            292,
+            454,
+            201
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            550,
+            354
+          ],
+          "visible_bounds": [
+            56,
+            249,
+            528,
+            228
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            526,
+            356
+          ],
+          "visible_bounds": [
+            72,
+            294,
+            489,
+            212
+          ]
+        }
+      ],
+      "visible_height": 228,
+      "visible_width": 528,
+      "recommended_world_height": 22,
+      "recommended_world_width": 36,
+      "recommended_scale_rule": "min(22 / visible_height, 36 / visible_width)",
+      "anchor_kind": "flat_clasp_center_at_nape"
+    },
+    {
+      "id": "future",
+      "file": "future.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            510,
+            297
+          ],
+          "visible_bounds": [
+            149,
+            270,
+            388,
+            204
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            519,
+            297
+          ],
+          "visible_bounds": [
+            139,
+            222,
+            409,
+            252
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            509,
+            297
+          ],
+          "visible_bounds": [
+            132,
+            270,
+            404,
+            202
+          ]
+        }
+      ],
+      "visible_height": 252,
+      "visible_width": 409,
+      "recommended_world_height": 22,
+      "recommended_world_width": 36,
+      "recommended_scale_rule": "min(22 / visible_height, 36 / visible_width)",
+      "anchor_kind": "flat_clasp_center_at_nape"
+    },
+    {
+      "id": "medieval",
+      "file": "medieval.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            596,
+            306
+          ],
+          "visible_bounds": [
+            134,
+            266,
+            502,
+            249
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            585,
+            306
+          ],
+          "visible_bounds": [
+            116,
+            214,
+            509,
+            262
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            578,
+            306
+          ],
+          "visible_bounds": [
+            86,
+            266,
+            533,
+            249
+          ]
+        }
+      ],
+      "visible_height": 262,
+      "visible_width": 533,
+      "recommended_world_height": 22,
+      "recommended_world_width": 36,
+      "recommended_scale_rule": "min(22 / visible_height, 36 / visible_width)",
+      "anchor_kind": "flat_clasp_center_at_nape"
+    },
+    {
+      "id": "cute",
+      "file": "cute.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            640,
+            295
+          ],
+          "visible_bounds": [
+            183,
+            260,
+            517,
+            220
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            575,
+            294
+          ],
+          "visible_bounds": [
+            150,
+            259,
+            501,
+            216
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            535,
+            295
+          ],
+          "visible_bounds": [
+            105,
+            260,
+            506,
+            228
+          ]
+        }
+      ],
+      "visible_height": 228,
+      "visible_width": 517,
+      "recommended_world_height": 22,
+      "recommended_world_width": 36,
+      "recommended_scale_rule": "min(22 / visible_height, 36 / visible_width)",
+      "anchor_kind": "flat_clasp_center_at_nape"
+    }
+  ]
+}

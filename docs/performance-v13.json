@@ -1,0 +1,13 @@
+{
+  "version": "0.13",
+  "measured_fps": null,
+  "verification": "headless resource-budget and functional tests; browser GPU not profiled",
+  "reduced_projectile_trail_emitters": {"before_limit": 160, "after_limit": 24},
+  "particles_per_trail_emitter": {"before": 10, "after_reduced": 5},
+  "maximum_reduced_trail_particles": {"before": 1600, "after": 120},
+  "dash_particles_allocated_per_physics_substep": {"after": 0},
+  "environment_particle_blur_material_in_reduced_mode": false,
+  "eager_decode_all_boss_and_scene_frames_at_startup": false,
+  "source_suites_passed": 23,
+  "exported_pack_suites_passed": 8
+}

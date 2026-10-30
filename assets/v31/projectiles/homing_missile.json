@@ -1,0 +1,189 @@
+{
+  "version": 31,
+  "id": "homing_missile",
+  "original_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    443.5,
+    443.5
+  ],
+  "layout": [
+    4,
+    2
+  ],
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        275.0,
+        238.852
+      ],
+      "visible_bounds": [
+        52,
+        46,
+        369,
+        345
+      ],
+      "source_cell": 0,
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        276.0,
+        235.506
+      ],
+      "visible_bounds": [
+        82,
+        25,
+        340,
+        365
+      ],
+      "source_cell": 1,
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        275.0,
+        237.051
+      ],
+      "visible_bounds": [
+        95,
+        63,
+        326,
+        316
+      ],
+      "source_cell": 2,
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        272.0,
+        236.912
+      ],
+      "visible_bounds": [
+        106,
+        162,
+        312,
+        248
+      ],
+      "source_cell": 3,
+      "smear": false
+    },
+    {
+      "rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        275.0,
+        213.171
+      ],
+      "visible_bounds": [
+        80,
+        129,
+        341,
+        267
+      ],
+      "source_cell": 4,
+      "smear": false
+    },
+    {
+      "rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        292.0,
+        213.14
+      ],
+      "visible_bounds": [
+        108,
+        20,
+        330,
+        364
+      ],
+      "source_cell": 5,
+      "smear": false
+    },
+    {
+      "rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        294.0,
+        213.642
+      ],
+      "visible_bounds": [
+        105,
+        30,
+        335,
+        329
+      ],
+      "source_cell": 6,
+      "smear": true
+    },
+    {
+      "rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        273.0,
+        219.945
+      ],
+      "visible_bounds": [
+        64,
+        46,
+        355,
+        330
+      ],
+      "source_cell": 7,
+      "smear": false
+    }
+  ],
+  "max_body_extent": 369,
+  "rotation_direction": "counterclockwise",
+  "animation_kind": "guided_bank",
+  "heading": "right in every frame; runtime follows flight heading",
+  "smear_frames": [
+    2,
+    6
+  ],
+  "fps": 14,
+  "sha256": "cd6f4e5e35b42ca30e90e273cfc6440bb3cbc6b5546417629a815a5225a70719",
+  "pixel_edits": "none; generated source copied intact"
+}

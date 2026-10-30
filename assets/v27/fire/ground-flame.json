@@ -1,0 +1,47 @@
+{
+  "image": "res://assets/v27/fire/ground-flame.png",
+  "source_size": [
+    2048,
+    768
+  ],
+  "columns": 4,
+  "rows": 1,
+  "fps": 10,
+  "loop": true,
+  "cell_size": [
+    512,
+    768
+  ],
+  "frame_rectangles": [
+    [
+      8,
+      288,
+      496,
+      354
+    ],
+    [
+      520,
+      288,
+      496,
+      354
+    ],
+    [
+      1032,
+      288,
+      496,
+      354
+    ],
+    [
+      1544,
+      288,
+      496,
+      354
+    ]
+  ],
+  "cell_floor_baseline_y": 641,
+  "anchor": "bottom_center",
+  "source_rectangles_space": "original_pixels_before_Godot_import_resize",
+  "recommended_import_size_limit": 1024,
+  "recommended_max_display_width_world": 120,
+  "notes": "Scale frame rectangles by actual imported texture size / source_size. Source rectangle bottom642 is one pixel below visible floor. Ignore faint alpha residue outside these measured rectangles. Do not render as projectile."
+}

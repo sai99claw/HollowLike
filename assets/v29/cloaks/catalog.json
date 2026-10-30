@@ -1,0 +1,336 @@
+{
+  "version": 29,
+  "description": "Cloak-only cosmetics. Full frame rects; collar pivot is local to rect. Do not recolor pigeon body.",
+  "styles": [
+    {
+      "id": "original",
+      "file": "original.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            682,
+            219
+          ],
+          "visible_bounds": [
+            60,
+            160,
+            646,
+            409
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            672,
+            219
+          ],
+          "visible_bounds": [
+            36,
+            158,
+            660,
+            357
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            646,
+            218
+          ],
+          "visible_bounds": [
+            54,
+            158,
+            616,
+            399
+          ]
+        }
+      ],
+      "visible_height": 409,
+      "recommended_world_height": 42
+    },
+    {
+      "id": "street",
+      "file": "street.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            597,
+            219
+          ],
+          "visible_bounds": [
+            107,
+            157,
+            526,
+            443
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            602,
+            219
+          ],
+          "visible_bounds": [
+            50,
+            157,
+            590,
+            345
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            611,
+            219
+          ],
+          "visible_bounds": [
+            107,
+            157,
+            541,
+            450
+          ]
+        }
+      ],
+      "visible_height": 450,
+      "recommended_world_height": 42
+    },
+    {
+      "id": "future",
+      "file": "future.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            626,
+            193
+          ],
+          "visible_bounds": [
+            69,
+            127,
+            585,
+            467
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            625,
+            193
+          ],
+          "visible_bounds": [
+            59,
+            127,
+            593,
+            447
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            630,
+            193
+          ],
+          "visible_bounds": [
+            113,
+            127,
+            544,
+            469
+          ]
+        }
+      ],
+      "visible_height": 469,
+      "recommended_world_height": 42
+    },
+    {
+      "id": "medieval",
+      "file": "medieval.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            643,
+            208
+          ],
+          "visible_bounds": [
+            69,
+            140,
+            597,
+            444
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            649,
+            208
+          ],
+          "visible_bounds": [
+            24,
+            139,
+            648,
+            394
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            641,
+            208
+          ],
+          "visible_bounds": [
+            122,
+            139,
+            541,
+            445
+          ]
+        }
+      ],
+      "visible_height": 445,
+      "recommended_world_height": 42
+    },
+    {
+      "id": "cute",
+      "file": "cute.png",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            643,
+            200
+          ],
+          "visible_bounds": [
+            41,
+            129,
+            655,
+            429
+          ]
+        },
+        {
+          "rect": [
+            724,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            645,
+            200
+          ],
+          "visible_bounds": [
+            46,
+            129,
+            651,
+            380
+          ]
+        },
+        {
+          "rect": [
+            1448,
+            0,
+            724,
+            724
+          ],
+          "pivot": [
+            641,
+            200
+          ],
+          "visible_bounds": [
+            147,
+            129,
+            545,
+            445
+          ]
+        }
+      ],
+      "visible_height": 445,
+      "recommended_world_height": 42
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "original_size": [
+    1536,
+    1024
+  ],
+  "generated_with": "builtin imagegen",
+  "source_sha256": "d92bdfc86e26d4c4e1a412026d023f08cce24941c53cd5f951e55a6e756ffb7f",
+  "biome": "sky",
+  "columns": 3,
+  "rows": 2,
+  "frames": [
+    {
+      "id": "aid",
+      "rect": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "pivot": [
+        277.0,
+        430
+      ],
+      "bounds": [
+        147,
+        129,
+        260,
+        301
+      ],
+      "world_size": [
+        130.0,
+        150.5
+      ]
+    },
+    {
+      "id": "forge",
+      "rect": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "pivot": [
+        256.0,
+        424
+      ],
+      "bounds": [
+        83,
+        173,
+        346,
+        251
+      ],
+      "world_size": [
+        173.0,
+        125.5
+      ]
+    },
+    {
+      "id": "reforge",
+      "rect": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "pivot": [
+        226.5,
+        425
+      ],
+      "bounds": [
+        64,
+        142,
+        325,
+        283
+      ],
+      "world_size": [
+        162.5,
+        141.5
+      ]
+    },
+    {
+      "id": "mail",
+      "rect": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "pivot": [
+        274.5,
+        364
+      ],
+      "bounds": [
+        110,
+        133,
+        329,
+        231
+      ],
+      "world_size": [
+        164.5,
+        115.5
+      ]
+    },
+    {
+      "id": "energy_infinite",
+      "rect": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "pivot": [
+        259.5,
+        367
+      ],
+      "bounds": [
+        135,
+        60,
+        249,
+        307
+      ],
+      "world_size": [
+        124.5,
+        153.5
+      ]
+    },
+    {
+      "id": "wardrobe",
+      "rect": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "pivot": [
+        226.5,
+        380
+      ],
+      "bounds": [
+        111,
+        56,
+        231,
+        324
+      ],
+      "world_size": [
+        115.5,
+        162.0
+      ]
+    }
+  ],
+  "source_pixels_per_world": 2.0,
+  "draw_contract": "Scale each complete silhouette uniformly to fit target station box; rect/pivot are original-source coordinates; imported texture rect must use imported/original ratio. Alpha<=1 at atlas borders."
+}

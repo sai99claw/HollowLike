@@ -1,0 +1,663 @@
+{
+  "version": 24,
+  "source_pixels_per_world": 2.0,
+  "tile_world": 96,
+  "material_world_repeat": 256,
+  "biomes": {
+    "sky": {
+      "material": {
+        "path": "material-sky.png",
+        "source_rect": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "world_size": [
+          256,
+          256
+        ],
+        "alpha_min": 249
+      },
+      "platforms": {
+        "1": {
+          "path": "platform-sky-1.png",
+          "source_rect": [
+            0,
+            0,
+            340,
+            151
+          ],
+          "atlas_source_rect": [
+            470,
+            646,
+            340,
+            151
+          ],
+          "body_span": [
+            8,
+            330
+          ],
+          "surface_y": 35,
+          "world_width": 96,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            56,
+            0,
+            226,
+            151
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            337,
+            151
+          ]
+        },
+        "2": {
+          "path": "platform-sky-2.png",
+          "source_rect": [
+            0,
+            0,
+            592,
+            166
+          ],
+          "atlas_source_rect": [
+            332,
+            771,
+            592,
+            166
+          ],
+          "body_span": [
+            8,
+            583
+          ],
+          "surface_y": 42,
+          "world_width": 192,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            56,
+            0,
+            479,
+            166
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            587,
+            164
+          ]
+        },
+        "3": {
+          "path": "platform-sky-3.png",
+          "source_rect": [
+            0,
+            0,
+            887,
+            170
+          ],
+          "atlas_source_rect": [
+            184,
+            917,
+            887,
+            170
+          ],
+          "body_span": [
+            11,
+            876
+          ],
+          "surface_y": 41,
+          "world_width": 288,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            59,
+            0,
+            769,
+            170
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            885,
+            170
+          ]
+        },
+        "4": {
+          "path": "platform-sky-4.png",
+          "source_rect": [
+            0,
+            0,
+            1195,
+            166
+          ],
+          "atlas_source_rect": [
+            30,
+            1071,
+            1195,
+            166
+          ],
+          "body_span": [
+            8,
+            1186
+          ],
+          "surface_y": 40,
+          "world_width": 384,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            56,
+            0,
+            1082,
+            166
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            1,
+            0,
+            1193,
+            166
+          ]
+        }
+      },
+      "middle": [
+        {
+          "path": "middle-sky-0.png",
+          "source_rect": [
+            0,
+            0,
+            450,
+            493
+          ],
+          "atlas_source_rect": [
+            12,
+            8,
+            450,
+            493
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            225.0,
+            246.5
+          ],
+          "pivot_source": [
+            225.0,
+            489
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        },
+        {
+          "path": "middle-sky-1.png",
+          "source_rect": [
+            0,
+            0,
+            513,
+            480
+          ],
+          "atlas_source_rect": [
+            7,
+            515,
+            513,
+            480
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            256.5,
+            240.0
+          ],
+          "pivot_source": [
+            256.5,
+            476
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        }
+      ]
+    },
+    "trunk": {
+      "material": {
+        "path": "material-trunk.png",
+        "source_rect": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "world_size": [
+          256,
+          256
+        ],
+        "alpha_min": 248
+      },
+      "platforms": {
+        "1": {
+          "path": "platform-trunk-1.png",
+          "source_rect": [
+            0,
+            0,
+            402,
+            151
+          ],
+          "atlas_source_rect": [
+            422,
+            645,
+            402,
+            151
+          ],
+          "body_span": [
+            30,
+            374
+          ],
+          "surface_y": 32,
+          "world_width": 96,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            78,
+            0,
+            248,
+            151
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            402,
+            151
+          ]
+        },
+        "2": {
+          "path": "platform-trunk-2.png",
+          "source_rect": [
+            0,
+            0,
+            709,
+            167
+          ],
+          "atlas_source_rect": [
+            267,
+            773,
+            709,
+            167
+          ],
+          "body_span": [
+            24,
+            687
+          ],
+          "surface_y": 38,
+          "world_width": 192,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            72,
+            0,
+            567,
+            167
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            709,
+            167
+          ]
+        },
+        "3": {
+          "path": "platform-trunk-3.png",
+          "source_rect": [
+            0,
+            0,
+            1005,
+            169
+          ],
+          "atlas_source_rect": [
+            123,
+            916,
+            1005,
+            169
+          ],
+          "body_span": [
+            25,
+            982
+          ],
+          "surface_y": 36,
+          "world_width": 288,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            73,
+            0,
+            861,
+            169
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            3,
+            0,
+            1005,
+            169
+          ]
+        },
+        "4": {
+          "path": "platform-trunk-4.png",
+          "source_rect": [
+            0,
+            0,
+            1227,
+            168
+          ],
+          "atlas_source_rect": [
+            17,
+            1075,
+            1227,
+            168
+          ],
+          "body_span": [
+            24,
+            1202
+          ],
+          "surface_y": 35,
+          "world_width": 384,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            72,
+            0,
+            1082,
+            168
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            1225,
+            167
+          ]
+        }
+      },
+      "middle": [
+        {
+          "path": "middle-trunk-0.png",
+          "source_rect": [
+            0,
+            0,
+            472,
+            458
+          ],
+          "atlas_source_rect": [
+            531,
+            46,
+            472,
+            458
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            236.0,
+            229.0
+          ],
+          "pivot_source": [
+            236.0,
+            454
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        },
+        {
+          "path": "middle-trunk-1.png",
+          "source_rect": [
+            0,
+            0,
+            525,
+            479
+          ],
+          "atlas_source_rect": [
+            506,
+            519,
+            525,
+            479
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            262.5,
+            239.5
+          ],
+          "pivot_source": [
+            262.5,
+            475
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        }
+      ]
+    },
+    "underground": {
+      "material": {
+        "path": "material-underground.png",
+        "source_rect": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "world_size": [
+          256,
+          256
+        ],
+        "alpha_min": 248
+      },
+      "platforms": {
+        "1": {
+          "path": "platform-underground-1.png",
+          "source_rect": [
+            0,
+            0,
+            346,
+            153
+          ],
+          "atlas_source_rect": [
+            454,
+            589,
+            346,
+            153
+          ],
+          "body_span": [
+            11,
+            335
+          ],
+          "surface_y": 28,
+          "world_width": 96,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            59,
+            0,
+            228,
+            153
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            1,
+            346,
+            153
+          ]
+        },
+        "2": {
+          "path": "platform-underground-2.png",
+          "source_rect": [
+            0,
+            0,
+            636,
+            173
+          ],
+          "atlas_source_rect": [
+            309,
+            731,
+            636,
+            173
+          ],
+          "body_span": [
+            17,
+            620
+          ],
+          "surface_y": 28,
+          "world_width": 192,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            65,
+            0,
+            507,
+            173
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            636,
+            173
+          ]
+        },
+        "3": {
+          "path": "platform-underground-3.png",
+          "source_rect": [
+            0,
+            0,
+            895,
+            190
+          ],
+          "atlas_source_rect": [
+            179,
+            882,
+            895,
+            190
+          ],
+          "body_span": [
+            22,
+            878
+          ],
+          "surface_y": 36,
+          "world_width": 288,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            70,
+            0,
+            760,
+            190
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            892,
+            190
+          ]
+        },
+        "4": {
+          "path": "platform-underground-4.png",
+          "source_rect": [
+            0,
+            0,
+            1186,
+            197
+          ],
+          "atlas_source_rect": [
+            35,
+            1057,
+            1186,
+            197
+          ],
+          "body_span": [
+            10,
+            1172
+          ],
+          "surface_y": 32,
+          "world_width": 384,
+          "source_pixels_per_world": 2.0,
+          "cap_width_source": 48,
+          "center_region": [
+            58,
+            0,
+            1066,
+            197
+          ],
+          "render": "draw natural outside overhang, left/right 48px endcaps at 0.5 scale; center sample/crop/repeat at 0.5 scale until exact world_width; never stretch full image",
+          "alpha_bounds": [
+            0,
+            0,
+            1186,
+            197
+          ]
+        }
+      },
+      "middle": [
+        {
+          "path": "middle-underground-0.png",
+          "source_rect": [
+            0,
+            0,
+            508,
+            406
+          ],
+          "atlas_source_rect": [
+            1023,
+            84,
+            508,
+            406
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            254.0,
+            203.0
+          ],
+          "pivot_source": [
+            254.0,
+            402
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        },
+        {
+          "path": "middle-underground-1.png",
+          "source_rect": [
+            0,
+            0,
+            499,
+            473
+          ],
+          "atlas_source_rect": [
+            1035,
+            522,
+            499,
+            473
+          ],
+          "source_pixels_per_world": 2,
+          "world_size": [
+            249.5,
+            236.5
+          ],
+          "pivot_source": [
+            249.5,
+            469
+          ],
+          "complete_silhouette": true,
+          "alpha_canvas_edges": "original atlas alpha outer edges max1; interior padding sampled alpha0",
+          "note": "Lower-row isolated objects extend a few pixels across nominal grid cell; crops follow actual alpha bounds, not grid."
+        }
+      ]
+    }
+  },
+  "generation": "Built-in image_gen; lossless cropping only. No platform stretching."
+}

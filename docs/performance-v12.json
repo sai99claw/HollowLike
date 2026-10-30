@@ -1,0 +1,19 @@
+{
+  "runtime": "Godot 4.7.2 headless",
+  "scope": "200 unchanged update_quickbar calls; first button identity tracked. This is CPU/UI work, not browser FPS.",
+  "before": {
+    "updates": 200,
+    "first_button_instances": 200,
+    "cpu_usec": 1729798
+  },
+  "after": {
+    "updates": 200,
+    "first_button_instances": 1,
+    "cpu_usec": 734
+  },
+  "wildlife_blur_texture_samples": {
+    "before": 49,
+    "after": 9
+  },
+  "reduced_mode": "Large middle/near layers bypass blur materials; hand-painted art and parallax remain"
+}

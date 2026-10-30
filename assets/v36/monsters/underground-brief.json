@@ -1,0 +1,139 @@
+{
+  "biome": "underground",
+  "palette": "amber ochre bone ivory charcoal",
+  "regular": [
+    [
+      "cinder_crab",
+      "燧甲鉗蟹",
+      "walk",
+      "slash",
+      "low charcoal cave crab with an amber crystal pincer",
+      "raises huge right pincer then snaps horizontally",
+      "claw",
+      null
+    ],
+    [
+      "lantern_toad",
+      "燈囊跳蟾",
+      "jump",
+      "arc",
+      "squat cave toad with amber resin cheeks and acorn throat sac",
+      "inflates throat then spits resin stone upward",
+      "resin_orb",
+      "clockwise tumble"
+    ],
+    [
+      "cave_moth",
+      "礦燈懸蛾",
+      "hover",
+      "linear",
+      "cave moth with lantern abdomen and mineral wings",
+      "pulls back abdomen then shoots pointed mineral spindle",
+      "mineral_dart",
+      "axial clockwise roll"
+    ],
+    [
+      "spore_bell",
+      "孢鐘水母",
+      "drift",
+      "trap",
+      "floating mushroom jellyfish with amber bell cap and root tendrils",
+      "opens underside bell then drops barbed spore pod",
+      "spore_pod",
+      "counterclockwise tumble"
+    ],
+    [
+      "root_ram",
+      "根角衝獸",
+      "walk",
+      "ram",
+      "blind root armored beetle with broad ram horn and heavy forelegs",
+      "plants feet lowers horn then lunges bodily forward",
+      "ram",
+      null
+    ]
+  ],
+  "elite": [
+    [
+      "geode_warden",
+      "晶鉗守衛",
+      "walk",
+      "giant armored geode crab with crystal claws and exposed amber chest",
+      "raises both claws then crushing scissor strike",
+      "claw",
+      null,
+      "unfolds crystal chest then fires three crystal needles",
+      "mineral_dart",
+      "axial clockwise roll"
+    ],
+    [
+      "censer_beetle",
+      "琥珀香爐甲",
+      "walk",
+      "heavy beetle with amber censer abdomen blunt horn throwing arm",
+      "lowers horn coils legs then body rams",
+      "ram",
+      null,
+      "cocks throwing arm then launches resin bomb",
+      "resin_orb",
+      "clockwise tumble"
+    ]
+  ],
+  "actor_grid": {
+    "columns": 12,
+    "regular_rows": 5,
+    "elite_rows": 4,
+    "phases": {
+      "move": [
+        0,
+        1,
+        2
+      ],
+      "windup": [
+        3,
+        4,
+        5
+      ],
+      "active": [
+        6,
+        7,
+        8
+      ],
+      "recovery": [
+        9,
+        10,
+        11
+      ]
+    },
+    "facing": "right",
+    "cell_foot_anchor": [
+      0.5,
+      0.88
+    ],
+    "padding": 0.1
+  },
+  "projectile_rows": [
+    {
+      "id": "resin_orb",
+      "rotation": "clockwise tumble"
+    },
+    {
+      "id": "mineral_dart",
+      "rotation": "axial clockwise roll"
+    },
+    {
+      "id": "spore_pod",
+      "rotation": "counterclockwise tumble"
+    }
+  ],
+  "effect_rows": [
+    {
+      "id": "melee_fx",
+      "description": "eight frame bright crescent swipe buildup slash dissolve"
+    },
+    {
+      "id": "trap_fx",
+      "description": "eight frame planted organic trap growing from fixed floor base"
+    }
+  ]
+}

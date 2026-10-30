@@ -1,0 +1,511 @@
+{
+  "version": 23,
+  "generator": "built-in image_gen",
+  "note": "Unmodified native generated PNGs. Visible bounds use alpha>=128 to ignore fully transparent RGB/antialias haze. Each frame has measured ground contact anchor; uniform scale perclip from restreferencewidth. Air streaks are artwork only. Frames0and7rest,1..2compression,3..4launch,5..6recovery.",
+  "clips": {
+    "underground": {
+      "path": "launcher-underground.png",
+      "fps": 8,
+      "reference_width": 298,
+      "world_width": 96,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            384,
+            470
+          ],
+          "pivot": [
+            186.0,
+            443
+          ],
+          "visible_bounds": [
+            47,
+            146,
+            298,
+            297
+          ],
+          "phase": "rest",
+          "sha256": "d5593116ad7cfb7871995c46b045117d19f11c77a24209482d4990dcf2098a5d"
+        },
+        {
+          "source_rect": [
+            384,
+            0,
+            384,
+            470
+          ],
+          "pivot": [
+            185.5,
+            443
+          ],
+          "visible_bounds": [
+            38,
+            178,
+            313,
+            265
+          ],
+          "phase": "compress",
+          "sha256": "b4bebabf588d96b91870227b8f1af2cbd3215d60f152972bbb75c348e9f09afa"
+        },
+        {
+          "source_rect": [
+            768,
+            0,
+            384,
+            470
+          ],
+          "pivot": [
+            184.0,
+            443
+          ],
+          "visible_bounds": [
+            23,
+            262,
+            332,
+            181
+          ],
+          "phase": "squash",
+          "sha256": "ebdbafa40bc1bc684bb747912f35286dd3789d6b9720adb27a57ad3bbc7970cf"
+        },
+        {
+          "source_rect": [
+            1152,
+            0,
+            384,
+            470
+          ],
+          "pivot": [
+            177.5,
+            443
+          ],
+          "visible_bounds": [
+            16,
+            51,
+            330,
+            392
+          ],
+          "phase": "launch",
+          "sha256": "37a649a07179bf39d54187575b36845228c242fb3bb2d70b8515aa92a6ebe886"
+        },
+        {
+          "source_rect": [
+            0,
+            470,
+            384,
+            554
+          ],
+          "pivot": [
+            191.0,
+            507
+          ],
+          "visible_bounds": [
+            17,
+            28,
+            358,
+            479
+          ],
+          "phase": "peak",
+          "sha256": "5887ff6d2a3784c9ab81adb4720b7cbfb5b372a8b2435612370db0f72307c6ed"
+        },
+        {
+          "source_rect": [
+            384,
+            470,
+            384,
+            554
+          ],
+          "pivot": [
+            187.5,
+            507
+          ],
+          "visible_bounds": [
+            33,
+            135,
+            314,
+            372
+          ],
+          "phase": "recoil",
+          "sha256": "eb15cbd0a229c6085f819af46aa791ba9fcbe99d67609153d0863caccb6acb6a"
+        },
+        {
+          "source_rect": [
+            768,
+            470,
+            384,
+            554
+          ],
+          "pivot": [
+            185.0,
+            507
+          ],
+          "visible_bounds": [
+            39,
+            222,
+            302,
+            285
+          ],
+          "phase": "settle",
+          "sha256": "6acd42b1b4e946c89fd329dca0be6c7379e1c9c3f51ed6ce9840a98ac814ba93"
+        },
+        {
+          "source_rect": [
+            1152,
+            470,
+            384,
+            554
+          ],
+          "pivot": [
+            182.5,
+            507
+          ],
+          "visible_bounds": [
+            43,
+            219,
+            300,
+            288
+          ],
+          "phase": "rest",
+          "sha256": "86d4c6e8653b953a7e240c74447bf92eda7b7bc893abe3b9f67b4ff803a8fbe1"
+        }
+      ]
+    },
+    "trunk": {
+      "path": "launcher-trunk.png",
+      "fps": 8,
+      "reference_width": 309,
+      "world_width": 96,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            191.5,
+            487
+          ],
+          "visible_bounds": [
+            39,
+            78,
+            309,
+            409
+          ],
+          "phase": "rest",
+          "sha256": "38e03c4b0895a19e4f29634aa632057cc5992b4b05d35cdd84692f18c173b437"
+        },
+        {
+          "source_rect": [
+            384,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            195.0,
+            487
+          ],
+          "visible_bounds": [
+            45,
+            155,
+            317,
+            332
+          ],
+          "phase": "compress",
+          "sha256": "763fe6760e7a1ed2e8fbc093f09efa1e205518834a63553796ebba6ed83c9012"
+        },
+        {
+          "source_rect": [
+            768,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            196.0,
+            487
+          ],
+          "visible_bounds": [
+            58,
+            247,
+            309,
+            240
+          ],
+          "phase": "squash",
+          "sha256": "9566e6e48c01f7884b847446b57c2504b54fc346cde73e8763db972acbc80cea"
+        },
+        {
+          "source_rect": [
+            1152,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            196.0,
+            487
+          ],
+          "visible_bounds": [
+            58,
+            29,
+            295,
+            458
+          ],
+          "phase": "launch",
+          "sha256": "0ef376157645c4a89a662095f0f24b4eebee5e3a359b85b50dca9236c78ccc71"
+        },
+        {
+          "source_rect": [
+            0,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            192.5,
+            502
+          ],
+          "visible_bounds": [
+            23,
+            6,
+            361,
+            496
+          ],
+          "phase": "peak",
+          "sha256": "9a82d6965ab089f96df72809587cf87d924e1b9284f6e7d19d0f50794cebec0e"
+        },
+        {
+          "source_rect": [
+            384,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            195.0,
+            503
+          ],
+          "visible_bounds": [
+            0,
+            91,
+            356,
+            412
+          ],
+          "phase": "recoil",
+          "sha256": "306393dd4196bf791ce63c6523cc798ab62ebeed3505f160819a1772ec7e56d7"
+        },
+        {
+          "source_rect": [
+            768,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            191.5,
+            502
+          ],
+          "visible_bounds": [
+            53,
+            173,
+            298,
+            329
+          ],
+          "phase": "settle",
+          "sha256": "f04e9e81ae38b8778ee8b86cf00c844cff4b44bc9c99fe46afdbc8feb8998b82"
+        },
+        {
+          "source_rect": [
+            1152,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            192.5,
+            503
+          ],
+          "visible_bounds": [
+            48,
+            105,
+            310,
+            398
+          ],
+          "phase": "rest",
+          "sha256": "c4a5f41755fd7ba4d63db187020a85d50955eccda1f166128732dbb06d395b5d"
+        }
+      ]
+    },
+    "sky": {
+      "path": "launcher-sky.png",
+      "fps": 8,
+      "reference_width": 303,
+      "world_width": 96,
+      "frames": [
+        {
+          "source_rect": [
+            0,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            191.0,
+            482
+          ],
+          "visible_bounds": [
+            44,
+            145,
+            303,
+            337
+          ],
+          "phase": "rest",
+          "sha256": "ae10849573c20adc1354dc108abedb6afd6d155c62ab52fef924e25ab6e000ab"
+        },
+        {
+          "source_rect": [
+            384,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            189.0,
+            482
+          ],
+          "visible_bounds": [
+            20,
+            204,
+            346,
+            278
+          ],
+          "phase": "compress",
+          "sha256": "e334c2babab356a2a410a6304f1371bf9a310477f48253233469a458efa367d0"
+        },
+        {
+          "source_rect": [
+            768,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            188.5,
+            482
+          ],
+          "visible_bounds": [
+            19,
+            269,
+            352,
+            213
+          ],
+          "phase": "squash",
+          "sha256": "5dc3050f7628aadc32cfbec454e6e5bc9e85abcc22c596b7151a6c1cfe785a2a"
+        },
+        {
+          "source_rect": [
+            1152,
+            0,
+            384,
+            500
+          ],
+          "pivot": [
+            185.0,
+            482
+          ],
+          "visible_bounds": [
+            5,
+            56,
+            360,
+            426
+          ],
+          "phase": "launch",
+          "sha256": "7c84eea82b3c2a8c3c9abbe67febac37ddcb0a985216799d9cb3b86c6e31e460"
+        },
+        {
+          "source_rect": [
+            0,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            191.0,
+            490
+          ],
+          "visible_bounds": [
+            21,
+            23,
+            363,
+            467
+          ],
+          "phase": "peak",
+          "sha256": "26d9f2d2e15096fe21c79ab7772f45f1179ec615882377eaf8e42d0408ef8992"
+        },
+        {
+          "source_rect": [
+            384,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            191.5,
+            490
+          ],
+          "visible_bounds": [
+            0,
+            82,
+            367,
+            408
+          ],
+          "phase": "recoil",
+          "sha256": "bccbad465f9c8a3db3af89011838be70eff90100cc8d4b00b01ee5c38f003ad9"
+        },
+        {
+          "source_rect": [
+            768,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            188.5,
+            489
+          ],
+          "visible_bounds": [
+            45,
+            137,
+            306,
+            352
+          ],
+          "phase": "settle",
+          "sha256": "3bacc1846f1b1f026d1a2acb1a54c093dd9194bb1b91e4667eb492329f5a26f9"
+        },
+        {
+          "source_rect": [
+            1152,
+            500,
+            384,
+            524
+          ],
+          "pivot": [
+            186.0,
+            490
+          ],
+          "visible_bounds": [
+            41,
+            157,
+            303,
+            333
+          ],
+          "phase": "rest",
+          "sha256": "fbdcd63c07ccf7391001e6c1c1d60f1834a4fd8580d5636902d59169ed2747b5"
+        }
+      ]
+    }
+  }
+}

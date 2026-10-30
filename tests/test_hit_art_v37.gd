@@ -1,0 +1,43 @@
+extends SceneTree
+const Hit=preload("res://scripts/hit_art_v37.gd")
+const Mantle=preload("res://scripts/mantle_art_v37.gd")
+const Feedback=preload("res://scripts/combat_feedback.gd")
+const Monster=preload("res://scripts/monster_art_v36.gd")
+const Attack=preload("res://scripts/attack_state.gd")
+var failures:Array[String]=[]
+func _initialize() -> void:call_deferred("run")
+func check(ok:bool,message:String) -> void:
+	if not ok:failures.append(message);push_error(message)
+func run() -> void:
+	var d:Dictionary=Hit.info();check(Hit.texture()!=null,"Hit atlas loads from actual packed resources")
+	for kind:String in ["feathers"]:
+		check(d["animations"][kind].size()==3,"Hit effect has exactly three authored frames")
+		var distinct:Dictionary={}
+		for f:Dictionary in d["animations"][kind]:distinct[str(f["source_rect"])]=true
+		check(distinct.size()==3,"Each hit pose selects its own cell")
+	check(Mantle.info()["frames"].size()==4 and ResourceLoader.exists(Mantle.ROOT+Mantle.info()["path"]),"Four-pose mantle artwork is exported")
+	var feedback:=Feedback.new();root.add_child(feedback)
+	for i in 10:feedback.hit({},Vector2(500,300),Vector2.RIGHT,"quick",false)
+	var angles:Dictionary={}
+	for f:Dictionary in feedback.flashes:
+		angles[snappedf(f["angle"],.001)]=true
+		check(Vector2(f["dir"]).is_equal_approx(Vector2.LEFT),"Feathers spray from the hit point opposite the strike")
+		check(is_equal_approx(f["length"],1280.0/3),"Crescent long axis is one-third screen width")
+		check(absf(angle_difference(f["angle"],PI))<=.241,"Crescent angle jitter stays restrained")
+	check(angles.size()>1 and feedback.bursts.is_empty(),"Hits vary angle without emitting old enemy-body ghost copies")
+	feedback.step(.19);check(feedback.flashes.is_empty(),"Transient VFX expire rather than accumulating")
+	for biome:String in ["underground","trunk","sky"]:
+		for row in 5:
+			var actor:Dictionary={"roster_id":"test","roster_row":row,"roster_elite":false,"roster_biome":biome,"vel":Vector2(50,0),"pos":Vector2(500,500),"face":1.0,"attack":Attack.new()};var seen:Dictionary={}
+			var body:Dictionary=preload("res://scripts/corpse_field_v21.gd").create(actor)
+			check(Vector2(body["visual_size"]).is_equal_approx(Monster.corpse_extent(actor)),"Corpse contact size derives from the unscaled authored silhouette")
+			for i in 6:seen[Monster.actor_sample(actor,(float(i)+.1)/12)["column"]]=true
+			check(seen.size()==6,"Every regular has six distinct movement poses")
+			actor["attack"].begin({"windup":.6,"active":.2,"recovery":.6});actor["attack"].tick(.15);var early:int=Monster.actor_sample(actor,0)["column"];actor["attack"].tick(.4)
+			check(early==7 and Monster.actor_sample(actor,0)["column"]==early,"Strong final windup silhouette is held for readability")
+	var game=load("res://main.tscn").instantiate();game.audio_enabled=false;root.add_child(game);await process_frame;game.set_process(false);game.set_physics_process(false)
+	game.effects.clear();game.combat_feedback.clear();game._hit_enemy({"hp":100.0,"training":true,"pos":Vector2(500,500)},1,Color.WHITE)
+	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Training targets use the same new impact with no old body-centered animation")
+	game.effects.clear();game.combat_feedback.clear();game.props.assign([{"kind":"dummy","pos":Vector2(500,500),"used":false,"hurt":0.0}]);game._hit_props(Rect2(450,420,100,100),1,99)
+	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Station dummies also show the three-frame feather impact")
+	game.queue_free();feedback.queue_free();await process_frame;print("v37 hit and animation checks: ",failures);quit(0 if failures.is_empty() else 1)

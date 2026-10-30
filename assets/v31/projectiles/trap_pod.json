@@ -1,0 +1,189 @@
+{
+  "version": 31,
+  "id": "trap_pod",
+  "original_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    443.5,
+    443.5
+  ],
+  "layout": [
+    4,
+    2
+  ],
+  "frames": [
+    {
+      "rect": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        253,
+        230
+      ],
+      "visible_bounds_alpha_gt_200": [
+        98,
+        145,
+        303,
+        169
+      ],
+      "smear": false,
+      "orientation_degrees": 0
+    },
+    {
+      "rect": [
+        444,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        233,
+        231
+      ],
+      "visible_bounds_alpha_gt_200": [
+        91,
+        122,
+        241,
+        232
+      ],
+      "smear": false,
+      "orientation_degrees": -45
+    },
+    {
+      "rect": [
+        887,
+        0,
+        443,
+        444
+      ],
+      "pivot": [
+        221,
+        223
+      ],
+      "visible_bounds_alpha_gt_200": [
+        106,
+        83,
+        199,
+        290
+      ],
+      "smear": true,
+      "orientation_degrees": -90
+    },
+    {
+      "rect": [
+        1330,
+        0,
+        444,
+        444
+      ],
+      "pivot": [
+        208,
+        220
+      ],
+      "visible_bounds_alpha_gt_200": [
+        112,
+        124,
+        243,
+        232
+      ],
+      "smear": false,
+      "orientation_degrees": -135
+    },
+    {
+      "rect": [
+        0,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        210,
+        218
+      ],
+      "visible_bounds_alpha_gt_200": [
+        68,
+        133,
+        302,
+        172
+      ],
+      "smear": false,
+      "orientation_degrees": -180
+    },
+    {
+      "rect": [
+        444,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        214,
+        221
+      ],
+      "visible_bounds_alpha_gt_200": [
+        122,
+        84,
+        230,
+        243
+      ],
+      "smear": false,
+      "orientation_degrees": -225
+    },
+    {
+      "rect": [
+        887,
+        444,
+        443,
+        443
+      ],
+      "pivot": [
+        219,
+        224
+      ],
+      "visible_bounds_alpha_gt_200": [
+        134,
+        64,
+        200,
+        297
+      ],
+      "smear": true,
+      "orientation_degrees": -270
+    },
+    {
+      "rect": [
+        1330,
+        444,
+        444,
+        443
+      ],
+      "pivot": [
+        229,
+        218
+      ],
+      "visible_bounds_alpha_gt_200": [
+        97,
+        78,
+        229,
+        239
+      ],
+      "smear": false,
+      "orientation_degrees": -315
+    }
+  ],
+  "max_body_extent": 303,
+  "max_visible_extent": 303,
+  "rotation": "counterclockwise",
+  "suggested_cycle_seconds": 0.64,
+  "pivot_space": "local to frame rect, measured largest solid body center",
+  "smear_frames_zero_based": [
+    2,
+    6
+  ],
+  "alpha": "authored RGBA preserved without raster editing",
+  "source_sha256": "21bf071b577dd88fc1f66639178f7b61de8fd4e20aaeda7bf985931263c5d2e8"
+}

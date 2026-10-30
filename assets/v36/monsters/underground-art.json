@@ -1,0 +1,133 @@
+{
+  "biome": "underground",
+  "generation": "built-in image_gen",
+  "brief": "underground-brief.json",
+  "assets": [
+    {
+      "kind": "regular",
+      "path": "source/underground-regular.png",
+      "columns": 12,
+      "rows": 5,
+      "size": [
+        1942,
+        809
+      ],
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-b14f4c44-b553-4e72-961c-6c5159bca451.png",
+      "prompt": "Use case: stylized-concept. Production transparent sprite atlas for a high quality 2D hand-painted gothic dark fantasy platformer at 1080p. EXACT layout: TWELVE equal columns and FIVE equal rows, 60 separate sprites, target 3072x1280, no text or grid lines. Each sprite must fit entirely inside its own cell with at least 12% empty transparent padding on all four sides. Never extend an attack or projectile into a neighboring cell. All creatures face RIGHT; fixed body scale and feet or floating bottom anchor at x50%, y86% of each cell. Finely painted dark contours, amber ochre single dominant hue, bone ivory highlights and charcoal shadows, textured organic surfaces. Not pixel art, not flat vector, no scene, no background, no ground or shadows. In EVERY row columns1-3 are three successive movement poses, columns4-6 are three distinct anticipatory WINDUP poses, columns7-9 are three attack execution poses, columns10-12 are three recovery poses. Each row SAME specific creature identity through twelve poses. Row1: low charcoal cave crab with an amber crystal pincer; walking; raises huge right pincer visibly through windup then snaps horizontally. Row2: squat cave toad with amber resin cheek sacs and acorn-shaped throat pouch; hopping; inflates throat three stages then spits one resin stone upward (keep detached stone tiny inside cell). Row3: cave moth with lantern abdomen and narrow mineral wings; hovering wing movement; pulls abdomen back then shoots pointed mineral spindle right. Row4: floating mushroom jellyfish with drooping amber bell cap and root tendrils; drifts; opens underside bell in three stages then drops one barbed spore pod. Row5: blind root-armored beetle with broad ram horn and powerful forelegs; walking; plants feet and lowers horn through clear windup then lunges bodily right and brakes. Movement and attack anatomy must match each creature. Keep attack effects restrained and entirely within cell. No labels, no numbers, no frame borders; real alpha transparency."
+    },
+    {
+      "kind": "elite",
+      "path": "source/underground-elite.png",
+      "columns": 12,
+      "rows": 4,
+      "size": [
+        2172,
+        724
+      ],
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-3793b086-a5eb-48b6-91f4-d92eafbaddcc.png",
+      "prompt": "Use case: stylized-concept. Production sprite atlas, real transparent background, hand-painted detailed gothic dark fantasy, warm amber ochre dominant, bone ivory edges, charcoal armor, intricate yet clear organic anatomy readable on 1080p. EXACTLY TWELVE equally spaced columns by FOUR rows: 48 sprites total. Target 3072x1024. EACH CELL isolated with 15% transparent margin, never overlap neighbors or crop limbs. Facing RIGHT. All poses fixed character scale with feet/bottom anchor x50%,y85% in cell. No text, no grid lines, no background, no cast shadows, no ground. Columns 1 2 3: three successive locomotion poses. Columns 4 5 6: THREE distinct WINDUP frames gradually preparing the specified attack. Columns 7 8 9: three execution frames. Columns 10 11 12: three recovery frames. Count every row twelve creatures, never eleven. Row1 CHARACTER A: giant armored geode crab with two broad amber crystal claws and exposed amber chest. Walking then raises BOTH claws overhead in clear three-frame anticipation, crosses them in crushing scissor strike, lowers them to recover. Row2 SAME CHARACTER A exact identity and proportions: walking then unfolds the crystal chest and leans backward through anticipation, fires three tiny crystal needles forward from chest, then closes chest; do not use claw attack poses in this row. Row3 CHARACTER B: heavy six-legged beetle with censer-shaped glowing amber abdomen, blunt ram horn, articulated throwing forearm. Walking, lowers horn and coils legs gradually, body rams forward, brakes and recovers. Row4 SAME CHARACTER B exact identity and proportions: walking, cocks the throwing forearm behind shoulder through three winding poses, launches a small resin bomb upward, follows through and recovers. Small separate projectile details entirely inside own cell. Both rows of each elite must visibly share the same complete anatomy. Fine painterly texture and dark outlines, no flat vector, no pixel art. Critical equal TWELVE columns per row and generous empty padding."
+    },
+    {
+      "kind": "projectiles",
+      "path": "source/underground-projectiles.png",
+      "columns": 8,
+      "rows": 5,
+      "size": [
+        1586,
+        992
+      ],
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-fb4a172c-77d9-4e07-bc92-3eaeaf04de4a.png",
+      "prompt": "Use case: stylized-concept. Exact EIGHT columns by FIVE rows transparent projectile animation atlas, 40 independent equal square cells, target2048x1280. Hand-painted gothic dark fantasy game sprites, warm amber ochre single dominant accent, bone ivory bright core, charcoal dark outline. Each cell MUST retain 15% transparent padding on every edge, no object or trail crossing cell boundaries. No background, no scene, no labels, text, numbers, grid lines or frame borders. High quality sharp organic detail for 1080p gameplay. Row1 resin_orb: round asymmetrical resin stone with amber insect trapped inside, EIGHT successive CLOCKWISE tumbling perspectives 0,45,90,135,180,225,270,315 degrees; clearly different orientation per frame; short painted dusty tail LEFT. Row2 mineral_dart: pointed amber crystal spindle facing RIGHT in every frame; EIGHT axial roll views CLOCKWISE around long right-pointing axis, changing facets/light, keeping nose right; short dust trailLEFT. Row3 spore_pod: barbed amber mushroom seed pod, EIGHT COUNTERCLOCKWISE tumbling views (0,-45,-90,-135,-180,-225,-270,-315deg); asymmetric hooked barbs make rotation obvious; short painted dust tailLEFT. Selected frames3 and7 in projectile rows have controlled small directional motion-blur strokes while preserving solid body silhouette; other frames crisp. Row4 melee_fx: eight successive bright amber CRESCENT SWIPE stages, faint buildup frames1-2, strike grows frames3-5, dissipates frames6-8; keep entire crescent isolated inside cell. Row5 trap_fx: eight planted barbed cave mushroom trap GROWTH frames, small bud frame1, rooted base fixed near bottom center, grows into thorned amber fungus acrossframes2-5, finalframes6-8 subtle pulse; this is a grounded rooted trap not floating projectile. Projectile rows1-3 centers exactlyx50%y50%cell; traprow root base x50%y85%. Real alpha transparency, not a painted checkerboard. Exactly eight sprites in EACH of five rows."
+    }
+  ],
+  "actor_phases": {
+    "move": [
+      0,
+      1,
+      2
+    ],
+    "windup": [
+      3,
+      4,
+      5
+    ],
+    "active": [
+      6,
+      7,
+      8
+    ],
+    "recovery": [
+      9,
+      10,
+      11
+    ]
+  },
+  "projectile_rows": [
+    "resin_orb",
+    "mineral_dart",
+    "spore_pod",
+    "melee_fx",
+    "trap_fx"
+  ],
+  "rotation": {
+    "resin_orb": "clockwise tumble",
+    "mineral_dart": "axial clockwise roll",
+    "spore_pod": "counterclockwise tumble"
+  },
+  "qa": [
+    "All three atlases have real RGBA transparency.",
+    "Visual count verified 12x5,12x4,8x5.",
+    "Identity matches behavior brief and distinct windup/execution phases.",
+    "Model output dimensions differ from requested 3072px; actual dimensions retained without upscaling.",
+    "Some limbs/glows approach cell borders; runtime extraction should use proportional cell boundaries, alpha bounds and padded packing. Do not assume requested 15% padding was achieved.",
+    "No source image downsizing or code changes performed."
+  ],
+  "source_grid": {
+    "regular": [
+      6,
+      10
+    ],
+    "elite": [
+      6,
+      8
+    ]
+  },
+  "actor_rework": {
+    "generation_mode": "builtin image_gen",
+    "source_grid": {
+      "regular": [
+        6,
+        10
+      ],
+      "elite": [
+        6,
+        8
+      ]
+    },
+    "regular": {
+      "path": "source/underground-regular.png",
+      "original_path": "/workspace/scratch/04706064e0ec/generated_images/exec-0d17826f-1e66-42f8-8025-13d9406ee5ca.png",
+      "size": [
+        971,
+        1619
+      ],
+      "prompt": "Use case: stylized-concept. Asset type: production transparent 2D game CHARACTER ONLY sprite sheet. Create exactly 6 columns and exactly 10 rows, evenly spaced invisible cells, 60 complete separate miniature creatures. Portrait aspect 3:5 (target1024x1707). Every creature must be SMALL: its entire body including every leg, pincer, wing, horn and tendril occupies at most HALF the width and HALF the height of its cell. Huge clear transparent gaps between every sprite. No grids or text. Each sprite faces RIGHT and keeps identical anatomy and scale across its two rows. Hand-painted finely detailed gothic dark fantasy, amber ochre single main accent, bone ivory, charcoal outlines, luminous minerals, NOT pixel art. True transparent background. ABSOLUTELY NO projectiles, no slashes, no glowing arcs, no motion streaks, no particles, no ground, no shadows, no decorative props. Only full character bodies in meaningful anatomical poses. Five species, each spans TWO consecutive rows: row1 cave crab charcoal shell amber crystal pincer: columns1-3 walking steps,4-6 slowly raising pincer for attack; row2 SAME crab: columns1-3 snapping its pincer horizontally without extending beyond body footprint,4-6 returning to idle. Row3 squat cave toad amber resin cheeks and throat sac: cols1-3 hopping preparation/air/landing,4-6 inflating throat; row4 SAMEtoad: cols1-3 open mouth recoil of spit but NOTHING emitted,4-6 deflate/recover. Row5 cave moth lantern abdomen mineral wings: cols1-3 wingbeat cycle,4-6 draw abdomen backward aiming; row6 SAMEmoth: cols1-3 abdomen forward firing pose without anything emitted,4-6 relax. Row7 floating mushroom jellyfish amber bell and root tendrils: cols1-3 drifting bell pulse,4-6 open underside; row8 SAMEjellyfish: cols1-3 contracting bell to drop a pod but no separate pod,4-6 closing bell. Row9 blind root armored beetle broad ram horn heavy forelegs: cols1-3 walking steps,4-6 brace legs lower horn; row10 SAMEbeetle: cols1-3 leaning naturally into body ram, NEVER elongate or stretch its body,4-6 braking to idle. Important: exactly six isolated complete characters on EVERY row. All limbs stay inside central HALF of every cell; preserve large transparent margins."
+    },
+    "elite": {
+      "path": "source/underground-elite.png",
+      "original_path": "/workspace/scratch/04706064e0ec/generated_images/exec-0144320b-0415-4e77-af76-d849a99f76fe.png",
+      "size": [
+        1086,
+        1448
+      ],
+      "prompt": "Use case: stylized-concept. Production transparent 2D game CHARACTER ONLY sprite atlas, exact6columns by8rows, 48 complete miniature creatures. Portrait3:4target1086x1448. Every entire character including all limbs/horns/pincers must fit within CENTRAL HALF of its invisible cell, huge empty transparent gaps all sides. RIGHTfacing, sameidentityandbodyscale acrossrows. Hand-painted finely detailed gothic darkfantasy, amberochre dominant, boneivory, charcoal cleancontours. NOtext,labels,grid,background,ground,castshadow. ABSOLUTELY NOprojectiles,slashingarcs,magicaleffects,particles,motionstreaks,detachedobjects: ONLYfullanatomicalcharacterposes. Two elite species each twoattacks. Rows1-4 SAME giant geodecrab knight with charcoal armored shell, two amber crystal claws and openable crystal chest: row1 cols1-3walksteps cols4-6raisingbothclaws; row2 cols1-3crossclawscrushingstrike CLOSE TO BODY (do not elongate arms) cols4-6recovery. Row3 cols1-3walksteps cols4-6unfoldingcrystalchest andaiming; row4 cols1-3chestforwardfiringpose withnothing emitted cols4-6chestclosing/recover. Rows5-8 SAMEheavybeetle with amber censerabdomen, blunt horn, articulatedthrowingforearm: row5 cols1-3walksteps cols4-6coillegsandlowerhorn; row6 cols1-3naturalbodyleanintoRAM withnormalproportions NEVERstretchingbody cols4-6braketorest. Row7 cols1-3walksteps cols4-6cockthrowingarmback; row8 cols1-3throwingarmfollowthrough EMPTY hand withnothing emitted cols4-6recoverarm. Exact6 isolatedcompletecharacters EVERYrow. SMALL sprites withatleast20%transparentpadding eachside. No creature or limb touches its cell boundaries."
+    },
+    "qa": [
+      "Six complete characters per row, correct six-column source mapping",
+      "Actor-only sheets have no embedded projectiles, slashes or motion streaks",
+      "All anatomy remains natural during ram",
+      "Some horn/pincer poses occupy more than requested half cell; runtime must use proportional cells and add transparent padding rather than assume fixed authored margins",
+      "Original 12-column sheets preserved as -v1.png"
+    ]
+  }
+}

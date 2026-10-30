@@ -1,0 +1,50 @@
+{
+  "mode": "built-in image_gen",
+  "source": "source/sky-regular.png",
+  "source_grid": [
+    6,
+    10
+  ],
+  "logical_phases": {
+    "move": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "windup": [
+      6,
+      7
+    ],
+    "active": [
+      8,
+      9
+    ],
+    "recovery": [
+      10,
+      11
+    ]
+  },
+  "prompt": "Use case: stylized-concept. Asset: production hand-painted dark fantasy 2D enemy animation spritesheet, genuine transparent background. Portrait canvas ratio 3:5 (exactly six equal columns by TEN equal rows). Absolutely no text, labels, frames, floor, shadows or projectiles. SIXTY completely separate whole-character poses with broad transparent gutters in every cell. All face right. Detailed black ink contours, azure/cyan/ivory, restrained navy shadow; crisp paint readable at 1080p.\nFive species, each occupies TWO consecutive rows. Each first row is SIX DISTINCT MOVEMENT CYCLE poses, and only movement. Each second row is EXACTLY two windup, two active strike, two recovery poses. Preserve same body anatomy, scale, colors and appendages across all twelve poses for that species. NOT three movement + three windup in the first row.\nRows1-2: compact cliff crab with blue cloud/crystal carapace and one hooked talon pincer. Row1 six distinct leg-scuttle phases, pincer neutral in all six. Row2 two tense raised-pincer anticipation poses, two horizontal pincer slash poses, two return-to-neutral poses.\nRows3-4: small blue hopping bird with broad feet and hail throat pouch. Row3 six coherent hopping locomotion phases: crouch, push, rise, apex, descend, contact. Row4 two inflated throat anticipation poses, two open-beak spit body poses (no pellet), two deflating recoveries.\nRows5-6: hovering blue swift, narrow wings, spear-like tail. Row5 six flapping phases with wings high, descending, level, low, rising, high folded. Row6 two tail draw-back anticipation, two forward tail-release body poses (no feather flying), two recovery.\nRows7-8: small floating manta with translucent blue veil fins and storm-seed anatomy. Row7 six rippling wing/fin waves across a complete cycle, exact same manta body identity. Row8 two cupped-fins anticipation, two downward release poses (no pod), two relaxed recovery.\nRows9-10: compact dark-wool cliff ram with blue curled wind horns, four short sturdy hooves. Row9 six true four-legged walk-cycle phases, horns/head neutral, weight and hoof placements visibly alternate. Row10 two planted-hooves/lowered-horn anticipation, two forward body charge-stride poses, two braking/recovery poses.\nCritical layout: every row contains SIX complete whole creatures evenly centered, no limb/wing/blade crosses the invisible cell boundary. Leave at least 15% transparent cell margin all sides. Every row at same vertical center within equal 1/10 canvas height. Keep 20px+ clear separation between rows. Do not add attack effects or droplets or beams; body only. Whole sequence consistent silhouettes, no morphing between move and attack.",
+  "notes": [
+    "Original source generated after behavior definitions.",
+    "Runtime atlas extraction only; no pose synthesized with code."
+  ],
+  "sha256": "cba97196cb9cb8203c4c6d9df0f904a347fef360765fff12a6e9a028a91189cf",
+  "source_size": [
+    971,
+    1620
+  ],
+  "validation": {
+    "extracted_frames": 60,
+    "row_bands": 10,
+    "viewed_contact_sheet": true,
+    "alpha_range": [
+      0,
+      255
+    ],
+    "notes": "All60 source poses extracted whole with standard actor_pieces; no measured rectangles required. Padding edit regenerated original brush pixels and restored first-column tail tip."
+  }
+}

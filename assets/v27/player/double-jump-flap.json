@@ -1,0 +1,104 @@
+{
+  "version": 27,
+  "path": "double-jump-flap.png",
+  "original_size": [
+    2172,
+    724
+  ],
+  "cell_size": [
+    543,
+    724
+  ],
+  "world_height": 50.9375,
+  "reference_height": 333,
+  "pixel_factor": 0.15296546546546547,
+  "fps": 12.5,
+  "duration": 0.32,
+  "loop": false,
+  "import_size_limit": 1024,
+  "frames": [
+    {
+      "pose": "folded_prepare",
+      "source_rect": [
+        0,
+        0,
+        543,
+        724
+      ],
+      "pivot": [
+        284,
+        594
+      ],
+      "visible_bounds": [
+        31,
+        261,
+        451,
+        333
+      ]
+    },
+    {
+      "pose": "wing_upstroke",
+      "source_rect": [
+        543,
+        0,
+        543,
+        724
+      ],
+      "pivot": [
+        329,
+        594
+      ],
+      "visible_bounds": [
+        28,
+        127,
+        498,
+        467
+      ]
+    },
+    {
+      "pose": "wing_downstroke",
+      "source_rect": [
+        1086,
+        0,
+        543,
+        724
+      ],
+      "pivot": [
+        317,
+        594
+      ],
+      "visible_bounds": [
+        37,
+        261,
+        479,
+        409
+      ]
+    },
+    {
+      "pose": "folded_recover",
+      "source_rect": [
+        1629,
+        0,
+        543,
+        724
+      ],
+      "pivot": [
+        317,
+        594
+      ],
+      "visible_bounds": [
+        67,
+        261,
+        451,
+        333
+      ]
+    }
+  ],
+  "notes": [
+    "Generated original pixels are unedited. Four equal horizontal cells.",
+    "Draw source rectangles scaled by imported_texture_size/original_size. Destination geometry and pivots stay in original pixel units with one shared pixel_factor.",
+    "Per-frame pivots compensate generated horizontal layout offsets to align the same eye/head/body landmark; no per-frame fitting or resizing.",
+    "The foot baseline is y594 in all cells. Wings extend beyond standing silhouette without changing protagonist body scale."
+  ],
+  "sha256": "99c200dea9344663ec62320f119ecbeca9a4d805d5d34a2a555a3929ab4494a0"
+}

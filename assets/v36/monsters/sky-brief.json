@@ -1,0 +1,147 @@
+{
+  "biome": "sky",
+  "palette": "azure frost cyan ivory dark navy",
+  "regular": [
+    [
+      "cloud_crab",
+      "雲棘爪蟹",
+      "walk",
+      "slash",
+      "cliff crab with blue cloud armor and hooked talon pincer",
+      "raises hooked talon then slashes horizontally",
+      "talon",
+      null
+    ],
+    [
+      "hail_hopper",
+      "霰囊跳雀",
+      "jump",
+      "arc",
+      "hopping blue bird with broad feet and hail throat pouch",
+      "inflates throat then spits faceted hail pellet upward",
+      "hail",
+      "clockwise tumble"
+    ],
+    [
+      "needle_swift",
+      "針羽懸燕",
+      "hover",
+      "linear",
+      "hovering blue swift with narrow wings and spear tail",
+      "draws back spear tail then fires pointed feather",
+      "feather",
+      "axial clockwise roll"
+    ],
+    [
+      "mist_ray",
+      "霧紗漂魟",
+      "drift",
+      "trap",
+      "floating manta with translucent blue veil fins and storm seeds",
+      "cups fins downward then drops storm pod",
+      "storm_pod",
+      "counterclockwise tumble"
+    ],
+    [
+      "gale_ram",
+      "風角衝羊",
+      "walk",
+      "ram",
+      "compact cliff ram with blue wind horns dark wool sturdy hooves",
+      "plants hooves lowers horns then body charges",
+      "ram",
+      null
+    ]
+  ],
+  "elite": [
+    [
+      "bell_herald",
+      "風鈴宣告者",
+      "hover",
+      "azure bell winged moth with ribbed throat bell and feather vanes",
+      "pulls bell wings apart then claps a sound crescent",
+      "sound_crescent",
+      "counterclockwise tumble",
+      "fans tail feathers then fires feather spread",
+      "feather",
+      "axial clockwise roll"
+    ],
+    [
+      "storm_lancer",
+      "逐霆槍蜂",
+      "hover",
+      "cobalt armored wasp knight with lance stinger and storm bulb abdomen",
+      "pulls lance back then short lance thrust",
+      "lance",
+      null,
+      "tilts storm bulb folds lance then fires lightning harpoon",
+      "storm_dart",
+      "axial counterclockwise roll"
+    ]
+  ],
+  "actor_grid": {
+    "columns": 12,
+    "regular_rows": 5,
+    "elite_rows": 4,
+    "phases": {
+      "move": [
+        0,
+        1,
+        2
+      ],
+      "windup": [
+        3,
+        4,
+        5
+      ],
+      "active": [
+        6,
+        7,
+        8
+      ],
+      "recovery": [
+        9,
+        10,
+        11
+      ]
+    },
+    "facing": "right",
+    "cell_foot_anchor": [
+      0.5,
+      0.88
+    ],
+    "padding": 0.1
+  },
+  "projectile_rows": [
+    {
+      "id": "hail",
+      "rotation": "clockwise tumble"
+    },
+    {
+      "id": "feather",
+      "rotation": "axial clockwise roll"
+    },
+    {
+      "id": "storm_pod",
+      "rotation": "counterclockwise tumble"
+    },
+    {
+      "id": "sound_crescent",
+      "rotation": "counterclockwise tumble"
+    },
+    {
+      "id": "storm_dart",
+      "rotation": "axial counterclockwise roll"
+    }
+  ],
+  "effect_rows": [
+    {
+      "id": "melee_fx",
+      "description": "eight frame bright crescent swipe buildup slash dissolve"
+    },
+    {
+      "id": "trap_fx",
+      "description": "eight frame planted organic trap growing from fixed floor base"
+    }
+  ]
+}

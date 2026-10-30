@@ -1,0 +1,509 @@
+{
+  "version": 22,
+  "tile_world_size": 96,
+  "notes": [
+    "PNG bytes are unedited generated originals. source_rect metadata is authoritative.",
+    "Material is an interior crop with every pixel alpha>=249; draw a solid biome-colored base beneath it or force material shaderalpha1 for a fully opaque collision rectangle.",
+    "Platform 1/2/3/4 are distinct authored sprites. Each has fixed world_size and top contact anchor; do not randomize perinstance scale. Plants above contactline are decorative."
+  ],
+  "biomes": {
+    "underground": {
+      "path": "surfaces-underground.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "9e41132b0da2507bf507248197b58011e6224234f10a75ea2029968953d0de8d",
+      "material": {
+        "source_rect": [
+          320,
+          40,
+          600,
+          600
+        ],
+        "world_repeat": 288,
+        "alpha_min": 250,
+        "alpha_max": 254,
+        "holes_below_240": 0
+      },
+      "platforms": {
+        "1": {
+          "cells": 1,
+          "source_rect": [
+            465,
+            670,
+            324,
+            111
+          ],
+          "bounds": [
+            0,
+            0,
+            324,
+            111
+          ],
+          "world_size": [
+            96,
+            48
+          ],
+          "anchor": [
+            0,
+            24
+          ],
+          "contact_source_y": 24,
+          "contact_span": [
+            1,
+            323
+          ],
+          "contact_coverage": 0.9938271604938271,
+          "body_source_rect": [
+            466,
+            694,
+            322,
+            87
+          ],
+          "sha256": "05204b9ec583793c23a6ce3b974746f3dee44a36e1f4520faf126034fb029c46"
+        },
+        "2": {
+          "cells": 2,
+          "source_rect": [
+            328,
+            796,
+            599,
+            119
+          ],
+          "bounds": [
+            0,
+            0,
+            599,
+            119
+          ],
+          "world_size": [
+            192,
+            48
+          ],
+          "anchor": [
+            0,
+            19
+          ],
+          "contact_source_y": 19,
+          "contact_span": [
+            2,
+            598
+          ],
+          "contact_coverage": 0.994991652754591,
+          "body_source_rect": [
+            330,
+            815,
+            596,
+            100
+          ],
+          "sha256": "219267e3a5ec18e865e013da8d279403705e917c22bbc46260f1b900b30771e0"
+        },
+        "3": {
+          "cells": 3,
+          "source_rect": [
+            220,
+            931,
+            816,
+            130
+          ],
+          "bounds": [
+            0,
+            0,
+            816,
+            130
+          ],
+          "world_size": [
+            288,
+            48
+          ],
+          "anchor": [
+            0,
+            23
+          ],
+          "contact_source_y": 23,
+          "contact_span": [
+            2,
+            815
+          ],
+          "contact_coverage": 0.9963235294117647,
+          "body_source_rect": [
+            222,
+            954,
+            813,
+            107
+          ],
+          "sha256": "dbe807f68512bc2688502556083dc78957d60cc46f42909895d0705a203efeb3"
+        },
+        "4": {
+          "cells": 4,
+          "source_rect": [
+            37,
+            1077,
+            1180,
+            146
+          ],
+          "bounds": [
+            0,
+            0,
+            1180,
+            146
+          ],
+          "world_size": [
+            384,
+            48
+          ],
+          "anchor": [
+            0,
+            23
+          ],
+          "contact_source_y": 23,
+          "contact_span": [
+            2,
+            1179
+          ],
+          "contact_coverage": 0.997457627118644,
+          "body_source_rect": [
+            39,
+            1100,
+            1177,
+            123
+          ],
+          "sha256": "92a7463801405f95f17b870894732f415e6e777d219e6ea632d867f131387155"
+        }
+      }
+    },
+    "trunk": {
+      "path": "surfaces-trunk.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "4b56b9b4bcfcd8eefc08ff8951c30ee9a87721d8f29683303d44b656d51d4a3c",
+      "material": {
+        "source_rect": [
+          310,
+          64,
+          640,
+          640
+        ],
+        "world_repeat": 288,
+        "alpha_min": 249,
+        "alpha_max": 254,
+        "holes_below_240": 0
+      },
+      "platforms": {
+        "1": {
+          "cells": 1,
+          "source_rect": [
+            462,
+            752,
+            339,
+            110
+          ],
+          "bounds": [
+            0,
+            0,
+            339,
+            110
+          ],
+          "world_size": [
+            96,
+            48
+          ],
+          "anchor": [
+            0,
+            25
+          ],
+          "contact_source_y": 25,
+          "contact_span": [
+            2,
+            329
+          ],
+          "contact_coverage": 0.9646017699115044,
+          "body_source_rect": [
+            464,
+            777,
+            327,
+            85
+          ],
+          "sha256": "7711cc692c2861af05ad54a481c1e3ac5284cc88e4fe2ba8d57c7a034e96a6a9"
+        },
+        "2": {
+          "cells": 2,
+          "source_rect": [
+            331,
+            862,
+            582,
+            122
+          ],
+          "bounds": [
+            0,
+            0,
+            582,
+            122
+          ],
+          "world_size": [
+            192,
+            48
+          ],
+          "anchor": [
+            0,
+            41
+          ],
+          "contact_source_y": 41,
+          "contact_span": [
+            11,
+            581
+          ],
+          "contact_coverage": 0.979381443298969,
+          "body_source_rect": [
+            342,
+            903,
+            570,
+            81
+          ],
+          "sha256": "90cc03c5e8f8a9eaca8116503aaae8fa226f3554a598d7c999c3733afd27eeee"
+        },
+        "3": {
+          "cells": 3,
+          "source_rect": [
+            174,
+            984,
+            889,
+            122
+          ],
+          "bounds": [
+            0,
+            0,
+            889,
+            122
+          ],
+          "world_size": [
+            288,
+            48
+          ],
+          "anchor": [
+            0,
+            43
+          ],
+          "contact_source_y": 43,
+          "contact_span": [
+            18,
+            888
+          ],
+          "contact_coverage": 0.9786276715410573,
+          "body_source_rect": [
+            192,
+            1027,
+            870,
+            79
+          ],
+          "sha256": "2d551b4d006a4fdeba5617c1d1bb9349f2e76d99ae52830168ab05a872d29298"
+        },
+        "4": {
+          "cells": 4,
+          "source_rect": [
+            45,
+            1106,
+            1165,
+            133
+          ],
+          "bounds": [
+            0,
+            0,
+            1165,
+            133
+          ],
+          "world_size": [
+            384,
+            48
+          ],
+          "anchor": [
+            0,
+            49
+          ],
+          "contact_source_y": 49,
+          "contact_span": [
+            1,
+            1164
+          ],
+          "contact_coverage": 0.9982832618025751,
+          "body_source_rect": [
+            46,
+            1155,
+            1163,
+            84
+          ],
+          "sha256": "5bfabd00cfd29099f4f5ba70368cc7a682794d4bb09dee2a6bd855e60d7d103f"
+        }
+      }
+    },
+    "sky": {
+      "path": "surfaces-sky.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "476637fa4fb489dab0ad3d3e8eb38394e3d0f426c334590b6672bd60b117d184",
+      "material": {
+        "source_rect": [
+          345,
+          42,
+          560,
+          560
+        ],
+        "world_repeat": 288,
+        "alpha_min": 249,
+        "alpha_max": 254,
+        "holes_below_240": 0
+      },
+      "platforms": {
+        "1": {
+          "cells": 1,
+          "source_rect": [
+            477,
+            644,
+            299,
+            131
+          ],
+          "bounds": [
+            0,
+            0,
+            299,
+            131
+          ],
+          "world_size": [
+            96,
+            48
+          ],
+          "anchor": [
+            0,
+            44
+          ],
+          "contact_source_y": 44,
+          "contact_span": [
+            2,
+            297
+          ],
+          "contact_coverage": 0.9866220735785953,
+          "body_source_rect": [
+            479,
+            688,
+            295,
+            87
+          ],
+          "sha256": "47e93c6a7a82396364b348f76180b21f8633865da8c95d08a8da7b739ee79006"
+        },
+        "2": {
+          "cells": 2,
+          "source_rect": [
+            351,
+            783,
+            553,
+            148
+          ],
+          "bounds": [
+            0,
+            0,
+            553,
+            148
+          ],
+          "world_size": [
+            192,
+            48
+          ],
+          "anchor": [
+            0,
+            56
+          ],
+          "contact_source_y": 56,
+          "contact_span": [
+            1,
+            551
+          ],
+          "contact_coverage": 0.9945750452079566,
+          "body_source_rect": [
+            352,
+            839,
+            550,
+            92
+          ],
+          "sha256": "81c5efc2bebc86e19b9a14aedbb472385e8ebb135656f1ed4f0e2daf1e7d1064"
+        },
+        "3": {
+          "cells": 3,
+          "source_rect": [
+            203,
+            935,
+            850,
+            153
+          ],
+          "bounds": [
+            0,
+            0,
+            850,
+            153
+          ],
+          "world_size": [
+            288,
+            48
+          ],
+          "anchor": [
+            0,
+            58
+          ],
+          "contact_source_y": 58,
+          "contact_span": [
+            2,
+            850
+          ],
+          "contact_coverage": 0.9976470588235294,
+          "body_source_rect": [
+            205,
+            993,
+            848,
+            95
+          ],
+          "sha256": "df4c65c7f709011a48517480c91a68c193d4e4c9a193e6bb63e6b8f3e4b2c61c"
+        },
+        "4": {
+          "cells": 4,
+          "source_rect": [
+            34,
+            1093,
+            1187,
+            139
+          ],
+          "bounds": [
+            0,
+            0,
+            1187,
+            139
+          ],
+          "world_size": [
+            384,
+            48
+          ],
+          "anchor": [
+            0,
+            55
+          ],
+          "contact_source_y": 55,
+          "contact_span": [
+            1,
+            1186
+          ],
+          "contact_coverage": 0.9983150800336984,
+          "body_source_rect": [
+            35,
+            1148,
+            1185,
+            84
+          ],
+          "sha256": "4c9997c7be6197c7bfabd6bafb8a9cb5ffda043669a434064f5375843c296587"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "method": "built-in image_gen",
+  "crescent": "Single slender handpainted ivory crescent. Remove halo, feather ornamentation and extra arcs; transparent outside blade.",
+  "laser": "Eight blue-white straight continuous beam pulse frames in 2x4 grid, transparent, no weapon heads.",
+  "sources": [
+    "effects/source/clean-crescent.png",
+    "effects/source/laser-beam.png"
+  ],
+  "packing": "Transparent source cells cropped and repacked without artwork edits.",
+  "final_prompts": {
+    "clean-crescent": "Edit target: this crescent combat sprite. Keep exactly the single elegant slender curved ivory blade, pointed ends, same composition and fine handpainted surface. REMOVE ALL surrounding glow, halo, haze, and shadow. Only the sharp solid blade remains and every pixel outside its crisp silhouette is completely transparent. No dark background or lighting bloom. Preserve one single continuous thin crescent, no additions.",
+    "laser-beam": "Edit target laser animation sheet. Keep same beautiful slender blue-white continuous straight ribbon beams. Arrange EXACTLY EIGHT beams in a TWO COLUMN by FOUR ROW grid. 2 beams per row, 4 rows = 8 individual beams, every cell separate with generous transparent gutter. No diffuse background or glow. The reference currently has seven, fix the count to exactly eight unique pulse frames. Each cell has one horizontally long pointed beam, no gun or object head. Transparent background outside sharp beam contours."
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "biome": "sky",
+  "generator": "built-in image_gen",
+  "design_first": "sky-brief.json",
+  "created_date": "2026-10-29",
+  "assets": [
+    {
+      "kind": "regular",
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-814f36c1-bf79-4b6b-b8af-d54a447436f7.png",
+      "prompt": "Use case: stylized-concept. Asset: production-ready transparent 2D game sprite atlas, finely hand-painted gothic dark fantasy. Create EXACTLY 12 equal columns by 5 equal rows, 60 separate sprites total, wide 12:5 aspect ratio (ideal 3072x1280). Transparent background with genuine alpha; no text, labels, grid lines, ground, cast shadows, decorative layout or background. Every sprite wholly inside its own equal cell with AT LEAST 10 percent empty margin on every side; no object, wing, weapon, emitted projectile or blur may cross cell boundaries. Small sprites must remain clear at 1080p gameplay: crisp ink contours, detailed brush-painted materials, restrained single dominant azure blue with frost cyan, ivory and dark navy. All creatures face RIGHT, consistent body identity/scale within row, feet or floating bottom anchor centered x50% y88% of each cell.\nEach row is ONE species, in this exact order:\nrow1: low cliff crab with blue cloud armor and a hooked talon pincer. Walk on feet. Attack raises hooked talon then slashes horizontally.\nrow2: small hopping blue bird with broad feet and a hailstone throat pouch. Attack inflates throat then spits ONE faceted hail pellet upward.\nrow3: hovering blue swift with narrow wings and a spear-like tail. Attack draws back spear tail then fires ONE pointed feather.\nrow4: floating manta with translucent blue veil fins and dangling storm seed organs. Attack cups fins downward then drops ONE storm seed pod.\nrow5: compact cliff ram with blue wind horns, dark wool and sturdy hooves. Attack plants hooves, lowers horns, then lunges body forward.\nThe SAME 12-column action layout repeats for EVERY row: columns1,2,3 are 3 genuinely different movement cycle poses; columns4,5,6 are 3 distinct sequential WINDUP preparation poses matching the exact anatomy/attack, increasing anticipation; columns7,8,9 are 3 sequential active attack poses; columns10,11,12 are 3 sequential recovery poses settling back. Exactly 12 columns, not 11. Keep the full character and attack silhouette in every cell; movement and preparation must be drawn animation, not copies. Do not draw large effects or long projectiles crossing into another cell. No busy glow halos.",
+      "grid": [
+        12,
+        5
+      ],
+      "target": "source/sky-regular.png"
+    },
+    {
+      "kind": "elite",
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-33a9163e-777d-4362-9f0a-d714b3850391.png",
+      "prompt": "Use case: stylized-concept. Asset: transparent production 2D game ELITE ENEMY sprite atlas, EXACTLY 12 equal columns by 4 equal rows, 48 sprites total, 3:1 wide aspect ratio ideal3072x1024. Hand-painted gothic dark fantasy, high-resolution detailed brushwork, crisp dark contour, azure and frost cyan blue dominant with ivory/dark navy. Genuine alpha transparent background, NO text/labels/grid/ground/shadows/background scenery. EACH cell has at least10percent empty margin on EVERYside; FULL creature, wings and weapon alwaysinsidecell, neveroverlap anothercell. All actors faceRIGHT, samebodysize andidentity throughouttheir2rows, feet/floatingbottomanchor x50% y88%cell. Avoid excessiveglow and longcrosscellprojectiles.\nRows1and2 are the SAME bell herald: an azure bell-winged moth with a pale ribbed throat bell, elegant feather vanes, and ornate gothic wing markings.\nRow1 attack: separates bell wings, visibly winds up the ribbed bell, then claps wings forward to launch ONE SMALL sound crescent. \nRow2 DIFFERENT attack of that SAME moth: fans its tail feather vanes, visibly draws them backward, then snaps tail forward to fire feather spread. Keep feathers contained insidecell.\nRows3and4 are the SAME storm lancer: cobalt armored wasp knight with a pointed articulated lance forearm/stinger, segmented armored abdomen and glowing storm bulb, clear full anatomy.\nRow3 attack: pulls lance forearm farback, coilsbody then drives a short close thrust forward.\nRow4 DIFFERENT attack of SAME wasp: folds lance underneath, tilts stormbulbabdomen forward, charges it then fires ONE short lightning harpoon.\nEVERY row uses EXACT SAME12column sequence: columns1,2,3 three distinct moving/hovering poses; columns4,5,6 three distinct animated WINDUP poses for that row's attack, readable anticipation increasing; columns7,8,9 three sequential activeattack poses; columns10,11,12 three sequential recoveryposes. Exactly12columns not11. No repeat-copy idle frames. Large legible silhouettes with generous gutters.",
+      "grid": [
+        12,
+        4
+      ],
+      "target": "source/sky-elite.png"
+    },
+    {
+      "kind": "projectiles",
+      "source": "/workspace/scratch/04706064e0ec/generated_images/exec-9e01fa9c-e58b-4234-9d58-05f1c64b22af.png",
+      "prompt": "Use case: stylized-concept. Asset: production transparent hand-painted gothic dark fantasy PROJECTILE and EFFECT animation atlas for azure sky ecology. EXACTLY8equalcolumns by7equalrows,56sprites total. Ideal2048x1792, exact8:7aspect. Genuine alpha transparentbackground, no labels/text/grid/borders/background/groundshadows. Eachspriteinsideitsowncell with10percentcleartransparentmargin onallsides, nevercross intoanothercell. Highresolutionfinebrushwork, crispdarkoutlines, blue/icycyan/ivory/navy singleblueaccent; readable small bodies, subtlecontrolledmotionblur ONLYframes3and7. A SHORTbrush-painted dustyshadow/windtrail is permitted LEFT ofeachprojectile but containedinsidecell, lessbrightthanbody, no giantglow.\nRows top-bottom MUSTbe exactly:\n1 HAIL: one faceted paleicyblue hailstone pellet, eightauthored45degree CLOCKWISEtumblingviews withdistinctfacets.\n2 FEATHER: one pointedbluefeather needle withmetallicivorytip, nosealwaysRIGHT inall8frames, eightauthoredAXIALCLOCKWISErollviews changingedge/face/exposedvanes NOTturningthenoseaway.\n3 STORM POD: one wrappedorganicnavystormseed withblueveins, eight45degreeCOUNTERCLOCKWISEtumblingviews.\n4 SOUND CRESCENT: one ivory-blue curvedribbedwindcrescent, eight45degreeCOUNTERCLOCKWISEtumblingviews visiblydifferentorientations.\n5 STORM DART: one lightningharpoon fromwaspstinger, pointedRIGHT nose inall8frames, eightAXIALCOUNTERCLOCKWISErollviews withdifferentexposedfacets, smallshortlefttrail.\n6 MELEE FX: eightsequentialhandpaintedbrightbluecrescent slashframes:1smallanticipation,2gather,3beginsweep,4widesweep,5fullsweep,6breakintothinwisps,7fade,8dissolve. Wholeeffectfitscell.\n7 PLANTED TRAP FX: eightsequentialgrowthframes ofa rootedblueorganicstormseedtrap emergingfromthefloor, paleveinedcasingandsharpnavyleaves. Fixedrootedbottomatx50%y88%EVERYframe, growingupwardfromsmallclosedseedthroughopeningintoarmedthorn. No floatingorb, nofloorline. Eightdistinctgrowth/armedflutterposes.\nExactly8columns,7rows. Keepmaterialdesignconsistentacrosseachrow andensure actualrotationdrawings, notsameimagecopies.",
+      "grid": [
+        8,
+        7
+      ],
+      "target": "source/sky-projectiles.png"
+    }
+  ],
+  "actual_sizes": {
+    "regular": [
+      1942,
+      809
+    ],
+    "elite": [
+      2172,
+      724
+    ],
+    "projectiles": [
+      1340,
+      1174
+    ]
+  },
+  "qa": {
+    "transparent_alpha": true,
+    "grid_count_visually_checked": true,
+    "actor_phase_columns": {
+      "move": [
+        0,
+        1,
+        2
+      ],
+      "windup": [
+        3,
+        4,
+        5
+      ],
+      "active": [
+        6,
+        7,
+        8
+      ],
+      "recovery": [
+        9,
+        10,
+        11
+      ]
+    },
+    "projectile_rows": [
+      "hail",
+      "feather",
+      "storm_pod",
+      "sound_crescent",
+      "storm_dart",
+      "melee_fx",
+      "trap_fx"
+    ],
+    "notes": [
+      "Right-facing characters and two specific elite attack poses retained.",
+      "Blue painted wisps approach some cell boundaries; proportional extraction and per-cell pivot normalization are required.",
+      "Rotations are authored views; feather and storm dart noses stay right for axial roll."
+    ]
+  },
+  "source_grid": {
+    "regular": {
+      "columns": 6,
+      "rows": 10
+    },
+    "elite": {
+      "columns": 6,
+      "rows": 8
+    },
+    "projectiles": {
+      "columns": 8,
+      "rows": 7
+    }
+  },
+  "regular_final": {
+    "source": "source/sky-regular.png",
+    "dimensions": [
+      971,
+      1620
+    ],
+    "grid": [
+      6,
+      10
+    ],
+    "tool": "builtin image_gen",
+    "generated_source": "/workspace/scratch/04706064e0ec/generated_images/exec-4fd2d292-2448-4a4f-b3dd-5472547e24f9.png",
+    "qa": "Six complete bodies perrow, no embedded FX/projectiles; last padding edit reduces claws/tails within cells. Some faintbluealpha stillapproachesedges and requires main-component cleanup during runtime extraction.",
+    "padding_edit": "imagegen reduce every sprite to70percent"
+  },
+  "elite_final": {
+    "source": "source/sky-elite.png",
+    "dimensions": [
+      1086,
+      1448
+    ],
+    "grid": [
+      6,
+      8
+    ],
+    "tool": "builtin image_gen, generated then geometric padding edit",
+    "generated_source": "/workspace/scratch/04706064e0ec/generated_images/exec-86ee910a-7476-40e1-aa53-0ba09919e791.png",
+    "candidate_source": "/workspace/scratch/04706064e0ec/generated_images/exec-958ee063-7c00-4298-bf40-b2db329422a5.png",
+    "qa": "All48complete actors, sixcolumns eightrows; targetedimagegen shrink correction provides clear transparent borders, full lance/wings. No projectile or slashFX. Each elite owns fourrows and two anatomical attackgestures."
+  }
+}

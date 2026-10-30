@@ -1,0 +1,198 @@
+{
+  "version": 37,
+  "path": "feather-crescent.webp",
+  "mode": "built-in image_gen",
+  "source": "source/feather-crescent.png",
+  "source_sha256": "b572b9c94d0fec80095d392ba17849959f6cbe3b3d165e51749f7b6550b0f1cf",
+  "size": [
+    1728,
+    1152
+  ],
+  "cell_size": [
+    576,
+    576
+  ],
+  "feather_duration": 0.18,
+  "crescent_duration": 0.14,
+  "crescent_world_long_axis": 426.6666666666667,
+  "crescent_reference_height": 447,
+  "animations": {
+    "feathers": [
+      {
+        "source_rect": [
+          0,
+          0,
+          576,
+          576
+        ],
+        "pivot": [
+          97,
+          294
+        ],
+        "original_rect": [
+          0,
+          0,
+          512,
+          512
+        ],
+        "original_pivot": [
+          65,
+          262
+        ],
+        "bounds": [
+          91,
+          114,
+          392,
+          337
+        ]
+      },
+      {
+        "source_rect": [
+          576,
+          0,
+          576,
+          576
+        ],
+        "pivot": [
+          59,
+          294
+        ],
+        "original_rect": [
+          512,
+          0,
+          512,
+          512
+        ],
+        "original_pivot": [
+          539,
+          262
+        ],
+        "bounds": [
+          53,
+          112,
+          473,
+          344
+        ]
+      },
+      {
+        "source_rect": [
+          1152,
+          0,
+          576,
+          576
+        ],
+        "pivot": [
+          60,
+          300
+        ],
+        "original_rect": [
+          1024,
+          0,
+          512,
+          512
+        ],
+        "original_pivot": [
+          1052,
+          268
+        ],
+        "bounds": [
+          50,
+          111,
+          445,
+          350
+        ]
+      }
+    ],
+    "crescent": [
+      {
+        "source_rect": [
+          0,
+          576,
+          576,
+          576
+        ],
+        "pivot": [
+          263.5,
+          262.0
+        ],
+        "original_rect": [
+          0,
+          512,
+          512,
+          512
+        ],
+        "original_pivot": [
+          231.5,
+          742.0
+        ],
+        "bounds": [
+          128,
+          57,
+          271,
+          410
+        ]
+      },
+      {
+        "source_rect": [
+          576,
+          576,
+          576,
+          576
+        ],
+        "pivot": [
+          275.5,
+          266.5
+        ],
+        "original_rect": [
+          512,
+          512,
+          512,
+          512
+        ],
+        "original_pivot": [
+          755.5,
+          746.5
+        ],
+        "bounds": [
+          87,
+          43,
+          377,
+          447
+        ]
+      },
+      {
+        "source_rect": [
+          1152,
+          576,
+          576,
+          576
+        ],
+        "pivot": [
+          286.5,
+          264.0
+        ],
+        "original_rect": [
+          1024,
+          512,
+          512,
+          512
+        ],
+        "original_pivot": [
+          1278.5,
+          744.0
+        ],
+        "bounds": [
+          84,
+          49,
+          405,
+          430
+        ]
+      }
+    ]
+  },
+  "notes": [
+    "Feathers authored spraying RIGHT; pivot is left emission origin.",
+    "Crescent pivot is visible crescent center. Use one shared scale across allframes.",
+    "Only transparent padding added. Source alpha preserved."
+  ]
+}

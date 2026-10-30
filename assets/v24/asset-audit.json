@@ -1,0 +1,4599 @@
+{
+  "version": 24,
+  "entries": {
+    "bosses:underground_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:underground_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:underground_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:underground_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:underground_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:underground_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:sky_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:sky_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:sky_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:sky_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:sky_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:sky_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:trunk_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:trunk_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:trunk_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:trunk_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:trunk_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:trunk_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:branches_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:branches_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:branches_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:branches_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:branches_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:branches_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:canopy_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:canopy_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:canopy_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:canopy_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:canopy_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:canopy_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:grass_impact": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:grass_melee": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:grass_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "bosses:grass_slash_fx": {
+      "runtime_usage": "used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:grass_projectile": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "bosses:grass_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "首領刀光／命中特效保留；舊身體和投射物已取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:pigeon_dissolve": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_featherblade_down": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_featherblade_up": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_greatblade_down": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_greatblade_up": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:pigeon_heavy": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_heavy_pose": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_land": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_pierce": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_quick": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_quick_pose": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_reach": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_reach_pose": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_slam": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:pigeon_soul_fly": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:pigeon_wall": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:pigeon_heavy_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_death": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_feather_left": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_feather_right": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_feather_thrust": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_feather_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_talons_down": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_talons_up": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_talons_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:pigeon_charge_heavy": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_charge_quick": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_charge_reach": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_dash": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:pigeon_jump": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:pigeon_great_front": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_great_side": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_great_spin": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_great_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:pigeon_talons_kick": {
+      "runtime_usage": "used",
+      "usage_note": "目前角色動作；舊替代姿態不再繪製。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "pigeon_action:3": {
+      "runtime_usage": "used",
+      "usage_note": "目前回血、跛行與風技前後姿態。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "pigeon_action:2": {
+      "runtime_usage": "used",
+      "usage_note": "目前回血、跛行與風技前後姿態。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "home:sleep": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "pigeon_action:0": {
+      "runtime_usage": "used",
+      "usage_note": "目前回血、跛行與風技前後姿態。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "idle:v19:idle": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.341,
+      "density_note": "來源密度 6.34 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:pigeon-motion:air": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 4.692,
+      "density_note": "來源密度 4.69 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:pigeon-motion:drowsy": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.223,
+      "density_note": "來源密度 6.22 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:pigeon-motion:air": {
+      "runtime_usage": "used",
+      "usage_note": "v23已接入主角、彈射、前前景或固定長跳台。",
+      "source_pixels_per_world_pixel": 5.183,
+      "density_note": "來源密度 5.18 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:pigeon-motion:wall": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 4.692,
+      "density_note": "來源密度 4.69 px／遊戲像素；以固定比例繪製。"
+    },
+    "idle:v19:rest": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.223,
+      "density_note": "來源密度 6.22 px／遊戲像素；以固定比例繪製。"
+    },
+    "pigeon_action:1": {
+      "runtime_usage": "used",
+      "usage_note": "目前回血、跛行與風技前後姿態。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v23:pigeon-motion:wall": {
+      "runtime_usage": "used",
+      "usage_note": "v23已接入主角、彈射、前前景或固定長跳台。",
+      "source_pixels_per_world_pixel": 5.183,
+      "density_note": "來源密度 5.18 px／遊戲像素；以固定比例繪製。"
+    },
+    "illustrated:pigeon_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "walk_v2:pigeon_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "行走只使用256px主圖集；80px舊版保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "walk_v2:pigeon_walk_master": {
+      "runtime_usage": "used",
+      "usage_note": "行走只使用256px主圖集；80px舊版保留。",
+      "source_pixels_per_world_pixel": 3.2,
+      "density_note": "來源密度 3.20 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.727,
+      "density_note": "來源密度 5.73 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:hanging_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.112,
+      "density_note": "來源密度 5.11 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:pebbles": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 6.364,
+      "density_note": "來源密度 6.36 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:root_cluster": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 4.159,
+      "density_note": "來源密度 4.16 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:wall_growth": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 7.766,
+      "density_note": "來源密度 7.77 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:underground:wall_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.802,
+      "density_note": "來源密度 5.80 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 6.227,
+      "density_note": "來源密度 6.23 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:hanging_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.162,
+      "density_note": "來源密度 5.16 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:pebbles": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 7.136,
+      "density_note": "來源密度 7.14 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:root_cluster": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 4.67,
+      "density_note": "來源密度 4.67 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:wall_growth": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 7.859,
+      "density_note": "來源密度 7.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:sky:wall_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.562,
+      "density_note": "來源密度 5.56 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.909,
+      "density_note": "來源密度 5.91 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:hanging_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.612,
+      "density_note": "來源密度 5.61 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:pebbles": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 7.955,
+      "density_note": "來源密度 7.95 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:root_cluster": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 4.568,
+      "density_note": "來源密度 4.57 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:wall_growth": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 8.172,
+      "density_note": "來源密度 8.17 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:edge:trunk:wall_roots": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 5.625,
+      "density_note": "來源密度 5.62 px／遊戲像素；以固定比例繪製。"
+    },
+    "procedural:door_boss": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲即時門光與水面；草叢程式示例只在RD展示。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "procedural:door_safe": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲即時門光與水面；草叢程式示例只在RD展示。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "procedural:water": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲即時門光與水面；草叢程式示例只在RD展示。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "procedural:door_reward": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲即時門光與水面；草叢程式示例只在RD展示。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "procedural:grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "遊戲即時門光與水面；草叢程式示例只在RD展示。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:illustrated/pigeon_attack_0_0.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:illustrated/pigeon_attack_0_1.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:illustrated/pigeon_attack_0_2.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:illustrated/pigeon_attack_0_3.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:illustrated/pigeon_move_1_3.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:walk_v2/pigeon_walk_v2_atlas.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:atmosphere_v09/turn.png": {
+      "runtime_usage": "used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "merchant:mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "merchant:far": {
+      "runtime_usage": "used",
+      "usage_note": "商人房背景使用；舊中景已移除。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_ambient_mushroom": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_ambient_root_glow": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_fullheal_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_fullheal_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:terrain:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:near": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:terrain:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:terrain:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:terrain:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:far": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_energy_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:underground_energy_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:module:branch_large": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:branch_medium": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:branch_small": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:door_musou": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:door_rogue": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:fern": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:foliage": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:grass_platform": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:hanging_root": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:mushroom_platform": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:nest": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:module:root_platform": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:sky_ambient_cloud_particles": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_fullheal_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_fullheal_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:terrain:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:near": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:terrain:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:terrain:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:terrain:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:far": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_energy_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:sky_energy_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_ambient_mushroom": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_ambient_root_glow": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_fullheal_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_fullheal_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:terrain:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:near": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:terrain:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:terrain:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:terrain:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:far": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_energy_break": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trunk_energy_idle": {
+      "runtime_usage": "used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_ambient_leaves": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_ambient_light": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_fullheal_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_fullheal_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_energy_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_energy_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:branches_ambient_grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_ambient_leaves": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_ambient_light": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_fullheal_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_fullheal_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_melee_repaired": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_energy_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_energy_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:canopy_ambient_grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:background:branches": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:background:canopy": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:background:grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:background:sky": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:background:trunk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:background:underground": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:grass_ambient_leaves": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_ambient_light": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_block_center": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_block_edge": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_block_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_fullheal_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_fullheal_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_parallax_far": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_parallax_mid": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_parallax_near": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_spring_base": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_spring_steam": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_spring_water": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_trunk_bottom": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_trunk_middle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_trunk_top": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_energy_break": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_energy_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:grass_ambient_grass": {
+      "runtime_usage": "un-used",
+      "usage_note": "當前3生態的互動物件與微粒；舊生態和方塊素材保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v23:platform:underground:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 3.727,
+      "density_note": "來源密度 3.73 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:underground:8": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.979,
+      "density_note": "來源密度 1.98 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:underground:10": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.281,
+      "density_note": "來源密度 1.28 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:underground:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:13": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:5": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:9": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.297,
+      "density_note": "來源密度 1.30 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:underground:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:12": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:6": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:7": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:15": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:14": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:11": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:underground:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v23:platform:sky:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 3.76,
+      "density_note": "來源密度 3.76 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:sky:8": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 2.01,
+      "density_note": "來源密度 2.01 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:sky:10": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.431,
+      "density_note": "來源密度 1.43 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:sky:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:13": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:5": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:9": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.203,
+      "density_note": "來源密度 1.20 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:sky:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:12": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:6": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:7": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:15": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:14": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:11": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:sky:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v23:platform:trunk:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 3.766,
+      "density_note": "來源密度 3.77 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:trunk:8": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.729,
+      "density_note": "來源密度 1.73 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:trunk:10": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.295,
+      "density_note": "來源密度 1.30 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:trunk:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:13": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:5": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:9": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.568,
+      "density_note": "來源密度 1.57 px／遊戲像素；以固定比例繪製。"
+    },
+    "v21:terrain:trunk:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:12": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:6": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:7": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:15": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:14": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:11": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:terrain:trunk:0": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:delivery_idle": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:delivery_parcel": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:delivery_send": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:dummy_hit": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:dummy_idle": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:first_aid_idle": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:rack_empty": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:awning": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:table": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:sign": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:steam": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:pool_front": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:pool_back": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:water": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "sanctuary:dummy": {
+      "runtime_usage": "used",
+      "usage_note": "目前商店桌面、假人與溫泉互動。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:first_aid_heal": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:rack_feather": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:energy_flower_hit": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:energy_flower_idle": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:rack_talons": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "spring:legacy": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:rack_great": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v22:platform:underground:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.354,
+      "density_note": "來源密度 3.35 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:underground:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.104,
+      "density_note": "來源密度 3.10 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:underground:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 2.823,
+      "density_note": "來源密度 2.82 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:underground:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.065,
+      "density_note": "來源密度 3.07 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:material:underground": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 2.083,
+      "density_note": "來源密度 2.08 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:sky:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.073,
+      "density_note": "來源密度 3.07 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:sky:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 2.865,
+      "density_note": "來源密度 2.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:sky:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 2.944,
+      "density_note": "來源密度 2.94 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:sky:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.086,
+      "density_note": "來源密度 3.09 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:material:sky": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 1.944,
+      "density_note": "來源密度 1.94 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:trunk:1": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.406,
+      "density_note": "來源密度 3.41 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:trunk:2": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 2.969,
+      "density_note": "來源密度 2.97 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:trunk:3": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.021,
+      "density_note": "來源密度 3.02 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:platform:trunk:4": {
+      "runtime_usage": "un-used",
+      "usage_note": "依需求改用v21平台家族／v23統一比例貼牆空中原畫。",
+      "source_pixels_per_world_pixel": 3.029,
+      "density_note": "來源密度 3.03 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:material:trunk": {
+      "runtime_usage": "un-used",
+      "usage_note": "v24統一密度新系列已替換此渲染路徑，原畫保留。",
+      "source_pixels_per_world_pixel": 2.222,
+      "density_note": "來源密度 2.22 px／遊戲像素；以固定比例繪製。"
+    },
+    "combat_v05:enemy_hover_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_hover_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_hover_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_hover_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_walk_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_walk_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_walk_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_walk_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_brake": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_dash_prepare": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_jump_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_jump_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_jump_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_jump_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_drift_hurt": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_drift_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_drift_death": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_drift_move": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:enemy_drift_turn": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:elite_biological": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:elite_weapon": {
+      "runtime_usage": "un-used",
+      "usage_note": "怪物身體已使用v18移動及v22攻擊、受傷、死亡原畫。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v23:launcher:underground": {
+      "runtime_usage": "used",
+      "usage_note": "v23已接入主角、彈射、前前景或固定長跳台。",
+      "source_pixels_per_world_pixel": 3.104,
+      "density_note": "來源密度 3.10 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:launcher:sky": {
+      "runtime_usage": "used",
+      "usage_note": "v23已接入主角、彈射、前前景或固定長跳台。",
+      "source_pixels_per_world_pixel": 3.156,
+      "density_note": "來源密度 3.16 px／遊戲像素；以固定比例繪製。"
+    },
+    "v23:launcher:trunk": {
+      "runtime_usage": "used",
+      "usage_note": "v23已接入主角、彈射、前前景或固定長跳台。",
+      "source_pixels_per_world_pixel": 3.219,
+      "density_note": "來源密度 3.22 px／遊戲像素；以固定比例繪製。"
+    },
+    "monster_projectile:amber_resin": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:cute_pillbug": {
+      "runtime_usage": "un-used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:dew_bubble": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:dew_pool": {
+      "runtime_usage": "un-used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:lamp_pollen": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:leaf_moon": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:mist_spore": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:moss_shard": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:moss_thorns": {
+      "runtime_usage": "un-used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:pollen_flower": {
+      "runtime_usage": "un-used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:root_spear": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:root_wave": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:silk_cocoon": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:silk_web": {
+      "runtime_usage": "un-used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:spring_seed": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "monster_projectile:storm_feather": {
+      "runtime_usage": "used",
+      "usage_note": "生態投射物仍使用；陷阱與鼠婦本體已由獨立動畫取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "motion:v18:sky": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.47,
+      "density_note": "來源密度 2.47 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:hover": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 7.158,
+      "density_note": "來源密度 7.16 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:jump": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.14,
+      "density_note": "來源密度 5.14 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:underground": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.566,
+      "density_note": "來源密度 2.57 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:drift": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.754,
+      "density_note": "來源密度 6.75 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:trunk": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.849,
+      "density_note": "來源密度 2.85 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:dash": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.14,
+      "density_note": "來源密度 3.14 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:branches": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.076,
+      "density_note": "來源密度 3.08 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:walk": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.632,
+      "density_note": "來源密度 4.63 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:grass": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.778,
+      "density_note": "來源密度 2.78 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:pillbug": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.368,
+      "density_note": "來源密度 5.37 px／遊戲像素；以固定比例繪製。"
+    },
+    "motion:v18:canopy": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.246,
+      "density_note": "來源密度 3.25 px／遊戲像素；以固定比例繪製。"
+    },
+    "combat_v05:bee_fly": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:bee_hit": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:block": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:boss_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:claw_short": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:door_light_loop": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:door_light_static": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:explosion_artificial": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:explosion_pollen": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:guardian_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:hit_heavy": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:hit_light": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:hit_medium": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:lifesteal": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:moth_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:musou_emblem_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:musou_gate_close": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:musou_gate_open": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:orbit_shield_fly": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:orbit_shield_intercept": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:parry": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:reflect": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:roguelike_emblem_idle": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:roguelike_gate_close": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:roguelike_gate_open": {
+      "runtime_usage": "un-used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:slinger_ranged": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:heal_guard": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:bee_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:beetle_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:boss_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:guardian_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:moth_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:slinger_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "slash:v18": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:death_feather_glow": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v22:water_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.523,
+      "density_note": "來源密度 2.52 px／遊戲像素；以固定比例繪製。"
+    },
+    "combat_v05:feather_left": {
+      "runtime_usage": "un-used",
+      "usage_note": "普攻已改用獨立v18月牙刀光。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:feather_right": {
+      "runtime_usage": "un-used",
+      "usage_note": "普攻已改用獨立v18月牙刀光。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:feather_thrust": {
+      "runtime_usage": "un-used",
+      "usage_note": "普攻已改用獨立v18月牙刀光。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:feather_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:motion_energy": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:claw_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:beetle_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:boss_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:guardian_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:moth_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:slinger_walk": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:great_front": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:great_side": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:great_spin": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:great_charge": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:coin": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:coin_spin": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:underground:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:underground:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:sky:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:sky:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:detail:trunk:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:middle:trunk:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:underground:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:sky:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:0": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:1": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:2": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:3": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:4": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v21:object:trunk:5": {
+      "runtime_usage": "used",
+      "usage_note": "v21物件與一至三格根石跳台已接入；其他地形舊模組保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:beam_body": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:beam_end": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:beam_start": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:flying_slash_bio": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:flying_slash_weapon": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_bomb": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_hammer": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_launcher": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_spear": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_heavy": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:projectile_acorn": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:projectile_bossfruit": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "illustrated:projectile_fruit": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:projectile_marble": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "illustrated:projectile_needle": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": 1,
+      "density_note": "來源密度 1.00 px／遊戲像素；以固定比例繪製。 舊低解析版本已停用。"
+    },
+    "combat_v05:projectile_needle": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_feather": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trap_case": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:trap_spore": {
+      "runtime_usage": "used",
+      "usage_note": "目前效果呼叫使用的ID；未被呼叫的版本保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:weapon_trap": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v22:death:pillbug": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.609,
+      "density_note": "來源密度 5.61 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:underground": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.643,
+      "density_note": "來源密度 2.64 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:sky": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.724,
+      "density_note": "來源密度 2.72 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:hover": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 8.687,
+      "density_note": "來源密度 8.69 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:jump": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.339,
+      "density_note": "來源密度 6.34 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:trunk": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.765,
+      "density_note": "來源密度 2.77 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:branches": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.796,
+      "density_note": "來源密度 2.80 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:canopy": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.269,
+      "density_note": "來源密度 3.27 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:drift": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 8.161,
+      "density_note": "來源密度 8.16 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:dash": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.171,
+      "density_note": "來源密度 3.17 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:walk": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.689,
+      "density_note": "來源密度 4.69 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:death:grass": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.815,
+      "density_note": "來源密度 2.82 px／遊戲像素；以固定比例繪製。"
+    },
+    "ambient:dragonfly": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲中的環境生物／商人。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ambient:bird": {
+      "runtime_usage": "un-used",
+      "usage_note": "舊版或替代素材，已由目前圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:2": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:0": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:4": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:1": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:3": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:underground:object:5": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:5": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:1": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:3": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:4": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:0": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:sky:object:2": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:1": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:4": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:2": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:5": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:0": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "ecology:trunk:object:3": {
+      "runtime_usage": "used",
+      "usage_note": "三生態背景、前景或可砍物件；舊中景與地形已停用。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_arc_shots": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_damage": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_linear_shots": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_range": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_shots": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_size": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:growth_speed": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_bloodblade": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_heartplus": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_longblade": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_orbit_bee": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_orbit_shield": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_reflect": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_sanctuary": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_swiftblade": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:strong_motion_energy": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_dashcharge": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_doublejump": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_wall": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_charge_horizontal": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_charge_vertical": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_dash_horizontal": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:skills_dash_vertical": {
+      "runtime_usage": "used",
+      "usage_note": "目前技能／武器／投射物路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:items_bomb": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:items_bomb": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:items_freeze": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:items_freeze": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:items_shield": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:items_shield": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:items_heal": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:items_heal": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:items_energy": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:items_energy": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:bloodblade": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:dewflow": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_gale": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:gale": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_guard": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:guard": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:heartplus": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_leech": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:leech": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:longblade": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_midas": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:midas": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:multishot": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:orbit_bee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:orbit_shield": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:pierce": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_pierce": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_reach": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:reach": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:reflect": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:sanctuary": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_soul": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:soul": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:swarm": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:swiftblade": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:wing": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:runes_wing": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:runes:motion_energy": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_chain_staff": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_impact_bomb": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_moonblade": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_moonblade": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_multibounce": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_needle": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_needle": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_piercing_laser": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_ricochet": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_ricochet": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_scatter": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_scatter": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_shockwave": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_stone": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_stone": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "combat_v05:secondary_sunray": {
+      "runtime_usage": "un-used",
+      "usage_note": "此圖示已由新背包圖集取代。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "inventory:items:secondary_sunray": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:motion_v13/merchant-background.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:motion_v13/merchant-middle.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "raw:motion_v13/wind.png": {
+      "runtime_usage": "un-used",
+      "usage_note": "程式直接參照的圖檔；未參照來源保留。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "wind:impact": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "wind:jet": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "explosion:air": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "explosion:surface": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "wind:form": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "merchant:owl": {
+      "runtime_usage": "used",
+      "usage_note": "遊戲中的環境生物／商人。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v22:trap:silk_web": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.203,
+      "density_note": "來源密度 6.20 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:trap:pollen_flower": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.438,
+      "density_note": "來源密度 6.44 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:trap:moss_thorns": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.688,
+      "density_note": "來源密度 5.69 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:trap:dew_pool": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 6.203,
+      "density_note": "來源密度 6.20 px／遊戲像素；以固定比例繪製。"
+    },
+    "home:rogue": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "home:background": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "home:musou": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "home:nest": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": null,
+      "density_note": "依用途顯示；背景、粒子、圖示使用各自固定尺寸。"
+    },
+    "v22:monster-actions:pillbug_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.93,
+      "density_note": "來源密度 3.93 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:pillbug_attack": {
+      "runtime_usage": "un-used",
+      "usage_note": "可愛遊盪者不攻擊；這些預備動作只供RD展示。",
+      "source_pixels_per_world_pixel": 3.93,
+      "density_note": "來源密度 3.93 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:pillbug_brake": {
+      "runtime_usage": "un-used",
+      "usage_note": "可愛遊盪者不攻擊；這些預備動作只供RD展示。",
+      "source_pixels_per_world_pixel": 3.93,
+      "density_note": "來源密度 3.93 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:pillbug_prepare": {
+      "runtime_usage": "un-used",
+      "usage_note": "可愛遊盪者不攻擊；這些預備動作只供RD展示。",
+      "source_pixels_per_world_pixel": 3.93,
+      "density_note": "來源密度 3.93 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:underground_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.939,
+      "density_note": "來源密度 1.94 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:underground_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.939,
+      "density_note": "來源密度 1.94 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:underground_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.939,
+      "density_note": "來源密度 1.94 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:sky_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.619,
+      "density_note": "來源密度 1.62 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:sky_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.619,
+      "density_note": "來源密度 1.62 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:sky_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.619,
+      "density_note": "來源密度 1.62 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:hover_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.807,
+      "density_note": "來源密度 4.81 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:hover_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.807,
+      "density_note": "來源密度 4.81 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:hover_brake": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.807,
+      "density_note": "來源密度 4.81 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:hover_prepare": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 4.807,
+      "density_note": "來源密度 4.81 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:jump_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.281,
+      "density_note": "來源密度 5.28 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:jump_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.281,
+      "density_note": "來源密度 5.28 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:jump_brake": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.281,
+      "density_note": "來源密度 5.28 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:jump_prepare": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.281,
+      "density_note": "來源密度 5.28 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:trunk_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.849,
+      "density_note": "來源密度 1.85 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:trunk_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.849,
+      "density_note": "來源密度 1.85 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:trunk_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.849,
+      "density_note": "來源密度 1.85 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:branches_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.895,
+      "density_note": "來源密度 1.90 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:branches_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.895,
+      "density_note": "來源密度 1.90 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:branches_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 1.895,
+      "density_note": "來源密度 1.90 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:canopy_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.172,
+      "density_note": "來源密度 2.17 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:canopy_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.172,
+      "density_note": "來源密度 2.17 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:canopy_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.172,
+      "density_note": "來源密度 2.17 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:drift_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.86,
+      "density_note": "來源密度 5.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:drift_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.86,
+      "density_note": "來源密度 5.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:drift_brake": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.86,
+      "density_note": "來源密度 5.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:drift_prepare": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 5.86,
+      "density_note": "來源密度 5.86 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:dash_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.877,
+      "density_note": "來源密度 2.88 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:dash_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.877,
+      "density_note": "來源密度 2.88 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:dash_brake": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.877,
+      "density_note": "來源密度 2.88 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:dash_prepare": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.877,
+      "density_note": "來源密度 2.88 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:walk_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.737,
+      "density_note": "來源密度 3.74 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:walk_attack": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.737,
+      "density_note": "來源密度 3.74 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:walk_brake": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.737,
+      "density_note": "來源密度 3.74 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:monster-actions:walk_prepare": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 3.737,
+      "density_note": "來源密度 3.74 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:grass_hurt": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.091,
+      "density_note": "來源密度 2.09 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:grass_melee": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.091,
+      "density_note": "來源密度 2.09 px／遊戲像素；以固定比例繪製。"
+    },
+    "v22:boss-actions:grass_ranged": {
+      "runtime_usage": "used",
+      "usage_note": "目前遊戲的角色、互動、裝備或效果路徑。",
+      "source_pixels_per_world_pixel": 2.091,
+      "density_note": "來源密度 2.09 px／遊戲像素；以固定比例繪製。"
+    },
+    "v24:material:sky": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:sky:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:sky:2": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:sky:3": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:sky:4": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:sky:0": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:sky:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:pebbles": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:grass": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:root_cluster": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:hanging_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:wall_growth": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:sky:wall_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:material:trunk": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:trunk:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:trunk:2": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:trunk:3": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:trunk:4": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:trunk:0": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:trunk:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:pebbles": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:grass": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:root_cluster": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:hanging_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:wall_growth": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:trunk:wall_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:material:underground": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:underground:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:underground:2": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:underground:3": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:platform:underground:4": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:underground:0": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:middle:underground:1": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:pebbles": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:grass": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:root_cluster": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:hanging_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:wall_growth": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:edge:underground:wall_roots": {
+      "runtime_usage": "used",
+      "usage_note": "v24目前實際地形／平台／景深繪製路徑；固定2來源像素／世界像素。"
+    },
+    "v24:weapon:needle": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:needle": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:chain_staff": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:chain_staff": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:impact_bomb": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:impact_bomb": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:ricochet": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:ricochet": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:homing_missile": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:homing_missile": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:trap_pod": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:trap_pod": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:moonblade": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:moonblade": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:fire_flask": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:fire_flask": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:weapon:piercing_laser": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:projectile:piercing_laser": {
+      "runtime_usage": "used",
+      "usage_note": "v24武器面板與實際投射物效果。"
+    },
+    "v24:rune:sub_velocity": {
+      "runtime_usage": "used",
+      "usage_note": "附武器強化符文，獨立原畫與實際效果。"
+    },
+    "v24:rune:sub_reach": {
+      "runtime_usage": "used",
+      "usage_note": "附武器強化符文，獨立原畫與實際效果。"
+    },
+    "v24:rune:sub_power": {
+      "runtime_usage": "used",
+      "usage_note": "附武器強化符文，獨立原畫與實際效果。"
+    },
+    "v24:rune:sub_volume": {
+      "runtime_usage": "used",
+      "usage_note": "附武器強化符文，獨立原畫與實際效果。"
+    },
+    "v24:corner:sky:convex": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    },
+    "v24:corner:sky:concave": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    },
+    "v24:corner:trunk:convex": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    },
+    "v24:corner:trunk:concave": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    },
+    "v24:corner:underground:convex": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    },
+    "v24:corner:underground:concave": {
+      "runtime_usage": "used",
+      "usage_note": "只放在相符內凹／外凸轉角。"
+    }
+  }
+}
