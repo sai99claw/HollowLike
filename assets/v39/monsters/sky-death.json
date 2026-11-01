@@ -1,0 +1,145 @@
+{
+  "path": "sky-death.webp",
+  "frames": [
+    {
+      "source_rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        118,
+        236,
+        118
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 72.67741413859578,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        135,
+        236,
+        101
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 57.50278627075829,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        99,
+        236,
+        137
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 57.232410882264595,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        130,
+        236,
+        106
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 62.919369230935125,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        129,
+        236,
+        107
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 62.905163861521615,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        109,
+        236,
+        127
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 72.03650333337953,
+      "reference_width": 236
+    },
+    {
+      "source_rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "bounds": [
+        10,
+        102,
+        236,
+        134
+      ],
+      "pivot": [
+        128,
+        236
+      ],
+      "world_width": 73.95664926861816,
+      "reference_width": 236
+    }
+  ]
+}

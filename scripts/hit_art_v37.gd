@@ -18,7 +18,7 @@ static func draw(c:CanvasItem,flash:Dictionary,base:Transform2D) -> void:
 	var angle:float=float(flash.get("angle",Vector2(flash["dir"]).angle()))
 	var zoom:float=maxf(.1,base.get_scale().x)
 	if elapsed<.12:
-		preload("res://scripts/clean_crescent_v38.gd").draw(c,flash["at"],angle,float(flash.get("length",1280.0/3))/zoom,base,clampf((.12-elapsed)/.04,0,1))
+		preload("res://scripts/clean_crescent_v39.gd").draw(c,flash["at"],angle,float(flash.get("length",1280.0/3))/zoom,base,clampf((.12-elapsed)/.04,0,1))
 	if bool(flash.get("feathers",false)):
 		var index:int=clampi(int(elapsed/.18*3),0,2)
 		var travel:Vector2=Vector2(flash["dir"])*elapsed*180

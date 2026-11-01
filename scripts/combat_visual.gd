@@ -103,6 +103,7 @@ static func player_clip(weapon:String,attack:Dictionary,anim:String) -> String:
 	if anim=="hurt":return "pigeon_hurt"
 	if anim in ["windup","active","recovery"] and attack.get("kind","") in ["slam","pierce"]:return ""
 	if anim not in ["charge","windup","active","recovery"]:return ""
+	if attack.get("great_spin_release",false) and anim!="charge":return "pigeon_great_spin"
 	var group:String={"foot":"talons","quick":"featherblade","heavy":"greatblade"}.get(weapon,"talons")
 	var direction:String=attack.get("direction","right")
 	if anim!="charge" and direction in ["up","down"]:return "pigeon_"+group+"_"+direction

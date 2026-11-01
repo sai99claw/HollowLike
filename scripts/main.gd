@@ -810,7 +810,7 @@ func _dash_pressed() -> void:
 
 
 func _primary_definition(request:Dictionary) -> Dictionary:
-	var def:Dictionary=Data.primary_attack(weapon_index,str(request.get("dir","right")),bool(request.get("charged",false)),bool(request.get("dash_charge",false)),int(request.get("combo",combo_index)))
+	var def:Dictionary=Data.action_attack(str(request.get("dir","right")),bool(request.get("charged",false)),float(p.get("dash_t",0))>0,int(request.get("combo",combo_index)))
 	def["damage"]=float(def["damage"])*Tuning.value("player_damage")
 	def["recovery"]=float(def["recovery"])*Tuning.value("attack_recovery")
 	var haste:float=(1+float(upgrades["haste"])*.07+_rune_effect("haste"))*(1+_rune_effect("haste_mult"))
@@ -1019,7 +1019,7 @@ func _update_heal(delta: float) -> void:
 func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO) -> void:
 	if float(en["hp"])<=0:return
 	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
-	en["flash_left"]=.055
+	en["flash_left"]=2.0/60.0;en["_impact_time"]=clock
 	_melee_hitstop()
 	if en.get("training",false):
 		en["training_total"]=float(en.get("training_total",0))+damage
@@ -1726,9 +1726,9 @@ func _update_skills() -> void:
 			meta["skills"].append(s["id"])
 			if ui!=null: _toast("技能解鎖："+s["name"])
 
-func _select_primary(index: int) -> void:
+func _select_primary(_index: int) -> void:
 	if _action_locked():return
-	weapon_index=clampi(index,0,2);p_attack.cancel()
+	weapon_index=1;p_attack.cancel()
 	_toast("主武器："+Data.PRIMARY[weapon_index]["name"])
 
 func _mode_name() -> String: return "無雙" if mode=="musou" else "Roguelike"
@@ -1813,7 +1813,7 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"lab_art":_open_rd()
 		"lab_tuning":_open_tuning()
 		"developer_tools":_show_developer_tools()
-		"lab_primary":weapon_index=clampi(int(payload),0,2);_close_panel();_update_hud()
+		"lab_primary":weapon_index=1;_close_panel();_update_hud()
 		"lab_secondary":secondary_index=clampi(int(payload),0,bag_weapons.size()-1);_close_panel();_update_hud()
 		"lab_monster":_summon_monster(int(payload));_close_panel()
 		"lab_clear":enemies.clear();projectiles.clear();hazards.clear();drops.clear();_close_panel()
@@ -2123,7 +2123,7 @@ func _draw() -> void:
 		bath.draw(self,_active_pool(),world_transform,draw_clock)
 		SanctuaryArt.pool_front(self,_active_pool(),draw_clock,world_transform)
 	if _is_healing():FX.fitted(self,"heal_guard",0,Rect2(p["pos"]-Vector2(35,65),Vector2(70,75)),world_transform,"right","idle",Color(.7,1,.8,.65),clock)
-	if float(p["dash_t"])>0 and not _wind_form_active():Wind.small_jet(self,p["pos"]-Vector2(0,22),p["dash_dir"],.16-float(p["dash_t"]),world_transform)
+	if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
 	_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	if charge_timer>.15 and show_hitboxes:
 		var threshold:float=_charge_threshold()
@@ -2229,9 +2229,10 @@ func _draw_player_body() -> void:
 	if not _wind_form_active():
 		if anim=="mantle":preload("res://scripts/mantle_art_v37.gd").draw(self,p,player_base,tint)
 		elif anim=="heavy_land":preload("res://scripts/heavy_landing_v28.gd").draw(self,p["pos"],float(p["face"]),.5-float(p["heavy_land_left"]),player_base,tint)
-		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and anim not in ["hurt","heal","wall","dash"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
+		elif float(p.get("dash_t",0))>0 and not p_attack.is_busy():preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),(.16-float(p["dash_t"]))*2,player_base,tint)
+		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
 		elif anim in ["idle","rest"]:IdleArt.draw(self,p["pos"],float(p["face"]),idle_time,player_base,tint)
-		else:Art.draw_pigeon(self,p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim,tint,1.0,(1-float(p["hurt"])/.25) if anim=="hurt" else p_attack.progress(),player_base,str(Data.PRIMARY[weapon_index]["style"]),p_attack.attack)
+		else:Art.draw_pigeon(self,p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim,tint,1.0,(1-float(p["hurt"])/.25) if anim=="hurt" else p_attack.progress(),player_base,str(p_attack.attack.get("style","quick")),p_attack.attack)
 	if not _wind_form_active():preload("res://scripts/cloak_art_v29.gd").draw(self,int(meta.get("skin",0)),p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim not in ["idle","rest","heavy_land"],player_base,anim,tint.a)
 	if p_attack.is_busy() and p_attack.attack.get("kind","")=="secondary":WorldItems.secondary(self,p_attack.attack,p["pos"],float(p["face"]),world_transform)
 
@@ -2243,7 +2244,7 @@ func _draw_hub() -> void:
 	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1)
 	else:
 		_draw_player_body()
-		if float(p["dash_t"])>0 and not _wind_form_active():Wind.small_jet(self,p["pos"]-Vector2(0,22),p["dash_dir"],.16-float(p["dash_t"]),Transform2D.IDENTITY)
+		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),Transform2D.IDENTITY)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	HomeArt.nest(self,true)
 	_text(Vector2(510,100),"枝間鴿行",42,Color("fff2cf"))
@@ -2367,7 +2368,7 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 	if is_player and atk.attack.get("kind","") in ["pierce","slam"]:
 		if atk.is_active() or bool(p.get("slam",false)):Wind.wind_form(self,at-Vector2(0,22),atk.attack["dir"],atk.elapsed,float(atk.attack["active"]),world_transform,atk.attack["kind"]=="slam")
 		return
-	if is_player and atk.attack.get("primary",false) and not atk.attack.get("charged",false):
+	if is_player and atk.attack.get("primary",false) and (not atk.attack.get("charged",false) or atk.attack.get("great_spin_release",false)):
 		if show_hitboxes and atk.is_active():draw_rect(_attack_box(at,atk.attack,face),Color("ffe3a0"),false,1)
 		return
 	if is_player and atk.attack.has("fx_clip"):
@@ -3144,7 +3145,7 @@ func _show_practice() -> void:
 	if lab_mode!="practice":return
 	var sections:Array[Dictionary]=[{"text":"自由試用所有裝備；練習結果不寫入冒險紀錄。","buttons":[{"label":"符文配置（全部可用）","action":"lab_runes"},{"label":"清空怪物與彈體","action":"lab_clear"},{"label":"怪物AI："+("開" if lab_ai else "停"),"action":"lab_ai"}]}]
 	var primary_buttons:Array=[]
-	for i in Data.PRIMARY.size():primary_buttons.append({"label":Data.PRIMARY[i]["name"],"action":"lab_primary","payload":i})
+	for i in [1]:primary_buttons.append({"label":Data.PRIMARY[i]["name"],"action":"lab_primary","payload":i})
 	sections.append({"text":"主武器","buttons":primary_buttons})
 	for i in Data.SECONDARY.size():sections.append({"text":Data.SECONDARY[i]["description"],"buttons":[{"label":"裝備 "+Data.SECONDARY[i]["name"],"action":"lab_secondary","payload":i}]})
 	for i in _lab_monsters().size():sections.append({"text":"召喚實際遊戲敵人","buttons":[{"label":_lab_monsters()[i],"action":"lab_monster","payload":i}]})
@@ -3225,7 +3226,7 @@ func _sync_enemy_canvases() -> void:
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
-	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or p_attack.attack.get("charged",false):return
+	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
 	SlashArt.draw(canvas,_attack_box(p["pos"],p_attack.attack,float(p["face"])),p_attack.attack,p_attack.progress(),world_transform)
 
 func _pogo() -> void:

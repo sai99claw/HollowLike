@@ -57,7 +57,7 @@ static func _weapons(ui,data:Dictionary,left:VBoxContainer,right:VBoxContainer) 
 	var list:VBoxContainer=_list(ui,right)
 	if data.get("in_start",false):
 		list.add_child(ui._label("主武器",13,GOLD))
-		for i in Data.PRIMARY.size():
+		for i in [1]:
 			var weapon:Dictionary=Data.PRIMARY[i];_tile(ui,list,str(weapon["name"]),str(weapon["description"]),Icons.primary(weapon),"primary_inventory",i,weapon["color"],i==int(data.get("primary_index",0)))
 	list.add_child(ui._label("隨身副武器",13,ui.MINT))
 	for i in weapons.size():

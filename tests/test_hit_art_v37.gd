@@ -21,9 +21,9 @@ func run() -> void:
 	var angles:Dictionary={}
 	for f:Dictionary in feedback.flashes:
 		angles[snappedf(f["angle"],.001)]=true
-		check(Vector2(f["dir"]).is_equal_approx(Vector2.LEFT),"Feathers spray from the hit point opposite the strike")
+		check(Vector2(f["dir"]).is_equal_approx(Vector2.RIGHT),"Feathers spray through the target in the strike direction")
 		check(is_equal_approx(f["length"],1280.0/3),"Crescent long axis is one-third screen width")
-		check(absf(angle_difference(f["angle"],PI))<=.241,"Crescent angle jitter stays restrained")
+		check(absf(angle_difference(f["angle"],0))<=.241,"Crescent angle jitter stays restrained")
 	check(angles.size()>1 and feedback.bursts.is_empty(),"Hits vary angle without emitting old enemy-body ghost copies")
 	feedback.step(.19);check(feedback.flashes.is_empty(),"Transient VFX expire rather than accumulating")
 	for biome:String in ["underground","trunk","sky"]:

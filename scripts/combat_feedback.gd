@@ -16,9 +16,16 @@ const FLASH_LENGTH:float=1280.0/3.0*1.2
 var impact_rng:=RandomNumberGenerator.new()
 func hit(en:Dictionary,at:Vector2,direction:Vector2,style:String,_killed:bool) -> void:
 	if flashes.size()>=12:flashes.pop_front()
-	var spray:Vector2=-direction.normalized() if direction.length_squared()>.01 else Vector2.LEFT
+	at=impact_center(en,at)
+	var spray:Vector2=direction.normalized() if direction.length_squared()>.01 else Vector2.RIGHT
 	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.18,"max":.18,"length":1280.0/3.0,"feathers":true})
 	queue_redraw()
+
+static func impact_center(en:Dictionary,fallback:Vector2) -> Vector2:
+	if en.has("roster_id") and en.has("roster_biome"):
+		return preload("res://scripts/monster_art_v36.gd").actor_bounds(en,float(en.get("_impact_time",0))).get_center()
+	if en.has("pos"):return Vector2(en["pos"])-Vector2(0,Motion.body_size(en).y*.5)
+	return fallback
 
 # Project the current authored silhouette onto the ejection direction. Using
 # the collider alone can still leave the spray inside wide wings or shells.
@@ -28,7 +35,7 @@ static func spray_origin(en:Dictionary,at:Vector2,direction:Vector2) -> Vector2:
 		var art=preload("res://scripts/monster_art_v36.gd")
 		var data:Dictionary=art.manifest(str(en["roster_biome"]))
 		if not data.is_empty():
-			var sample:Dictionary=art.actor_sample(en,0);var sheet:String=sample["sheet"];var row:int=sample["row"]
+			var sample:Dictionary=art.actor_sample(en,float(en.get("_impact_time",0)));var sheet:String=sample["sheet"];var row:int=sample["row"]
 			var f:Dictionary=art.frame(data,sheet,row,int(sample["column"]));var b:Array=f["bounds"];var pivot:Array=f["pivot"]
 			var factor:float=50.9375*(sqrt(2.0) if en.get("roster_elite",false) else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
 			for x:float in [float(b[0]),float(b[0])+float(b[2])]:

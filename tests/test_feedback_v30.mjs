@@ -11,5 +11,5 @@ assert.equal((await worker.fetch(post({message:'x'.repeat(2001)}),env)).status,4
 const body={id:crypto.randomUUID(),message:'試玩：跳躍操作建議',category:'操作與手感'};
 assert.equal((await worker.fetch(post(body),env)).status,200);assert.equal(rows.size,1);
 await worker.fetch(post(body),env);assert.equal(rows.size,1);
-const row=[...rows.values()][0];assert.equal(row[1],'匿名玩家');assert.equal(row[3],body.message);assert.equal(row[4],'v0.38');
+const row=[...rows.values()][0];assert.equal(row[1],'匿名玩家');assert.equal(row[3],body.message);assert.equal(row[4],'v0.39');
 console.log('PASS feedback: bounded validation, origin, private reads, bound insert, retry idempotency');

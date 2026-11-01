@@ -5,7 +5,7 @@ extends RefCounted
 
 const PRIMARY: Array[Dictionary] = [
 	{"id":"talons","name":"腳爪踢","name_en":"Bare Talons","style":"foot","color":Color("8af3da"),"description":"超快速 · 極短距離 · 強反作用力","charge_time":1.4,"damage_mult":2.0,"speed_mult":3.0,"range_mult":.65},
-	{"id":"featherblade","name":"羽毛刀","name_en":"Feather Knife","style":"quick","color":Color("e0d8ff"),"description":"快速 · 左斬／右斬／刺擊 · 均衡擊退","charge_time":1.4,"damage_mult":3.0,"speed_mult":1.5,"range_mult":1.0},
+	{"id":"featherblade","name":"羽毛刀","name_en":"Feather Knife","style":"quick","color":Color("e0d8ff"),"description":"羽毛刀連擊 · 單C中攻擊為大刀斬擊 · 集氣為第三下旋斬","charge_time":1.4,"damage_mult":3.0,"speed_mult":1.5,"range_mult":1.0},
 	{"id":"greatblade","name":"大刀","name_en":"Great Cleaver","style":"heavy","color":Color("ffc38d"),"description":"重攻擊 · 正砍／側砍／旋轉 · 強擊退","charge_time":1.4,"damage_mult":5.0,"speed_mult":.7,"range_mult":1.3}
 ]
 
@@ -125,6 +125,14 @@ static func primary_attack(index:int,direction:String,charged:bool,dash_charge:b
 		def["windup"]=0.0;def["active"]=[.09,.12,.16][clampi(index,0,2)]
 		def["recovery"]=maxf(0,cadence-float(def["active"]))
 	def["size"]=float(def["width"])*.5
+	return def
+
+## Old profiles remain available to the animation library, not as selectable weapons.
+static func action_attack(direction:String,charged:bool,during_dash:bool,combo:int=0) -> Dictionary:
+	var def:Dictionary=primary_attack(2 if charged or during_dash else 1,direction,false,false,2 if charged else combo)
+	def["dash_attack"]=during_dash
+	if charged:
+		def.merge({"kind":"charge","charged":true,"great_spin_release":true,"windup":0.0,"active":1.0,"recovery":0.0,"recoil":0.0,"energy_gain":2.0,"super_armor":true,"complete_release":true},true)
 	return def
 
 static func secondary_attack(index:int) -> Dictionary:

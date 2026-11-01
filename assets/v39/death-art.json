@@ -1,0 +1,9 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Redraw exact seven referenced ecology monsters as authored collapsed death poses. Preserve anatomy, palette and identity. Four columns, two rows; first five regulars, then two elites, final cell empty. Same facing; no procedural rotation, floor, text or blood; transparent background.",
+  "source_sheets": [
+    "monsters/source/underground-death.png",
+    "monsters/source/trunk-death.png",
+    "monsters/source/sky-death.png"
+  ]
+}

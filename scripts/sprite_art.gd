@@ -62,7 +62,7 @@ static func player(c:CanvasItem,pos:Vector2,face:float,time:float,anim:String,ti
 	if anim=="heal":return FX.actor(c,"pigeon_talons_charge",fmod(time*.8,1),pos,base,face,scale_value,tint,"windup")
 	var delivered:String=FX.player_clip(weapon,attack,anim)
 	if not delivered.is_empty():
-		var phase:String="idle" if anim=="charge" else anim
+		var phase:String="" if attack.get("great_spin_release",false) and anim=="active" else ("idle" if anim=="charge" else anim)
 		if FX.actor(c,delivered,progress,pos,base,face,scale_value,tint,phase,time if anim=="charge" else -1):return true
 	var clip:String="pigeon_walk"
 	var index:int=0

@@ -24,7 +24,7 @@ static func create(en:Dictionary) -> Dictionary:
 	direction=direction.normalized()
 	var force:float=clampf(float(en.get("death_knockback",90))*.85,65,120)
 	var velocity:Vector2=death_velocity(en)
-	var face:float=signf(direction.x) if absf(direction.x)>.1 else float(en.get("face",1))
+	var face:float=float(en.get("face",1))
 	return {"identity":identity,"pos":Vector2(en["pos"]),"vel":velocity,"factor":factor,"visual_size":extent,"body_size":extent*Vector2(.9,.9),"age":0.0,"land_age":-1.0,"frame":0,"face":face,"settled":false}
 static func step(body:Dictionary,delta:float,solids:Array,platforms:Array,bounds:Vector2) -> bool:
 	if body.get("settled",false):return false

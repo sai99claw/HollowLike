@@ -1,0 +1,7 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "ONE extremely fine elongated razor crescent sweep; vertical arc, 1200px length, 5\u20138px stroke, ivory, transparent outside blade. No halo, no extra arcs.",
+  "source": "effects/source/fine-crescent.png",
+  "runtime": "effects/fine-crescent.webp",
+  "anchor": "Opaque stroke midpoint, aligned to actual enemy sprite center."
+}

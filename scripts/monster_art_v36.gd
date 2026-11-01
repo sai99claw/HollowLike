@@ -48,6 +48,15 @@ static func _draw(c:CanvasItem,data:Dictionary,sheet:String,item:Dictionary,at:V
 	c.draw_set_transform_matrix(base*Transform2D(angle,Vector2(face*factor,factor),0,at))
 	c.draw_texture_rect_region(tex,Rect2(-Vector2(pivot[0],pivot[1]),Vector2(r[2],r[3])),Rect2(r[0],r[1],r[2],r[3]),tint)
 	c.draw_set_transform_matrix(base);return true
+static func actor_bounds(en:Dictionary,time:float=0) -> Rect2:
+	var data:Dictionary=manifest(str(en["roster_biome"]));var sample:Dictionary=actor_sample(en,time)
+	var sheet:String=sample["sheet"];var row:int=sample["row"];var item:Dictionary=frame(data,sheet,row,int(sample["column"]))
+	var b:Array=item["bounds"];var pivot:Array=item["pivot"]
+	var factor:float=50.9375*(sqrt(2.0) if en.get("roster_elite",false) else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
+	var face:float=float(en.get("face",1));var center:=Vector2((float(b[0])+float(b[2])*.5-float(pivot[0]))*face,float(b[1])+float(b[3])*.5-float(pivot[1]))*factor+Vector2(en["pos"])
+	var size:=Vector2(b[2],b[3])*factor
+	return Rect2(center-size*.5,size)
+
 static func draw_actor(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=Transform2D.IDENTITY) -> bool:
 	if not en.has("roster_id"):return false
 	var data:Dictionary=manifest(str(en["roster_biome"]))
@@ -82,23 +91,9 @@ static func draw_melee(c:CanvasItem,at:Vector2,attack:Variant,face:float,base:Tr
 	var data:Dictionary=manifest(key["biome"]);var spec:Dictionary=data.get("projectiles",{}).get("melee_fx",{})
 	if spec.is_empty():return false
 	return _draw(c,data,"projectiles",frame(data,"projectiles",int(spec["row"]),clampi(int(attack.progress()*8),0,7)),at+Vector2(face*35,-25),float(attack.attack.get("range",80))/maxf(1,float(spec["body_extent"])),face,base)
-static func corpse_angle(bounds:Array) -> float:return PI if float(bounds[2])>float(bounds[3])*1.15 else PI*.5
+static func corpse_angle(_bounds:Array) -> float:return 0.0
 static func corpse_extent(en:Dictionary) -> Vector2:
-	var data:Dictionary=manifest(str(en["roster_biome"]));var elite:bool=bool(en.get("roster_elite",false));var sheet:String="elite" if elite else "regular";var row:int=int(en["roster_row"])*(2 if elite else 1)
-	var b:Array=frame(data,sheet,row,11)["bounds"];var factor:float=50.9375*(sqrt(2.0) if elite else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
-	var angle:float=corpse_angle(b)
-	return Vector2(absf(cos(angle))*float(b[2])+absf(sin(angle))*float(b[3]),absf(sin(angle))*float(b[2])+absf(cos(angle))*float(b[3]))*factor
+	return preload("res://scripts/death_art_v39.gd").extent(en)
 static func draw_corpse(c:CanvasItem,body:Dictionary) -> bool:
 	if not body.has("roster_actor"):return false
-	var en:Dictionary=body["roster_actor"];var data:Dictionary=manifest(str(en["roster_biome"]))
-	if data.is_empty():return false
-	var sheet:String="elite" if en.get("roster_elite",false) else "regular";var row:int=int(en["roster_row"])*(2 if sheet=="elite" else 1)
-	var factor:float=50.9375*(sqrt(2.0) if sheet=="elite" else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
-	var item:Dictionary=frame(data,sheet,row,11);var b:Array=item["bounds"];var pivot:Array=item["pivot"]
-	# Exact living scale, rigid rotation; no squash/stretch at death.
-	var angle:float=float(body.get("face",1))*lerpf(.2,corpse_angle(b),clampf(float(body.get("age",0))/.25,0,1))
-	var center:=Vector2(float(b[0])+float(b[2])*.5-float(pivot[0]),float(b[1])+float(b[3])*.5-float(pivot[1]))*factor
-	center.x*=float(body["face"])
-	var visible_height:float=(absf(sin(angle))*float(b[2])+absf(cos(angle))*float(b[3]))*factor
-	var anchor:Vector2=body["pos"]-Vector2(0,visible_height*.5)-center.rotated(angle)
-	return _draw(c,data,sheet,item,anchor,factor,float(body["face"]),Transform2D.IDENTITY,Color(.65,.65,.65,.85),angle)
+	return preload("res://scripts/death_art_v39.gd").draw(c,body)

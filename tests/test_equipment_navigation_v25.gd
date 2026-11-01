@@ -13,7 +13,7 @@ func key(code:Key) -> InputEventKey:
 func focus_key() -> String:
 	var control:Control=root.gui_get_focus_owner();return str(control.get_meta("equipment_key","")) if control!=null else ""
 func run() -> void:
-	var game=load("res://main.tscn").instantiate();game.audio_enabled=false;root.add_child(game);await settle();game.set_process(false);game.set_physics_process(false);game.new_run("rogue",250025);game.weapon_index=0 # Explicit navigation fixture; the default knife is covered byv33 tests.
+	var game=load("res://main.tscn").instantiate();game.audio_enabled=false;root.add_child(game);await settle();game.set_process(false);game.set_physics_process(false);game.new_run("rogue",250025);game.weapon_index=1 # Only the feather knife remains selectable.
 	game._show_equipment(0);await settle()
 	check(focus_key()=="tab:0","E starts focused on the main weapon tab")
 	var bar:Node=game.ui.panel_rows.find_child("EquipmentTabsV24",true,false)
@@ -25,12 +25,12 @@ func run() -> void:
 		check(game.ui.panel_rows.find_child("InventoryTabs",true,false)==null,"Equipment never includes legacy duplicate tabs")
 	await press(game,"right");check(game.equipment_page==3,"Right from main opens runes")
 	await press(game,"left");check(game.equipment_page==0,"Left from runes header returns main")
-	await press(game,"down");check(focus_key()=="primary_inventory|0","Down enters actual weapon list, not another tab or Close")
-	await press(game,"down");check(focus_key()=="primary_inventory|1","Down selects next weapon")
-	await press(game,"down");check(focus_key()=="primary_inventory|2","Down selects third weapon")
-	await press(game,"down");check(focus_key()=="primary_inventory|2","Bottom of list never jumps to Close")
-	await press(game,"attack");check(game.weapon_index==2 and focus_key()=="primary_inventory|2","Confirm equips intended weapon and preserves list cursor")
-	game._unhandled_input(key(KEY_1));check(game.weapon_index==2,"Gameplay weapon shortcuts cannot change equipment behind an open panel")
+	await press(game,"down");check(focus_key()=="primary_inventory|1","Down enters actual weapon list, not another tab or Close")
+	await press(game,"down");check(focus_key()=="primary_inventory|1","Repeated down stays on the sole selectable knife")
+	await press(game,"down");check(focus_key()=="primary_inventory|1","Removed weapons never appear in the list")
+	await press(game,"down");check(focus_key()=="primary_inventory|1","Bottom of list never jumps to Close")
+	await press(game,"attack");check(game.weapon_index==1 and focus_key()=="primary_inventory|1","Confirm equips intended weapon and preserves list cursor")
+	game._unhandled_input(key(KEY_1));check(game.weapon_index==1,"Gameplay weapon shortcuts cannot change equipment behind an open panel")
 	await press(game,"up");await press(game,"up");await press(game,"up");check(focus_key()=="tab:0","Up from first item returns header")
 	game.bag_weapons.clear();game._show_equipment(1);await settle()
 	var name_label:Label=game.ui.panel_rows.find_child("EquipmentHeroName",true,false)

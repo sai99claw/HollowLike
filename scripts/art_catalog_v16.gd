@@ -22,11 +22,11 @@ static func all_entries() -> Array[Dictionary]:
 	_inventory();_sanctuary();_monster();_ecology();_curated_sheets();_motion_v18();_idle_v19();_biomes_v21();_v22();_v23();_v24();_procedural()
 	# PCK directories expose remapped source names. Discover future image assets
 	# as well, so a newly generated v16 effect is never invisible in the RD room.
-	_monsters_v36();_art_v37();_art_v38()
+	_monsters_v36();_art_v37();_art_v38();_art_v39()
 	_remaining_images(ROOT)
 	var audit:Dictionary=_json(ROOT+("v24/asset-audit.json" if FileAccess.file_exists(ROOT+"v24/asset-audit.json") else "v23/asset-audit.json" if FileAccess.file_exists(ROOT+"v23/asset-audit.json") else "v22/asset-audit.json")).get("entries",{})
 	for item:Dictionary in _entries:
-		if str(item["id"]).begins_with("v36:") or str(item["id"]).begins_with("v37:") or str(item["id"]).begins_with("v38:"):item.merge({"runtime_usage":"used","usage_note":"目前生態怪物、攻擊前搖或投射物。"},true)
+		if str(item["id"]).begins_with("v36:") or str(item["id"]).begins_with("v37:") or str(item["id"]).begins_with("v38:") or str(item["id"]).begins_with("v39:"):item.merge({"runtime_usage":"used","usage_note":"目前生態怪物、攻擊前搖或投射物。"},true)
 		else:item.merge(audit.get(item["id"],{"runtime_usage":"un-used","usage_note":"保留於素材庫，未接入目前遊戲畫面。"}),true)
 	_entries.sort_custom(func(a:Dictionary,b:Dictionary)->bool:return str(a["category"])+str(a["label"])<str(b["category"])+str(b["label"]))
 	return _entries
@@ -50,6 +50,14 @@ static func _art_v38() -> void:
 	data=_json(ROOT+"v38/effects/laser-beam.json");var frames:Array=[]
 	for f:Dictionary in data.get("frames",[]):frames.append(_descriptor(ROOT+"v38/effects/"+data["path"],f["source_rect"]))
 	_add("v38:laser","連續雷射","戰鬥特效",frames,24,"八張連續光束貼圖，寬度與命中範圍相同。")
+
+static func _art_v39() -> void:
+	var d:Dictionary=_json(ROOT+"v39/effects/fine-crescent.json")
+	_add("v39:crescent","細長月牙","戰鬥特效",[_descriptor(ROOT+"v39/effects/"+d["path"],d["source_rect"])],8,"月牙中段對準敵人中心。")
+	for biome:String in ["underground","trunk","sky"]:
+		d=_json(ROOT+"v39/monsters/"+biome+"-death.json")
+		for i in 7:
+			_add("v39:"+biome+":death:"+str(i),BIOME_NAMES[biome]+" · 死亡姿勢 "+str(i+1),"怪物",[_descriptor(ROOT+"v39/monsters/"+d["path"],d["frames"][i]["source_rect"])],1,"專用倒地姿勢，固定面向、尺寸與接地線。")
 
 static func _monsters_v36() -> void:
 	for biome:String in ["underground","trunk","sky"]:
