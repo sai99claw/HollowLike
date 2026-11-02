@@ -164,6 +164,7 @@ var phase_multiplier: float = 1.0
 var p: Dictionary = {}
 var backdrop: Node2D
 var static_props:Node2D
+var terrain_region:Rect2
 var player_flash_layer:Node2D
 var edge_foreground:Node2D
 var corpse_layer:Node2D
@@ -228,6 +229,7 @@ var practice_rd_settings:Dictionary={}
 
 
 func _ready() -> void:
+	preload("res://scripts/render_budget_v40.gd").configure(get_window(),OS.has_feature("web"))
 	rng.randomize()
 	Sprites.warmup()
 	BossVisual.warmup()
@@ -482,6 +484,10 @@ func _process(delta: float) -> void:
 		atmosphere.set_audio_enabled(audio_enabled and life_event.is_empty() and not ui.is_panel_open())
 		atmosphere.update_view(render_camera,zoom,world_transform,p["pos"],draw_clock,world_speed,low_effects)
 	view_rect=Rect2(render_camera-Vector2(120,130)/zoom,Vector2(1520,980)/zoom)
+	var region:Rect2=preload("res://scripts/render_budget_v40.gd").region(view_rect)
+	if region!=terrain_region:
+		terrain_region=region
+		terrain.invalidate();edge_background.invalidate();edge_foreground.invalidate()
 	_sync_enemy_canvases()
 	if player_flash_layer!=null:
 		player_flash_layer.actor=p;player_flash_layer.refresh(world_transform,screen=="game" and life_event.is_empty() and float(p.get("flash_left",0))>0 and not _wind_form_active())
@@ -798,7 +804,7 @@ func _dash_pressed() -> void:
 		if not _skill("dash_vertical" if dir.y>0 else "dash_horizontal"):_toast("穿刺技能尚未解鎖，請查看技能樹");return
 		if float(p["energy"])<1:_toast("穿刺需要1能量");return
 		p["energy"]-=1;p_attack.cancel();pending_attack.clear();p["impact_root"]=0;charge_timer=0
-		p_attack.begin({"kind":"slam" if dir.y>0 else "pierce","windup":.035,"active":1.8 if dir.y>0 else .24,"recovery":.16,"damage":2.0,"range":38.0,"width":40.0,"dir":dir,"direction":"down" if dir.y>0 else ("right" if dir.x>0 else "left"),"color":Color("d3eaff"),"primary":false})
+		p_attack.begin({"kind":"slam" if dir.y>0 else "pierce","windup":.035,"active":1.8 if dir.y>0 else .24,"recovery":0.0,"damage":2.0,"range":38.0,"width":40.0,"dir":dir,"direction":"down" if dir.y>0 else ("right" if dir.x>0 else "left"),"color":Color("d3eaff"),"primary":false})
 		return
 	last_dash_time=clock;dash_chain_open=true
 	# Down+C only arms the next press: no movement, no animation cancellation.
@@ -806,6 +812,7 @@ func _dash_pressed() -> void:
 	if bool(p["air_dash"]) and not bool(p["grounded"]) and int(p["wall"])==0:dash_chain_open=false;return
 	p_attack.cancel();pending_attack.clear();p["impact_root"]=0
 	p["dash_dir"]=Vector2(float(p["face"]),0);p["dash_t"]=.16;p["air_dash"]=true;p["wall_lock"]=.1
+	combat_feedback.single_dash(p["pos"]-Vector2(0,24)-Vector2(p["dash_dir"])*12,p["dash_dir"])
 	_sound("dash_wind")
 
 
@@ -2078,7 +2085,7 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 		return
 	if layout.has("maze_grid"):
 		var id:String=str(_ecology()["id"])
-		if not NewBiome.draw_terrain(canvas,id,layout,solids):
+		if not NewBiome.draw_terrain(canvas,id,layout,solids,terrain_region):
 			for solid:Rect2 in solids:BiomeArt.terrain(canvas,id,solid)
 			for plat:Rect2 in layout.get("one_way",[]):BiomeArt.terrain(canvas,id,plat,true)
 		if show_hitboxes:
@@ -2252,7 +2259,7 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.36",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.40",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
@@ -2845,7 +2852,7 @@ func _draw_props() -> void:
 		if kind=="shop_dummy":SanctuaryArt.dummy(self,at,clock,prop_base);continue
 		if kind=="merchant":Adventure.merchant(self,at,clock,prop_base);continue
 		elif kind=="chest":Adventure.chest(self,at,clock,prop_base,bool(prop.get("used",false)))
-		elif _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:preload("res://scripts/scene_art_v33.gd").station(self,biome,kind,at,prop_base)
+		elif _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:pass # Station paintings live in the retained static layer.
 		elif kind in ["gift_pedestal","wardrobe"]:preload("res://scripts/adventure_art_v29.gd").station(self,kind,at,prop_base)
 		elif kind in ["forge","reforge","mail"]:preload("res://scripts/station_art_v26.gd").draw(self,kind,at,prop_base)
 		else:EnvArt.prop(self,prop,biome,clock,prop_base,weapon_index)
@@ -3184,6 +3191,7 @@ func _paint_static_props(c:CanvasItem) -> void:
 	if screen!="game":return
 	for prop:Dictionary in props:
 		if prop.get("used",false):continue
+		if _is_start() and prop["kind"] in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:preload("res://scripts/scene_art_v33.gd").station(c,str(_ecology()["id"]),prop["kind"],prop["pos"],preload("res://scripts/world_placement_v27.gd").prop_base())
 		if prop["kind"] in ["ecology_object","coin_urn"]:BiomeArt.prop(c,prop,"underground" if prop["kind"]=="coin_urn" else str(_ecology()["id"]),0,preload("res://scripts/world_placement_v27.gd").prop_base())
 	if room.get("fountain",false) and layout.has("fountain_pos"):preload("res://scripts/spring_v33.gd").draw(c,layout["fountain_pos"],str(_ecology()["id"]),preload("res://scripts/world_placement_v27.gd").prop_base())
 	if room.get("spring",false):SanctuaryArt.pool_back(c,layout.get("pool",Rect2()),0,Transform2D.IDENTITY)
@@ -3221,6 +3229,9 @@ func _sync_enemy_canvases() -> void:
 		var sprite=enemy_canvases[id];sprite.actor=en
 		var attack=en["attack"]
 		var signature:Array=[stamp,en.get("face",1),attack.phase,int(attack.progress()*60),int(float(en.get("hurt",0))*60),en.get("scale",1),int(float(en.get("turn_left",0))*60)]
+		if en.has("roster_id"):
+			var sample:Dictionary=preload("res://scripts/monster_art_v36.gd").actor_sample(en,draw_clock)
+			signature=[sample["sheet"],sample["row"],sample["column"],en.get("face",1),float(en.get("hurt",0))>0,en.get("scale",1)]
 		sprite.refresh(world_transform,enabled,signature)
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
@@ -3284,10 +3295,10 @@ func _paint_corpses(canvas:CanvasItem) -> void:
 	for body:Dictionary in corpses:CorpseField.draw(canvas,body)
 
 func _paint_edge_background(canvas:CanvasItem) -> void:
-	if screen=="game":NewBiome.draw_details(canvas,str(_ecology()["id"]),layout,-1)
+	if screen=="game":NewBiome.draw_details(canvas,str(_ecology()["id"]),layout,-1,terrain_region)
 
 func _paint_edge_foreground(canvas:CanvasItem) -> void:
-	if screen=="game":NewBiome.draw_details(canvas,str(_ecology()["id"]),layout)
+	if screen=="game":NewBiome.draw_details(canvas,str(_ecology()["id"]),layout,1,terrain_region)
 
 func _paint_player_flash(canvas:CanvasItem,_actor:Dictionary) -> void:
 	Art.draw_pigeon(canvas,p["pos"],float(p["face"]),clock,"hurt",Color.WHITE,1.0,1-float(p.get("hurt",0))/.25,Transform2D.IDENTITY,str(Data.PRIMARY[weapon_index]["style"]),p_attack.attack)

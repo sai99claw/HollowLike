@@ -99,16 +99,27 @@ static func _fill(c:CanvasItem,image:Texture2D,rect:Rect2,_seed_value:int) -> vo
 			c.draw_set_transform_matrix(Transform2D(0,Vector2(-1 if horizontal else 1,-1 if vertical else 1),0,part.get_center()))
 			c.draw_texture_rect_region(image,Rect2(-part.size*.5,part.size),Rect2(uv*image.get_size(),extent*image.get_size()))
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
-static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Array) -> bool:
+static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Array,visible:Rect2=Rect2()) -> bool:
 	var fill:Texture2D=Terrain.texture("material-"+biome+".png")
 	if fill==null:fill=Surfaces.material(biome)
 	if fill==null:return false
 	var seed_value:int=int(layout.get("seed",0));var edge_list:Array=layout.get("art_edges_v21",[])
 	for rect:Rect2 in solids:
+		if visible.has_area():
+			rect=rect.intersection(visible)
+			if not rect.has_area():continue
 		c.draw_rect(rect,Surfaces.BASE_COLORS.get(biome,Color("354331")))
 		_fill(c,fill,rect,seed_value)
 	for edge:Dictionary in edge_list:
 		var span:Vector2=edge["span"];var side:String=edge["side"]
+		if visible.has_area():
+			if side in ["top","bottom"]:
+				if float(edge["at"])<visible.position.y-8 or float(edge["at"])>visible.end.y+8:continue
+				span=Vector2(maxf(span.x,visible.position.x),minf(span.y,visible.end.x))
+			else:
+				if float(edge["at"])<visible.position.x-8 or float(edge["at"])>visible.end.x+8:continue
+				span=Vector2(maxf(span.x,visible.position.y),minf(span.y,visible.end.y))
+			if span.y<=span.x:continue
 		# Bevels stay INSIDE the exact collision boundary. Decorative grass,
 		# roots and rocks are drawn separately on the outside foreground edge.
 		var inward:Vector2={"top":Vector2.DOWN,"bottom":Vector2.UP,"left":Vector2.RIGHT,"right":Vector2.LEFT}[side]
@@ -118,13 +129,16 @@ static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Arra
 		var tangent:Vector2=(end-start).normalized();var points:=PackedVector2Array()
 		for step in range(0,ceili(length/9)+1):
 			var distance:float=minf(length,step*9.0)
-			var inset:float=3.0+1.5*sin((start.x+start.y+distance)*.13)+.8*sin(distance*.41)
+			var art_distance:float=distance+span.x-float(edge["span"].x)
+			var inset:float=3.0+1.5*sin((start.x+start.y+distance)*.13)+.8*sin(art_distance*.41)
 			points.append(start+tangent*distance+inward*inset)
 		if points.size()>1:c.draw_polyline(points,Color(.62,.77,.61,.24) if side in ["top","left"] else Color(.04,.06,.08,.45),3,true)
-	Terrain.draw_corners(c,biome,layout)
+	Terrain.draw_corners(c,biome,layout,visible)
 
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
-	for rect:Rect2 in layout.get("platform_art_runs",layout.get("one_way",[])):draw_platform(c,biome,rect)
+	for rect:Rect2 in layout.get("platform_art_runs",layout.get("one_way",[])):
+		if visible.has_area() and not visible.intersects(rect.grow(192)):continue
+		draw_platform(c,biome,rect)
 	return true
 static func _rim(c:CanvasItem,image:Texture2D,target:Rect2,side:String) -> void:
 	var horizontal:bool=side in ["top","bottom"]
@@ -185,8 +199,8 @@ static func prepare(layout:Dictionary,seed_value:int) -> void:
 			cursor+=random.randf_range(78,190)
 	layout["edge_details_v21"]=details
 	layout["edge_details_v23"]=EdgeDecor.plan(edge_list,solids,layout.get("reserved_regions",[]),seed_value)
-static func draw_details(c:CanvasItem,biome:String,layout:Dictionary,layer:int=1) -> void:
-	EdgeDecor.draw(c,biome,layout,layer)
+static func draw_details(c:CanvasItem,biome:String,layout:Dictionary,layer:int=1,visible:Rect2=Rect2()) -> void:
+	EdgeDecor.draw(c,biome,layout,layer,visible)
 static func middle_plan(seed_value:int,bounds:Vector2,layout:Dictionary={},biome:String="trunk",quiet:bool=false) -> Array[Dictionary]:
 	# Large props belong to exposed support surfaces, never random heights.
 	var random:=RandomNumberGenerator.new();random.seed=seed_value+21129;var result:Array[Dictionary]=[]

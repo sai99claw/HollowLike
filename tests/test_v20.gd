@@ -23,8 +23,8 @@ func run() -> void:
 	game._choose_soul_rune("");game._update_life_event(1.41)
 	check(game.life_event.is_empty() and int(game.tower["seed"])==seed_before and not game.ui.is_panel_open(),"Soul returns to the same adventure after selection")
 	reset(game);game.life_event={"kind":"injury"};game._set_action("attack",true);check(not game.p_attack.is_busy(),"Injury flight still blocks attack input")
-	reset(game);game.p["dash_t"]=.16;game._set_action("attack",true);game._set_action("attack",false);game.p_attack.tick(.161);game._update_hud()
-	check(game.ui.phase_label.is_visible_in_tree() and game.ui.phase_bar.is_visible_in_tree() and "後搖" in game.ui.phase_label.text and "1.9" in game.ui.phase_label.text,"Heavy recovery shows an actual remaining duration")
+	reset(game);game._set_action("attack",true);game._set_action("attack",false);game.p_attack.tick(.121);game._update_hud()
+	check(game.ui.phase_label.is_visible_in_tree() and game.ui.phase_bar.is_visible_in_tree() and "後搖" in game.ui.phase_label.text,"Ordinary featherblade recovery shows its remaining duration")
 	check("C 可取消" in game.ui.phase_label.text,"Recovery explains the mapped dash cancel")
 	game.key_bindings["dash"]=KEY_V;game._update_hud();check("V 可取消" in game.ui.phase_label.text,"Recovery prompt follows rebound controls");game.key_bindings["dash"]=KEY_C
 	var id:int=game.p_attack.attack_id;game._set_action("attack",true);game._set_action("attack",false)

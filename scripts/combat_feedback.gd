@@ -27,25 +27,15 @@ static func impact_center(en:Dictionary,fallback:Vector2) -> Vector2:
 	if en.has("pos"):return Vector2(en["pos"])-Vector2(0,Motion.body_size(en).y*.5)
 	return fallback
 
-# Project the current authored silhouette onto the ejection direction. Using
-# the collider alone can still leave the spray inside wide wings or shells.
-static func spray_origin(en:Dictionary,at:Vector2,direction:Vector2) -> Vector2:
-	var unit:Vector2=direction.normalized();var radius:float=0
-	if en.has("roster_id") and en.has("roster_biome"):
-		var art=preload("res://scripts/monster_art_v36.gd")
-		var data:Dictionary=art.manifest(str(en["roster_biome"]))
-		if not data.is_empty():
-			var sample:Dictionary=art.actor_sample(en,float(en.get("_impact_time",0)));var sheet:String=sample["sheet"];var row:int=sample["row"]
-			var f:Dictionary=art.frame(data,sheet,row,int(sample["column"]));var b:Array=f["bounds"];var pivot:Array=f["pivot"]
-			var factor:float=50.9375*(sqrt(2.0) if en.get("roster_elite",false) else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
-			for x:float in [float(b[0]),float(b[0])+float(b[2])]:
-				for y:float in [float(b[1]),float(b[1])+float(b[3])]:
-					var corner:Vector2=Vector2(en["pos"])+Vector2((x-float(pivot[0]))*float(en.get("face",1)),y-float(pivot[1]))*factor
-					radius=maxf(radius,(corner-at).dot(unit))
-	else:
-		var size:Vector2=Motion.body_size(en)
-		radius=absf(unit.x)*size.x*.5+absf(unit.y)*size.y*.5
-	return at+unit*(radius+14)
+static func spray_origin(_en:Dictionary,at:Vector2,_direction:Vector2) -> Vector2:
+	# v40: the authored spray starts at the same sprite center as the crescent.
+	return at
+
+func single_dash(at:Vector2,direction:Vector2) -> CPUParticles2D:
+	var particle:CPUParticles2D=double_jump(at)
+	particle.name="SingleDashBackwardFeathers";particle.direction=-direction.normalized()
+	particle.gravity=particle.direction*90
+	return particle
 
 func double_jump(at:Vector2) -> CPUParticles2D:
 	var particle:CPUParticles2D=_burst(at,preload("res://scripts/adventure_art_v29.gd").feather_texture(),18 if reduced else 28,.52)
@@ -133,6 +123,7 @@ func finish_trail(pr:Dictionary) -> void:
 	if trails.has(key):trails[key]["emitter"].emitting=false;trails[key]["ending"]=true
 
 func update_cache(enabled:bool,at:Vector2,time:float) -> void:
+	if cache_motes==null and not enabled:return
 	if cache_motes==null:
 		cache_motes=CPUParticles2D.new();cache_motes.name="DeathCacheFallingWhiteFeathers"
 		var atlas:AtlasTexture=preload("res://scripts/adventure_art_v29.gd").feather_texture()
@@ -151,6 +142,7 @@ var charge_at:Vector2
 var charge_amount:float=0
 var charging:bool=false
 func update_charge(enabled:bool,at:Vector2,elapsed:float,threshold:float) -> void:
+	if not enabled and not charging:return
 	if charging!=enabled:queue_redraw()
 	charging=enabled;charge_at=at;charge_amount=clampf(elapsed/maxf(.1,threshold),0,1)
 	if charge_motes==null:

@@ -131,6 +131,7 @@ static func primary_attack(index:int,direction:String,charged:bool,dash_charge:b
 static func action_attack(direction:String,charged:bool,during_dash:bool,combo:int=0) -> Dictionary:
 	var def:Dictionary=primary_attack(2 if charged or during_dash else 1,direction,false,false,2 if charged else combo)
 	def["dash_attack"]=during_dash
+	if during_dash:def["recovery"]=0.0
 	if charged:
 		def.merge({"kind":"charge","charged":true,"great_spin_release":true,"windup":0.0,"active":1.0,"recovery":0.0,"recoil":0.0,"energy_gain":2.0,"super_armor":true,"complete_release":true},true)
 	return def

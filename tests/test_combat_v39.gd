@@ -30,9 +30,9 @@ func run() -> void:
 			var center:Vector2=Monster.actor_bounds(en).get_center()
 			feedback.hit(en,Vector2.ZERO,Vector2.RIGHT,"quick",false);var hit:Dictionary=feedback.flashes.back()
 			check(Vector2(hit["at"]).is_equal_approx(center),"Crescent uses actual sprite center rather than feet or old hit contact")
-			check(hit["dir"]==Vector2.RIGHT and hit["spray_at"].x>Monster.actor_bounds(en).end.x,"Attack from left ejects feathers outside right side")
+			check(hit["dir"]==Vector2.RIGHT and Vector2(hit["spray_at"]).is_equal_approx(center),"Attack from left sprays right from the sprite center")
 			feedback.hit(en,Vector2.ZERO,Vector2.LEFT,"quick",false);hit=feedback.flashes.back()
-			check(hit["dir"]==Vector2.LEFT and hit["spray_at"].x<Monster.actor_bounds(en).position.x,"Attack from right ejects feathers outside left side")
+			check(hit["dir"]==Vector2.LEFT and Vector2(hit["spray_at"]).is_equal_approx(center),"Attack from right sprays left from the sprite center")
 			en["death_direction"]=Vector2.RIGHT;en["death_knockback"]=80
 			var body:Dictionary=Corpses.create(en);check(body["face"]==-1 and body["vel"].x==120,"Death preserves facing and the 1.5x knockback")
 			check(Monster.corpse_angle([0,0,100,30])==0 and Monster.corpse_angle([0,0,20,100])==0,"Neither wide nor tall corpses are artificially rotated")

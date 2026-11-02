@@ -49,9 +49,10 @@ static func middle(c:CanvasItem,biome:String,items:Array) -> bool:
 	c.draw_set_transform_matrix(Transform2D.IDENTITY);return true
 
 static var corners:Dictionary={}
-static func draw_corners(c:CanvasItem,biome:String,layout:Dictionary) -> void:
+static func draw_corners(c:CanvasItem,biome:String,layout:Dictionary,visible:Rect2=Rect2()) -> void:
 	if corners.is_empty():corners=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"corner-manifest.json"))
 	for corner:Dictionary in layout.get("art_corners_v21",[]):
+		if visible.has_area() and not visible.grow(64).has_point(corner["pos"]):continue
 		var definition:Dictionary=corners.get("biomes",{}).get(biome,{}).get("concave" if corner["inner"] else "convex",{})
 		if definition.is_empty():continue
 		var image:Texture2D=texture(definition["path"])

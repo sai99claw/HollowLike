@@ -15,12 +15,12 @@ func run() -> void:
 	var needle:Dictionary=Data.secondary_attack(Arsenal.index_of("needle"))
 	var laser:Dictionary=Data.secondary_attack(Arsenal.index_of("piercing_laser"))
 	# The same physical key reaches the configured gameplay action first.
-	game.bag_items={"0":2};game.p["hp"]=1;game.weapon_index=2
+	game.bag_items={"0":2};game.p["hp"]=1;game.weapon_index=1
 	game._unhandled_input(key_event(KEY_1))
-	check(game.weapon_index==0 and game.bag_items["0"]==2,"Bare1 selects primary1 without consuming inventory")
-	game._unhandled_input(key_event(KEY_3));check(game.weapon_index==2,"Bare3 selects primary3")
+	check(game.weapon_index==1 and game.bag_items["0"]==2,"Bare1 preserves the only independent primary without consuming inventory")
+	game._unhandled_input(key_event(KEY_3));check(game.weapon_index==1,"Bare3 cannot restore the removed heavy primary")
 	game._unhandled_input(key_event(KEY_1,true))
-	check(game.weapon_index==2 and game.bag_items["0"]==1 and game.p["hp"]==3,"Shift1 explicitly consumes slot1 without changing weapon or opening panel")
+	check(game.weapon_index==1 and game.bag_items["0"]==1 and game.p["hp"]==3,"Shift1 explicitly consumes slot1 without changing weapon or opening panel")
 	game.Bindings.assign(game.key_bindings,"primary_2",KEY_4);game.bag_items["3"]=2
 	game._unhandled_input(key_event(KEY_4));check(game.weapon_index==1 and game.bag_items["3"]==2,"A custom binding on4 is not intercepted by consumables")
 	# Capped purchases keep the stock and coins, including while trial equipment is present.

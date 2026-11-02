@@ -42,11 +42,7 @@ func run() -> void:
 				var at:=Vector2(500,475)
 				for dir:Vector2 in [Vector2.LEFT,Vector2.RIGHT,Vector2.UP,Vector2.DOWN]:
 					var origin:Vector2=Feedback.spray_origin(en,at,dir)
-					var data:Dictionary=MonsterArt.manifest(biome);var f:Dictionary=MonsterArt.frame(data,"regular",row,0);var b:Array=f["bounds"];var p:Array=f["pivot"];var scale_value:float=50.9375/float(data["sheets"]["regular"]["reference_heights"][row])
-					for x:float in [float(b[0]),float(b[0])+float(b[2])]:
-						for y:float in [float(b[1]),float(b[1])+float(b[3])]:
-							var corner:Vector2=Vector2(en["pos"])+Vector2((x-float(p[0]))*face,y-float(p[1]))*scale_value
-							check((origin-corner).dot(dir)>=13.99,"Spray begins outside the full authored silhouette")
+					check(origin.is_equal_approx(at),"Spray starts at the supplied sprite center in every direction")
 	check(Crescent.info()["frames"]==1 and Crescent.texture()!=null,"Single clean crescent ships as a real texture")
 	check(Laser.info()["frames"].size()==8 and Laser.texture()!=null,"Eight separate continuous beam frames ship")
 	var indices:Dictionary={}

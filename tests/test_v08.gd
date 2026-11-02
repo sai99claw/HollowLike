@@ -54,7 +54,7 @@ func run() -> void:
 				if phase=="recovery":scene.p_attack.tick(float(scene.p_attack.attack["windup"])+float(scene.p_attack.attack["active"])+.001)
 				scene._dash_pressed();check(not scene.p_attack.is_busy() and scene.p["dash_t"]>0,"All weapon outer phases can dash-cancel")
 	scene._clear_keys();scene._reset_player(Vector2(700,1050));scene.weapon_index=2;scene.keys["right"]=true;scene.p["vel"].x=330;scene._begin_primary({"dir":"right","charged":false});scene._update_player(.05)
-	check(scene.p["vel"].x==0 and scene.p["pos"].x==700,"Heavy attacks stop horizontal movement immediately")
+	check(scene.p_attack.attack["style"]=="quick" and scene.p["pos"].x>700,"Removed heavy selection resolves to the movable featherblade")
 	scene.strong_slots.clear();scene.rune_slots.clear();scene.weapon_index=1
 	var plain:Dictionary=scene._primary_definition({"dir":"right","charged":false})
 	scene.rune_slots.assign(["gale"]);var fast:Dictionary=scene._primary_definition({"dir":"right","charged":false})

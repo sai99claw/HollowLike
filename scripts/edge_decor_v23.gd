@@ -5,6 +5,7 @@ const Atlas=preload("res://scripts/atlas_v23.gd")
 # Texture2D alive. Own the finite set of eighteen edge textures across frames
 # and room changes; a temporary load() inside draw() leaves white silhouettes.
 static var _textures:Dictionary={}
+static var libraries:Dictionary={}
 static func texture(path:String) -> Texture2D:
 	var absolute:String="res://assets/v24/edges/"+path
 	if _textures.has(absolute):return _textures[absolute]
@@ -32,9 +33,11 @@ static func plan(edges:Array,solids:Array,reserved:Array,seed_value:int) -> Arra
 				result.append({"pos":at,"side":side,"size_class":size_class,"variant":random.randi_range(0,100000)})
 			cursor+=random.randf_range(100,165) if size_class!="large" else random.randf_range(180,240)
 	return result
-static func draw(c:CanvasItem,biome:String,layout:Dictionary,layer:int=1) -> void:
-	var library:Array=JSON.parse_string(FileAccess.get_file_as_string("res://assets/v24/edges/manifest.json")).get("biomes",{}).get(biome,[])
+static func draw(c:CanvasItem,biome:String,layout:Dictionary,layer:int=1,visible:Rect2=Rect2()) -> void:
+	if libraries.is_empty():libraries=JSON.parse_string(FileAccess.get_file_as_string("res://assets/v24/edges/manifest.json")).get("biomes",{})
+	var library:Array=libraries.get(biome,[])
 	for item:Dictionary in layout.get("edge_details_v23",[]):
+		if visible.has_area() and not visible.grow(512).has_point(item["pos"]):continue
 		var choices:Array=library.filter(func(piece:Dictionary)->bool:return piece["size_class"]==item["size_class"])
 		if choices.is_empty():choices=library
 		if choices.is_empty():continue

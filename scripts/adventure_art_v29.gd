@@ -3,6 +3,7 @@ extends RefCounted
 static var images:Dictionary={}
 static var metadata:Dictionary={}
 static var halo:GradientTexture2D
+static var feather_atlas:AtlasTexture
 static func image(path:String) -> Texture2D:
 	if not images.has(path):images[path]=load(path)
 	return images[path]
@@ -31,12 +32,13 @@ static func rune_halo(c:CanvasItem,at:Vector2,time:float,base:Transform2D) -> vo
 	c.draw_set_transform_matrix(base)
 	c.draw_texture_rect(halo_texture(),Rect2(at-Vector2.ONE*radius,Vector2.ONE*radius*2),false)
 static func feather_texture() -> AtlasTexture:
+	if feather_atlas!=null:return feather_atlas
 	var path:String="res://assets/v29/effects/refined-feather"
 	var tex:Texture2D=image(path+".png");var data:Dictionary=info(path+".json")
 	var ratio:Vector2=tex.get_size()/_size(data["original_size"])
 	var source:Rect2=_rect(data["source_rect"])
 	var atlas:=AtlasTexture.new();atlas.atlas=tex;atlas.region=Rect2(source.position*ratio,source.size*ratio)
-	return atlas
+	feather_atlas=atlas;return atlas
 static func death_feather(c:CanvasItem,at:Vector2,time:float,base:Transform2D) -> void:
 	var tex:Texture2D=feather_texture();var size:Vector2=tex.get_size();size*=104.0/maxf(size.x,size.y)
 	c.draw_set_transform_matrix(base)
