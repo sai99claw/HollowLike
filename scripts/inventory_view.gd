@@ -51,7 +51,7 @@ static func _weapons(ui,data:Dictionary,left:VBoxContainer,right:VBoxContainer) 
 		var item:Dictionary=Data.ITEMS[int(key)];var b:Button=ui._button("%d ×%d"%[int(key)+1,int(items[key])],"use_item",int(key));b.icon=Icons.texture("items_"+str(item["id"]));b.expand_icon=true;b.add_theme_constant_override("icon_max_width",28);b.custom_minimum_size=Vector2(116,42)
 		ui.bind_description(b,item["name"],item["desc"],"items_"+str(item["id"]));supply.add_child(b)
 	if data.get("mode","")=="musou":
-		left.add_child(ui._label("無雙成長",15,GOLD));var growth:=HFlowContainer.new();growth.name="GrowthArt";left.add_child(growth)
+		left.add_child(ui._label("無雙夢境成長",15,GOLD));var growth:=HFlowContainer.new();growth.name="GrowthArt";left.add_child(growth)
 		for id in Icons.held_growth(str(data.get("upgrades",""))):growth.add_child(ui._icon("growth_"+id,32))
 	right.add_child(ui._label("可更換／使用  ·  家中收藏" if data.get("in_start",false) else "可更換／使用",18,ui.INK))
 	var list:VBoxContainer=_list(ui,right)

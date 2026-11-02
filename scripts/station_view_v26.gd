@@ -54,7 +54,7 @@ static func forge(ui,data:Dictionary) -> void:
 			ui.station_selection=id;hero["animation"].set_weapon(id);hero["image"].texture=Icons.texture("secondary_"+id);hero["image"].material=null if known else grayscale();hero["title"].text=def["name"];hero["description"].text=def["description"]
 			var capped:bool=data["mode"]=="musou" and data["weapons"].size()>=16
 			if data["mode"]=="rogue":capped=data["weapons"].any(func(held:Dictionary)->bool:return held.get("id","")==id and int(held.get("duplicate_bonus",0))>=8)
-			hero["requirements"].text="合成需求\n%s\n金幣 %d / %d（隨身 %d ＋ 家中 %d）\n%s"%["藍圖：已解鎖" if known else "藍圖：未解鎖，冒險中取得此武器即可解鎖",int(data["coins"])+int(data["bank"]),Arsenal.CRAFT_COST,int(data["coins"]),int(data["bank"]),"已達持有／強化上限" if capped else "無雙最多16把；Roguelike重複合成增加投射物，最多+8。"]
+			hero["requirements"].text="合成需求\n%s\n金幣 %d / %d（隨身 %d ＋ 家中 %d）\n%s"%["藍圖：已解鎖" if known else "藍圖：未解鎖，冒險中取得此武器即可解鎖",int(data["coins"])+int(data["bank"]),Arsenal.CRAFT_COST,int(data["coins"]),int(data["bank"]),"已達持有／強化上限" if capped else "無雙夢境最多16把；Roguelike重複合成增加投射物，最多+8。"]
 			craft.disabled=not known or capped or int(data["coins"])+int(data["bank"])<Arsenal.CRAFT_COST;craft.text="合成 · %d 金幣"%Arsenal.CRAFT_COST
 			craft.set_meta("craft_id",id)
 		tile.focus_entered.connect(preview);tile.mouse_entered.connect(preview);tile.pressed.connect(preview)
@@ -107,7 +107,7 @@ static func warehouse(ui,data:Dictionary) -> void:
 	var deposit:Button=_button(ui,left,"一鍵儲存未使用符文 · %d 枚"%int(data["unused"]),"warehouse_store_unused",null,"warehouse:store_unused");deposit.disabled=int(data["unused"])<=0
 	var bar:=HBoxContainer.new();bar.add_theme_constant_override("separation",8);left.add_child(bar)
 	for entry:Array in [["存入金幣","coins"],["存入全部附武器","weapons"],["存入全部消耗品","items"]]:_button(ui,bar,entry[0],"parcel",entry[1],"warehouse:deposit:"+str(entry[1]))
-	_text(ui,left,"家中庫存永久保存。取出放入行囊；一鍵儲存只移動未裝備的符文，使用中的符文會保留。附武器取出仍遵循無雙16把與重複強化+8上限。",12)
+	_text(ui,left,"家中庫存永久保存。取出放入行囊；一鍵儲存只移動未裝備的符文，使用中的符文會保留。附武器取出仍遵循無雙夢境16把與重複強化+8上限。",12)
 	_text(ui,right,"家中物品",20,ui.MINT)
 	var filters:=GridContainer.new();filters.name="WarehouseFilters";filters.columns=3;filters.add_theme_constant_override("h_separation",5);filters.add_theme_constant_override("v_separation",5);right.add_child(filters)
 	for entry:Array in FILTERS:

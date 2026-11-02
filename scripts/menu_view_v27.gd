@@ -39,7 +39,7 @@ static func build(ui,game,category:String) -> void:
 			var links:=HBoxContainer.new();links.add_theme_constant_override("separation",8);right.add_child(links)
 			for entry:Array in [["技能樹","skills"],["全塔地圖","map"],["造型工坊","shop"]]:Station._button(ui,links,entry[0],entry[1],null,"settings:"+str(entry[1]))
 			Station._text(ui,right,"開始新冒險",18,ui.MINT);Station._text(ui,right,"以下選擇會重置本次局內進度，永久收藏保留。",14)
-			Station._button(ui,right,"無雙 · 轉頭起飛鴿子","start_musou",null,"settings:musou")
+			Station._button(ui,right,"無雙夢境 · 轉頭起飛鴿子","start_musou",null,"settings:musou")
 			Station._button(ui,right,"Roguelike · 戰士鴿子","start_rogue",null,"settings:rogue")
 			Station._button(ui,right,"回鳥巢（結束本次）","hub",null,"settings:hub")
 	ui.call_deferred("focus_first")

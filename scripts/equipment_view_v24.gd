@@ -38,7 +38,7 @@ static func build(ui,data:Dictionary,page:int) -> void:
 	var title:Label=ui._label(str(definition.get("name","尚無附武器" if page==1 else "沒有消耗品")),26,ui.INK);title.name="EquipmentHeroName";hero.add_child(title)
 	var description:String=str(definition.get("description",definition.get("desc","")))
 	if page==1:
-		description+=("\n無雙齊射：%d / 16把\n按Z消耗1格能量，全部武器同時發動。"%data["weapons"].size() if data["mode"]=="musou" else "\n重複武器增加投射物，最多 +8。\n遊戲中Q切換；面板內↓進入清單，X裝備。")
+		description+=("\n無雙夢境齊射：%d / 16把\n按Z消耗1格能量，全部武器同時發動。"%data["weapons"].size() if data["mode"]=="musou" else "\n重複武器增加投射物，最多 +8。\n遊戲中Q切換；面板內↓進入清單，X裝備。")
 		if data["mode"]=="musou":description+="\n齊射週期 %.2f秒（基礎0.60秒），受攻速符文調整；前搖0，不隨選取武器改變。"%float(data.get("musou_cycle_seconds",.6))
 		if not data["weapons"].is_empty():description+="\n目前重複強化 +%d"%int(definition.get("duplicate_bonus",0))
 	if page==2:description+="\n快捷：Shift＋1～9 使用消耗品。\n未綁定的數字鍵也可使用消耗品。"
@@ -67,7 +67,7 @@ static func build(ui,data:Dictionary,page:int) -> void:
 			if page==1:
 				var position:int=int(str(child.get_meta("inventory_focus","")).get_slice("|",1));var weapon:Dictionary=data["weapons"][position]
 				var show_weapon:Callable=func()->void:
-					image.texture=Icons.texture(Icons.secondary(weapon));title.text=weapon["name"];text.text=str(weapon["description"])+( "\n無雙齊射週期 %.2f秒 · 前搖0\n全部武器同時發動，不隨選取武器改變。"%float(data.get("musou_cycle_seconds",.6)) if data["mode"]=="musou" else "\n強化 +%d / 8 · 發射預覽"%int(weapon.get("duplicate_bonus",0)));preview.set_weapon(str(weapon["id"]))
+					image.texture=Icons.texture(Icons.secondary(weapon));title.text=weapon["name"];text.text=str(weapon["description"])+( "\n無雙夢境齊射週期 %.2f秒 · 前搖0\n全部武器同時發動，不隨選取武器改變。"%float(data.get("musou_cycle_seconds",.6)) if data["mode"]=="musou" else "\n強化 +%d / 8 · 發射預覽"%int(weapon.get("duplicate_bonus",0)));preview.set_weapon(str(weapon["id"]))
 				child.focus_entered.connect(show_weapon);child.mouse_entered.connect(show_weapon)
 
 	ui.call_deferred("focus_first")

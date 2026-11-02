@@ -177,7 +177,7 @@ static func _curated_sheets() -> void:
 	for region_data:Array in HOME_SLEEP:sleeping.append(_descriptor(ROOT+"home_v13/sleep.png",region_data))
 	_add("home:sleep","鳥巢 · 睡眠與起身","主角姿態",sleeping,6)
 	for id:String in ["background","musou","rogue","nest"]:
-		_add("home:"+id,"鳥巢 · "+{"background":"樹梢背景","musou":"無雙大門","rogue":"冒險大門","nest":"鳥巢"}[id],"首頁與大門",[_descriptor(ROOT+"v33/home/background.png") if id=="background" else _descriptor(ROOT+"v33/home/props.png",[],[2,2],[0 if id=="musou" else 1,0]) if id in ["musou","rogue"] else _descriptor(ROOT+"v34/home/nest.png")],1)
+		_add("home:"+id,"鳥巢 · "+{"background":"樹梢背景","musou":"無雙夢境大門","rogue":"冒險大門","nest":"鳥巢"}[id],"首頁與大門",[_descriptor(ROOT+"v33/home/background.png") if id=="background" else _descriptor(ROOT+"v33/home/props.png",[],[2,2],[0 if id=="musou" else 1,0]) if id in ["musou","rogue"] else _descriptor(ROOT+"v34/home/nest.png")],1)
 	for id:String in ["background","musou","rogue","nest"]:_covered[ROOT+"home_v13/"+id+".png"]=true
 	_sheet("ambient:bird","遠景飛鳥 · 四格","環境生物",ROOT+"atmosphere_v09/bird.png",4,1,4,7)
 	_sheet("ambient:dragonfly","近景蜻蜓 · 四格","環境生物",ROOT+"atmosphere_v09/dragonfly.png",4,1,4,22)

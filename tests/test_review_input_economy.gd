@@ -41,7 +41,7 @@ func run() -> void:
 	game.room["type"]="start";game._close_panel();game._clear_keys();game.rune_slots.clear();game.strong_slots.clear();game.bag_weapons.assign([needle,laser]);game.p["hurt"]=0;game.p["energy"]=6;game.p_attack.cancel();game.secondary_index=0
 	game._begin_secondary();var a:Dictionary=game.p_attack.attack.duplicate(true)
 	game.p_attack.cancel();game.secondary_index=1;game._begin_secondary();var b:Dictionary=game.p_attack.attack.duplicate(true)
-	check(a["windup"]==0 and b["windup"]==0 and is_equal_approx(a["active"]+a["recovery"],.60) and is_equal_approx(a["active"]+a["recovery"],b["active"]+b["recovery"]),"Musou base cycle is0.60s with zero windup regardless of selection")
+	check(a["windup"]==0 and b["windup"]==0 and a["recovery"]==0 and b["recovery"]==0 and is_equal_approx(a["active"],.16) and is_equal_approx(a["active"],b["active"]),"Dream salvo retains its0.16s hit window with zero outer phases regardless of selection")
 	check(a["salvo"].size()==2 and b["salvo"].size()==2 and a["salvo"][0]["id"]==b["salvo"][0]["id"] and a["salvo"][1]["id"]==b["salvo"][1]["id"],"Both selected views fire the same complete loadout")
 	check(game.p["energy"]==4,"Each whole salvo costs one energy")
 	game.p_attack.cancel();game.bag_runes={"gale":1};game.rune_slots.assign(["gale"]);game.p["energy"]=6;game._begin_secondary()

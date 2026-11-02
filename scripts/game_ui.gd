@@ -24,6 +24,9 @@ var coins_label: Label
 var weapon_label: Label
 var phase_label: Label
 var phase_bar: ProgressBar
+var dream_row:VBoxContainer
+var dream_label:Label
+var dream_cells:Array[ColorRect]=[]
 var health_bar: ProgressBar
 var energy_bar: ProgressBar
 var health_cells:HBoxContainer
@@ -150,6 +153,11 @@ func _build_header() -> void:
 	phase_row.add_child(phase_label)
 	phase_bar = _bar(MINT,Vector2(108,4));phase_bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 	phase_row.add_child(phase_bar)
+	dream_row=VBoxContainer.new();dream_row.name="DreamEnergy";dream_row.visible=false;main.add_child(dream_row)
+	dream_label=_label("無雙能量 0 / 20",12,GOLD);dream_row.add_child(dream_label)
+	var cells:=HBoxContainer.new();cells.add_theme_constant_override("separation",3);dream_row.add_child(cells)
+	for i in 20:
+		var cell:=ColorRect.new();cell.custom_minimum_size=Vector2(9,7);cell.mouse_filter=Control.MOUSE_FILTER_IGNORE;cells.add_child(cell);dream_cells.append(cell)
 	var tools := HBoxContainer.new()
 	tools.position = Vector2(944,18)
 	tools.add_theme_constant_override("separation",6)
@@ -273,7 +281,7 @@ func update_hud(info: Dictionary) -> void:
 	for weapon in Icons.Data.PRIMARY:
 		if str(weapon["name"])==str(info.get("weapon","")):primary_art.texture=Icons.texture(Icons.primary(weapon));break
 	var mode_value: String = str(info.get("mode", ""))
-	var mode_name: String = "無雙" if mode_value in ["musou", "無雙"] else "Roguelike"
+	var mode_name: String = "無雙夢境" if mode_value in ["musou", "無雙", "無雙夢境"] else "Roguelike"
 	if mode_value in ["", "hub", "鳥巢"]:
 		mode_name = "鳥巢"
 	var map_value: String = str(info.get("map", "—"))
@@ -283,6 +291,12 @@ func update_hud(info: Dictionary) -> void:
 	var home:bool=mode_name=="鳥巢"
 	if home:location_label.text="鳥巢 · 選擇左右大門開始冒險"
 	elif bool(info.get("in_start",false)):location_label.text="安全屋 · "+biome_value
+	dream_row.visible=mode_name=="無雙夢境" and not home
+	if dream_row.visible:
+		var amount:int=clampi(int(info.get("dream_energy",0)),0,20)
+		var rage_left:float=float(info.get("dream_rage",0))
+		dream_label.text="無雙能量 %d / 20"%amount+(" · 攻擊 ×2　%d秒"%ceili(rage_left) if rage_left>0 else "")
+		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
 	for control:Control in [hp_label,energy_label,health_cells,energy_cells]:control.visible=not home
 	primary_art.get_parent().visible=not home
 	secondary_art.get_parent().visible=not home
