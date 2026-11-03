@@ -11,7 +11,7 @@ const SPECS:Array[Dictionary]=[
 	{"id":"plaza_scale","group":"地圖生成","label":"廣場開闊程度","default":1.0,"min":.5,"max":1.5,"step":.05},
 	{"id":"room_scale","group":"地圖生成","label":"房間尺寸倍率","default":1.0,"min":.8,"max":1.4,"step":.05},
 	{"id":"reward_chance","group":"地圖生成","label":"獎勵房機率","default":.7,"min":0,"max":1,"step":.05},
-	{"id":"merchant_chance","group":"地圖生成","label":"每關商店機率","default":.5,"min":0,"max":1,"step":.05},
+	{"id":"merchant_chance","group":"地圖生成","label":"每關商店機率","default":.3,"min":0,"max":1,"step":.05},
 	{"id":"fountain_chance","group":"地圖生成","label":"戰鬥房泉水機率","default":.1,"min":0,"max":1,"step":.05},
 	{"id":"enemy_density","group":"怪物與戰鬥","label":"怪物生成倍率","default":1.2,"min":.5,"max":2.5,"step":.1},
 	{"id":"enemy_hp","group":"怪物與戰鬥","label":"怪物生命倍率","default":1.0,"min":.25,"max":3,"step":.05},

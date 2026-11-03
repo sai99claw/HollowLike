@@ -12,6 +12,12 @@ func reset(g,at:Vector2) -> void:
 	g.enemies.clear();g.props.clear();g.doors.clear();g.projectiles.clear();g.hazards.clear();g.drops.clear();g.solids.clear();g.platforms.clear();g.layout={"size":Vector2(2000,1500),"floor_y":1200.0,"tile_size":64};g.room_cooldown=999;g.world_speed=1
 func run() -> void:
 	var g=load("res://main.tscn").instantiate();g.audio_enabled=false;root.add_child(g);await process_frame;g.set_process(false);g.set_physics_process(false);g.practice_mode=true;g.new_run("rogue",370037)
+	var normal_speed:float=g._movement_factor()
+	g.keys["attack"]=true;g.charge_timer=.25
+	check(is_equal_approx(g._movement_factor(),normal_speed*.8),"Quick-draw charging reduces movement speed by twenty percent")
+	g.keys["attack"]=false
+	check(is_equal_approx(g._movement_factor(),normal_speed),"Released attack restores normal movement speed")
+
 	reset(g,Vector2(600,1000));g.p["grounded"]=true
 	g._dash_pressed();check(g.p["dash_t"]>0 and g.p["invul"]==0,"Single C grants no invulnerability")
 	check(g._hurt_player(1,Vector2(550,1000)),"Single C can actually take damage")

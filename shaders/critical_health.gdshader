@@ -1,7 +1,10 @@
 shader_type canvas_item;
-void fragment(){
- vec2 uv=UV;
- float d=min(min(length(uv*vec2(1.0,0.5625)),length((uv-vec2(1,0))*vec2(1.0,0.5625))),min(length((uv-vec2(0,1))*vec2(1.0,0.5625)),length((uv-vec2(1,1))*vec2(1.0,0.5625))));
- float glow=(1.0-smoothstep(0.0,0.24,d))*(0.39+sin(TIME*3.0)*0.06);
- COLOR=vec4(1.0,0.32,0.04,glow);
+
+void fragment() {
+	vec2 edges = min(UV, vec2(1.0) - UV) * vec2(1280.0, 720.0);
+	float edge = min(edges.x, edges.y);
+	float rim = 1.0 - smoothstep(3.0, 12.0, edge);
+	float glow = 1.0 - smoothstep(0.0, 95.0, edge);
+	float pulse = 0.5 + 0.5 * sin(TIME * 3.0);
+	COLOR = vec4(0.91, 0.04, 0.065, max(rim * 0.82, glow * (0.32 + 0.14 * pulse)));
 }

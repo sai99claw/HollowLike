@@ -54,38 +54,57 @@ static func generate(seed_value:int,stage_count:int=6,per_stage:int=0,options:Di
 		var desired:int=clampi(per_stage,MIN_ROOMS,MAX_ROOMS) if per_stage>0 else rng.randi_range(DEFAULT_MIN_ROOMS,DEFAULT_MAX_ROOMS)
 		var coords:Array[Vector2i]=[start];var edges:Array[Vector2i]=[];var local:Dictionary={start:0};var depths:Array[int]=[0]
 		var side:int=progression_side
-		var spine:int=clampi(ceili(desired*.65),4,maxi(4,desired-3))
+		var spine:int=rng.randi_range(maxi(4,ceili(desired*.55)),maxi(4,desired-3))
 		# A monotone upward spine plus bounded-depth side branches makes the
 		# terminal Boss the unique farthest room, even after safe optional loops.
 		for step in range(1,spine):
-			var delta:Vector2i=Vector2i(side,0) if step<=2 else (Vector2i.UP if step==3 or rng.randf()<vertical_weight else Vector2i(side,0))
+			var delta:=Vector2i.UP
+			if step<=2:delta=Vector2i(side,0)
+			elif step!=3 and step!=spine-1 and rng.randf()>=vertical_weight:
+				delta=Vector2i(side if rng.randf()<.5 else -side,0)
 			var candidate:Vector2i=coords[-1]+delta
 			if occupied.has(candidate) or local.has(candidate):candidate=coords[-1]+Vector2i.UP
 			local[candidate]=coords.size();edges.append(Vector2i(coords.size()-1,coords.size()));coords.append(candidate);depths.append(step)
 		var endpoint:Vector2i=coords[-1]
-		# Reserve one horizontal leaf off the first combat room. The first two
-		# spine edges form Start -> Merchant -> Combat; these safe rooms never
-		# acquire vertical branches. Keep true world adjacency and map geometry.
+		var exit_side:int=side if rng.randf()<.45 else -side
+		var next_lower:Vector2i=endpoint+Vector2i(exit_side*4,1)
+		if occupied.has(next_lower) or local.has(next_lower):
+			exit_side=-exit_side
+			next_lower=endpoint+Vector2i(exit_side*4,1)
+		# Reserve the horizontal Boss door, next entrance, and two safe entry rooms.
+		# The final upward step puts this seam on a fresh row.
+		var seam:Array[Vector2i]=[]
+		for distance in range(1,5):seam.append(endpoint+Vector2i(exit_side*distance,0))
+		seam.append(next_lower)
 		var reward_leaf:int=coords.size()
-		var leaf:Vector2i=coords[2]+Vector2i(side,0)
-		assert(not occupied.has(leaf) and not local.has(leaf))
-		local[leaf]=coords.size();edges.append(Vector2i(2,coords.size()));coords.append(leaf);depths.append(3)
-		# Reserve a descending route without changing the upward Boss spine.
+		var branch_parents:Array[int]=[]
+		for parent in range(2,spine-2):branch_parents.append(parent)
+		if branch_parents.is_empty():branch_parents.append(2)
+		var reward_slots:Array[Vector2i]=[]
+		for parent in branch_parents:
+			for direction in [-1,1]:
+				var leaf:Vector2i=coords[parent]+Vector2i(direction,0)
+				if not occupied.has(leaf) and not local.has(leaf) and not seam.has(leaf):
+					reward_slots.append(Vector2i(parent,direction))
+		var slot:Vector2i=reward_slots[rng.randi_range(0,reward_slots.size()-1)]
+		var leaf:Vector2i=coords[slot.x]+Vector2i(slot.y,0)
+		local[leaf]=coords.size();edges.append(Vector2i(slot.x,coords.size()));coords.append(leaf);depths.append(depths[slot.x]+1)
 		if coords.size()<desired-1:
 			var lower:Vector2i=coords[2]+Vector2i.DOWN
-			local[lower]=coords.size();edges.append(Vector2i(2,coords.size()));coords.append(lower);depths.append(3)
+			if not occupied.has(lower):
+				local[lower]=coords.size();edges.append(Vector2i(2,coords.size()));coords.append(lower);depths.append(3)
 		var attempts:int=0
 		while coords.size()<desired-1:
 			attempts+=1
 			assert(attempts<10000,"Stage branch capacity exhausted")
 			var parent:int=rng.randi_range(0,coords.size()-1)
-			if parent in [0,1,reward_leaf] or depths[parent]>=spine-2:continue
+			if parent in [0,1,reward_leaf] or depths[parent]>=spine-1:continue
 			var delta:Vector2i=DELTAS[DIRECTIONS[rng.randi_range(0,3)]]
 			var candidate:Vector2i=coords[parent]+delta
-			if occupied.has(candidate) or local.has(candidate) or candidate.y<endpoint.y or candidate.x*side>endpoint.x*side:continue
+			if occupied.has(candidate) or local.has(candidate) or candidate.y<endpoint.y or seam.has(candidate):continue
 			local[candidate]=coords.size();edges.append(Vector2i(parent,coords.size()));coords.append(candidate);depths.append(depths[parent]+1)
 		var boss_local:int=coords.size()
-		var boss_coord:Vector2i=endpoint+Vector2i(side,0)
+		var boss_coord:Vector2i=seam[0]
 		edges.append(Vector2i(spine-1,boss_local));coords.append(boss_coord);local[boss_coord]=boss_local;depths.append(spine)
 		var offset:int=rooms.size();var ids:Array[int]=[]
 		for j in coords.size():
@@ -106,14 +125,20 @@ static func generate(seed_value:int,stage_count:int=6,per_stage:int=0,options:Di
 		for id in ids:
 			if rooms[id]["type"]=="combat":candidates.append(id)
 		var merchant:int=-1
-		if rng.randf()<float(options.get("merchant_chance",.50)):
-			merchant=offset+1;candidates.erase(merchant);rooms[merchant]["type"]="merchant"
+		if rng.randf()<float(options.get("merchant_chance",.30)):
+			var horizontal:Array[int]=[]
+			for id in candidates:
+				var neighbors:Dictionary=rooms[id]["neighbors"]
+				if id!=offset+reward_leaf and not neighbors.has("up") and not neighbors.has("down"):horizontal.append(id)
+			merchant=horizontal[rng.randi_range(0,horizontal.size()-1)]
+			candidates.erase(merchant);rooms[merchant]["type"]="merchant"
 		var reward:int=-1;var spring:int=-1
 		if rng.randf()<float(options.get("reward_chance",REWARD_CHANCE)) and not candidates.is_empty():reward=offset+reward_leaf;candidates.erase(reward);rooms[reward]["type"]="reward"
 		# Dedicated spring rooms are retired; fountain rolls happen per hostile room.
 		previous_boss=offset+boss_local
 		maps.append({"index":stage_index,"stage_number":stage_index+1,"stage_name":STAGE_NAMES[stage_index],"start_id":offset,"boss_id":previous_boss,"merchant_id":merchant,"reward_id":reward,"spring_id":spring,"room_ids":ids})
-		start=rooms[previous_boss]["coord"]+Vector2i(side,0)
+		start=seam[1]
+		progression_side=exit_side
 	var profile_bag:Array=[];var last_profile:String=""
 	for rm:Dictionary in rooms:
 		if rm["type"]!="combat" or rm.get("spring",false):continue

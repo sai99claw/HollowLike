@@ -14,7 +14,7 @@ func run() -> void:
 		for room:Dictionary in tower["rooms"]:
 			check(not room.get("spring",false),"No dedicated spring room is generated")
 			if room["type"] in ["combat","elite"]:fights+=1;wet+=int(room.get("fountain",false))
-	check(absf(float(shops)/chapters-.5)<.05,"Merchant roll is fifty percent per chapter")
+	check(absf(float(shops)/chapters-.3)<.05,"Merchant roll is thirty percent per chapter")
 	check(absf(float(wet)/fights-.1)<.02,"Each hostile room independently rolls ten percent fountain chance")
 	for biome:String in ["sky","trunk","underground"]:
 		check(Art.texture("res://assets/v33/safehouses/"+biome+"-background.png")!=null,"Each ecology has an independent safehouse background")

@@ -2432,8 +2432,19 @@ func _draw_player_body() -> void:
 		if anim=="mantle":preload("res://scripts/mantle_art_v37.gd").draw(self,p,player_base,tint)
 		elif anim=="heavy_land":preload("res://scripts/heavy_landing_v28.gd").draw(self,p["pos"],float(p["face"]),.5-float(p["heavy_land_left"]),player_base,tint)
 		elif float(p.get("dash_t",0))>0 and not p_attack.is_busy():preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),(.16-float(p["dash_t"]))*2,player_base,tint)
-		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
+		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash","charge"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
 		elif dream_progress>=0 and anim not in ["hurt","heal","wall"]:FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
+		elif anim=="charge":
+			var pose:Texture2D=preload("res://assets/v47/pigeon_quickdraw.webp")
+			var windup:float=clampf((charge_timer-.15)/.22,0,1)
+			var breath:float=sin(clock*8.0)*.015
+			var stride:float=sin(clock*19.0)*.06 if bool(p["grounded"]) and absf(p["vel"].x)>30 else 0.0
+			var shape:=Vector2(lerpf(.90,1.0,windup),lerpf(1.08,.96,windup)+breath)
+			var size:Vector2=pose.get_size()*(51.0/pose.get_height())
+			var feet:Vector2=p["pos"]
+			draw_set_transform_matrix(player_base*Transform2D(0,Vector2(float(p["face"])*shape.x,shape.y),stride,feet))
+			draw_texture_rect(pose,Rect2(Vector2(-size.x*.50,-size.y),size),false,tint)
+			draw_set_transform_matrix(world_transform)
 		elif anim in ["idle","rest"]:IdleArt.draw(self,p["pos"],float(p["face"]),idle_time,player_base,tint)
 		else:Art.draw_pigeon(self,p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim,tint,1.0,(1-float(p["hurt"])/.25) if anim=="hurt" else p_attack.progress(),player_base,str(p_attack.attack.get("style","quick")),p_attack.attack)
 	if not _wind_form_active():preload("res://scripts/cloak_art_v29.gd").draw(self,int(meta.get("skin",0)),p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim not in ["idle","rest","heavy_land"],player_base,anim,tint.a)
@@ -2455,7 +2466,7 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.46",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.47",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
@@ -3162,6 +3173,7 @@ func _draw_life_event() -> void:
 
 func _movement_factor() -> float:
 	var factor:float=(.8 if injured else 1.0)*Tuning.value("move_speed")
+	if charge_timer>.15 and _key("attack"):factor*=.8
 	if _is_healing():factor*=.4
 	if _in_bath():factor*=.55
 	if _key("dash") and not _key("down"):factor*=1.55
