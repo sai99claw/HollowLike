@@ -14,6 +14,14 @@ static func prepare(en:Dictionary) -> void:
 	en["boss_stagger_immunity"]=0.0;en["boss_phase_left"]=0.0
 	en["boss_history"]=[];en["boss_staggers"]=0
 
+static func enrage(en:Dictionary) -> void:
+	if en.get("boss_enraged",false) or float(en["hp"])>float(en.get("max_hp",en["hp"]))*0.5:return
+	en["boss_enraged"]=true
+	for key in ["speed","dash_speed"]:
+		if en.has(key):en[key]=float(en[key])*2.0
+	en["attack_speed"]=float(en.get("attack_speed",1.0))*2.0
+	en["cooldown"]=float(en.get("cooldown",0.0))*0.5
+
 static func posture_limit(en:Dictionary) -> float:
 	return clampf(float(en.get("max_hp",en.get("hp",80)))*.12,4,12)
 

@@ -1158,13 +1158,48 @@ func _update_enemies(delta:float,movement_delta:float=-1) -> void:
 	_update_enemies_profiled_body(delta,movement_delta)
 	perf_log.span("physics.enemies",Time.get_ticks_usec()-measured)
 
+func _spawn_boss_reinforcements(roster:Array, count:int, elite:bool, random:RandomNumberGenerator) -> void:
+	var biome:String=str(_ecology()["id"])
+	for index in count:
+		var definition:Dictionary=MonsterRoster.elite(random.randi_range(0,5)) if elite else MonsterRoster.regular(biome,random.randi_range(0,4))
+		var at:=Vector2(lerpf(260.0,_room_size().x-260.0,float(index)/maxi(1,count-1)),_room_floor())
+		definition["pos"]=at
+		var spawn:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if definition["move"]=="fly" else _fit_enemy_ground(definition)
+		if not spawn.is_finite():spawn=_fit_enemy_ground(definition)
+		if not spawn.is_finite():continue
+		spawn_serial+=1
+		var health:float=(float(definition["hp"])+float(room["map_index"])*.5)*(3.0 if elite else 1.0)*Tuning.value("enemy_hp")
+		definition.merge({"uid":200000+spawn_serial,"pos":spawn,"spawn_platform":0,"ecology_id":biome,"hp":health,"max_hp":health,"speed":float(definition["speed"])*Tuning.value("enemy_speed"),"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":1.0+index*.15,"attack":Attack.new()},true)
+		roster.append(definition)
+
+func _boss_summoning(en:Dictionary,delta:float) -> bool:
+	en["summon_check_left"]=float(en.get("summon_check_left",15.0))-delta
+	var cast_left:float=float(en.get("summon_cast_left",0))
+	if cast_left>0.0:
+		en["summon_cast_left"]=maxf(0,cast_left-delta)
+		if en["summon_cast_left"]<=0.0:_spawn_boss_reinforcements(enemies,3,false,rng)
+		return true
+	if float(en["summon_check_left"])>0.0:return false
+	en["summon_check_left"]=15.0
+	var elite_count:int=0
+	for enemy in enemies:
+		if enemy.get("elite",false) and float(enemy["hp"])>0:elite_count+=1
+	if elite_count>=2:return false
+	en["attack"].cancel()
+	en["charge_phase"]="idle";en["charge_left"]=0.0
+	en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
+	en["vel"]=Vector2.ZERO;en["summon_cast_left"]=.8
+	_float(en["pos"]-Vector2(0,110),"召喚援軍",Color("ffbd89"))
+	return true
+
 func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 	if movement_delta<0:movement_delta=delta*world_speed
 	var frozen:bool=freeze_timer>0
 	var initial_room:int=current_room
 	var world:Array=solids+platforms
-	for en in enemies:
+	for index in enemies.size():
 		if screen!="game" or current_room!=initial_room:return
+		var en:Dictionary=enemies[index]
 		if float(en["hp"])<=0:continue
 		if en.get("training",false):
 			en["training_age"]=float(en.get("training_age",0))+movement_delta
@@ -1172,7 +1207,12 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 				var t:float=en["training_age"];en["pos"]=Vector2(en["anchor"])+Vector2(sin(t*.83)*115,sin(t*1.27)*18)
 			continue
 		Motion.prepare(en)
-		if int(en["model"])==4:_confine_boss(en)
+		if int(en["model"])==4:
+			_confine_boss(en)
+			BossDirector.enrage(en)
+			if mode=="musou" and room.get("type","")=="boss":
+				if not frozen and _boss_summoning(en,delta):continue
+				if float(en.get("summon_cast_left",0))>0.0:continue
 		for key in ["hurt","stun","cooldown","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
 		var atk=en["attack"]
 		var toward:Vector2=p["pos"]-en["pos"]
@@ -1732,7 +1772,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 		if room["type"] in ["combat","elite"] and not room.get("spring",false) and spawn_density>0:plan=Ecology.spawn_plan(layout,biome,mode,int(layout["seed"]),int(room["map_index"]),spawn_density)
 		elif room["type"]=="boss":
 			plan.append({"model":4,"pos":Vector2(_room_size().x*.5,_room_floor()),"platform":0})
-			for guard in 3:plan.append({"model":3,"pos":Vector2(_room_size().x*(.30+.20*guard),_room_floor()),"platform":0})
+
 		if room["type"]=="elite":
 			for entry:Dictionary in plan:entry["model"]=3
 			if plan.is_empty():
@@ -1742,7 +1782,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			for door in doors:
 				if Vector2(entry["pos"]).distance_to(door["pos"])<180:return false
 			return true)
-		if mode=="musou":plan=Dream.expand_plan(plan,layout,int(room["map_index"]),int(layout["seed"]),doors)
+		if mode=="musou" and room["type"]!="boss":plan=Dream.expand_plan(plan,layout,int(room["map_index"]),int(layout["seed"]),doors)
 		for i in plan.size():
 			var model:int=int(plan[i]["model"])
 			var spawn_rng:=RandomNumberGenerator.new();spawn_rng.seed=int(layout["seed"])+i*827+spawn_serial*3571
@@ -1751,7 +1791,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			if model==4:
 				for attack in def["attacks"]:attack["damage"]*=2;attack["knockback"]=120.0
 			def["uid"]=id*100+i+1
-			if model==4:room["boss_id"]=def["id"]
+			if model==4:room["boss_id"]=def["id"];def["summon_check_left"]=15.0
 			def["pos"]=plan[i]["pos"];def["spawn_platform"]=plan[i]["platform"]
 			if model!=4:def["biome"]=biome["id"]
 			def["ecology_id"]=biome["id"]
@@ -1766,10 +1806,15 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			if model!=4 and doors.any(func(door:Dictionary)->bool:return def["pos"].distance_to(door["pos"])<180):continue
 			def["vel"]=Vector2.ZERO;def["face"]=-1.0;def["stun"]=0.0;def["hurt"]=0.0;def["cooldown"]=1.0+i*.15;def["attack"]=Attack.new()
 			def["hp"]=float(def["hp"])+float(room["map_index"])*(.5 if model!=4 else 10)
+			if model==4:def["hp"]*=2.0
 			if def.get("elite",false):def["hp"]*=3.0
 			def["hp"]*=Tuning.value("enemy_hp");def["speed"]*=Tuning.value("enemy_speed")
 			def["max_hp"]=def["hp"]
 			room["enemies"].append(def)
+		if room["type"]=="boss":
+			var guard_rng:=RandomNumberGenerator.new()
+			guard_rng.seed=int(layout["seed"])+4251
+			_spawn_boss_reinforcements(room["enemies"],6,true,guard_rng)
 		if room["type"] in ["merchant","start"]:
 			for i in (2 if room["type"]=="start" else 1):
 				var dummy_rng:=RandomNumberGenerator.new();dummy_rng.seed=int(layout["seed"])+i
@@ -2410,7 +2455,7 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.45",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.46",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
@@ -2753,6 +2798,10 @@ func _make_props() -> Array[Dictionary]:
 			if prop_rng.randf()<.24:result.append({"kind":"chest","pos":layout["enemy_spawns"][prop_rng.randi_range(0,layout["enemy_spawns"].size()-1)],"used":false,"hurt":0.0})
 			if prop_rng.randf()<.4:result.append({"kind":"energy","pos":layout["enemy_spawns"][prop_rng.randi_range(0,layout["enemy_spawns"].size()-1)],"used":false,"hurt":0.0})
 			if prop_rng.randf()<.01:result.append({"kind":"health","pos":layout["enemy_spawns"][prop_rng.randi_range(0,layout["enemy_spawns"].size()-1)],"used":false,"hurt":0.0})
+	if room["type"]=="boss":
+		for fraction in [.30,.70]:
+			var at:=Vector2(_room_size().x*fraction,_room_floor())
+			result.append({"kind":"launcher","pos":at,"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0})
 	if room.get("fountain",false) and layout.has("fountain_pos"):result.append({"kind":"fountain","pos":layout["fountain_pos"],"used":false,"hurt":0.0,"water_cd":0.0})
 	if room["type"] in ["combat","elite"] and not room.get("spring",false):
 		for reward:Dictionary in layout.get("dead_end_rewards",[]):

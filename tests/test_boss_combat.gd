@@ -65,6 +65,7 @@ func run() -> void:
 			target["hp"]=100;scene._slam_impact(Vector2(620,1050));scene._slam_impact(Vector2(620,1050))
 			check(is_equal_approx(100.0-float(target["hp"]),2.0),"Down slam shares damage and deduplicates hits")
 	# Force each chapter index; boss identity is stable within its ecology pair.
+	scene.mode="rogue" # Windup checks need the mode with authored windup.
 	var boss_id:int=int(scene.tower["maps"][0]["boss_id"])
 	for i in 6:
 		var r:Dictionary=scene.tower["rooms"][boss_id];r.erase("initialized");r["map_index"]=i;r.erase("layout")
@@ -74,6 +75,8 @@ func run() -> void:
 		for tick in 900:
 			scene.camera_pos=scene._camera_target(boss["pos"]);scene._update_enemies(1.0/60);seen[Motion.current(boss)]=true
 		check(seen.size()>=2,"Boss actually switches movement during combat: "+str(boss["id"]))
+		for guard:Dictionary in scene.enemies.slice(1):
+			guard["attack"].cancel();guard["cooldown"]=100.0
 		for definition in boss["attacks"]:
 			boss["attack"].cancel();scene.projectiles.clear();scene.hazards.clear();scene.freeze_timer=0
 			scene.p["pos"]=boss["pos"]+Vector2(100,0);scene.p["invul"]=100

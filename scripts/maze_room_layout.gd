@@ -19,6 +19,11 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	cfg.platformer=true;cfg.dead_end_chance=clampf(float(room.get("maze_config",{}).get("dead_end_chance",.25)),.20,1.0)
 	cfg.arena=safe or room["type"]=="boss" or room.get("practice_arena",false);cfg.num_rooms=1 if cfg.arena else 3
 	var maze:=Maze.new(cfg);maze.generate()
+	if room["type"]=="boss":
+		# Raised cover keeps the floor and side portal approaches open.
+		var y:int=cfg.height-6
+		for cell in [Vector2i(4,y),Vector2i(4,y+1),Vector2i(5,y+1),Vector2i(cfg.width-5,y),Vector2i(cfg.width-5,y+1),Vector2i(cfg.width/2,y-2)]:
+			maze.grid[cell.y][cell.x]=Maze.WALL
 	var size:=Vector2(cfg.width*TILE,cfg.height*TILE);var floor_y:float=size.y-TILE
 	var walls:Array[Rect2]=[];var platforms:Array[Rect2]=[];var one_way:Array[Rect2]=[];var navigation:Array[Rect2]=[]
 	var solid_lookup:Dictionary={}

@@ -66,6 +66,31 @@ func run() -> void:
 	check(Director.choose(mole,Vector2(100,0),[0,1,2])==0,"Mole punishes close positioning with its claw branch")
 	var attack:Dictionary=Director.attack_definition(mole,mole["attacks"][1])
 	check(attack["spread"]>0 and attack["windup"]==mole["attacks"][1]["windup"] and attack["recovery"]==mole["attacks"][1]["recovery"],"Second-phase spread preserves its dodge and punish windows")
+	for mode_name:String in ["rogue","musou"]:
+		scene.new_run(mode_name,171);scene._close_panel()
+		for chapter:Dictionary in scene.tower["maps"]:
+			scene._enter_room(chapter["boss_id"]);scene._close_panel()
+			var guards:Array=scene.enemies.filter(func(e):return e.get("elite",false))
+			var bosses:Array=scene.enemies.filter(func(e):return e.get("model",0)==4)
+			check(guards.size()==6 and bosses.size()==1,"Both modes start each chapter Boss with six elites "+str([chapter["index"],guards.size(),bosses.size()]))
+			check(scene.props.filter(func(prop):return prop["kind"]=="launcher").size()>=2,"Boss arena has two bounce mushrooms")
+			if bosses.is_empty():continue
+			var boss:Dictionary=bosses[0]
+			check(is_equal_approx(boss["max_hp"],(float(Combat.boss(boss["biome"])["hp"])+float(chapter["index"])*10.0)*2.0),"Boss HP is doubled after chapter scaling")
+			var speed:float=boss["speed"]
+			boss["hp"]=boss["max_hp"]*.5
+			Director.enrage(boss);Director.enrage(boss)
+			check(is_equal_approx(boss["speed"],speed*2) and boss["attack_speed"]==2,"Half-health speed and cadence double only once")
+			for guard:Dictionary in guards:guard["hp"]=0
+			scene.freeze_timer=0;scene.p["invul"]=1000
+			var before:int=scene.enemies.size()
+			boss["summon_check_left"]=.01
+			scene._update_enemies(.02,.02)
+			if mode_name=="musou":
+				check(boss["vel"]==Vector2.ZERO and boss["summon_cast_left"]>0 and scene.enemies.size()==before,"Musou boss stops before reinforcements arrive")
+				scene._update_enemies(.8,.8)
+				check(scene.enemies.size()==before+3 and scene.enemies.slice(before).all(func(e):return not e.get("elite",false) and e["hp"]>0),"Cast summons exactly three ordinary enemies")
+			else:check(not boss.has("summon_cast_left") and scene.enemies.size()==before,"Rogue boss never summons")
 	scene.queue_free();await process_frame
 	print("Boss director V35: ","passed" if failures.is_empty() else failures)
 	quit(0 if failures.is_empty() else 1)
