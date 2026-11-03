@@ -1,5 +1,6 @@
 class_name TowerAtmosphere
 extends Node2D
+var profiler:RefCounted
 const NewArt=preload("res://scripts/biome_art_v21.gd")
 const BiomeArt=preload("res://scripts/biome_art_v15.gd")
 const FX=preload("res://scripts/combat_visual.gd")
@@ -120,6 +121,12 @@ func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=
 	for particle in ambient+foreground+mid_particles+rain_layers+[spores]:
 		particle.process_mode=Node.PROCESS_MODE_DISABLED if quiet_room or not enabled or not particle.emitting else Node.PROCESS_MODE_INHERIT
 func update_view(camera:Vector2,zoom:float,world:Transform2D,player:Vector2,time:float,speed:float,reduced:bool) -> void:
+	if profiler==null or not profiler.active:
+		_update_view_profiled_body(camera,zoom,world,player,time,speed,reduced);return
+	var measured:int=Time.get_ticks_usec()
+	_update_view_profiled_body(camera,zoom,world,player,time,speed,reduced)
+	profiler.span("process.atmosphere",Time.get_ticks_usec()-measured)
+func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,player:Vector2,time:float,speed:float,reduced:bool) -> void:
 	if middle==null:return
 	if not active:return
 	if not depth_origin_ready:depth_origin=camera;depth_origin_ready=true

@@ -1,4 +1,9 @@
 extends Node2D
+const PerfLog=preload("res://scripts/performance_log_v42.gd")
+var perf_log=PerfLog.new()
+var perf_bridge:JavaScriptObject
+var perf_callback:JavaScriptObject
+var perf_paused:bool=false
 ## Playable vertical slice. All damaging actions use the same three-phase clock.
 const StationView=preload("res://scripts/station_view_v26.gd")
 const StationStock=preload("res://scripts/station_inventory_v26.gd")
@@ -280,6 +285,7 @@ func _ready() -> void:
 	_configure_home()
 	_update_hud()
 	_update_shortcuts()
+	_setup_performance_log()
 	queue_redraw()
 	if OS.get_cmdline_user_args().has("--smoke"):
 		new_run("rogue",12345)
@@ -295,6 +301,7 @@ func _reset_player(at: Vector2) -> void:
 	pending_attack.clear()
 
 func _input(event:InputEvent) -> void:
+	if perf_paused:return
 	if practice_rd_panel!=null:
 		if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE:practice_rd_panel.closed.emit();get_viewport().set_input_as_handled()
 		return
@@ -328,6 +335,7 @@ func _input(event:InputEvent) -> void:
 		capturing_key="";_save_settings();_show_keybindings()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if perf_paused:return
 	if practice_rd_panel!=null:get_viewport().set_input_as_handled();return
 	if lab_mode in ["rd","tuning"]:get_viewport().set_input_as_handled();return
 	if life_event.get("kind","")=="await_choice" and event is InputEventJoypadButton:
@@ -383,6 +391,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_keys()
 
 func _set_action(action: String, pressed: bool) -> void:
+	if perf_paused:return
 	if practice_rd_panel!=null:return
 	if minimap_open:
 		if pressed and action in ["left","right"]:
@@ -462,6 +471,15 @@ func _clear_keys() -> void:
 	charge_timer=0.0; pending_attack.clear(); dash_chain_open=false
 
 func _process(delta: float) -> void:
+	if not perf_log.active:
+		_process_profiled_body(delta);return
+	perf_log.begin_frame()
+	var measured:int=Time.get_ticks_usec()
+	_process_profiled_body(delta)
+	perf_log.span("process.total",Time.get_ticks_usec()-measured)
+	if perf_log.finish_frame(_performance_context):call_deferred("_show_performance_report")
+
+func _process_profiled_body(delta: float) -> void:
 	if lab_buttons!=null:lab_buttons.visible=screen=="hub" and lab_mode not in ["rd","tuning"] and not ui.is_panel_open()
 	if practice_tools!=null:practice_tools.visible=lab_mode=="practice" and not ui.is_panel_open() and practice_rd_panel==null
 	if lab_mode in ["rd","tuning"]:return
@@ -486,7 +504,7 @@ func _process(delta: float) -> void:
 	if spring_particles!=null:spring_particles.transform=world_transform
 	if atmosphere!=null:
 		atmosphere.set_audio_enabled(audio_enabled and life_event.is_empty() and not ui.is_panel_open())
-		atmosphere.update_view(render_camera,zoom,world_transform,p["pos"],draw_clock,world_speed,low_effects)
+		atmosphere.update_view(render_camera,zoom,world_transform,p["pos"],draw_clock,0.0 if perf_paused else world_speed,low_effects)
 	view_rect=Rect2(render_camera-Vector2(120,130)/zoom,Vector2(1520,980)/zoom)
 	var region:Rect2=preload("res://scripts/render_budget_v40.gd").region(view_rect)
 	if region!=terrain_region:
@@ -497,12 +515,12 @@ func _process(delta: float) -> void:
 		player_flash_layer.actor=p;player_flash_layer.refresh(world_transform,screen=="game" and life_event.is_empty() and float(p.get("flash_left",0))>0 and not _wind_form_active())
 	if slash_canvas!=null:slash_canvas.invalidate()
 	if combat_feedback!=null:
-		combat_feedback.set_frozen(hitstop>0 or minimap_open or practice_rd_panel!=null,world_speed)
+		combat_feedback.set_frozen(perf_paused or hitstop>0 or minimap_open or practice_rd_panel!=null,world_speed)
 		combat_feedback.reduced=low_effects
 		combat_feedback.transform=world_transform
 		combat_feedback.update_charge(screen=="game" and life_event.is_empty() and not ui.is_panel_open() and _key("attack") and charge_timer>.08,p["pos"]-Vector2(0,27),charge_timer,_charge_threshold())
 		combat_feedback.update_cache(screen=="game" and ((life_event.get("kind","")=="death" and float(life_event.get("elapsed",0))>.7) or (not feather.is_empty() and int(feather.get("room",-1))==current_room)),p["pos"] if life_event.get("kind","")=="death" else feather.get("pos",Vector2.ZERO),clock)
-	if dream_visual!=null:dream_visual.set_view(screen=="game" and mode=="musou",world_transform,p["pos"],dream.rage_left>0 and life_event.is_empty(),hitstop>0 or minimap_open or ui.is_panel_open() or practice_rd_panel!=null or not life_event.is_empty(),world_speed)
+	if dream_visual!=null:dream_visual.set_view(screen=="game" and mode=="musou",world_transform,p["pos"],dream.rage_left>0 and life_event.is_empty(),perf_paused or hitstop>0 or minimap_open or ui.is_panel_open() or practice_rd_panel!=null or not life_event.is_empty(),world_speed)
 	if ui!=null and ui.is_panel_open():
 		# Panels already pause gameplay; retained draw lists need no per-frame rebuild.
 		return
@@ -519,6 +537,14 @@ func _invalidate_scene() -> void:
 	queue_redraw()
 
 func _physics_process(delta:float) -> void:
+	if not perf_log.active:
+		_physics_process_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_physics_process_profiled_body(delta)
+	perf_log.span("physics.total",Time.get_ticks_usec()-measured)
+
+func _physics_process_profiled_body(delta:float) -> void:
+	if perf_paused:return
 	if practice_rd_panel!=null:return
 	if lab_mode in ["rd","tuning"]:return
 	if lab_mode=="practice":p["energy"]=p["max_energy"];p["invul"]=2;freeze_timer=0 if lab_ai else 999
@@ -658,6 +684,13 @@ func _rune_effect(effect: String) -> float:
 	return float(_rune_cache.get(effect,0))
 
 func _update_player(delta:float) -> void:
+	if not perf_log.active:
+		_update_player_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_player_profiled_body(delta)
+	perf_log.span("physics.player",Time.get_ticks_usec()-measured)
+
+func _update_player_profiled_body(delta:float) -> void:
 	# Preserve ordinary-jump clearance at every global speed setting.
 	var steps:int=maxi(1,int(ceil(delta/(1.0/120))))
 	for step in steps:_step_player(delta/steps)
@@ -969,6 +1002,12 @@ func _body_box(pos: Vector2, scale_value: float=1.0) -> Rect2:
 	return Rect2(pos-Vector2(17,42)*scale_value,Vector2(34,42)*scale_value)
 
 func _process_player_attack() -> void:
+	if not perf_log.active:
+		_process_player_attack_profiled_body();return
+	var measured:int=Time.get_ticks_usec()
+	_process_player_attack_profiled_body()
+	perf_log.span("physics.attack",Time.get_ticks_usec()-measured)
+func _process_player_attack_profiled_body() -> void:
 	if not p_attack.is_active(): return
 	var def: Dictionary=p_attack.attack
 	var kind: String=str(def.get("kind",""))
@@ -1025,6 +1064,12 @@ func _parry(en: Dictionary) -> void:
 	_float(at,"拼刀！ +2 能量",Color("ffe3a0"));hitstop=.055;shake=7;_sound("parry")
 
 func _update_heal(delta: float) -> void:
+	if not perf_log.active:
+		_update_heal_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_heal_profiled_body(delta)
+	perf_log.span("physics.heal",Time.get_ticks_usec()-measured)
+func _update_heal_profiled_body(delta: float) -> void:
 	if _key("heal") and float(p["energy"])>=3 and float(p["hp"])<float(p["max_hp"]) and not p_attack.is_busy():
 		heal_timer+=delta
 		if rng.randf()<.3: _particles(p["pos"]-Vector2(0,20),Color("8de4ac"),1,25)
@@ -1105,6 +1150,13 @@ func _death() -> void:
 	_toast("首次倒下：重傷後醒來，這一局再倒下便會死亡" if first_down else "羽翼碎落……選一枚符文返回安全屋，其餘背包留在發光羽毛")
 
 func _update_enemies(delta:float,movement_delta:float=-1) -> void:
+	if not perf_log.active:
+		_update_enemies_profiled_body(delta,movement_delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_enemies_profiled_body(delta,movement_delta)
+	perf_log.span("physics.enemies",Time.get_ticks_usec()-measured)
+
+func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 	if movement_delta<0:movement_delta=delta*world_speed
 	var frozen:bool=freeze_timer>0
 	var initial_room:int=current_room
@@ -1344,6 +1396,13 @@ func _projectile_surfaces() -> Array:
 	return solids+platforms.filter(func(surface:Rect2)->bool:return not pass_through.has(surface))
 
 func _update_projectiles(delta:float) -> void:
+	if not perf_log.active:
+		_update_projectiles_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_projectiles_profiled_body(delta)
+	perf_log.span("physics.projectiles",Time.get_ticks_usec()-measured)
+
+func _update_projectiles_profiled_body(delta:float) -> void:
 	var initial_room:int=current_room
 	var world:Array=_projectile_surfaces()
 	for pr in projectiles:
@@ -1437,6 +1496,13 @@ func _emit_traps(en:Dictionary,def:Dictionary) -> void:
 		projectiles.append({"pos":start,"vel":velocity,"launch_angle":Vector2(target-start).angle(),"radius":float(def.get("size",16)) if def.get("from_player",false) else 8.0,"life":flight,"elapsed":0.0,"gravity":gravity,"distance_left":1000.0,"trap_carrier":true,"landing":landing,"visual_id":str(def.get("visual_id","")),"hazard_visual_id":str(def.get("hazard_visual_id","")),"weapon_id":str(def.get("id","")),"definition":def.duplicate(true),"group":str(def.get("group","biological")),"from_player":bool(def.get("from_player",false)),"owner_uid":en["uid"],"color":def["color"],"kind":"throw","sprite":"fruit","hits":{},"pierce":false,"damage":0.0,"bounces":0,"boss_biome":str(def.get("boss_biome",""))})
 
 func _update_hazards(delta:float) -> void:
+	if not perf_log.active:
+		_update_hazards_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_hazards_profiled_body(delta)
+	perf_log.span("physics.hazards",Time.get_ticks_usec()-measured)
+
+func _update_hazards_profiled_body(delta:float) -> void:
 	var initial_room:int=current_room
 	for hazard in hazards:
 		if float(hazard.get("hp",1))<=0:continue
@@ -1507,6 +1573,13 @@ func _drop(kind: String, at: Vector2, value: int) -> void:
 	drops.append(drop)
 
 func _update_drops(delta:float) -> void:
+	if not perf_log.active:
+		_update_drops_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_drops_profiled_body(delta)
+	perf_log.span("physics.drops",Time.get_ticks_usec()-measured)
+
+func _update_drops_profiled_body(delta:float) -> void:
 	var picked_gold:int=0
 	var bounds:=Rect2(Vector2(18,0),_room_size()-Vector2(36,0))
 	for drop in drops:
@@ -1597,6 +1670,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 	_save_meta()
 
 func _enter_room(id: int, from_dir: String="center") -> void:
+	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
 	_return_trial(false);bath.reset();spring_particles.clear()
 	if dream_visual!=null:dream_visual.clear_waves()
 	if not room.is_empty():
@@ -1804,6 +1878,12 @@ func _float(at:Vector2,message:String,color:Color) -> void:
 	floaters.append({"pos":at,"text":message,"color":color,"life":.8})
 
 func _update_visual_effects(delta:float) -> void:
+	if not perf_log.active:
+		_update_visual_effects_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_visual_effects_profiled_body(delta)
+	perf_log.span("physics.effects",Time.get_ticks_usec()-measured)
+func _update_visual_effects_profiled_body(delta:float) -> void:
 	if combat_feedback!=null:combat_feedback.step(delta)
 	for e in effects:
 		e["life"]-=delta;e["pos"]+=e["vel"]*delta
@@ -2085,6 +2165,13 @@ func _draw_rewards() -> void:
 		if _nearest_reward()==i:draw_arc(at-Vector2(0,112),38,0,TAU,24,Color("ffe3a1"),2,true);_text(at-Vector2(90,166),"↑／X · 查看贈禮",14,Color("ffe3a1"))
 
 func _update_hud() -> void:
+	if not perf_log.active:
+		_update_hud_profiled_body();return
+	var measured:int=Time.get_ticks_usec()
+	_update_hud_profiled_body()
+	perf_log.span("process.hud",Time.get_ticks_usec()-measured)
+
+func _update_hud_profiled_body() -> void:
 	if ui==null:return
 	var phase_name:String=p_attack.phase
 	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"map":int(room.get("map_index",-1))+1,"room":current_room+1,"biome":_biome_name(),"mode":"鳥巢" if screen=="hub" else _mode_name(),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"revive":not revive_used,"audio_enabled":audio_enabled,"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"seed":tower.get("seed",0),"fps":fps_smoothed,"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
@@ -2125,6 +2212,13 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 
 
 func _draw() -> void:
+	if not perf_log.active:
+		_draw_profiled_body();return
+	var measured:int=Time.get_ticks_usec()
+	_draw_profiled_body()
+	perf_log.span("draw.main",Time.get_ticks_usec()-measured)
+
+func _draw_profiled_body() -> void:
 	if font==null:return
 	if screen=="hub":_draw_hub();return
 	draw_set_transform_matrix(world_transform)
@@ -2289,7 +2383,7 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.41",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.42",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
@@ -2309,6 +2403,12 @@ func _home_interact() -> bool:
 	return false
 
 func _update_home(delta:float) -> void:
+	if not perf_log.active:
+		_update_home_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_home_profiled_body(delta)
+	perf_log.span("physics.home",Time.get_ticks_usec()-measured)
+func _update_home_profiled_body(delta:float) -> void:
 	var axis:float=float(int(_key("right"))-int(_key("left")))
 	if axis!=0 and home_sleeping:_wake_home()
 	if home_wake_left>0:home_wake_left=maxf(0,home_wake_left-delta);return
@@ -2520,6 +2620,13 @@ func _healing_guard() -> bool:
 	return _rune_effect("heal_guard")>0 and _key("heal") and float(p["energy"])>=3 and float(p["hp"])<float(p["max_hp"]) and not p_attack.is_busy()
 
 func _update_dream(delta:float) -> void:
+	if not perf_log.active:
+		_update_dream_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_dream_profiled_body(delta)
+	perf_log.span("physics.dream",Time.get_ticks_usec()-measured)
+
+func _update_dream_profiled_body(delta:float) -> void:
 	if mode!="musou":return
 	dream.step(delta);dream_visual.step(delta*world_speed)
 	if dream.pending>0:
@@ -2545,6 +2652,12 @@ func _release_dream_slash() -> void:
 	shake=maxf(shake,7);_update_hud()
 
 func _update_passives(delta:float) -> void:
+	if not perf_log.active:
+		_update_passives_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_passives_profiled_body(delta)
+	perf_log.span("physics.passives",Time.get_ticks_usec()-measured)
+func _update_passives_profiled_body(delta:float) -> void:
 	passive_energy+=delta*_rune_effect("energy_regen")
 	while passive_energy>=1:passive_energy-=1;_restore_vital("energy",1)
 	blood_timer-=delta
@@ -2636,6 +2749,13 @@ func _make_props() -> Array[Dictionary]:
 	return result
 
 func _update_props(delta:float) -> void:
+	if not perf_log.active:
+		_update_props_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_props_profiled_body(delta)
+	perf_log.span("physics.props",Time.get_ticks_usec()-measured)
+
+func _update_props_profiled_body(delta:float) -> void:
 	for prop in props:
 		prop["hurt"]=maxf(0,float(prop["hurt"])-delta)
 		for timer in ["break_left","event_left","launch_left","launch_cooldown","launch_hit_cooldown"]:prop[timer]=maxf(0,float(prop.get(timer,0))-delta)
@@ -3276,6 +3396,13 @@ func _paint_enemy_body(canvas:CanvasItem,en:Dictionary) -> void:
 			_text_on(canvas,en["pos"]-Vector2(20,75),"菁英",12,Color("ffd7a1"))
 
 func _sync_enemy_canvases() -> void:
+	if not perf_log.active:
+		_sync_enemy_canvases_profiled_body();return
+	var measured:int=Time.get_ticks_usec()
+	_sync_enemy_canvases_profiled_body()
+	perf_log.span("process.actor_sync",Time.get_ticks_usec()-measured)
+
+func _sync_enemy_canvases_profiled_body() -> void:
 	var alive:Dictionary={}
 	var stamp:int=int(draw_clock*30)
 	for en:Dictionary in enemies:
@@ -3284,7 +3411,7 @@ func _sync_enemy_canvases() -> void:
 		var enabled:bool=screen=="game" and view_rect.intersects(_enemy_body_box(en).grow(24))
 		if not enemy_canvases.has(id):
 			if not enabled and float(en.get("flash_left",0))<=0:continue
-			var fresh=EnemyCanvas.new();fresh.local_origin=true;fresh.paint=_paint_enemy_body;add_child(fresh);enemy_canvases[id]=fresh
+			var fresh=EnemyCanvas.new();fresh.profiler=perf_log;fresh.local_origin=true;fresh.paint=_paint_enemy_body;add_child(fresh);enemy_canvases[id]=fresh
 		var sprite=enemy_canvases[id];sprite.actor=en
 		var attack=en["attack"]
 		var signature:Array=[stamp,en.get("face",1),attack.phase,int(attack.progress()*60),int(float(en.get("hurt",0))*60),en.get("scale",1),int(float(en.get("turn_left",0))*60)]
@@ -3344,6 +3471,13 @@ func _open_tuning() -> void:
 	tuning_view.closed.connect(func()->void:lab_mode="";layer.queue_free();tuning_view=null;_clear_keys();_invalidate_scene())
 
 func _update_corpses(delta:float) -> void:
+	if not perf_log.active:
+		_update_corpses_profiled_body(delta);return
+	var measured:int=Time.get_ticks_usec()
+	_update_corpses_profiled_body(delta)
+	perf_log.span("physics.corpses",Time.get_ticks_usec()-measured)
+
+func _update_corpses_profiled_body(delta:float) -> void:
 	var changed:bool=false
 	for body:Dictionary in corpses:
 		if CorpseField.step(body,delta,solids,platforms,_room_size()):changed=true
@@ -3500,3 +3634,61 @@ func _restart_after_death() -> void:
 	new_run(chosen_mode,next_seed)
 	weapon_index=1;hitstop=0;shake=0;freeze_timer=0;equipment_open=false;_clear_keys()
 	_toast("新的一局已開始，只有存入倉庫的物品會保留")
+
+
+func _setup_performance_log() -> void:
+	atmosphere.profiler=perf_log
+	for entry:Array in [[backdrop,"background"],[terrain,"terrain"],[static_props,"props"],[edge_background,"edge_back"],[edge_foreground,"edge_front"],[corpse_layer,"corpses"],[minimap,"minimap"],[slash_canvas,"slash"],[atmosphere.middle,"middle"],[atmosphere.middle_objects,"middle_objects"],[atmosphere.near_layer,"near"]]:
+		entry[0].profiler=perf_log;entry[0].profile_name="draw.cache."+str(entry[1])
+	player_flash_layer.profiler=perf_log
+	if OS.has_feature("web"):
+		perf_bridge=JavaScriptBridge.get_interface("PigeonPerf")
+		if perf_bridge!=null:
+			perf_callback=JavaScriptBridge.create_callback(_performance_command)
+			perf_bridge.register(perf_callback)
+
+func _performance_context() -> Dictionary:
+	var measured:int=Time.get_ticks_usec()
+	var alive:int=0;var seen:int=0;var training:int=0;var passive:int=0
+	for en:Dictionary in enemies:
+		if float(en.get("hp",0))<=0:continue
+		if en.get("training",false):training+=1;continue
+		if en.get("passive",false):passive+=1;continue
+		alive+=1
+		if view_rect.has_point(en.get("pos",Vector2.ZERO)):seen+=1
+	var emitters:int=0;var amount:int=0
+	for node in find_children("*","CPUParticles2D",true,false):
+		if node.emitting and node.is_visible_in_tree() and node.process_mode!=Node.PROCESS_MODE_DISABLED:emitters+=1;amount+=node.amount
+	var context:Dictionary={"screen":screen,"mode":mode,"room":current_room,"map":int(room.get("map_index",-1))+1,"type":room.get("type","hub"),"paused":perf_paused or ui.is_panel_open() or minimap_open or not life_event.is_empty() or practice_rd_panel!=null,"hitstop":hitstop>0,"lab":lab_mode,"zoom":snappedf(_view_zoom(),.01),"low_fx":low_effects,"enemy_alive":alive,"enemy_visible":seen,"training":training,"passive":passive,"solids":solids.size(),"platforms":platforms.size(),"corners":layout.get("art_corners_v21",[]).size(),"edge_decor":layout.get("edge_details_v23",[]).size(),"middle_objects":atmosphere.middle_structures.size(),"projectiles":projectiles.size(),"hazards":hazards.size(),"drops":drops.size(),"props":props.size(),"effects":effects.size(),"emitters":emitters,"particle_budget":amount,"draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"primitives":Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),"engine_process_ms":snappedf(Performance.get_monitor(Performance.TIME_PROCESS)*1000,.001),"engine_physics_ms":snappedf(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000,.001),"static_mib":snappedf(Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0,.01),"vram_mib":snappedf(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0,.01),"nodes":Performance.get_monitor(Performance.OBJECT_NODE_COUNT),"render_size":str(get_viewport().get_texture().get_size()),"window_size":str(get_window().size),"stretch_mode":get_window().content_scale_mode}
+	if perf_bridge!=null:context["browser"]=JSON.parse_string(str(perf_bridge.sample()))
+	if perf_log.active:perf_log.span("recorder.snapshot",Time.get_ticks_usec()-measured)
+	return context
+
+func _performance_pause() -> void:
+	perf_paused=true;_clear_keys()
+
+func _performance_resume() -> void:
+	perf_paused=false;_clear_keys()
+
+func _performance_command(arguments:Array) -> void:
+	if arguments.is_empty():return
+	match str(arguments[0]):
+		"panel":_performance_pause()
+		"resume":_performance_resume()
+		"start":
+			_performance_resume()
+			if ui.is_panel_open():_close_panel()
+			var info:Dictionary={"version":PerfLog.VERSION,"utc":Time.get_datetime_string_from_system(true),"godot":Engine.get_version_info().get("string",""),"platform":OS.get_name(),"debug_build":OS.is_debug_build(),"max_fps":Engine.max_fps,"vsync_mode":DisplayServer.window_get_vsync_mode(),"renderer":ProjectSettings.get_setting("rendering/renderer/rendering_method")}
+			if perf_bridge!=null:info["browser"]=JSON.parse_string(str(perf_bridge.environment()))
+			perf_log.start(info,_performance_context())
+			if perf_bridge!=null:perf_bridge.status(true)
+		"mark":perf_log.mark(_performance_context())
+		"stop":
+			perf_log.stop(_performance_context());_show_performance_report()
+
+func _show_performance_report() -> void:
+	_performance_pause()
+	if perf_bridge!=null:perf_bridge.status(false);perf_bridge.show_report(perf_log.last_report)
+	else:
+		var output:=FileAccess.open("user://pigeon-perf-last.txt",FileAccess.WRITE)
+		if output!=null:output.store_string(perf_log.last_report)

@@ -1,4 +1,6 @@
 extends Node2D
+var profiler:RefCounted
+var profile_name:String="draw.actors"
 ## Per-actor material keeps white flash out of weapons, text and other actors.
 var paint:Callable
 var actor:Dictionary
@@ -18,6 +20,12 @@ func refresh(base:Transform2D,enabled:bool,signature:Array=[]) -> void:
 	if enabled and (signature.is_empty() or signature!=last_signature):
 		last_signature=signature.duplicate();queue_redraw()
 func _draw() -> void:
+	if profiler==null or not profiler.active:
+		_paint_profiled_body();return
+	var measured:int=Time.get_ticks_usec()
+	_paint_profiled_body()
+	profiler.span(profile_name,Time.get_ticks_usec()-measured)
+func _paint_profiled_body() -> void:
 	if not paint.is_valid():return
 	rebuilds+=1
 	if local_origin:

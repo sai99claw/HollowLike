@@ -1,0 +1,41 @@
+extends SceneTree
+const Log=preload("res://scripts/performance_log_v42.gd")
+var failures:Array[String]=[]
+func _initialize() -> void:call_deferred("run")
+func check(ok:bool,message:String) -> void:
+	if not ok:failures.append(message);push_error(message)
+func context() -> Dictionary:return {"room":4,"screen":"game","mode":"musou","type":"start","paused":false,"enemy_alive":0}
+func run() -> void:
+	var log=Log.new();log.span("ignored",20);log.begin_frame(100);check(log.totals.is_empty() and log.frames==0,"Disabled logging stores no samples")
+	log.start({"version":"test"},context(),0)
+	for i in 21:
+		log.begin_frame(i*50000);log.span("process.total",1000);log.span("physics.total",2000)
+	log.finish_frame(context,1000000)
+	check(log.windows.size()==1 and log.windows[0]["enemy_alive"]==0,"Empty-room recording creates one structured interval")
+	check(Log.percentile(log.gaps,.95)==50 and log.gap_count==20,"Monotonic callback gaps correctly diagnose20FPS independently of engine delta")
+	check(Log.cpu(log.windows[0],"process.total")==1,"Per-frame CPU time has correct units")
+	log.mark(context(),"manual",1100000)
+	var report:String=log.stop(context(),1200000)
+	check(not log.active and report.begins_with("=== PIGEON_PERF") and report.ends_with("=== END PIGEON_PERF ==="),"Stopping creates a complete pasteable report")
+	check("WORST_FRAMES" in report and "manual" in report and "GPU milliseconds are NOT measured" in report,"Report preserves annotations and distinguishes unmeasured GPU time")
+	check(log.stop(context(),1300000)==report,"Repeated stop preserves the completed report")
+	log.start({},context(),0);check(log.last_report.is_empty() and log.windows.is_empty() and log.frames==0,"New capture clears previous timing data")
+	for i in Log.MAX_GAPS+25:log.begin_frame(i*1000)
+	check(log.gaps.size()==Log.MAX_GAPS and log.worst.size()==10,"Frame and slow-frame storage remain bounded")
+	check(log.finish_frame(context,121000000) and not log.active,"Recording automatically stops after120seconds")
+	var empty=Log.new();empty.start({},context(),0);check(not empty.stop(context(),1).is_empty(),"Immediate stop handles zero frames without division errors")
+	var g=load("res://main.tscn").instantiate();g.audio_enabled=false;root.add_child(g);await process_frame;g.set_process(false);g.set_physics_process(false)
+	g._performance_command(["panel"]);check(g.perf_paused,"Opening capture controls pauses an active game")
+	var before:float=g.real_clock;g._physics_process(.5);g._set_action("attack",true)
+	check(g.real_clock==before and not g.p_attack.is_busy(),"Report dialog blocks simulation and input instead of allowing a hidden death")
+	g._performance_command(["start"]);check(g.perf_log.active and not g.ui.is_panel_open(),"Starting recording closes its pause panel")
+	g._process(.016);g._physics_process(.016);g.queue_redraw();await process_frame;await process_frame
+	check(g.perf_log.totals.has("process.total") and g.perf_log.totals.has("physics.total") and g.perf_log.totals.has("draw.main"),"Actual process, physics and drawing callbacks are timed")
+	check(g.perf_log.totals.has("process.atmosphere"),"Atmosphere work is separated from total process work")
+	var snapshot:Dictionary=g._performance_context();check(snapshot.has("particle_budget") and snapshot.has("render_size") and snapshot.has("draw_calls") and snapshot.has("paused"),"Snapshots include rendering, particles and pause state")
+	g.enemies.append({"hp":1,"training":true,"pos":Vector2.ZERO});var classified:Dictionary=g._performance_context();g.enemies.pop_back()
+	check(classified["enemy_alive"]==0 and classified["training"]==1,"Safehouse dummies are distinguished from actual monsters in empty-room logs")
+	g._performance_command(["mark"]);check(g.perf_log.marks.size()==1,"Manual stutter marker records the current scene")
+	g.perf_log.stop(snapshot)
+	g._performance_command(["panel"]);g._performance_command(["resume"]);check(not g.perf_paused and not g.ui.is_panel_open(),"Closing diagnostics resumes gameplay")
+	g.queue_free();await process_frame;print("v42 profiler checks: ",failures);quit(0 if failures.is_empty() else 1)

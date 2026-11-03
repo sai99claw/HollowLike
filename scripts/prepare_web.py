@@ -36,3 +36,5 @@ if __name__ == '__main__':
     import shutil
     shutil.copy2(Path(__file__).resolve().parent.parent / 'web_touch_v29.js', ROOT / 'web_touch_v29.js')
     shutil.copy2(Path(__file__).resolve().parent.parent / 'web_feedback_v30.js', ROOT / 'web_feedback_v30.js')
+
+    shutil.copy2(Path(__file__).resolve().parent.parent / "web_performance_v42.js", ROOT / "web_performance_v42.js")
