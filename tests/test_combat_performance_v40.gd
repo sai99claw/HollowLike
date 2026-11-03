@@ -61,5 +61,20 @@ func run() -> void:
 	en["face"]=-1;g._sync_enemy_canvases()
 	for i in 3:await process_frame
 	check(sprite.rebuilds==builds+1,"Facing changes still rebuild the sprite immediately")
+	var resting:Dictionary={"kind":"coin","pos":Vector2(250,293),"vel":Vector2.ZERO,"sleeping":true,"grounded":true,"age":1.0,"taken":false,"value":1}
+	var moving:Dictionary={"kind":"coin","pos":Vector2(255,293),"vel":Vector2.LEFT*30}
+	g.CoinField.collide([resting,moving])
+	check(resting["sleeping"] and resting["pos"]==Vector2(250,293),"A settled coin stays asleep even when another coin overlaps it")
+	g.drops.assign([resting]);g.p["pos"]=Vector2(250,313)
+	var old_gold:int=g.run_coins
+	g._update_drops(1.0/60.0)
+	check(g.drops.is_empty() and g.run_coins==old_gold+1,"Sleeping coins still collect when approached")
+	var bounds:=Rect2(0,0,1000,800)
+	var shot:Dictionary={"pos":Vector2(1001,400),"vel":Vector2.RIGHT*500}
+	check(g._straight_shot_left_room(shot,bounds),"A straight shot leaving the outer room bounds can be culled")
+	shot["vel"]=Vector2.LEFT*500
+	check(not g._straight_shot_left_room(shot,bounds),"An incoming shot outside the room still runs")
+	shot["vel"]=Vector2.RIGHT*500;shot["return_after"]=.5
+	check(not g._straight_shot_left_room(shot,bounds),"Returning shots continue updating outside the room")
 	g.queue_free();feedback.queue_free();await process_frame
 	print("v40 combat/performance checks: ",failures);quit(0 if failures.is_empty() else 1)

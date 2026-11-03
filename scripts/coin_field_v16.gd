@@ -27,13 +27,13 @@ static func collide(coins:Array) -> void:
 	var grid:Dictionary={}
 	for i in coins.size():
 		var coin:Dictionary=coins[i]
-		if coin.get("kind","")!="coin" or coin.get("taken",false):continue
+		if coin.get("kind","")!="coin" or coin.get("taken",false) or coin.get("display_only",false) or coin.get("gift",false):continue
+		if coin.get("sleeping",false) and Vector2(coin["vel"]).length_squared()<.01:continue
 		var key:=Vector2i(Vector2(coin["pos"])/24)
 		for dy in range(-1,2):
 			for dx in range(-1,2):
 				for other:int in grid.get(key+Vector2i(dx,dy),[]):
 					var b:Dictionary=coins[other]
-					if coin.get("sleeping",false) and b.get("sleeping",false):continue
 					var gap:Vector2=coin["pos"]-b["pos"];var distance:float=gap.length()
 					if distance>=14:continue
 					var normal:Vector2=gap/distance if distance>.001 else Vector2.RIGHT

@@ -226,6 +226,7 @@ var run_recorded:bool=false
 var merchant_trial:Dictionary={}
 var bath=Bath.new()
 var coin_field=CoinField.new()
+var projectile_surfaces: Array = []
 var lab_mode:String=""
 var lab_meta:Dictionary={}
 var lab_ai:bool=true
@@ -1391,9 +1392,12 @@ func _projectile_impact(pr:Dictionary) -> void:
 	effects.append({"boss_fx":biome,"pos":pr["pos"],"color":pr["color"],"life":.4,"max":.4,"radius":0.0,"ring":false,"vel":Vector2.ZERO,"fx_scale":.65})
 
 func _projectile_surfaces() -> Array:
+	return projectile_surfaces
+
+func _rebuild_projectile_surfaces() -> void:
 	# Pass-through traversal ledges are supports, never horizontal shot barriers.
 	var pass_through:Array=layout.get("one_way",[])
-	return solids+platforms.filter(func(surface:Rect2)->bool:return not pass_through.has(surface))
+	projectile_surfaces=solids+platforms.filter(func(surface:Rect2)->bool:return not pass_through.has(surface))
 
 func _update_projectiles(delta:float) -> void:
 	if not perf_log.active:
@@ -1402,11 +1406,27 @@ func _update_projectiles(delta:float) -> void:
 	_update_projectiles_profiled_body(delta)
 	perf_log.span("physics.projectiles",Time.get_ticks_usec()-measured)
 
+func _straight_shot_left_room(pr:Dictionary, bounds:Rect2) -> bool:
+	if pr.get("trap_carrier",false) or pr.get("homing",false) or int(pr.get("bounces",0))>0:
+		return false
+	if float(pr.get("return_after",0))>0 or float(pr.get("wave_amplitude",0))!=0 or float(pr.get("gravity",0))!=0:
+		return false
+	var at:Vector2=pr["pos"]
+	var velocity:Vector2=pr["vel"]
+	return ((at.x<bounds.position.x and velocity.x<=0) or (at.x>bounds.end.x and velocity.x>=0)
+		or (at.y<bounds.position.y and velocity.y<=0) or (at.y>bounds.end.y and velocity.y>=0))
+
 func _update_projectiles_profiled_body(delta:float) -> void:
+	if projectiles.is_empty():return
+	var room_bounds:=Rect2(Vector2.ZERO,_room_size())
+	var trail_view:=view_rect.grow(80)
 	var initial_room:int=current_room
 	var world:Array=_projectile_surfaces()
 	for pr in projectiles:
 		if float(pr["life"])<=0:continue
+		if _straight_shot_left_room(pr,room_bounds.grow(320+ProjectileReadability.visual_radius(pr))):
+			pr["life"]=0
+			continue
 		pr["life"]-=delta;pr["elapsed"]=float(pr.get("elapsed",0))+delta
 		if float(pr.get("return_after",0))>0 and float(pr["elapsed"])>=float(pr["return_after"]):pr["vel"]=(pr["origin"]-pr["pos"]).normalized()*pr["base_velocity"].length()
 		if float(pr.get("wave_amplitude",0))>0:pr["vel"].y=pr["base_velocity"].y+float(pr["wave_amplitude"])*float(pr["wave_frequency"])*cos(float(pr["elapsed"])*float(pr["wave_frequency"]))
@@ -1424,8 +1444,13 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 		var wall_hit:bool=wall_t<INF
 		if wall_hit:next=old+movement*maxf(0,wall_t-.0001)
 		pr["pos"]=next
-		ProjectileReadability.record(pr,old,next,delta)
-		if combat_feedback!=null and view_rect.grow(80).has_point(pr["pos"]):combat_feedback.projectile_trail(pr,world_speed)
+		if ProjectileReadability.uses_line_trail(pr):
+			ProjectileReadability.record(pr,old,next,delta)
+		elif combat_feedback!=null and trail_view.has_point(next):
+			combat_feedback.projectile_trail(pr,world_speed)
+		elif combat_feedback!=null:
+			combat_feedback.finish_trail(pr)
+			pr.erase("trail_id")
 		pr["distance_left"]=float(pr.get("distance_left",INF))-old.distance_to(next)
 		if pr.get("trap_carrier",false):
 			if not pr.get("destroyed",false) and (wall_hit or pr["life"]<=0 or pr["distance_left"]<=0):_settle_trap(pr);pr["life"]=0
@@ -1580,6 +1605,9 @@ func _update_drops(delta:float) -> void:
 	perf_log.span("physics.drops",Time.get_ticks_usec()-measured)
 
 func _update_drops_profiled_body(delta:float) -> void:
+	if drops.is_empty():return
+	var target:Vector2=p["pos"]-Vector2(0,20)
+	var magnet_radius:float=125+_rune_effect("magnet")
 	var picked_gold:int=0
 	var bounds:=Rect2(Vector2(18,0),_room_size()-Vector2(36,0))
 	for drop in drops:
@@ -1589,19 +1617,16 @@ func _update_drops_profiled_body(delta:float) -> void:
 		if not drop.has("radius"):drop["radius"]=7.0 if drop["kind"]=="coin" else 18.0
 		Coins.initialize(drop,Vector2(rng.randf_range(-180,180),rng.randf_range(-350,-190)) if not drop.has("vel") else Vector2.ZERO)
 		drop["impact_cd"]=maxf(0,float(drop.get("impact_cd",0))-delta)
-		var target:Vector2=p["pos"]-Vector2(0,20)
-		var distance:float=drop["pos"].distance_to(target)
-		if drop["kind"]=="coin" and float(drop["age"])>.35 and distance<125+_rune_effect("magnet"):
+		if drop["kind"]=="coin" and float(drop["age"])>.35 and Vector2(drop["pos"]).distance_squared_to(target)<magnet_radius*magnet_radius:
 			drop["sleeping"]=false;drop["vel"]=drop["vel"].move_toward((target-drop["pos"]).normalized()*450,delta*1200)
 		var nearby:Array=[] if drop.get("sleeping",false) and Vector2(drop["vel"]).length_squared()<.01 else coin_field.query(drop["pos"],drop["vel"],delta,float(drop["radius"])+3)
 		if Coins.step(drop,delta,nearby,bounds) and drop["kind"]=="coin" and float(drop["impact_cd"])<=0:
 			drop["impact_cd"]=.15;_particles(drop["pos"],Color("efdba3"),4,65);_sound("coin")
-		var dist:float=drop["pos"].distance_to(p["pos"]-Vector2(0,20))
-		if dist<36 and float(drop.get("age",0))>.35:
+		if Vector2(drop["pos"]).distance_squared_to(target)<36*36 and float(drop.get("age",0))>.35:
 			drop["taken"]=true
 			if drop["kind"]=="coin":picked_gold+=int(drop["value"])
 			else:_give_drop(str(drop["kind"]),int(drop["value"]))
-	CoinField.collide(drops.filter(func(d:Dictionary)->bool:return not d.get("display_only",false) and not d.get("gift",false)))
+	CoinField.collide(drops)
 	if picked_gold>0:run_coins+=picked_gold;_sound("coin")
 	drops=drops.filter(func(drop:Dictionary)->bool:return not bool(drop["taken"]))
 	room["drops"]=drops
@@ -1694,6 +1719,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	platforms.assign(layout["platforms"])
 	solids.assign(layout.get("solids",[]))
 	coin_field.rebuild(platforms,solids)
+	_rebuild_projectile_surfaces()
 	doors.clear()
 	for dir in room["neighbors"]:
 		doors.append({"dir":dir,"pos":layout["doors"][dir],"target":int(room["neighbors"][dir])})
@@ -2004,7 +2030,7 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"practice":practice_mode=not practice_mode;_show_settings()
 		"audio":audio_enabled=not audio_enabled;_save_settings();_show_settings()
 		"mute":audio_enabled=not audio_enabled;_save_settings();_update_hud()
-		"effects":low_effects=not low_effects;_show_settings()
+		"effects":low_effects=not low_effects;terrain.invalidate();_show_settings()
 		"timing_slower":phase_multiplier=1.6 if phase_multiplier<1.2 else 1.0;_show_settings()
 		"reward":_claim_reward(int(payload))
 		"minimap":pass
@@ -2200,7 +2226,7 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 		return
 	if layout.has("maze_grid"):
 		var id:String=str(_ecology()["id"])
-		if not NewBiome.draw_terrain(canvas,id,layout,solids,terrain_region):
+		if not NewBiome.draw_terrain(canvas,id,layout,solids,terrain_region,low_effects):
 			for solid:Rect2 in solids:BiomeArt.terrain(canvas,id,solid)
 			for plat:Rect2 in layout.get("one_way",[]):BiomeArt.terrain(canvas,id,plat,true)
 		if show_hitboxes:
@@ -2383,13 +2409,14 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.43",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.44",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
 	layout={"size":Vector2(1280,720),"floor_y":600.0,"pool":Rect2(),"spawn_positions":{"center":Vector2(640,600)}}
 	platforms.assign([Rect2(40,600,1200,9)])
 	solids.assign([Rect2(0,600,1280,120),Rect2(18,0,22,600),Rect2(1240,0,22,600),Rect2(0,-20,1280,20)])
+	_rebuild_projectile_surfaces()
 	props.assign([{"kind":"adventure_records","pos":Vector2(790,600),"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
 	p_attack.cancel();pending_attack.clear();charge_timer=0;room_cooldown=0;weapon_index=1
 	if home_atmosphere!=null:home_atmosphere.set_active(true)

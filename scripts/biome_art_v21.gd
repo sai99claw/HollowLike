@@ -99,7 +99,7 @@ static func _fill(c:CanvasItem,image:Texture2D,rect:Rect2,_seed_value:int) -> vo
 			c.draw_set_transform_matrix(Transform2D(0,Vector2(-1 if horizontal else 1,-1 if vertical else 1),0,part.get_center()))
 			c.draw_texture_rect_region(image,Rect2(-part.size*.5,part.size),Rect2(uv*image.get_size(),extent*image.get_size()))
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
-static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Array,visible:Rect2=Rect2()) -> bool:
+static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Array,visible:Rect2=Rect2(),reduced:bool=false) -> bool:
 	var fill:Texture2D=Terrain.texture("material-"+biome+".png")
 	if fill==null:fill=Surfaces.material(biome)
 	if fill==null:return false
@@ -125,6 +125,10 @@ static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Arra
 		var inward:Vector2={"top":Vector2.DOWN,"bottom":Vector2.UP,"left":Vector2.RIGHT,"right":Vector2.LEFT}[side]
 		var start:Vector2=Vector2(span.x,edge["at"]) if side in ["top","bottom"] else Vector2(edge["at"],span.x)
 		var end:Vector2=Vector2(span.y,edge["at"]) if side in ["top","bottom"] else Vector2(edge["at"],span.y)
+		var bevel_color:=Color(.62,.77,.61,.24) if side in ["top","left"] else Color(.04,.06,.08,.45)
+		if reduced:
+			c.draw_line(start+inward*3.0,end+inward*3.0,bevel_color,3.0)
+			continue
 		var length:float=start.distance_to(end)
 		var tangent:Vector2=(end-start).normalized();var points:=PackedVector2Array()
 		for step in range(0,ceili(length/9)+1):
@@ -132,7 +136,7 @@ static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Arra
 			var art_distance:float=distance+span.x-float(edge["span"].x)
 			var inset:float=3.0+1.5*sin((start.x+start.y+distance)*.13)+.8*sin(art_distance*.41)
 			points.append(start+tangent*distance+inward*inset)
-		if points.size()>1:c.draw_polyline(points,Color(.62,.77,.61,.24) if side in ["top","left"] else Color(.04,.06,.08,.45),3,true)
+		if points.size()>1:c.draw_polyline(points,bevel_color,3,true)
 	Terrain.draw_corners(c,biome,layout,visible)
 
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
