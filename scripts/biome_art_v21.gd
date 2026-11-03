@@ -227,6 +227,14 @@ static func middle_plan(seed_value:int,bounds:Vector2,layout:Dictionary={},biome
 		var item:Dictionary=candidates.pop_at(random.randi_range(0,candidates.size()-1));var body:Rect2=item["bounds"]
 		if result.any(func(other:Dictionary)->bool:return Rect2(other["bounds"]).grow(65).intersects(body)):continue
 		result.append(item)
+	if result.is_empty() and not layout.is_empty():
+		# The rear plane is independent of foreground collision.
+		var entry:Vector2=layout.get("spawn_positions",{}).get("center",bounds*.5)
+		var variant:int=random.randi_range(0,choices.size()-1)
+		var size:Array=choices[variant]["world_size"]
+		var extent:=Vector2(float(size[0]),float(size[1]))
+		var anchor:=Vector2(clampf(entry.x+180,extent.x*.5,bounds.x-extent.x*.5),clampf(entry.y+40,extent.y,bounds.y))
+		result.append({"variant":variant,"pos":anchor,"bounds":Rect2(anchor-Vector2(extent.x*.5,extent.y),extent),"size":extent.y,"flip":random.randf()<.5,"rear_plane":true})
 	return result
 static func draw_middle(c:CanvasItem,biome:String,items:Array) -> void:
 	if Terrain.middle(c,biome,items):return

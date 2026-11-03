@@ -10,7 +10,8 @@ var enabled:bool=true
 var music_volume:float=.55
 
 static func title_for(room_type:String,biome:String,spring:bool=false) -> String:
-	if spring or room_type in ["hub","start","reward","win"]:return RELAX.get(biome,RELAX["branches"])
+	if room_type=="hub":return "Grotto_of_Sleeping_Waters"
+	if spring or room_type in ["start","reward","win"]:return RELAX.get(biome,RELAX["branches"])
 	if room_type=="boss":return BOSS.get(biome,BOSS["branches"])
 	return FIGHT.get(biome,FIGHT["branches"])
 

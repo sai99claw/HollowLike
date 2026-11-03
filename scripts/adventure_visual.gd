@@ -3,6 +3,7 @@ extends RefCounted
 const FX=preload("res://scripts/combat_visual.gd")
 static var owl:Texture2D
 static var actions:Texture2D
+static var portal_dot:GradientTexture2D
 const FEATHER_SIZE:=Vector2(120,80)
 const FEATHER_BOB:float=6.0
 const ACTION_REGIONS=[[[20,105,259,211],[346,87,251,230],[656,63,258,254],[969,69,240,248]],[[25,423,266,220],[335,417,274,218],[648,426,289,212],[967,421,279,217]],[[19,715,297,178],[312,714,317,144],[625,736,317,118],[938,713,303,168]],[[69,922,196,250],[408,921,143,279],[720,914,222,302],[938,1026,299,165]]]
@@ -14,13 +15,22 @@ static func portal_mote(at:Vector2,time:float,index:int) -> Dictionary:
 	return {"pos":center+Vector2(cos(angle),sin(angle)*.7)*radius,"alpha":sin(t*PI)*.24,"radius":radius,"progress":t}
 static func portal(c:CanvasItem,at:Vector2,color:Color,time:float,base:Transform2D,_biome:String,direction:String="left",opening:float=64,reduced:bool=false) -> void:
 	var center:Vector2=at-Vector2(0,opening*.5) if direction in ["left","right"] else at
+	if portal_dot==null:
+		var fade:=Gradient.new()
+		fade.offsets=PackedFloat32Array([0.0,.37,.48,.72,1.0])
+		fade.colors=PackedColorArray([Color.WHITE,Color.WHITE,Color(1,1,1,.40),Color(1,1,1,.09),Color(1,1,1,0)])
+		portal_dot=GradientTexture2D.new()
+		portal_dot.width=32;portal_dot.height=32
+		portal_dot.fill=GradientTexture2D.FILL_RADIAL
+		portal_dot.fill_from=Vector2(.5,.5);portal_dot.fill_to=Vector2(1,.5)
+		portal_dot.gradient=fade
 	c.draw_set_transform_matrix(base)
 	for i in (84 if reduced else 168):
 		var mote:Dictionary=portal_mote(center+Vector2(0,38),time,i)
 		var tint:Color=color.lerp(Color.WHITE,.25);tint.a=float(mote["alpha"])
 		var radius:float=1+fposmod(i*.37,1.1)
-		c.draw_circle(mote["pos"],radius+1.8,Color(tint,tint.a*.10),true,-1,true)
-		c.draw_circle(mote["pos"],radius,tint,true,-1,true)
+		var extent:float=radius+1.8
+		c.draw_texture_rect(portal_dot,Rect2(Vector2(mote["pos"])-Vector2.ONE*extent,Vector2.ONE*(extent*2)),false,tint)
 	c.draw_set_transform_matrix(base)
 
 static func dash(c:CanvasItem,at:Vector2,dir:Vector2,time:float,base:Transform2D,slam:bool=false) -> void:

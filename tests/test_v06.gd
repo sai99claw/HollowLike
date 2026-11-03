@@ -97,7 +97,9 @@ func run() -> void:
 			check(audio is AudioStreamOggVorbis,"Filename-mapped room music is playable")
 			check(Music.title_for("combat",biome,true)==Music.title_for("start",biome),"Spring overrides combat music with ecological relaxation track")
 	check(selected.size()==9,"Room mapping uses every supplied music title")
-	var player=Music.new();root.add_child(player);player.select("combat","sky")
+	var player=Music.new();root.add_child(player);player.select("hub","branches")
+	check(player.current_title=="Grotto_of_Sleeping_Waters" and player.stream is AudioStreamOggVorbis and player.stream.loop,"Home selects and loops the supplied music")
+	player.select("combat","sky")
 	await create_timer(.06).timeout
 	check(player.stream.loop and player.playing,"Music plays and loops")
 	var same=player.stream;player.select("combat","sky");check(player.stream==same,"Same song is retained across adjacent rooms")

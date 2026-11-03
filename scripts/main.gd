@@ -768,6 +768,7 @@ func _step_player(delta: float) -> void:
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
+	var rising:bool=vel.y<0.0
 	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),solids,4)
 	if _in_bath() and absf(vel.x)>1 and absf(resolved["vel"].x)<1:
 		for lift in [8.0,18.0,30.0]:
@@ -779,9 +780,9 @@ func _step_player(delta: float) -> void:
 	p["grounded"]=resolved["grounded"]
 	var wall_contact:int=int(resolved["wall"])
 	var dashed_into:bool=dash_contact and signf(p["dash_dir"].x)==wall_contact
-	var contact:Dictionary=Ledge.contact(pos,wall_contact,solids)
-	var wall_allowed:bool=_skill("wall") and (float(p["wall_lock"])<=0 or dashed_into) and not bool(p["grounded"]) and not bool(p["slam"])
-	p["wall"]=wall_contact if wall_allowed and float(contact["ratio"])+.000001>=Ledge.ATTACH_RATIO else 0
+	var wall_allowed:bool=not rising and wall_contact!=0 and _skill("wall") and (float(p["wall_lock"])<=0 or dashed_into) and not bool(p["grounded"]) and not bool(p["slam"])
+	var contact:Dictionary=Ledge.contact(pos,wall_contact,solids) if wall_allowed else {}
+	p["wall"]=wall_contact if float(contact.get("ratio",0.0))+.000001>=Ledge.ATTACH_RATIO else 0
 	if wall_allowed and contact.has("target"):
 		p["pos"]=pos;p["face"]=wall_contact;Ledge.begin(p,contact["target"]);p_attack.cancel();pending_attack.clear();charge_timer=0;p["_motion_step"]=false;return
 	if p["grounded"]:_restore_ground_movement()
@@ -2409,7 +2410,7 @@ func _draw_hub() -> void:
 	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.44",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.45",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY

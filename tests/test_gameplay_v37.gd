@@ -38,6 +38,11 @@ func run() -> void:
 				reset(g,at);Ledge.begin(g.p,result["target"]);var seen:Dictionary={}
 				for i in 32:seen[Ledge.frame_index(g.p["mantle_left"])]=true;g._step_player(.01)
 				check(seen.size()==4 and g.p["grounded"] and g.p["pos"].is_equal_approx(result["target"]),"Mantle completes all four frames onto the solid top")
+		reset(g,Vector2(500,500));g.p["vel"]=Vector2(side*200,-260)
+		g.keys["right" if side>0 else "left"]=true
+		g.solids.assign([Rect2(517 if side>0 else 383,390,100,200)])
+		g._step_player(1.0/120)
+		check(g.p["wall"]==0 and g.p["mantle_left"]==0 and g.p["vel"].y<0 and is_equal_approx(g.p["pos"].x,500),"Rising preserves upward motion and wall collision")
 		for ratio:float in [.4,.6]:
 			reset(g,Vector2(500,500));g.p["vel"]=Vector2(side*200,80);g.keys["right" if side>0 else "left"]=true
 			g.solids.assign([Rect2(517 if side>0 else 383,500-42*ratio,100,200)]);g._step_player(1.0/120)

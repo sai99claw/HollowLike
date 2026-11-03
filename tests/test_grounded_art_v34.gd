@@ -14,9 +14,13 @@ func run() -> void:
 		for room:Dictionary in tower["rooms"]:
 			var layout:Dictionary=Layout.generate(room,seed_value);var biome:String=preload("res://scripts/ecology.gd").from_stage(int(room["map_index"]))["id"];var quiet:bool=room["type"] in ["start","merchant","reward"]
 			var plan:Array[Dictionary]=Biome.middle_plan(seed_value,layout["size"],layout,biome,quiet)
-			if room["type"] in ["start","merchant"]:check(not plan.is_empty(),"Safehouses and merchants retain grounded middle objects")
+			check(not plan.is_empty(),"Every room has large middle objects")
 			for item:Dictionary in plan:
-				var at:Vector2=item["pos"];var body:Rect2=item["bounds"];var support:Rect2=item["support"]
+				var at:Vector2=item["pos"];var body:Rect2=item["bounds"]
+				if item.get("rear_plane",false):
+					check(Rect2(Vector2.ZERO,layout["size"]).encloses(body),"Rear plane fallback fits inside the room")
+					continue
+				var support:Rect2=item["support"]
 				check(is_equal_approx(at.y,support.position.y+10),"Middle contact plane follows terrain with ten-pixel inset")
 				check(body.position.x>=support.position.x and body.end.x<=support.end.x,"Entire middle prop footprint is supported")
 				check(not layout["solids"].any(func(rock:Rect2)->bool:return rock.intersects(body)),"Complete middle prop silhouette is not cut by rock")

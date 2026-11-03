@@ -54,7 +54,7 @@ static func generate(seed_value:int,stage_count:int=6,per_stage:int=0,options:Di
 		var desired:int=clampi(per_stage,MIN_ROOMS,MAX_ROOMS) if per_stage>0 else rng.randi_range(DEFAULT_MIN_ROOMS,DEFAULT_MAX_ROOMS)
 		var coords:Array[Vector2i]=[start];var edges:Array[Vector2i]=[];var local:Dictionary={start:0};var depths:Array[int]=[0]
 		var side:int=progression_side
-		var spine:int=maxi(4,ceili(desired*.65))
+		var spine:int=clampi(ceili(desired*.65),4,maxi(4,desired-3))
 		# A monotone upward spine plus bounded-depth side branches makes the
 		# terminal Boss the unique farthest room, even after safe optional loops.
 		for step in range(1,spine):
@@ -70,6 +70,10 @@ static func generate(seed_value:int,stage_count:int=6,per_stage:int=0,options:Di
 		var leaf:Vector2i=coords[2]+Vector2i(side,0)
 		assert(not occupied.has(leaf) and not local.has(leaf))
 		local[leaf]=coords.size();edges.append(Vector2i(2,coords.size()));coords.append(leaf);depths.append(3)
+		# Reserve a descending route without changing the upward Boss spine.
+		if coords.size()<desired-1:
+			var lower:Vector2i=coords[2]+Vector2i.DOWN
+			local[lower]=coords.size();edges.append(Vector2i(2,coords.size()));coords.append(lower);depths.append(3)
 		var attempts:int=0
 		while coords.size()<desired-1:
 			attempts+=1

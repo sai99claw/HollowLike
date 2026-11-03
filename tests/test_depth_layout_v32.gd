@@ -13,10 +13,14 @@ func run() -> void:
 	var merged:Array[Rect2]=Layout._merge_platforms(input)
 	check(merged==[Rect2(0,96,480,9)],"Overlapping, duplicate and touching ledges form one exact support run")
 	var rooms_checked:int=0
-	for count:int in [6,10,12]:
+	for count:int in [6,7,10,12]:
 		for seed_value:int in [32,772]:
 			var tower:Dictionary=Tower.generate(seed_value,6,count)
 			check(Tower.validate(tower).is_empty(),"Six-stage topology remains reciprocal, unique-farthest and connected")
+			if count>6:
+				for chapter:Dictionary in tower["maps"]:
+					var entrance:Vector2i=tower["rooms"][chapter["start_id"]]["coord"]
+					check(chapter["room_ids"].any(func(id:int)->bool:return tower["rooms"][id]["coord"].y>entrance.y),"Every chapter with a spare branch slot descends below its entrance")
 			for room:Dictionary in tower["rooms"]:
 				var safe:bool=room["type"] in ["start","merchant","reward"]
 				if safe:

@@ -84,13 +84,13 @@ func _ready() -> void:
 	var mat:=ShaderMaterial.new();mat.shader=load("res://shaders/player_focus.gdshader");mat.set_shader_parameter("darkness",.22);focus.material=mat;add_child(focus)
 func _feathers(depth:int,dark:bool) -> CPUParticles2D:
 	var particle:=CPUParticles2D.new();particle.name="Feathers_%d_%s"%[depth,"Black" if dark else "White"]
-	particle.z_index=[-12,4,6][depth];particle.amount=[23,15,9][depth];particle.lifetime=14;particle.preprocess=14;particle.local_coords=true
-	particle.emission_shape=CPUParticles2D.EMISSION_SHAPE_RECTANGLE;particle.emission_rect_extents=Vector2(850,650)
+	particle.z_index=[-12,4,6][depth];particle.amount=[34,23,14][depth];particle.lifetime=14;particle.preprocess=14;particle.local_coords=true
+	particle.emission_shape=CPUParticles2D.EMISSION_SHAPE_RECTANGLE;particle.emission_rect_extents=Vector2(680,420)
 	particle.texture=FX.texture_for("death_feather_glow")
 	particle.direction=Vector2(1,.25);particle.spread=24;particle.gravity=Vector2(2,3);particle.initial_velocity_min=10;particle.initial_velocity_max=25
 	particle.angular_velocity_min=-24;particle.angular_velocity_max=30
 	particle.scale_amount_min=[.035,.05,.14][depth];particle.scale_amount_max=[.06,.09,.24][depth]
-	particle.modulate=Color(.03,.035,.05,.16 if depth==2 else .26) if dark else Color(.88,.94,1,.12 if depth==2 else .21)
+	particle.modulate=Color(.03,.035,.05,.22 if depth==2 else .34) if dark else Color(.88,.94,1,.17 if depth==2 else .28)
 	particle.color=Color.WHITE;particle.set_meta("full_amount",particle.amount)
 	var ramp:=Gradient.new();ramp.offsets=PackedFloat32Array([0,.15,.8,1]);ramp.colors=PackedColorArray([Color(1,1,1,0),Color.WHITE,Color.WHITE,Color(1,1,1,0)]);particle.color_ramp=ramp
 	if depth!=1:particle.material=_near_blur if depth==2 else _blur
@@ -167,16 +167,17 @@ func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,play
 		if particle.get_meta("frame",-1)!=frame:particle.texture=FX.texture_for(id,frame);particle.set_meta("frame",frame)
 		var grounded:bool=id.ends_with("grass") or id.ends_with("mushroom") or id.ends_with("root_glow")
 		particle.transform=parallax(camera,zoom,.60)*Transform2D(0,Vector2(750,1020 if grounded else 550));particle.direction=Vector2(wind,.2);particle.speed_scale=speed
-	var mid:Transform2D=parallax(camera,zoom,.50)
+	var feather_drift:Vector2=(camera-depth_origin).limit_length(300)*zoom
+	var mid:=Transform2D(0,Vector2.ONE*zoom,0,Vector2(640,360)-feather_drift*.22)
 	for particle in mid_particles:
-		particle.transform=mid*Transform2D(0,Vector2(750,550));particle.direction=Vector2(wind,.25);particle.gravity=Vector2(wind*3+sin(time*.12)*2,4);particle.speed_scale=speed
-		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.2 if reduced else 1))
+		particle.transform=mid;particle.direction=Vector2(wind,.25);particle.gravity=Vector2(wind*3+sin(time*.12)*2,4);particle.speed_scale=speed
+		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.32 if reduced else 1))
 		if particle.amount!=amount:particle.amount=amount
 	for i in foreground.size():
 		var particle:CPUParticles2D=foreground[i]
-		var factor:float=1.0 if i<2 else 1.18
-		particle.transform=parallax(camera,zoom,factor)*Transform2D(0,Vector2(750,550));particle.direction=Vector2(wind,.22);particle.gravity=Vector2(wind*4,6);particle.speed_scale=speed
-		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.2 if reduced else 1))
+		var drift:float=.10 if i<2 else -.18
+		particle.transform=Transform2D(0,Vector2.ONE*zoom,0,Vector2(640,360)-feather_drift*drift);particle.direction=Vector2(wind,.22);particle.gravity=Vector2(wind*4,6);particle.speed_scale=speed
+		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.32 if reduced else 1))
 		if particle.amount!=amount:particle.amount=amount
 	for particle in ambient:
 		particle.emitting=active and not reduced;particle.visible=particle.emitting;particle.process_mode=Node.PROCESS_MODE_INHERIT if particle.emitting else Node.PROCESS_MODE_DISABLED

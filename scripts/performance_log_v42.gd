@@ -1,6 +1,6 @@
 class_name PerformanceLogV42
 extends RefCounted
-const VERSION:String="v0.44"
+const VERSION:String="v0.45"
 const MAX_SECONDS:float=120.0
 const MAX_WINDOWS:int=180
 const MAX_GAPS:int=8192
