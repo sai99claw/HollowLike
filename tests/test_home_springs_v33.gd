@@ -33,6 +33,19 @@ func run() -> void:
 	g._close_panel();g._reset_player(Vector2(1080,600))
 	var saved_meta:Dictionary=g.meta.duplicate(true)
 	check(g._home_interact() and g.lab_mode=="tutorial" and not g.ui.is_panel_open(),"Tutorial entrance opens directly into the practice room")
+	check(g._room_size()==Vector2(g.room["width"],g.room["height"])*96 and g.solids.size()==4,"Tutorial bounds match its map dimensions and contain the four enclosure surfaces")
+	check(g.layout["art_edges_v21"].size()>=4,"Tutorial terrain prepares authored edges")
+	check(g._nearby_tutorial_station()==-1,"The entrance has no station prompt overlay")
+	var station_sheet:Texture2D=load("res://assets/v62/tutorial/stations.webp")
+	var station_image:Image=station_sheet.get_image()
+	var station_hashes:Dictionary={}
+	for i in 3:
+		var image:Image=station_image.get_region(Rect2i(160*i,0,160,144))
+		check(image.get_used_rect().has_area(),"Each tutorial station has art")
+		station_hashes[hash(image.get_data())]=true
+		g.p["pos"]=g._tutorial_station_position(i)
+		check(g._nearby_tutorial_station()==i,"Only the nearby station is selected")
+	check(station_hashes.size()==3,"The three tutorial stations use distinct images")
 	check(g.enemies.size()==3 and g.layout["one_way"].size()==3,"One harmless target per platform")
 	for i in g.enemies.size():
 		var target:Dictionary=g.enemies[i]

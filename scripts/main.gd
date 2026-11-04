@@ -2068,10 +2068,10 @@ func _interact(allow_panel:bool=true) -> void:
 	if _action_locked():return
 	if room_cooldown>0: return
 	if lab_mode=="tutorial" and allow_panel:
-		for i in TUTORIAL_STATIONS.size():
-			if Vector2(p["pos"]).distance_to(_tutorial_station_position(i))<85:
-				_show_tutorial_station(i)
-				return
+		var station:int=_nearby_tutorial_station()
+		if station>=0:
+			_show_tutorial_station(station)
+			return
 	if screen=="hub":
 		_home_interact();return
 	if screen!="game":return
@@ -2529,7 +2529,7 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 	if screen=="hub":
 		pass # The home branch belongs to the newly painted home background.
 		return
-	if layout.has("maze_grid"):
+	if layout.has("maze_grid") or lab_mode=="tutorial":
 		var id:String=str(_ecology()["id"])
 		if not NewBiome.draw_terrain(canvas,id,layout,solids,terrain_region,low_effects):
 			for solid:Rect2 in solids:BiomeArt.terrain(canvas,id,solid)
@@ -2762,7 +2762,7 @@ func _draw_hub() -> void:
 	_home_gate_sign(Vector2(640,250),"按鍵上下左右走到想去的門","",Color("fff2cf"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"跳起後 %s＋%s 下砍蘑菇，反彈到最高點再 %s 二段跳"%[_tutorial_key("down"),_tutorial_key("attack"),_tutorial_key("jump")],14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.61",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.62",13,Color("a6c1b6"))
 
 func _home_gate_sign(at:Vector2,title:String,hint:String,tint:Color) -> void:
 	var width:float=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,22).x
@@ -3841,7 +3841,11 @@ func _enter_practice(tutorial:bool=false) -> void:
 		for i in Data.ITEMS.size():bag_items[str(i)]=99
 	secondary_index=0;weapon_index=1;run_coins=9999;mode="rogue";screen="game";room={};current_room=-1;injured=false;life_event.clear();feather.clear()
 	tower={"seed":160016,"rooms":[{"id":0,"map_index":2,"type":"start","laboratory":true,"width":25,"height":15,"neighbors":{},"doors_config":{},"coord":Vector2i.ZERO,"visited":false,"initialized":false}],"maps":[]}
-	if tutorial:tower["rooms"][0]["layout"]=_tutorial_layout()
+	if tutorial:
+		var tutorial_room:Dictionary=tower["rooms"][0]
+		tutorial_room["layout"]=_tutorial_layout()
+		tutorial_room["width"]=24
+		tutorial_room["height"]=9
 	_reset_player(Vector2(300,896));_enter_room(0)
 	if tutorial:
 		upgrades={"count":0,"power":0.0,"reach":0.0,"haste":0.0,"charge":0.0,"shots":0,"subpower":0.0}
@@ -3856,6 +3860,7 @@ func _enter_practice(tutorial:bool=false) -> void:
 	else:_toast("練習房：全部武器、符文與怪物。能量無限，角色無敵。")
 
 const TUTORIAL_STATIONS=["副武器試用","符文領取","動作與特效"]
+const TutorialArt=preload("res://scripts/tutorial_art_v62.gd")
 
 func _tutorial_layout() -> Dictionary:
 	var floor_rect:=Rect2(0,768,2304,96)
@@ -3870,6 +3875,11 @@ func _tutorial_key(action:String) -> String:
 
 func _tutorial_station_position(index:int) -> Vector2:
 	return Vector2(360+index*235,_room_floor())
+
+func _nearby_tutorial_station() -> int:
+	for i in TUTORIAL_STATIONS.size():
+		if Vector2(p["pos"]).distance_squared_to(_tutorial_station_position(i))<85.0*85.0:return i
+	return -1
 
 func _show_tutorial_station(index:int) -> void:
 	match index:
@@ -3928,17 +3938,13 @@ func _tutorial_demo(action:String) -> void:
 		"sub":_begin_secondary()
 
 func _draw_tutorial_stations() -> void:
-	for i in TUTORIAL_STATIONS.size():
-		var at:Vector2=_tutorial_station_position(i)
-		var color:Color=[Color("b3e2f4"),Color("efcd88"),Color("a8ebcd")][i]
-		draw_rect(Rect2(at-Vector2(87,101),Vector2(174,70)),Color(.035,.075,.08,.94))
-		draw_rect(Rect2(at-Vector2(87,101),Vector2(174,70)),Color(color,.65),false,2)
-		draw_rect(Rect2(at-Vector2(33,10),Vector2(66,10)),color)
-		_text(at-Vector2(60,72),TUTORIAL_STATIONS[i],20,color)
-		_text(at-Vector2(60,46),"按 %s 互動"%_tutorial_key("up"),15,Color.WHITE)
-	_text(Vector2(118,_room_floor()-130),"新手教學 · 由左往右探索",22,Color("b9f5d6"))
-	_text(Vector2(118,_room_floor()-103),"在這裡可以安全試打，能量會自動補滿。",16,Color.WHITE)
-	_text(Vector2(1270,_room_floor()-255),"試打區 · 怪物無害，擊倒後 3 秒重生",20,Color("b9f5d6"))
+	var index:int=_nearby_tutorial_station()
+	if index>=0 and not ui.is_panel_open():
+		var at:Vector2=_tutorial_station_position(index)+Vector2(0,14)
+		var prompt:String="%s · 按 %s 互動"%[TUTORIAL_STATIONS[index],_tutorial_key("up")]
+		var width:float=font.get_string_size(prompt,HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
+		draw_rect(Rect2(at-Vector2(width*.5+9,0),Vector2(width+18,25)),Color("#101c1aee"))
+		_text(at+Vector2(-width*.5,17),prompt,15,Color("edf8de"))
 	for en in enemies:
 		if en.has("tutorial_respawn") and float(en["hp"])<=0:
 			_text(Vector2(en["anchor"])-Vector2(37,24),"%.1f 秒"%float(en["tutorial_respawn"]),16,Color("b9f5d6"))
@@ -4045,6 +4051,8 @@ func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
 
 func _paint_static_props(c:CanvasItem) -> void:
 	if screen!="game":return
+	if lab_mode=="tutorial":
+		for i in TUTORIAL_STATIONS.size():TutorialArt.draw_station(c,i,_tutorial_station_position(i))
 	for prop:Dictionary in props:
 		if prop.get("used",false):continue
 		if _is_start() and prop["kind"] in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:preload("res://scripts/scene_art_v33.gd").station(c,str(_ecology()["id"]),prop["kind"],prop["pos"],preload("res://scripts/world_placement_v27.gd").prop_base())
