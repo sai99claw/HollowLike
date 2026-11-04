@@ -85,45 +85,80 @@ static func boss(biome_id: String) -> Dictionary:
 	var movements: Array[String] = []
 	match selected:
 		"sky":
-			result.merge({"id":"sky_gale_falcon","name":"逐霆隼王","hp":72.0,"speed":112.0,"move":"fly","color":Color("b9e3f4"),"movement_logic":"roam"},true)
-			movements.assign(["hover","drift"])
-			attacks.append(attack("flying_slash",{"name":"裂風爪襲","size":30,"range":850,"speed":330,"count":2,"damage":1,"piercing":true,"spread":.28,"windup":.85,"active":.25,"recovery":.90,"origin_y":-60,"color":Color("b9e3f4"),"style_id":"cloud_crescent","animation_role":"melee"}))
-			attacks.append(attack("linear",{"name":"雷羽梭","size":10,"range":1050,"speed":440,"count":3,"damage":1,"spread":.18,"windup":1.0,"active":.15,"recovery":.85,"origin_y":-65,"color":Color("d8edff"),"style_id":"storm_feather"}))
+			result.merge({"id":"sky_gale_falcon","name":"逐霆隼王","hp":72.0,"speed":115.0,"move":"fly","color":Color("b9e3f4"),"movement_logic":"roam"},true)
+			movements.assign(["drift","hover","dash"])
+			attacks.append(_boss_attack(selected,0,"slash","掠空雙爪","cloud_crescent",{"size":49,"range":170,"count":2,"damage":1,"windup":.65,"active":.3,"origin_y":-40,"animation_role":"melee"}))
+			attacks.append(_boss_attack(selected,1,"linear","暴風翎槍","storm_feather",{"size":24,"range":1100,"speed":620,"damage":2,"windup":1.15,"origin_y":-65,"boss_tell":"ray"}))
+			attacks.append(_boss_attack(selected,2,"flying_slash","散翼風刃","cloud_crescent",{"size":26,"range":720,"speed":255,"count":3,"spread":.24,"damage":1,"windup":.95,"origin_y":-65,"boss_tell":"ray"}))
 		"canopy":
-			result.merge({"id":"canopy_mantis_queen","name":"綾冠螳后","hp":80.0,"speed":105.0,"color":Color("b7d992")},true)
-			movements.assign(["jump","dash"])
-			attacks.append(attack("slash",{"name":"新月雙鐮","size":42,"range":195,"count":2,"damage":1,"windup":.75,"active":.24,"recovery":.8,"origin_y":-58,"color":Color("d3edab"),"style_id":"mantis_shear"}))
-			attacks.append(attack("flying_slash",{"name":"迴葉月刃","size":24,"range":850,"speed":320,"count":1,"damage":1,"piercing":true,"return_after":1.0,"windup":.85,"active":.15,"recovery":.75,"origin_y":-70,"color":Color("d4d58b"),"style_id":"leaf_moon"}))
+			result.merge({"id":"canopy_mantis_queen","name":"綾冠螳后","hp":80.0,"speed":108.0,"color":Color("b7d992")},true)
+			movements.assign(["jump","walk","dash"])
+			attacks.append(_boss_attack(selected,0,"slash","剪冠雙鐮","mantis_shear",{"size":48,"range":196,"count":2,"damage":1,"windup":.73,"active":.3,"origin_y":-58}))
+			attacks.append(_boss_attack(selected,1,"flying_slash","折返葉刃","leaf_moon",{"size":27,"range":850,"speed":335,"count":2,"spread":.20,"damage":1,"piercing":true,"return_after":.8,"windup":.9,"origin_y":-68,"boss_tell":"ray"}))
+			attacks.append(_boss_attack(selected,2,"slash","伏鐮穿冠","mantis_shear",{"size":38,"range":345,"ram":true,"ram_speed":560,"damage":2,"windup":1.08,"active":.65,"recovery":.92,"origin_y":-58,"boss_tell":"ram"}))
 		"branches":
-			result.merge({"id":"bough_nest_weaver","name":"織巢蛛母","hp":76.0,"speed":85.0,"move":"walk","color":Color("c6b4e1"),"movement_logic":"roam"},true)
+			result.merge({"id":"bough_nest_weaver","name":"織巢蛛母","hp":76.0,"speed":91.0,"color":Color("c6b4e1"),"movement_logic":"roam"},true)
 			movements.assign(["walk","jump"])
-			attacks.append(attack("slash",{"name":"斷枝刺繡","size":35,"range":185,"count":2,"damage":1,"windup":.9,"active":.28,"recovery":1.0,"origin_y":-52,"color":Color("dccbf4"),"style_id":"silk_stitch"}))
-			attacks.append(attack("arc",{"name":"結網繭彈","size":18,"range":740,"speed":290,"count":1,"damage":1,"windup":1.1,"active":.15,"recovery":.9,"origin_y":-52,"color":Color("dccbf4"),"style_id":"silk_cocoon"}))
-			attacks.append(attack("trap",{"name":"結網封路","size":62,"range":510,"count":2,"damage":1,"max_hits":2,"hit_interval":.85,"lifetime":4.3,"arming_time":.7,"windup":1,"active":.12,"recovery":.9,"origin_y":0,"color":Color("d7c2ed"),"style_id":"silk_web"}))
+			attacks.append(_boss_attack(selected,0,"slash","撐足刺擊","silk_stitch",{"size":35,"range":176,"count":2,"damage":1,"windup":.72,"active":.26,"origin_y":-51}))
+			attacks.append(_boss_attack(selected,1,"linear","穿枝束絲","silk_cocoon",{"size":18,"range":830,"speed":510,"count":2,"spread":0.0,"damage":2,"windup":1.08,"origin_y":-52,"boss_tell":"ray"}))
+			attacks.append(_boss_attack(selected,2,"trap","三節封網","silk_web",{"size":53,"range":510,"count":3,"damage":1,"max_hits":2,"hit_interval":.85,"lifetime":4.3,"arming_time":.86,"windup":1.05,"origin_y":0}))
 		"trunk":
-			result.merge({"id":"trunk_amber_stag","name":"琥珀鍬皇","hp":90.0,"speed":88.0,"color":Color("d6a578")},true)
-			movements.assign(["walk","dash"])
-			attacks.append(attack("slash",{"name":"鎖木巨鉗","size":45,"range":205,"count":1,"damage":2,"windup":1.05,"active":.30,"recovery":1.1,"origin_y":-55,"color":Color("f1c28c"),"style_id":"amber_pincers"}))
-			attacks.append(attack("arc",{"name":"琥珀榴彈","size":20,"range":1000,"speed":330,"count":1,"damage":1,"gravity":600,"launch_y":-310,"windup":1.15,"active":.15,"recovery":1,"origin_y":-55,"color":Color("ddb081"),"style_id":"amber_resin"}))
+			result.merge({"id":"trunk_amber_stag","name":"琥珀鍬皇","hp":90.0,"speed":81.0,"color":Color("d6a578")},true)
+			movements.assign(["walk","dash","jump"])
+			attacks.append(_boss_attack(selected,0,"slash","鍬角夾擊","amber_pincers",{"size":46,"range":182,"damage":2,"windup":.95,"active":.24,"origin_y":-49,"boss_tell":"cleave"}))
+			attacks.append(_boss_attack(selected,1,"arc","碎琥珀榴彈","amber_resin",{"size":25,"range":760,"speed":355,"damage":2,"gravity":630,"launch_y":-300,"explode_on_hit":true,"explosion_radius":105,"windup":1.25,"origin_y":-55,"boss_tell":"arc"}))
+			attacks.append(_boss_attack(selected,2,"slash","低角破木","amber_pincers",{"size":43,"range":340,"ram":true,"ram_speed":485,"damage":2,"windup":1.12,"active":.73,"recovery":.95,"origin_y":-54,"boss_tell":"ram"}))
 		"grass":
-			result.merge({"id":"grass_dew_toad","name":"露冠蟾王","hp":84.0,"speed":70.0,"color":Color("b4cc83"),"movement_logic":"roam","jump_speed":590.0},true)
+			result.merge({"id":"grass_dew_toad","name":"露冠蟾王","hp":84.0,"speed":68.0,"color":Color("b4cc83"),"movement_logic":"roam","jump_speed":600.0},true)
 			movements.assign(["jump","walk"])
-			attacks.append(attack("slash",{"name":"蘆槍橫掃","size":38,"range":185,"damage":1,"windup":.95,"active":.28,"recovery":.95,"origin_y":-45,"color":Color("b7dfd4"),"style_id":"reed_slash"}))
-			attacks.append(attack("linear",{"name":"露泡浮雷","size":23,"range":700,"speed":125,"count":2,"damage":1,"wave_amplitude":35,"wave_frequency":4,"windup":1,"active":.15,"recovery":.85,"origin_y":-45,"color":Color("c4ece5"),"style_id":"dew_bubble"}))
-			attacks.append(attack("trap",{"name":"露環苗床","size":48,"range":500,"count":3,"damage":1,"max_hits":3,"hit_interval":.9,"lifetime":4.5,"arming_time":.8,"windup":1,"active":.12,"recovery":.95,"origin_y":0,"color":Color("b9d5b9"),"style_id":"dew_pool"}))
+			attacks.append(_boss_attack(selected,0,"slash","長舌點刺","reed_slash",{"size":26,"range":206,"damage":1,"windup":.76,"active":.17,"origin_y":-48,"shape":"thrust","boss_tell":"cleave"}))
+			attacks.append(_boss_attack(selected,1,"linear","浮沫氣泡","dew_bubble",{"size":21,"range":655,"speed":140,"count":3,"spread":.14,"damage":1,"wave_amplitude":26,"wave_frequency":4,"windup":.92,"origin_y":-44}))
+			attacks.append(_boss_attack(selected,2,"explosion","鼓腹震地","dew_pool",{"size":162,"range":162,"damage":2,"windup":1.18,"recovery":1.15,"boss_tell":"burst","animation_role":"melee"}))
 		"underground":
-			result.merge({"id":"underroot_blind_mole","name":"盲根掘王","hp":96.0,"speed":82.0,"color":Color("9fbed3"),"dash_speed":350.0},true)
+			result.merge({"id":"underroot_blind_mole","name":"盲根掘王","hp":96.0,"speed":85.0,"color":Color("9fbed3")},true)
 			movements.assign(["walk","dash"])
-			attacks.append(attack("slash",{"name":"裂根掘爪","size":40,"range":190,"damage":1,"windup":.9,"active":.26,"recovery":1,"origin_y":-48,"color":Color("a9d1dd"),"style_id":"root_claw"}))
-			attacks.append(attack("flying_slash",{"name":"根鑽螺彈","size":24,"range":900,"speed":270,"count":2,"damage":1,"piercing":true,"spread":0,"windup":1.05,"active":.15,"recovery":.9,"origin_y":-24,"color":Color("a9d1dd"),"style_id":"root_wave"}))
-			attacks.append(attack("trap",{"name":"根刺破土","size":42,"range":560,"count":3,"damage":1,"max_hits":2,"hit_interval":.8,"lifetime":3.8,"arming_time":.75,"windup":1.1,"active":.12,"recovery":1,"origin_y":0,"color":Color("b2d5d1"),"style_id":"root_spike"}))
-	for definition:Dictionary in attacks:definition["boss_biome"]=selected
+			attacks.append(_boss_attack(selected,0,"slash","翻岩掘爪","root_claw",{"size":48,"range":182,"damage":1,"windup":.78,"active":.26,"origin_y":-46}))
+			attacks.append(_boss_attack(selected,1,"flying_slash","雙向裂地","root_wave",{"size":26,"range":830,"speed":370,"count":2,"damage":2,"piercing":true,"spread":0.0,"windup":1.08,"origin_y":-26,"boss_tell":"ray"}))
+			attacks.append(_boss_attack(selected,2,"trap","鑽土根陣","root_spike",{"size":42,"range":540,"count":3,"damage":1,"max_hits":2,"hit_interval":.8,"lifetime":3.8,"arming_time":.85,"windup":1.07,"origin_y":0}))
 	var widths:Dictionary={"sky":96.0,"canopy":84.0,"branches":144.0,"trunk":150.0,"grass":144.0,"underground":160.0}
 	result["body_size"]=Vector2(float(widths[selected]),34.0*42.0*8.0/float(widths[selected]))
 	result["movements"] = movements
 	result["attacks"] = attacks
 	Design.decorate_boss(result)
+	for definition:Dictionary in attacks:definition["color"]=result["color"]
+	result["movements"]=movements.filter(func(movement:String)->bool:return movement!="dash" or selected not in ["branches","grass"])
+	var pacing:Dictionary={
+		"sky":{"hover_height":175.0,"dash_speed":540.0,"dash_windup":.94,"dash_duration":.55,"dash_cooldown":5.2},
+		"canopy":{"jump_speed":595.0,"dash_speed":490.0,"dash_windup":.68,"dash_cooldown":4.3},
+		"branches":{"jump_speed":410.0,"roam_radius":290.0,"movement_period":3.25},
+		"trunk":{"jump_speed":385.0,"dash_speed":420.0,"dash_windup":.96,"dash_duration":.62,"dash_cooldown":5.5},
+		"grass":{"jump_speed":600.0,"roam_radius":180.0,"movement_period":3.8},
+		"underground":{"dash_speed":470.0,"dash_windup":.88,"dash_duration":.62,"dash_cooldown":5.0}}
+	result.merge(pacing[selected],true)
 	return result
+
+
+static func _boss_attack(biome:String,slot:int,kind:String,title:String,style:String,settings:Dictionary) -> Dictionary:
+	var params:Dictionary={"name":title,"style_id":style,"boss_biome":biome,"boss_sound":"%s_%d"%[biome,slot],"attack_cooldown":1.2,"recovery":.88}
+	params.merge(settings,true)
+	return attack(kind,params)
+
+
+static func boss_phase_two(en:Dictionary) -> Dictionary:
+	var biome:String=str(en["biome"])
+	var definition:Dictionary
+	match biome:
+		"sky":definition=_boss_attack(biome,3,"linear","折翼雷列","storm_feather",{"size":17,"range":930,"speed":495,"count":5,"spread":.14,"damage":1,"windup":1.18,"origin_y":-68,"boss_tell":"ray"})
+		"canopy":definition=_boss_attack(biome,3,"flying_slash","雙層返刃","leaf_moon",{"size":28,"range":900,"speed":370,"count":3,"spread":.24,"damage":1,"windup":1.03,"origin_y":-66,"return_after":.74,"boss_tell":"ray"})
+		"branches":definition=_boss_attack(biome,3,"arc","蛛絲流星","silk_cocoon",{"size":22,"range":750,"speed":310,"gravity":620,"launch_y":-215,"count":2,"spread":.24,"damage":2,"windup":1.15,"origin_y":-52,"boss_tell":"arc"})
+		"trunk":definition=_boss_attack(biome,3,"linear","琥珀碎槍","amber_resin",{"size":25,"range":915,"speed":530,"count":2,"spread":.18,"damage":2,"windup":1.22,"origin_y":-55,"boss_tell":"ray"})
+		"grass":definition=_boss_attack(biome,3,"trap","落露泥沼","dew_pool",{"size":54,"range":460,"count":3,"damage":1,"arming_time":.9,"lifetime":4.0,"windup":1.04,"origin_y":0})
+		_:definition=_boss_attack(biome,3,"slash","潛鑽破根","root_claw",{"size":46,"range":365,"ram":true,"ram_speed":510,"damage":2,"windup":1.12,"active":.7,"origin_y":-46,"boss_tell":"ram"})
+	definition["visual_id"]=Design.BOSS_VISUALS.get(definition["style_id"],"root_spear")
+	definition["hazard_visual_id"]=definition["visual_id"]
+	definition["color"]=en["color"]
+	if definition["library_kind"]=="trap":definition["hp"]=1.0
+	return definition
 
 
 static func attach_regular(en: Dictionary) -> void:

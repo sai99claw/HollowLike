@@ -46,7 +46,8 @@ func run() -> void:
 	for side in [-1,1]:
 		for vy in [-300.0,0.0,30.0]:
 			reset(game,Vector2(700-side*17,600));game.solids.assign([Rect2(700 if side>0 else 604,0,96,1050)]);game.p["grounded"]=false;game.p["vel"]=Vector2(0,vy);game._update_player(.01)
-			check(game.p["wall"]==side and game.p["wall_hold_left"]>0,"At least51percent wall contact latches during ascent or apex on either side")
+			if vy<0:check(game.p["wall"]==0,"A rising jump does not attach to walls")
+			else:check(game.p["wall"]==side and game.p["wall_hold_left"]>0,"Wall contact attaches at the apex or on descent")
 		reset(game,Vector2(700-side*17,600));game.solids.assign([Rect2(700 if side>0 else 604,0,96,1050)]);game.p["grounded"]=false;game.p["vel"]=Vector2(0,250);game._update_player(.01)
 		check(game.p["wall"]==side and game.p["vel"].y==0 and game.p["wall_hold_left"]>0,"Falling wall contact begins the one-second hold before36px/sec slide")
 		reset(game,Vector2(700-side*40,600));game.solids.assign([Rect2(700 if side>0 else 604,0,96,1050)]);game.p["grounded"]=false;game.p["face"]=side;game.clock+=2;game._dash_pressed();game._update_player(.08)
@@ -64,11 +65,11 @@ func run() -> void:
 	game.rune_slots.resize(16);game.rune_slots.fill(Data.RUNES[0]["id"]);game._give_drop("rune",1)
 	check(game.rune_slots.count(Data.RUNES[1]["id"])==0 and int(game.bag_runes[Data.RUNES[1]["id"]])==1,"Full small board stores the pickup instead of replacing a rune")
 	game._give_drop("rune",Data.RUNES.size());check(game.strong_slots.size()==1,"Strong rune pickup independently fills its large slot")
-	game._set_map_held(true);game._set_action("right",true);check(game.minimap_full_tower,"Held Tab plus right switches to full tower")
+	game._cycle_map();game._cycle_map();game._cycle_map();check(game.minimap_page==2,"Third map press switches to full tower")
 	var overview:Array=TowerMap.full_tower_layout(game.tower,Rect2(180,155,915,422));var rooms:int=0
 	for chapter:Dictionary in overview:rooms+=chapter["graph"]["points"].size()
 	check(overview.size()==6 and rooms==game.tower["rooms"].size(),"Full tower overview includes every chapter and room")
-	game._set_action("left",true);check(not game.minimap_full_tower,"Left switches back without moving the player");game._set_map_held(false)
+	game._set_action("left",true);check(game.minimap_page==1,"Left switches back without moving the player");game._set_map_held(false)
 	reset(game,Vector2(700,1040));game.layout["pool"]=Rect2(400,1000,600,100);game.room["spring"]=true;game._set_action("attack",true)
 	check(game.spring_particles.bursts.size()==1 and game.effects.filter(func(e:Dictionary)->bool:return e.has("water_attack")).is_empty(),"Water attack uses native droplets without authored splash sprites")
 	check(game.spring_particles.bursts[0].texture is GradientTexture2D and game.spring_particles.bursts[0].position.y==1000,"Droplets originate on the actual waterline")

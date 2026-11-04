@@ -137,6 +137,10 @@ static func draw_charge(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=T
 	var color:Color=en.get("color",Color("d5dba2"))
 	c.draw_set_transform_matrix(base)
 	if phase=="windup":
+		if Appearance.is_boss(en):
+			var endpoint:Vector2=at+dir*float(en["dash_speed"])*float(en["dash_duration"])
+			c.draw_line(at,endpoint,Color(1,.32,.13,.20),25,true)
+			c.draw_line(at,endpoint,Color("ffdfa3"),2,true)
 		var progress:float=1-float(en.get("charge_left",0))/maxf(.01,float(en.get("dash_windup",.6)))
 		for i in 5:
 			var angle:float=time*3+i*TAU/5;var distance:float=lerpf(34,8,fmod(progress+float(i)*.2,1))

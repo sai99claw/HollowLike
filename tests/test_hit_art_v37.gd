@@ -16,6 +16,10 @@ func run() -> void:
 		for f:Dictionary in d["animations"][kind]:distinct[str(f["source_rect"])]=true
 		check(distinct.size()==3,"Each hit pose selects its own cell")
 	check(Mantle.info()["frames"].size()==4 and ResourceLoader.exists(Mantle.ROOT+Mantle.info()["path"]),"Four-pose mantle artwork is exported")
+	check(Hit.feather_frame(62499)==0 and Hit.feather_frame(62500)==1 and Hit.feather_frame(125000)==-1,"Two feather frames last 1/16 second each")
+	var crescent=preload("res://scripts/clean_crescent_v39.gd")
+	var scale:Vector2=crescent.pose(Vector2.ZERO,0,1475).get_scale().abs()
+	check(scale.is_equal_approx(Vector2(.85,1.20)) and Hit.CRESCENT_DURATION_USEC==125000,"Crescent is narrower, longer and lasts 1/8 second")
 	var feedback:=Feedback.new();root.add_child(feedback)
 	for i in 10:feedback.hit({},Vector2(500,300),Vector2.RIGHT,"quick",false)
 	var angles:Dictionary={}
@@ -25,7 +29,7 @@ func run() -> void:
 		check(is_equal_approx(f["length"],1280.0/3),"Crescent long axis is one-third screen width")
 		check(absf(angle_difference(f["angle"],0))<=.241,"Crescent angle jitter stays restrained")
 	check(angles.size()>1 and feedback.bursts.is_empty(),"Hits vary angle without emitting old enemy-body ghost copies")
-	feedback.step(.19);check(feedback.flashes.is_empty(),"Transient VFX expire rather than accumulating")
+	feedback.step(.26);check(feedback.flashes.is_empty(),"Transient VFX expire rather than accumulating")
 	for biome:String in ["underground","trunk","sky"]:
 		for row in 5:
 			var actor:Dictionary={"roster_id":"test","roster_row":row,"roster_elite":false,"roster_biome":biome,"vel":Vector2(50,0),"pos":Vector2(500,500),"face":1.0,"attack":Attack.new()};var seen:Dictionary={}
@@ -39,5 +43,16 @@ func run() -> void:
 	game.effects.clear();game.combat_feedback.clear();game._hit_enemy({"hp":100.0,"training":true,"pos":Vector2(500,500)},1,Color.WHITE)
 	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Training targets use the same new impact with no old body-centered animation")
 	game.effects.clear();game.combat_feedback.clear();game.props.assign([{"kind":"dummy","pos":Vector2(500,500),"used":false,"hurt":0.0}]);game._hit_props(Rect2(450,420,100,100),1,99)
-	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Station dummies also show the three-frame feather impact")
+	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Station dummies also show the two-frame feather impact")
+	game._enter_practice(true)
+	game._begin_primary({"dir":"right","charged":false})
+	check(game.p_attack.is_active() and game.p_attack.attack["windup"]==0.0,"Primary attack starts active")
+	var target:Dictionary=game.enemies[0]
+	game._hit_enemy(target,.01,Color.WHITE)
+	var frozen_pose:float=game._enemy_pose_clock(target)
+	game.draw_clock+=.1
+	game._update_enemies_profiled_body(.1)
+	check(is_equal_approx(target["impact_freeze_left"],.025) and game._enemy_pose_clock(target)==frozen_pose and game.hitstop==0,"Only the struck enemy pose freezes")
+	game._update_enemies_profiled_body(.025)
+	check(is_zero_approx(target["impact_freeze_left"]),"Enemy resumes after 1/8 second")
 	game.queue_free();feedback.queue_free();await process_frame;print("v37 hit and animation checks: ",failures);quit(0 if failures.is_empty() else 1)

@@ -39,7 +39,7 @@ func run() -> void:
 				var boss:Dictionary=tower["rooms"][stage["boss_id"]];var next:Dictionary=tower["rooms"][tower["maps"][stage["index"]+1]["start_id"]]
 				check(boss["neighbors"].get("left",-1)==next["id"] or boss["neighbors"].get("right",-1)==next["id"],"Boss horizontal exit directly joins next Start")
 		for room:Dictionary in tower["rooms"]:
-			check(room["width"] in Tower.WIDTHS and room["height"] in Tower.HEIGHTS and room["width"]>room["height"],"Random odd horizontal room bounds")
+			check(int(room["width"])%2==1 and int(room["height"])%2==1 and room["width"]>=17 and room["height"]>=11 and room["width"]>room["height"],"Random odd horizontal room bounds")
 			dimensions[Vector2i(room["width"],room["height"])]=true
 			check(room["biome_id"]==Ecology.from_stage(room["map_index"])["id"],"Two stages per ecology")
 			for direction in room["neighbors"]:

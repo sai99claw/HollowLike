@@ -3,6 +3,10 @@ extends RefCounted
 const ROOT="res://assets/home_v13/"
 const LEFT_GATE:=Rect2(80,315,240,285)
 const RIGHT_GATE:=Rect2(960,315,240,285)
+# Default pogo + air jump reaches feet Y=42 against the nest ceiling.
+const ROGUE_PLATFORM_Y:float=64.44+50.0
+const ROGUE_PLATFORM:=Rect2(505,ROGUE_PLATFORM_Y,270,9)
+const ROGUE_GATE:=Rect2(600,ROGUE_PLATFORM_Y-78,80,78)
 static var textures:Dictionary={}
 static func texture(id:String) -> Texture2D:
 	if not textures.has(id):
@@ -14,9 +18,13 @@ static func texture(id:String) -> Texture2D:
 static func background(c:CanvasItem) -> void:
 	preload("res://scripts/home_visual_v33.gd").background(c)
 static func gates(c:CanvasItem,time:float,player:Vector2) -> void:
-	for entry in [["musou",LEFT_GATE,Color("ffd887")],["rogue",RIGHT_GATE,Color("9cdcf3")]]:
+	var home_visual=preload("res://scripts/home_visual_v33.gd")
+	home_visual.prop(c,"rogue",Vector2(ROGUE_GATE.get_center().x,ROGUE_PLATFORM_Y),Vector2(61,78))
+	c.draw_rect(ROGUE_PLATFORM,Color("393138"))
+	c.draw_line(ROGUE_PLATFORM.position,Vector2(ROGUE_PLATFORM.end.x,ROGUE_PLATFORM.position.y),Color("c4a279"),3)
+	for entry in [["musou",LEFT_GATE,Color("ffd887")],["rogue",RIGHT_GATE,Color("a4f3cf")]]:
 		var box:Rect2=entry[1];var near:bool=absf(player.x-box.get_center().x)<100
-		preload("res://scripts/home_visual_v33.gd").gate(c,str(entry[0]),Vector2(box.get_center().x,600))
+		home_visual.gate(c,str(entry[0]),Vector2(box.get_center().x,600))
 		if near:
 			var center:=Vector2(box.get_center().x,box.end.y-85)
 			for i in 6:

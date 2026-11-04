@@ -23,6 +23,8 @@ static func build(ui,game,category:String) -> void:
 			Station._button(ui,right,"操作說明","help",null,"settings:help")
 		"display":
 			Station._text(ui,right,"畫面與聲音",22,ui.GOLD)
+			Station._button(ui,right,"放大填滿"+(" ✓" if game.display_fit=="cover" else ""),"display_fit","cover","settings:cover")
+			Station._button(ui,right,"縮小完整"+(" ✓" if game.display_fit=="contain" else ""),"display_fit","contain","settings:contain")
 			Station._button(ui,right,"特效量："+("精簡" if game.low_effects else "標準"),"effects",null,"settings:effects")
 			Station._button(ui,right,"音樂與音效："+("開" if game.audio_enabled else "關"),"audio",null,"settings:audio")
 			Station._text(ui,right,"精簡模式保留投射物軌跡、命中回饋與地面燃燒。",15)
@@ -38,6 +40,11 @@ static func build(ui,game,category:String) -> void:
 			Station._text(ui,right,"冒險與進度",22,ui.GOLD)
 			var links:=HBoxContainer.new();links.add_theme_constant_override("separation",8);right.add_child(links)
 			for entry:Array in [["技能樹","skills"],["全塔地圖","map"],["造型工坊","shop"]]:Station._button(ui,links,entry[0],entry[1],null,"settings:"+str(entry[1]))
+			if game.lab_mode=="tutorial":
+				Station._button(ui,right,"教學與武器","tutorial_guide",null,"settings:tutorial")
+				Station._button(ui,right,"返回鳥巢","hub",null,"settings:hub")
+				ui.call_deferred("focus_first")
+				return
 			Station._text(ui,right,"開始新冒險",18,ui.MINT);Station._text(ui,right,"以下選擇會重置本次局內進度，永久收藏保留。",14)
 			Station._button(ui,right,"無雙夢境 · 轉頭起飛鴿子","start_musou",null,"settings:musou")
 			Station._button(ui,right,"Roguelike · 戰士鴿子","start_rogue",null,"settings:rogue")

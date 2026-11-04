@@ -1,7 +1,7 @@
 extends RefCounted
 ## Main and backup keep the existing plain JSON format. Only validated data
 ## can become a new checkpoint; interrupted writes stay in the .tmp file.
-const SCHEMA={"coins":0,"runes":{},"skills":[],"attempts":0,"skins":[],"skin":0,"best_map":0,"rd_tuning":{},"items":{},"weapons":[],"records":[],"blueprints":[],"settings":{}}
+const SCHEMA={"coins":0,"runes":{},"skills":[],"attempts":0,"skins":[],"skin":0,"best_map":0,"rd_tuning":{},"items":{},"weapons":[],"records":[],"blueprints":[],"trophies":{},"settings":{}}
 static var blocked_paths:Dictionary={}
 
 static func valid(data:Variant, _defaults:Dictionary) -> bool:
@@ -21,6 +21,10 @@ static func valid(data:Variant, _defaults:Dictionary) -> bool:
 			if not entry is Dictionary:return false
 	for key in ["skills","blueprints"]:
 		for entry in data.get(key,[]):
+			if not entry is String:return false
+	for collection:Variant in data.get("trophies",{}).values():
+		if not collection is Array:return false
+		for entry in collection:
 			if not entry is String:return false
 	return true
 

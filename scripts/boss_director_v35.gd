@@ -90,3 +90,63 @@ static func attack_definition(en:Dictionary,definition:Dictionary) -> Dictionary
 		elif result["library_kind"]=="flying_slash":
 			result["spread"]=.24 if phase==2 else .38
 	return result
+
+
+static func draw_tell(c:CanvasItem,en:Dictionary,definition:Dictionary,progress:float,base:Transform2D,world_speed:float=.8) -> bool:
+	var tell:String=definition.get("boss_tell","")
+	if tell.is_empty():return false
+	var origin:Vector2=Vector2(en["pos"])+Vector2(0,float(definition["origin_y"]))
+	var color:Color=Color("ffe6b5",.58+progress*.38)
+	var span:float=float(definition["range"])
+	var radius:float=float(definition["size"])
+	c.draw_set_transform_matrix(base)
+	if tell=="burst":
+		origin=Vector2(en["pos"])-Vector2(0,25)
+		c.draw_circle(origin,span,Color(.95,.43,.22,.10+.12*progress),true,-1,true)
+		c.draw_arc(origin,span,0,TAU,48,color,2.0,true)
+		c.draw_arc(origin,span*progress,0,TAU,48,Color(color,.45),2.0,true)
+	elif tell in ["cleave","ram"]:
+		var direction:=Vector2(float(en["face"]),0)
+		if tell=="ram":span=float(definition["ram_speed"])*float(definition["active"])*world_speed
+		_tell_stroke(c,PackedVector2Array([origin,origin+direction*span]),radius,color)
+	else:
+		var aim:Vector2=Vector2(definition.get("aim",Vector2.RIGHT)).normalized()
+		if aim.is_zero_approx():aim=Vector2.RIGHT
+		var count:int=int(definition["count"])
+		var spread:float=float(definition["spread"])
+		var horizontal:bool=definition.get("style_id","")=="root_wave"
+		for i in count:
+			var offset:float=float(i)-float(count-1)*.5
+			var heading:Vector2=Vector2.RIGHT if horizontal and i%2==0 else (Vector2.LEFT if horizontal else aim.rotated(offset*spread))
+			var start:Vector2=origin
+			if spread==0 and count>1 and not horizontal:start+=aim.orthogonal()*offset*radius*2.1
+			var points:=PackedVector2Array([start])
+			if tell=="arc":
+				var velocity:Vector2=heading*float(definition["speed"])+Vector2(0,float(definition["launch_y"]))
+				var gravity:float=float(definition["gravity"])
+				var flight:float=minf(1.15,span/maxf(1.0,velocity.length()))
+				for j in range(1,15):
+					var t:float=flight*float(j)/14.0
+					points.append(start+velocity*t+Vector2(0,.5*gravity*t*t))
+			else:points.append(start+heading*span)
+			_tell_stroke(c,points,radius,color)
+	return true
+
+
+static func _tell_stroke(c:CanvasItem,points:PackedVector2Array,radius:float,color:Color) -> void:
+	c.draw_polyline(points,Color(.98,.35,.16,.19),maxf(8.0,radius*1.1),true)
+	c.draw_polyline(points,color,2.5,true)
+	c.draw_circle(points[-1],4,color,true,-1,true)
+
+
+static func play_attack(host:Node,definition:Dictionary) -> void:
+	var key:String=definition.get("boss_sound","")
+	if key.is_empty():return
+	var path:String="res://assets/v55/boss_sounds/"+key+".mp3"
+	if not ResourceLoader.exists(path):return
+	var voice:=AudioStreamPlayer.new()
+	voice.stream=load(path)
+	voice.volume_db=-10
+	host.add_child(voice)
+	voice.finished.connect(voice.queue_free)
+	voice.play()

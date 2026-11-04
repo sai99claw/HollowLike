@@ -2,11 +2,16 @@ class_name PracticeRDV22
 extends Control
 signal regenerate(parameters:Dictionary)
 signal closed
-const DEFAULTS:Dictionary={"biome":"trunk","arena":false,"width":21,"height":13,"seed":0,"profile":"terraces","straight_bias":.55,"braid_rate":.45,"plaza_scale":1.0,"enemy_density":0.0,"dead_end_chance":.25}
+const ROOM_TYPES:Array[Array]=[
+	["一般戰鬥房","combat"],["開放練習場","arena"],["菁英房","elite"],["首領房","boss"],
+	["整備房","start"],["商人房","merchant"],["獎勵房","reward"],["尖刺島","spike_islands"],["漂浮香菇房","mushroom_air"]
+]
+const DEFAULTS:Dictionary={"room_kind":"combat","biome":"trunk","arena":false,"width":21,"height":13,"seed":0,"profile":"terraces","straight_bias":.55,"braid_rate":.45,"plaza_scale":1.0,"enemy_density":0.0,"dead_end_chance":.25}
 var draft:Dictionary={}
 var editors:Dictionary={}
 func setup(parameters:Dictionary) -> void:
 	draft=DEFAULTS.duplicate();draft.merge(parameters,true)
+	if parameters.get("arena",false) and not parameters.has("room_kind"):draft["room_kind"]="arena"
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);mouse_filter=Control.MOUSE_FILTER_STOP
 	var skin:=Theme.new();skin.default_font=load("res://assets/Chinese.otf");skin.default_font_size=17;theme=skin
 	var backing:=ColorRect.new();backing.color=Color(.02,.05,.06,.93);backing.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(backing)
@@ -17,7 +22,7 @@ func setup(parameters:Dictionary) -> void:
 	var note:=Label.new();note.text="生成會清空房內怪物、屍體與掉落物；你的裝備保留。只影響練習房。";note.add_theme_font_size_override("font_size",14);body.add_child(note)
 	var grid:=GridContainer.new();grid.columns=4;grid.add_theme_constant_override("h_separation",15);grid.add_theme_constant_override("v_separation",12);body.add_child(grid)
 	_choice(grid,"生態系","biome",[["土色地底","underground"],["綠色樹幹","trunk"],["藍色天空","sky"]])
-	_choice(grid,"房型","arena",[["程序探索房",false],["開放練習場",true]])
+	_choice(grid,"房型","room_kind",ROOM_TYPES)
 	_choice(grid,"地形輪廓","profile",[["階梯層岩","terraces"],["雙廳分流","twin_halls"],["洞穴岩柱","pillars"],["大廳豎井","shaft"],["寬闊洞穴","cavern"],["環狀長廊","loops"]])
 	_number(grid,"隨機種子（0 隨機）","seed",0,2000000000,1)
 	_number(grid,"寬度（格）","width",17,25,2);_number(grid,"高度（格）","height",11,17,2)

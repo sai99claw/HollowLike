@@ -45,8 +45,16 @@ func run() -> void:
 	var icon_box:=Rect2(Vector2(display["pos"])-Vector2(24,24),Vector2(48,48))
 	check(not g.layout["one_way"].any(func(platform:Rect2)->bool:return platform.intersects(icon_box)),"Free weapon display no longer intersects a stair platform")
 	check(preload("res://scripts/art_catalog_v16.gd").entry("home:nest")["frames"][0]["path"]=="res://assets/v34/home/nest.png","Art gallery uses the new nest rather than excluded old resource")
-	var world:=Transform2D(0,Vector2(.8,.8),0,Vector2(-150,-50));g.atmosphere.update_view(Vector2(200,100),.8,world,Vector2(800,800),1,1,false)
-	check(g.atmosphere.middle_objects.transform==g.atmosphere.depth_transform(Vector2(200,100),.8,g.Atmosphere.MID_FACTOR),"Middle objects retain complete silhouettes on their own depth plane")
+	var background:Rect2=g._background_rect()
+	for item:Dictionary in g.atmosphere.middle_structures:
+		var bounds:Rect2=item["bounds"]
+		check(is_equal_approx(bounds.end.y,background.end.y) and bounds.size.y<=background.size.y*2/3.0+.001,"Middle objects sit on the background bottom within the height limit")
+	for camera:Vector2 in [Vector2(200,100),Vector2(200,20)]:
+		var far_transform:Transform2D=g.atmosphere.depth_transform(camera,.8,g.Atmosphere.FAR_FACTOR)
+		g.atmosphere.backdrop_transform=far_transform
+		g.atmosphere.update_view(camera,.8,Transform2D.IDENTITY,Vector2(800,800),1,1,false)
+		var edge:=Vector2(0,background.end.y)
+		check(is_equal_approx((g.atmosphere.middle_objects.transform*edge).y,(far_transform*edge).y),"Jump camera keeps middle and far bottom edges aligned")
 	for room:Dictionary in g.tower["rooms"]:
 		if room["type"]!="merchant":continue
 		g._enter_room(room["id"]);await process_frame;check(g.atmosphere.middle_objects.visible and not g.atmosphere.middle_structures.is_empty(),"Merchant middle layer remains visible");break

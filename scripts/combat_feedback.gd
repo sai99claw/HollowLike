@@ -18,10 +18,12 @@ func hit(en:Dictionary,at:Vector2,direction:Vector2,style:String,_killed:bool) -
 	if flashes.size()>=12:flashes.pop_front()
 	at=impact_center(en,at)
 	var spray:Vector2=direction.normalized() if direction.length_squared()>.01 else Vector2.RIGHT
-	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.18,"max":.18,"length":1280.0/3.0,"feathers":true})
+	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.25,"max":.25,"length":1280.0/3.0,"started_usec":Time.get_ticks_usec(),"feathers":true})
 	queue_redraw()
 
 static func impact_center(en:Dictionary,fallback:Vector2) -> Vector2:
+	if en.has("v55_row"):
+		return preload("res://scripts/monster_art_v55.gd").actor_bounds(en,float(en.get("_impact_time",0))).get_center()
 	if en.has("roster_id") and en.has("roster_biome"):
 		return preload("res://scripts/monster_art_v36.gd").actor_bounds(en,float(en.get("_impact_time",0))).get_center()
 	if en.has("pos"):return Vector2(en["pos"])-Vector2(0,Motion.body_size(en).y*.5)
@@ -157,7 +159,7 @@ func update_charge(enabled:bool,at:Vector2,elapsed:float,threshold:float) -> voi
 	queue_redraw()
 func grass_hit(at:Vector2,direction:Vector2,style:String) -> void:
 	if flashes.size()>=12:flashes.pop_front()
-	flashes.append({"at":at,"dir":direction,"style":style,"life":.12,"max":.12,"length":1280.0/3.0,"angle":direction.angle(),"feathers":false})
+	flashes.append({"at":at,"dir":direction,"style":style,"life":.25,"max":.25,"started_usec":Time.get_ticks_usec(),"length":1280.0/3.0,"angle":direction.angle(),"feathers":false})
 
 func set_frozen(frozen:bool,speed:float=1.0) -> void:
 	for child in get_children():

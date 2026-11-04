@@ -1,7 +1,8 @@
 class_name TowerAtmosphere
 extends Node2D
 var profiler:RefCounted
-const NewArt=preload("res://scripts/biome_art_v21.gd")
+const Midground=preload("res://scripts/tower_midground_v51.gd")
+const DepthStyle=preload("res://scripts/depth_style_v32.gd")
 const BiomeArt=preload("res://scripts/biome_art_v15.gd")
 const FX=preload("res://scripts/combat_visual.gd")
 const Sprites=preload("res://scripts/sprite_art.gd")
@@ -13,6 +14,7 @@ const Cache=preload("res://scripts/cached_canvas.gd")
 const MID_FACTOR:float=.42
 const FAR_FACTOR:float=.10
 var room_bounds:Vector2=Vector2(2800,1800)
+var backdrop_transform:=Transform2D.IDENTITY
 var depth_origin:=Vector2.ZERO
 var depth_origin_ready:bool=false
 var middle_objects:Node2D
@@ -95,13 +97,15 @@ func _feathers(depth:int,dark:bool) -> CPUParticles2D:
 	var ramp:=Gradient.new();ramp.offsets=PackedFloat32Array([0,.15,.8,1]);ramp.colors=PackedColorArray([Color(1,1,1,0),Color.WHITE,Color.WHITE,Color(1,1,1,0)]);particle.color_ramp=ramp
 	if depth!=1:particle.material=_near_blur if depth==2 else _blur
 	return particle
-func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=false,quiet:bool=false,layout:Dictionary={}) -> void:
+func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=false,quiet:bool=false,_layout:Dictionary={},background:Rect2=Rect2()) -> void:
 	merchant_room=merchant;quiet_room=quiet;ambient_frame=-1;depth_origin_ready=false
 	biome=ecology_id;room_seed=seed_value;wind=-1 if seed_value%2 else 1;active=enabled
 	rainy=is_rainy(ecology_id,seed_value) and enabled and not merchant_room and not quiet_room
 	for rain in rain_layers:rain.emitting=rainy;rain.visible=rainy
 	_sync_rain_audio()
-	middle_structures=NewArt.middle_plan(seed_value,room_bounds,layout,biome,quiet_room)
+	if not background.has_area():background=DepthStyle.backdrop_rect()
+	middle_structures.clear()
+	if enabled:middle_structures=Midground.plan(biome,seed_value,background)
 	if middle_objects!=null:middle_objects.material=preload("res://scripts/depth_style_v32.gd").material(biome,"middle",effects_reduced)
 	if middle_objects!=null:middle_objects.visible=enabled;middle_objects.invalidate()
 	if far_birds!=null:far_birds.configure(seed_value+319,false)
@@ -144,7 +148,7 @@ func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,play
 	if quiet:
 		for particle in ambient+foreground+mid_particles+rain_layers+[spores]:particle.emitting=false;particle.visible=false;particle.process_mode=Node.PROCESS_MODE_DISABLED
 		focus.visible=false;near_layer.visible=false
-		middle_objects.transform=depth_transform(camera,zoom,MID_FACTOR)
+		middle_objects.transform=_middle_transform(camera)
 		middle.transform=parallax(camera,zoom,MID_FACTOR)
 		return
 	if reduced_mode!=int(reduced):
@@ -156,7 +160,7 @@ func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,play
 		if rain_layers[i].amount!=count:rain_layers[i].amount=count
 	far_birds.update_view(camera,zoom,time)
 	near_dragonflies.update_view(camera,zoom,time)
-	middle_objects.transform=depth_transform(camera,zoom,MID_FACTOR)
+	middle_objects.transform=_middle_transform(camera)
 	middle.transform=parallax(camera,zoom,MID_FACTOR)
 	near_layer.transform=parallax(camera,zoom,1.12)
 	for particle in ambient:
@@ -228,5 +232,11 @@ func _sync_rain_audio() -> void:
 		if not rain_audio.playing:rain_audio.play()
 	else:rain_audio.stop()
 
+func _middle_transform(camera:Vector2) -> Transform2D:
+	var result:Transform2D=backdrop_transform
+	var x_scale:float=result.x.length()
+	result.origin.x=depth_transform(camera,x_scale,MID_FACTOR).origin.x
+	return result
+
 func _paint_middle_objects(c:CanvasItem) -> void:
-	NewArt.draw_middle(c,biome,middle_structures)
+	Midground.draw(c,middle_structures)

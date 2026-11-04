@@ -23,7 +23,9 @@ var playing:bool=true
 var entries:Array[Dictionary]=[]
 var filtered_entries:Array[Dictionary]=[]
 var thumbnail_page:int=0
-var displayed_frames:Array[int]=[]
+var _timeline:Array[Dictionary]=[]
+var _phase_edits:Dictionary={}
+var _phase_id:String="all"
 var _elapsed:float=0
 var _built:bool=false
 var _changing:bool=false
@@ -45,6 +47,10 @@ var _counter:Label
 var _scrubber:HSlider
 var _fps_control:SpinBox
 var _play_button:Button
+var _insert_blank:Button
+var _toggle_hidden:Button
+var _remove_blank:Button
+var _reset_preview:Button
 var _thumbnail_scroll:ScrollContainer
 var _strip:HBoxContainer
 var _page_label:Label
@@ -136,7 +142,13 @@ func _build() -> void:
 	controls.add_child(_button("‹",func()->void:pause();seek_frame(frame_index-1),36));controls.add_child(_button("›",func()->void:pause();seek_frame(frame_index+1),36))
 	_scrubber=HSlider.new();_scrubber.name="FrameScrubber";_scrubber.step=1;_scrubber.min_value=0;_scrubber.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_scrubber.value_changed.connect(func(value:float)->void:if not _changing:pause();seek_frame(int(value)));controls.add_child(_scrubber)
 	_counter=_label("0 / 0",14);_counter.custom_minimum_size.x=65;_counter.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;controls.add_child(_counter)
-	controls.add_child(_label("FPS",13,MUTED));_fps_control=SpinBox.new();_fps_control.name="AnimationFPS";_fps_control.min_value=1;_fps_control.max_value=60;_fps_control.step=1;_fps_control.custom_minimum_size.x=82;_fps_control.value_changed.connect(func(value:float)->void:if not _changing:set_fps(value));controls.add_child(_fps_control)
+	controls.add_child(_label("FPS",13,MUTED));_fps_control=SpinBox.new();_fps_control.name="AnimationFPS";_fps_control.min_value=1;_fps_control.max_value=60;_fps_control.step=.1;_fps_control.custom_minimum_size.x=82;_fps_control.value_changed.connect(func(value:float)->void:if not _changing:set_fps(value));controls.add_child(_fps_control)
+	var edit_controls:=HBoxContainer.new();right.add_child(edit_controls)
+	_insert_blank=_button("後方插入空白幀",insert_blank_frame);edit_controls.add_child(_insert_blank)
+	_toggle_hidden=_button("隱藏此幀",toggle_frame_visibility);edit_controls.add_child(_toggle_hidden)
+	_remove_blank=_button("移除空白幀",remove_blank_frame);edit_controls.add_child(_remove_blank)
+	_reset_preview=_button("還原試播",reset_preview);edit_controls.add_child(_reset_preview)
+	edit_controls.add_child(_label("只影響試播",12,MUTED))
 	var strip_header:=HBoxContainer.new();right.add_child(strip_header)
 	strip_header.add_child(_label("影格順序 · 點選任一格定位",13,MUTED));var spacer:=Control.new();spacer.size_flags_horizontal=Control.SIZE_EXPAND_FILL;strip_header.add_child(spacer)
 	_previous_page=_button("上一頁",func()->void:_change_page(-1),70);strip_header.add_child(_previous_page)
@@ -179,9 +191,10 @@ func _filter() -> void:
 func clear_filters() -> void:
 	_search.text="";_category.select(0);_kind.select(0);_usage.select(0);_filter()
 func _clear_selection() -> void:
-	pause();current_entry={};displayed_frames.clear();frame_index=0;_preview_frame=-1;_preview_id=""
+	pause();current_entry={};_phase_edits.clear();_timeline=[];frame_index=0;_preview_frame=-1;_preview_id=""
 	if _preview==null:return
 	_preview.texture=null;_procedural.hide();_name.text="沒有符合條件的素材";_source.text="";_asset_id.text="";_notes.text="請換個關鍵字，或按「清除全部條件」。";_counter.text="0 / 0";_play_button.disabled=true
+	_update_edit_controls()
 	_changing=true;_scrubber.max_value=0;_scrubber.value=0;_changing=false
 	for child in _strip.get_children():_strip.remove_child(child);child.queue_free()
 	_thumb_buttons.clear();_thumb_indices.clear();_page_label.text="0 / 0";_previous_page.disabled=true;_next_page.disabled=true
@@ -196,7 +209,7 @@ func select_entry(value:Variant) -> void:
 	else:item=Catalog.entry(str(value))
 	if item.is_empty():return
 	current_entry=item;frame_index=0;thumbnail_page=0;_elapsed=0;_preview_frame=-1;_preview_id=""
-	displayed_frames=Catalog.sequence(item);fps=clampf(float(item.get("fps",12)),1,60)
+	_phase_edits.clear();_phase_id="all";_timeline=_original_timeline();fps=clampf(float(item.get("fps",12)),1,60)
 	if not _built:return
 	_changing=true;_fps_control.value=fps;_phase.clear();_phase.add_item("完整動畫");_phase.set_item_metadata(0,"all")
 	for raw in item.get("phases",{}):
@@ -207,19 +220,82 @@ func select_entry(value:Variant) -> void:
 	_name.text=str(item["label"]);_name.tooltip_text=str(item["id"])
 	_source.text=str(item["id"])+"  ·  "+str(item["frames"][0].get("path",""));_source.tooltip_text=_source.text
 	_asset_id.text=str(item["id"])
-	_notes.text=("已使用" if item.get("runtime_usage","")=="used" else "un-used")+" · "+str(item.get("usage_note",""))+"\n"+str(item.get("density_note",""))+"\n"+str(item.get("notes",""));_scrubber.max_value=maxi(0,int(item["frame_count"])-1);_changing=false
-	_play_button.disabled=int(item["frame_count"])<=1;playing=int(item["frame_count"])>1;_play_button.text="暫停" if playing else "播放"
-	_rebuild_thumbnails();_refresh_preview();_filter_selection()
+	_notes.text=("已使用" if item.get("runtime_usage","")=="used" else "un-used")+" · "+str(item.get("usage_note",""))+"\n"+str(item.get("density_note",""))+"\n"+str(item.get("notes",""));_changing=false
+	playing=_timeline.size()>1;_play_button.text="暫停" if playing else "播放"
+	_refresh_timeline();_filter_selection()
 func _filter_selection() -> void:
 	for i in filtered_entries.size():
 		if filtered_entries[i]["id"]==current_entry.get("id",""):_list.select(i);_list.ensure_current_is_visible();break
 func _phase_selected(index:int) -> void:
 	if _changing or current_entry.is_empty():return
-	displayed_frames=Catalog.sequence(current_entry,str(_phase.get_item_metadata(index)));_elapsed=0
-	if not displayed_frames.is_empty():seek_frame(displayed_frames[0])
+	_phase_id=str(_phase.get_item_metadata(index))
+	_timeline=_phase_edits.get(_phase_id,_original_timeline())
+	seek_frame(0)
+	_refresh_timeline()
+
+func _original_timeline() -> Array[Dictionary]:
+	var slots:Array[Dictionary]=[]
+	for source:int in Catalog.sequence(current_entry,_phase_id):
+		slots.append({"source":source,"hidden":false})
+	return slots
+
+func insert_blank_frame() -> void:
+	if _timeline.is_empty():return
+	_timeline.insert(frame_index+1,{"source":-1,"hidden":false})
+	frame_index+=1
+	_finish_timeline_edit()
+
+func toggle_frame_visibility() -> void:
+	if _timeline.is_empty() or int(_timeline[frame_index]["source"])<0:return
+	var slot:Dictionary=_timeline[frame_index]
+	slot["hidden"]=not slot["hidden"]
+	_finish_timeline_edit()
+
+func remove_blank_frame() -> void:
+	if _timeline.is_empty() or int(_timeline[frame_index]["source"])>=0:return
+	_timeline.remove_at(frame_index)
+	frame_index=mini(frame_index,_timeline.size()-1)
+	_finish_timeline_edit()
+
+func reset_preview() -> void:
+	if _timeline.is_empty():return
+	pause()
+	_phase_edits.clear()
+	_timeline=_original_timeline()
+	set_fps(float(current_entry.get("fps",12)))
+	frame_index=0
+	_refresh_timeline()
+
+func _finish_timeline_edit() -> void:
+	pause()
+	_phase_edits[_phase_id]=_timeline
+	_elapsed=0
+	_refresh_timeline()
+
+func _refresh_timeline() -> void:
+	_changing=true
+	_scrubber.max_value=maxi(0,_timeline.size()-1)
+	_changing=false
+	_play_button.disabled=_timeline.size()<=1
+	if _play_button.disabled:pause()
+	thumbnail_page=frame_index/PAGE_SIZE
+	_preview_frame=-1
+	_rebuild_thumbnails()
+	_refresh_preview()
+
+func _update_edit_controls() -> void:
+	var empty:bool=_timeline.is_empty()
+	var blank:bool=not empty and int(_timeline[frame_index]["source"])<0
+	var hidden:bool=not empty and bool(_timeline[frame_index]["hidden"])
+	_insert_blank.disabled=empty
+	_toggle_hidden.disabled=empty or blank
+	_toggle_hidden.text="顯示此幀" if hidden else "隱藏此幀"
+	_remove_blank.disabled=not blank
+	_reset_preview.disabled=empty
+
 func seek_frame(index:int) -> void:
-	if current_entry.is_empty():return
-	frame_index=clampi(index,0,int(current_entry["frame_count"])-1);_elapsed=0
+	if _timeline.is_empty():return
+	frame_index=clampi(index,0,_timeline.size()-1);_elapsed=0
 	var desired_page:int=frame_index/PAGE_SIZE
 	if desired_page!=thumbnail_page:thumbnail_page=desired_page;_rebuild_thumbnails()
 	_refresh_preview()
@@ -230,30 +306,34 @@ func pause() -> void:
 	playing=false
 	if _play_button!=null:_play_button.text="播放"
 func play() -> void:
-	if current_entry.is_empty() or int(current_entry.get("frame_count",0))<=1:return
+	if _timeline.size()<=1:return
 	playing=true;_elapsed=0
 	if _play_button!=null:_play_button.text="暫停"
 func _toggle_play() -> void:
 	if playing:pause()
 	else:play()
 func _process(delta:float) -> void:
-	if not visible or (_gallery!=null and _gallery.visible) or not playing or current_entry.is_empty() or displayed_frames.size()<=1:return
+	if not visible or (_gallery!=null and _gallery.visible) or not playing or _timeline.size()<=1:return
 	_elapsed+=delta
 	var interval:float=1.0/fps
 	if _elapsed<interval:return
 	var advance:int=maxi(1,int(_elapsed/interval));_elapsed=fmod(_elapsed,interval)
-	var position:int=displayed_frames.find(frame_index)
-	frame_index=displayed_frames[(maxi(0,position)+advance)%displayed_frames.size()]
+	frame_index=(frame_index+advance)%_timeline.size()
 	var desired_page:int=frame_index/PAGE_SIZE
 	if desired_page!=thumbnail_page:thumbnail_page=desired_page;_rebuild_thumbnails()
 	_refresh_preview()
 func _refresh_preview() -> void:
 	if _preview==null or current_entry.is_empty():return
 	if _preview_frame==frame_index and _preview_id==current_entry["id"]:return
-	_procedural.visible=current_entry.get("kind","")=="procedural"
-	if _procedural.visible:_procedural.configure(current_entry["id"],frame_index)
-	_preview.texture=Catalog.frame(current_entry,frame_index);_preview_frame=frame_index;_preview_id=current_entry["id"]
-	_counter.text="%d / %d"%[frame_index+1,int(current_entry["frame_count"])]
+	var slot:Dictionary=_timeline[frame_index]
+	var source:int=slot["source"]
+	var shown:bool=source>=0 and not slot["hidden"]
+	_procedural.visible=shown and current_entry.get("kind","")=="procedural"
+	if _procedural.visible:_procedural.configure(current_entry["id"],source)
+	_preview.texture=Catalog.frame(current_entry,source) if shown else null
+	_preview_frame=frame_index;_preview_id=current_entry["id"]
+	_counter.text="%d / %d"%[frame_index+1,_timeline.size()]
+	_update_edit_controls()
 	_changing=true;_scrubber.value=frame_index;_changing=false
 	_highlight_thumbnails()
 	_cache_label.text="按需載入 · 快取 %d / 24 筆"%Catalog.cache_size()
@@ -263,21 +343,24 @@ func _rebuild_thumbnails() -> void:
 	if _strip==null or current_entry.is_empty():return
 	for child in _strip.get_children():_strip.remove_child(child);child.queue_free()
 	_thumb_buttons.clear();_thumb_indices.clear()
-	var count:int=int(current_entry["frame_count"]);var pages:int=maxi(1,ceili(float(count)/PAGE_SIZE));thumbnail_page=clampi(thumbnail_page,0,pages-1)
+	var count:int=_timeline.size();var pages:int=maxi(1,ceili(float(count)/PAGE_SIZE));thumbnail_page=clampi(thumbnail_page,0,pages-1)
 	for index in range(thumbnail_page*PAGE_SIZE,mini(count,(thumbnail_page+1)*PAGE_SIZE)):
 		var frame_number:int=index
+		var source:int=_timeline[index]["source"]
+		var hidden:bool=_timeline[index]["hidden"]
+		var status:String="空白" if source<0 else ("隱藏" if hidden else "")
 		var button:=_button("",func()->void:pause();seek_frame(frame_number));button.name="Frame_%d"%index;button.custom_minimum_size=Vector2(72,76);button.tooltip_text="第 %d 格"%(index+1);_strip.add_child(button)
 		var box:=VBoxContainer.new();box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);box.offset_left=4;box.offset_right=-4;box.offset_top=3;box.offset_bottom=-3;box.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(box)
-		var image:=TextureRect.new();image.texture=Catalog.frame(current_entry,index);image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;image.size_flags_vertical=Control.SIZE_EXPAND_FILL;image.custom_minimum_size=Vector2(64,48);image.mouse_filter=Control.MOUSE_FILTER_IGNORE;box.add_child(image)
-		if current_entry.get("kind","")=="procedural":
-			var sample:=Procedural.new();sample.custom_minimum_size=Vector2(64,48);sample.configure(current_entry["id"],index);box.remove_child(image);image.queue_free();box.add_child(sample)
-		var number:=_label(str(index+1),11,MUTED);number.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;number.mouse_filter=Control.MOUSE_FILTER_IGNORE;box.add_child(number)
+		var image:=TextureRect.new();image.texture=Catalog.frame(current_entry,source) if source>=0 and not hidden else null;image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;image.size_flags_vertical=Control.SIZE_EXPAND_FILL;image.custom_minimum_size=Vector2(64,48);image.mouse_filter=Control.MOUSE_FILTER_IGNORE;box.add_child(image)
+		if source>=0 and not hidden and current_entry.get("kind","")=="procedural":
+			var sample:=Procedural.new();sample.custom_minimum_size=Vector2(64,48);sample.configure(current_entry["id"],source);box.remove_child(image);image.queue_free();box.add_child(sample)
+		var number:=_label(str(index+1)+" "+status,11,MUTED);number.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;number.mouse_filter=Control.MOUSE_FILTER_IGNORE;box.add_child(number)
 		_thumb_buttons.append(button);_thumb_indices.append(index)
 	_page_label.text="%d / %d"%[thumbnail_page+1,pages];_previous_page.disabled=thumbnail_page==0;_next_page.disabled=thumbnail_page>=pages-1
 	_highlight_thumbnails()
 func _change_page(amount:int) -> void:
 	if current_entry.is_empty():return
-	pause();var pages:int=maxi(1,ceili(float(current_entry["frame_count"])/PAGE_SIZE));thumbnail_page=clampi(thumbnail_page+amount,0,pages-1);_rebuild_thumbnails();_refresh_preview()
+	pause();var pages:int=maxi(1,ceili(float(_timeline.size())/PAGE_SIZE));thumbnail_page=clampi(thumbnail_page+amount,0,pages-1);_rebuild_thumbnails();_refresh_preview()
 func _close() -> void:
 	pause();hide();set_process(false);_preview.texture=null
 	for button:Button in _thumb_buttons:

@@ -115,7 +115,7 @@ var screen: String = "hub"
 var spring_particles:Node2D
 var home_atmosphere:Node2D
 var mode: String = "rogue"
-var meta: Dictionary = {"coins":0,"runes":{"gale":1,"reach":1,"guard":1},"skills":[],"attempts":0,"skins":[0],"skin":0,"best_map":0,"rd_tuning":{},"items":{},"weapons":[],"records":[],"blueprints":[],"settings":{"zoom":1.3,"speed":.8,"keys":{}}}
+var meta: Dictionary = {"coins":0,"runes":{"gale":1,"reach":1,"guard":1},"skills":[],"attempts":0,"skins":[0],"skin":0,"best_map":0,"rd_tuning":{},"items":{},"weapons":[],"records":[],"blueprints":[],"trophies":{"weapons":[],"runes":[]},"settings":{"zoom":1.3,"speed":.8,"keys":{}}}
 var tower: Dictionary = {}
 var current_room: int = -1
 var room: Dictionary = {}
@@ -128,6 +128,8 @@ var hazards: Array[Dictionary] = []
 var effects: Array[Dictionary] = []
 var floaters: Array[Dictionary] = []
 var camera_zoom:float=1.3
+var display_fit:String="contain"
+var trophy_room:bool=false
 var key_bindings:Dictionary=Bindings.DEFAULTS.duplicate()
 var capturing_key:String=""
 var camera_pos: Vector2 = Vector2.ZERO
@@ -213,7 +215,12 @@ var prep_station:String="forge"
 var atmosphere:Node2D
 var combat_feedback:Node2D
 var minimap_open:bool=false
-var minimap_full_tower:bool=false
+var minimap_page:int=-1
+var poison_clouds:Array[Dictionary]=[]
+var poison_left:float=0.0
+const NewRoster=preload("res://scripts/monster_roster_v55.gd")
+const NewMonsterArt=preload("res://scripts/monster_art_v55.gd")
+const HazardRoom=preload("res://scripts/hazard_room_v54.gd")
 var rune_target_slot:int=-1
 var last_checkpoint:int=-1
 var kills:int=0
@@ -228,6 +235,7 @@ var bath=Bath.new()
 var coin_field=CoinField.new()
 var projectile_surfaces: Array = []
 var lab_mode:String=""
+var tutorial_previous_practice:bool=false
 var lab_meta:Dictionary={}
 var lab_ai:bool=true
 var rd_view:Control
@@ -235,9 +243,11 @@ var lab_buttons:HBoxContainer
 var practice_tools:HBoxContainer
 var practice_rd_panel:Control
 var practice_rd_settings:Dictionary={}
+var practice_page:String="rooms"
 
 
 func _ready() -> void:
+	if not OS.has_feature("web"):get_window().size_changed.connect(_apply_display_fit)
 	preload("res://scripts/render_budget_v40.gd").configure(get_window(),OS.has_feature("web"))
 	rng.randomize()
 	Sprites.warmup()
@@ -283,6 +293,9 @@ func _ready() -> void:
 	for sound_name in ["hit","slash","parry","coin","jump","metal_hit","explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh","charge_build","charge_release","impact_hit","impact_heavy"]:
 		var path: String = "res://assets/v30/audio/"+sound_name+".wav" if sound_name in ["charge_build","charge_release","impact_hit","impact_heavy"] else ("res://assets/v29/audio/" if sound_name in ["explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh"] else "res://assets/")+sound_name+".wav"
 		if ResourceLoader.exists(path): sounds[sound_name] = load(path)
+	for id:String in Arsenal.IDS:
+		var shot_path:String="res://assets/v54/shot_audio/"+id+".wav"
+		if ResourceLoader.exists(shot_path):sounds["shot_"+id]=load(shot_path)
 	_configure_home()
 	_update_hud()
 	_update_shortcuts()
@@ -315,7 +328,7 @@ func _input(event:InputEvent) -> void:
 	# Capture before GUI navigation so Space, Tab and arrow keys can be rebound.
 	if capturing_key.is_empty():
 		if event is InputEventKey and Bindings.action_for(key_bindings,int(event.physical_keycode))=="map":
-			if not event.echo:_set_map_held(event.pressed)
+			if event.pressed and not event.echo:_cycle_map()
 			get_viewport().set_input_as_handled();return
 		if minimap_open and event is InputEventKey:
 			var map_action:String=Bindings.action_for(key_bindings,int(event.physical_keycode))
@@ -361,7 +374,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var action:String=Bindings.action_for(key_bindings,int(e.physical_keycode))
 		# Assigned actions win over bare-number item shortcuts. Shift+number is
 		# the explicit route to every consumable, including slots1–3.
-		if e.pressed and screen=="game" and not ui.is_panel_open() and e.physical_keycode>=KEY_1 and e.physical_keycode<=KEY_9 and (e.shift_pressed or action.is_empty()):
+		if e.pressed and screen=="game" and not ui.is_panel_open() and e.physical_keycode>=KEY_1 and e.physical_keycode<=KEY_5 and (e.shift_pressed or action.is_empty()):
 			_use_item(int(e.physical_keycode-KEY_1),true,false);get_viewport().set_input_as_handled();return
 		if action.is_empty():return
 		if ui.is_panel_open() and action in ["primary_1","primary_2","primary_3","cycle","skills"]:get_viewport().set_input_as_handled();return
@@ -386,7 +399,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and screen == "hub" and not ui.is_panel_open():
 		var mouse: Vector2 = get_global_mouse_position()
 		if HomeArt.LEFT_GATE.has_point(mouse): new_run("musou")
-		elif HomeArt.RIGHT_GATE.has_point(mouse): new_run("rogue")
+		elif HomeArt.RIGHT_GATE.has_point(mouse):_enter_practice(true)
+		elif HomeArt.ROGUE_GATE.has_point(mouse):
+			if _at_rogue_gate():new_run("rogue")
+			else:_toast("跳起後下砍蘑菇，反彈到最高點再二段跳")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_keys()
@@ -396,7 +412,7 @@ func _set_action(action: String, pressed: bool) -> void:
 	if practice_rd_panel!=null:return
 	if minimap_open:
 		if pressed and action in ["left","right"]:
-			minimap_full_tower=not minimap_full_tower
+			minimap_page=posmod(minimap_page+(-1 if action=="left" else 1),3)
 			if minimap!=null:minimap.invalidate()
 		if not pressed:keys[action]=false
 		return
@@ -459,8 +475,16 @@ func _set_action(action: String, pressed: bool) -> void:
 			pending_attack={"dir":dir,"charged":true,"dash_charge":float(p["dash_t"])>0 and _skill("dashcharge")}
 		charge_timer=0.0
 
+func _cycle_map() -> void:
+	if screen!="game" or ui.is_panel_open() or not life_event.is_empty():return
+	minimap_page=(minimap_page+1)%4
+	minimap_open=minimap_page<3
+	ui.header.visible=not minimap_open
+	minimap.invalidate()
+
 func _set_map_held(pressed:bool) -> void:
-	if pressed and not minimap_open:minimap_full_tower=false
+	if pressed and not minimap_open:minimap_page=0
+	if not pressed:minimap_page=-1
 	minimap_open=pressed and screen=="game" and life_event.is_empty() and not ui.is_panel_open()
 	if ui!=null:ui.header.visible=not minimap_open
 	if minimap!=null:minimap.invalidate()
@@ -505,6 +529,7 @@ func _process_profiled_body(delta: float) -> void:
 	if spring_particles!=null:spring_particles.transform=world_transform
 	if atmosphere!=null:
 		atmosphere.set_audio_enabled(audio_enabled and life_event.is_empty() and not ui.is_panel_open())
+		atmosphere.backdrop_transform=backdrop.transform
 		atmosphere.update_view(render_camera,zoom,world_transform,p["pos"],draw_clock,0.0 if perf_paused else world_speed,low_effects)
 	view_rect=Rect2(render_camera-Vector2(120,130)/zoom,Vector2(1520,980)/zoom)
 	var region:Rect2=preload("res://scripts/render_budget_v40.gd").region(view_rect)
@@ -548,6 +573,7 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if perf_paused:return
 	if practice_rd_panel!=null:return
 	if lab_mode in ["rd","tuning"]:return
+	if lab_mode=="tutorial":p["energy"]=p["max_energy"]
 	if lab_mode=="practice":p["energy"]=p["max_energy"];p["invul"]=2;freeze_timer=0 if lab_ai else 999
 	real_clock+=delta
 	if minimap_open:return
@@ -569,7 +595,7 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if screen!="game":return
 	_update_dream(delta)
 	room_cooldown=maxf(0,room_cooldown-delta);freeze_timer=maxf(0,freeze_timer-delta)
-	for key in ["invul","hurt","wall_lock","shield","impact_root","flash_left","heavy_land_left"]:p[key]=maxf(0,float(p[key])-delta)
+	for key in ["invul","hurt","wall_lock","shield","impact_root","flash_left","heavy_land_left","power_item_left","shield_item_left"]:p[key]=maxf(0,float(p.get(key,0))-delta)
 	if _key("attack"):
 		var previous_charge:float=charge_timer;charge_timer+=delta
 		if previous_charge<.18 and charge_timer>=.18:_sound("charge_build")
@@ -585,7 +611,7 @@ func _physics_process_profiled_body(delta:float) -> void:
 	var previous:Vector2=p["pos"]
 	_update_player(delta*world_speed)
 	_update_idle(delta)
-	var walking:bool=bool(p["grounded"]) and absf(p["vel"].x)>30 and float(p["hurt"])<=0 and float(p["dash_t"])<=0 and float(p["recoil_left"])<=0 and (not p_attack.is_busy() or p_attack.phase=="recovery") and charge_timer<=.15
+	var walking:bool=bool(p["grounded"]) and absf(p["vel"].x)>30 and float(p["hurt"])<=0 and float(p["dash_t"])<=0 and float(p["recoil_left"])<=0 and (not p_attack.is_busy() or p_attack.phase=="recovery")
 	Walk.limping=injured
 	walker.step_turn(float(p["face"]),delta,bool(p["grounded"]) and (not p_attack.is_busy() or p_attack.phase=="recovery") and charge_timer<=.15 and float(p["dash_t"])<=0 and float(p["hurt"])<=0)
 	walker.advance(absf(p["pos"].x-previous.x),walking,Walk.surface(str(_ecology()["id"]),p["pos"],layout),audio_enabled)
@@ -628,13 +654,24 @@ func _load_settings() -> void:
 	var settings:Variant=meta.get("settings",{})
 	if not settings is Dictionary:settings={}
 	camera_zoom=clampf(float(settings.get("zoom",1.3)),.8,2.0)
+	display_fit="cover" if settings.get("display_fit","contain")=="cover" else "contain"
+	_apply_display_fit()
 	world_speed=clampf(float(settings.get("speed",.8)),.4,1.5)
 	audio_enabled=bool(settings.get("audio_enabled",audio_enabled))
 	key_bindings=Bindings.load_bindings(settings.get("keys",{}))
 	if int(settings.get("bindings_version",0))<2 and int(key_bindings.get("sub",0))==KEY_U and Bindings.action_for(key_bindings,KEY_Z)=="":Bindings.assign(key_bindings,"sub",KEY_Z)
 
+func _apply_display_fit() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("document.documentElement.dataset.gameFit="+JSON.stringify(display_fit))
+	else:
+		var window:Window=get_window()
+		var dimensions:Vector2=Vector2(window.size)
+		var ratio:float=dimensions.x/maxf(1.0,dimensions.y)
+		window.content_scale_factor=maxf(ratio/(16.0/9.0),(16.0/9.0)/maxf(.01,ratio)) if display_fit=="cover" else 1.0
+
 func _save_settings() -> void:
-	meta["settings"]={"zoom":camera_zoom,"speed":world_speed,"keys":key_bindings.duplicate(),"bindings_version":2,"audio_enabled":audio_enabled,"touch_enabled":touch_enabled}
+	meta["settings"]={"zoom":camera_zoom,"speed":world_speed,"keys":key_bindings.duplicate(),"bindings_version":2,"audio_enabled":audio_enabled,"touch_enabled":touch_enabled,"display_fit":display_fit}
 	_save_meta()
 	_update_shortcuts()
 
@@ -692,6 +729,9 @@ func _update_player(delta:float) -> void:
 	perf_log.span("physics.player",Time.get_ticks_usec()-measured)
 
 func _update_player_profiled_body(delta:float) -> void:
+	if _healing_guard():
+		p["vel"]=Vector2.ZERO
+		return
 	# Preserve ordinary-jump clearance at every global speed setting.
 	var steps:int=maxi(1,int(ceil(delta/(1.0/120))))
 	for step in steps:_step_player(delta/steps)
@@ -766,6 +806,7 @@ func _step_player(delta: float) -> void:
 		if jumped:
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
+	if _rune_effect("held_flight")>0 and _key("jump") and not p["grounded"] and not _wind_form_active() and not knocked:vel.y=minf(vel.y,-230.0)
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
@@ -807,7 +848,7 @@ func _step_player(delta: float) -> void:
 	if int(p["wall"])==0:p["wall_hold_left"]=0.0
 	if bool(p["grounded"]) and bool(p["slam"]):_slam_impact(pos)
 	if pos.y<0:pos.y=0;vel.y=maxf(0,vel.y)
-	if pos.y>_room_size().y+80 and not room.get("neighbors",{}).has("down"):_hurt_player(2,pos);pos=layout.get("spawn_positions",{}).get("center",Vector2(230,_room_floor()))
+	if pos.y>_room_size().y+80 and (layout.has("hazard_room") or not room.get("neighbors",{}).has("down")):_hurt_player(2,pos);pos=layout.get("spawn_positions",{}).get("center",Vector2(230,_room_floor()))
 	if not was_grounded and not was_slam:p["fall_distance"]=float(p.get("fall_distance",0))+maxf(0,pos.y-old_pos.y)
 	if bool(p["grounded"]) and not was_grounded and not was_slam:
 		p["landing_left"]=.09
@@ -838,15 +879,11 @@ func _dash_pressed() -> void:
 	if _key("up"):return
 	if p_attack.is_busy() and p_attack.phase=="active":return
 	var elapsed:float=clock-last_dash_time
-	var second:bool=dash_chain_open and elapsed<=.5 and elapsed>.02
+	var second:bool=_rune_effect("single_pierce")>0 or (dash_chain_open and elapsed<=.5 and elapsed>.02)
 	if second:
 		dash_chain_open=false
 		var dir:Vector2=Vector2.DOWN if _key("down") else Vector2(float(p["face"]),0)
-		if not _skill("dash_vertical" if dir.y>0 else "dash_horizontal"):_toast("穿刺技能尚未解鎖，請查看技能樹");return
-		if float(p["energy"])<1:_toast("穿刺需要1能量");return
-		p["energy"]-=1;p_attack.cancel();pending_attack.clear();p["impact_root"]=0;charge_timer=0
-		var definition:Dictionary={"kind":"slam" if dir.y>0 else "pierce","windup":.035,"active":1.8 if dir.y>0 else .24,"recovery":0.0,"damage":2.0,"range":38.0,"width":40.0,"dir":dir,"direction":"down" if dir.y>0 else ("right" if dir.x>0 else "left"),"color":Color("d3eaff"),"primary":false}
-		p_attack.begin(Dream.instant(definition) if mode=="musou" else definition)
+		_begin_dash_followup(dir)
 		return
 	last_dash_time=clock;dash_chain_open=true
 	# Down+C only arms the next press: no movement, no animation cancellation.
@@ -858,12 +895,20 @@ func _dash_pressed() -> void:
 	_sound("dash_wind")
 
 
+func _begin_dash_followup(dir:Vector2) -> void:
+	if _rune_effect("single_pierce")<=0 and not _skill("dash_vertical" if dir.y>0 else "dash_horizontal"):_toast("穿刺技能尚未解鎖，請查看技能樹");return
+	if float(p["energy"])<1:_toast("穿刺需要1能量");return
+	p["energy"]-=1;p_attack.cancel();pending_attack.clear();p["impact_root"]=0;charge_timer=0
+	var definition:Dictionary={"kind":"slam" if dir.y>0 else "pierce","windup":0.0,"active":1.8 if dir.y>0 else .24,"recovery":0.0,"damage":2.0,"range":38.0,"width":40.0,"dir":dir,"direction":"down" if dir.y>0 else ("right" if dir.x>0 else "left"),"color":Color("d3eaff"),"primary":false}
+	p_attack.begin(Dream.instant(definition) if mode=="musou" else definition)
+
 func _primary_definition(request:Dictionary) -> Dictionary:
 	var def:Dictionary=Data.action_attack(str(request.get("dir","right")),bool(request.get("charged",false)),float(p.get("dash_t",0))>0,int(request.get("combo",combo_index)))
-	def["damage"]=float(def["damage"])*Tuning.value("player_damage")
+	def["damage"]=float(def["damage"])*Tuning.value("player_damage")*(1.20 if not def.get("charged",false) and float(p.get("power_item_left",0))>0 else 1.0)
 	def["recovery"]=float(def["recovery"])*Tuning.value("attack_recovery")
 	var haste:float=(1+float(upgrades["haste"])*.07+_rune_effect("haste"))*(1+_rune_effect("haste_mult"))
-	for key in ["windup","recovery"]:def[key]=float(def[key])/haste*phase_multiplier
+	def["windup"]=0.0
+	def["recovery"]=float(def["recovery"])/haste*phase_multiplier
 	if not bool(def["charged"]):def["active"]=float(def["active"])*phase_multiplier
 	def["range"]=float(def["range"])*(1+float(upgrades["reach"])*.07+_rune_effect("reach"))*(1+_rune_effect("reach_mult"))
 	if mode=="musou":def["damage"]=ceilf(float(def["damage"])*(1+float(upgrades["power"])*.14))
@@ -875,6 +920,7 @@ func _release_locked() -> bool:
 	return p_attack.is_active() and bool(p_attack.attack.get("charged",false)) and bool(p_attack.attack.get("primary",false))
 
 func _movement_locked() -> bool:
+	if _healing_guard():return true
 	if float(p.get("heavy_land_left",0))>0 or float(p.get("mantle_left",0))>0:return true
 	return false if _release_locked() else _action_locked()
 
@@ -969,7 +1015,8 @@ func _player_active_started() -> void:
 		"secondary":
 			if def.has("salvo"):
 				for weapon:Dictionary in def["salvo"]:_emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),weapon,true)
-			elif def.get("weapon_kind","")!="sword": _emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),def,true)
+			elif def.get("weapon_kind","")=="sword":_sound("shot_"+str(def.get("id","")))
+			else: _emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),def,true)
 		"pierce","slam":
 			p["slam_speed"]=520.0;_sound("double_dash_wind")
 			p["dash_dir"]=def["dir"];p["dash_t"]=float(def["active"]);p["air_dash"]=true
@@ -1084,7 +1131,9 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 	if mode=="musou":damage*=dream.damage_factor()
 	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
 	en["flash_left"]=2.0/60.0;en["_impact_time"]=clock
-	if gain_dream:_melee_hitstop()
+	if int(en.get("model",0))!=4 or float(en.get("boss_impact_guard",0))<=0:
+		en["impact_freeze_left"]=.125;en["impact_pose_clock"]=draw_clock
+		if int(en.get("model",0))==4:en["boss_impact_guard"]=.45
 	if en.get("training",false):
 		en["training_total"]=float(en.get("training_total",0))+damage
 		var contact:Vector2=en["pos"]-Vector2(0,60);_float(contact-Vector2(0,65),"%.1f"%damage,color)
@@ -1111,6 +1160,7 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 	if float(en["hp"])<=0:_enemy_defeated(en)
 
 func _hurt_player(amount:float,source:Vector2) -> bool:
+	if lab_mode=="tutorial":return false
 	if _slam_invulnerable() or not life_event.is_empty() or float(p["invul"])>0 or float(p["shield"])>0 or _healing_guard():return false
 	amount=maxi(1,roundi(amount)) if amount>0 else 0
 	charge_timer=0;keys["attack"]=false;idle_time=0
@@ -1200,6 +1250,23 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 	for index in enemies.size():
 		if screen!="game" or current_room!=initial_room:return
 		var en:Dictionary=enemies[index]
+		if en.has("boss_impact_guard"):en["boss_impact_guard"]=maxf(0.0,float(en["boss_impact_guard"])-delta)
+		if float(en["hp"])>0 and float(en.get("frost_left",0))>0:
+			en["frost_left"]=maxf(0.0,float(en["frost_left"])-delta)
+			continue
+		if float(en["hp"])>0 and float(en.get("impact_freeze_left",0))>0:
+			en["impact_freeze_left"]=maxf(0.0,float(en["impact_freeze_left"])-delta)
+			en["flash_left"]=maxf(0.0,float(en.get("flash_left",0))-delta)
+			continue
+		if en.has("tutorial_respawn"):
+			if float(en["hp"])<=0:
+				en["tutorial_respawn"]=maxf(0,float(en["tutorial_respawn"])-delta)
+				if en["tutorial_respawn"]<=0:
+					en["hp"]=en["max_hp"];en["pos"]=en["anchor"];en["vel"]=Vector2.ZERO
+					for key in ["hurt","stun","flash_left","push_left","impact_freeze_left"]:en[key]=0.0
+			else:
+				for key in ["hurt","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
+			continue
 		if float(en["hp"])<=0:continue
 		if en.get("training",false):
 			en["training_age"]=float(en.get("training_age",0))+movement_delta
@@ -1282,7 +1349,10 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		if frozen:continue
 		if atk.is_active() and not bool(atk.attack.get("emitted",false)):
 			atk.attack["emitted"]=true
-			if atk.attack.get("library_kind","")=="trap":_emit_traps(en,atk.attack)
+			if int(en.get("model",0))==4 and audio_enabled:BossDirector.play_attack(self,atk.attack)
+			if atk.attack.get("poison_cloud",false):
+				poison_clouds.append({"pos":Vector2(en["pos"])+Vector2(float(en["face"])*48,-26),"left":3.0,"hostile":true})
+			elif atk.attack.get("library_kind","")=="trap":_emit_traps(en,atk.attack)
 			elif atk.attack.get("library_kind","")=="explosion":_explode(en["pos"]-Vector2(0,25),float(atk.attack["range"]),float(atk.attack["damage"]),150,false,{},str(atk.attack.get("group","biological")))
 			elif not bool(atk.attack.get("primary",true)):
 				_emit_weapon(en["pos"]+Vector2(0,float(atk.attack.get("origin_y",-30))),atk.attack.get("aim",toward.normalized()),atk.attack,false)
@@ -1342,7 +1412,8 @@ func _start_enemy_attack(en:Dictionary,definition:Dictionary) -> void:
 	def["aim"]=(target-origin).normalized()
 	def["target"]=en["pos"]+(p["pos"]-en["pos"]).limit_length(float(def.get("range",500)))
 	for key in ["windup","active","recovery"]:def[key]=float(def[key])*phase_multiplier/maxf(.1,float(en.get("attack_speed",1)))
-	if mode=="musou":Dream.instant(def)
+	if mode=="musou" and int(en.get("model",0))!=4 and not def.get("ram",false) and not def.get("poison_cloud",false):Dream.instant(def)
+	if not str(def.get("boss_tell","")).is_empty():def["windup"]=maxf(.42,float(def["windup"]))
 	if en["attack"].begin(def):en["cooldown"]=float(def["windup"])+float(def["active"])+float(def["recovery"])+float(def.get("attack_cooldown",1.1))/maxf(.1,float(en.get("attack_speed",1)))
 
 func _enemy_body_box(en:Dictionary) -> Rect2:
@@ -1386,6 +1457,7 @@ func _enemy_begin(en:Dictionary,ranged:bool) -> void:
 		if bool(def.get("primary",false))!=ranged:_start_enemy_attack(en,def);return
 
 func _emit_weapon(at:Vector2,dir:Vector2,def:Dictionary,from_player:bool) -> void:
+	if from_player:_sound("shot_"+str(def.get("id","")))
 	if from_player and def.get("weapon_kind","")=="trap":
 		var trap:Dictionary=def.duplicate(true);trap["from_player"]=true;trap["group"]="biological";trap["hazard_visual_id"]="moss_thorns";trap["target"]=at+dir.normalized()*260
 		_emit_traps({"pos":at+Vector2(0,35),"uid":-1},trap);return
@@ -1402,7 +1474,7 @@ func _emit_weapon(at:Vector2,dir:Vector2,def:Dictionary,from_player:bool) -> voi
 		if projectiles.size()>=384:break
 		var heading:Vector2=direction.rotated((float(i)-float(shots-1)*.5)*spread)
 		if def.get("style_id","")=="root_wave" or kind=="wave":heading=Vector2(1 if i%2==0 else -1,0)
-		var radius:float=float(def.get("size",9 if kind=="throw" else 6))
+		var radius:float=float(def.get("size",9 if kind=="throw" else 6))*(1.20 if from_player else 1.0)
 		var spawn:Vector2=at
 		spawn.y=minf(spawn.y,_room_floor()-radius-2)
 		if spread==0 and shots>1 and def.get("style_id","")!="root_wave":spawn+=direction.orthogonal()*(float(i)-float(shots-1)*.5)*radius*2.1
@@ -1411,7 +1483,8 @@ func _emit_weapon(at:Vector2,dir:Vector2,def:Dictionary,from_player:bool) -> voi
 		if gravity!=0:velocity.y+=float(def.get("launch_y",-260))
 		var distance:float=float(def.get("range",900))
 		projectiles.append({"pos":spawn,"vel":velocity,"sprite":sprite,"from_player":from_player,"damage":float(def.get("damage",3)),"life":float(def.get("lifetime",distance/maxf(1,velocity.length())+1)),"color":def.get("color",Color.WHITE),"kind":kind,"radius":radius,"gravity":gravity,"pierce":bool(def.get("piercing",false)) or (from_player and _rune_effect("pierce")>0),"hits":{},"bounces":int(def.get("bounces",0)),"distance_left":distance,"style_id":str(def.get("style_id",kind)),"boss_biome":str(def.get("boss_biome","")),"visual_id":str(def.get("visual_id","")),"group":str(def.get("group","weapon" if from_player else "biological")),"elapsed":0.0,"return_after":float(def.get("return_after",.7 if path=="return" else 0)),"origin":spawn,"launch_angle":direction.angle(),"base_velocity":velocity,"wave_amplitude":float(def.get("wave_amplitude",0)) if path=="sine" or def.get("style_id","")=="dew_bubble" else 0.0,"wave_frequency":float(def.get("wave_frequency",4)),"knockback":float(def.get("knockback",76)),"explode_on_hit":bool(def.get("explode_on_hit",false)),"explosion_radius":float(def.get("explosion_radius",80)),"parryable":bool(def.get("parryable",kind=="flying_slash")),"owner_uid":int(def.get("owner_uid",-2)),"weapon_id":str(def.get("id","")),"homing":def.get("weapon_kind","")=="homing","ground_fire":bool(def.get("ground_fire",false)),"fire_size":float(def.get("explosion_radius",100)),"dream_slash":bool(def.get("dream_slash",false))})
-	_effect(at,Color(def.get("color",Color.WHITE)),28,.15);_sound("slash")
+	_effect(at,Color(def.get("color",Color.WHITE)),28,.15)
+	if not def.has("boss_sound"):_sound("slash")
 
 func _segment_hits_box(a:Vector2,b:Vector2,box:Rect2) -> bool:
 	var direction:Vector2=b-a
@@ -1457,6 +1530,27 @@ func _straight_shot_left_room(pr:Dictionary, bounds:Rect2) -> bool:
 	return ((at.x<bounds.position.x and velocity.x<=0) or (at.x>bounds.end.x and velocity.x>=0)
 		or (at.y<bounds.position.y and velocity.y<=0) or (at.y>bounds.end.y and velocity.y>=0))
 
+func _try_projectile_riposte(enemy:Dictionary,shot:Dictionary,old:Vector2,next:Vector2,radius:float) -> bool:
+	var attack=enemy["attack"]
+	var center:Vector2=_enemy_body_box(enemy).get_center()
+	if attack.is_busy() or float(enemy.get("cooldown",0))>0 or float(enemy.get("stun",0))>0 or float(enemy.get("frost_left",0))>0 or float(enemy.get("impact_freeze_left",0))>0:return false
+	var incoming:Vector2=shot["vel"]
+	if incoming.dot(center-old)<=0 or not _segment_hits_box(old,next,_enemy_body_box(enemy).grow(radius+33)):return false
+	_start_enemy_attack(enemy,Combat.attack("slash",{"windup":0.0,"active":.13,"recovery":.36,"range":95.0,"damage":1.0}))
+	var direction:Vector2=(Vector2(p["pos"])-Vector2(0,22)-next).normalized()
+	shot["from_player"]=false
+	shot["vel"]=direction*maxf(320.0,incoming.length())
+	shot["base_velocity"]=shot["vel"]
+	shot["pos"]=next+direction*8
+	shot["hits"]={}
+	shot["owner_uid"]=enemy["uid"]
+	shot["homing"]=false
+	shot["return_after"]=0.0
+	shot["distance_left"]=maxf(400,float(shot.get("distance_left",0)))
+	shot["life"]=maxf(.7,float(shot["life"]))
+	_block_effect(next,"reflect")
+	return true
+
 func _update_projectiles_profiled_body(delta:float) -> void:
 	if projectiles.is_empty():return
 	var room_bounds:=Rect2(Vector2.ZERO,_room_size())
@@ -1499,6 +1593,8 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 		if bool(pr["from_player"]):
 			for en in enemies:
 				if en["hp"]<=0:continue
+				if en.get("projectile_riposte",false) and _try_projectile_riposte(en,pr,old,next,radius):
+					break
 				var ea=en["attack"]
 				if ea.is_active() and bool(ea.attack.get("primary",false)) and _segment_hits_box(old,next,_attack_box(en["pos"],ea.attack,float(en["face"])).grow(radius)):
 					pr["life"]=0;_projectile_impact(pr);_block_effect(next);break
@@ -1513,7 +1609,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 				_damage_traps(Rect2(old.min(next),old.max(next)-old.min(next)).grow(radius),float(pr["damage"]),not pr.get("dream_slash",false))
 		else:
 			var blocked:bool=false
-			if _rune_effect("orbit_shield")>0:
+			if _rune_effect("orbit_shield")>0 or float(p.get("shield_item_left",0))>0:
 				for i in 2:
 					var shield:Vector2=p["pos"]-Vector2(0,24)+Vector2.from_angle(draw_clock*2+i*PI)*52
 					if _segment_hits_box(old,next,Rect2(shield-Vector2.ONE*(12+radius),Vector2.ONE*(24+radius*2))):pr["life"]=0;blocked=true;_block_effect(shield,"orbit_shield_intercept");break
@@ -1559,7 +1655,7 @@ func _emit_traps(en:Dictionary,def:Dictionary) -> void:
 		var start:Vector2=en["pos"]-Vector2(0,35)
 		var gravity:float=900;var flight:float=.38
 		var velocity:Vector2=(landing-start)/flight-Vector2(0,.5*gravity*flight)
-		projectiles.append({"pos":start,"vel":velocity,"launch_angle":Vector2(target-start).angle(),"radius":float(def.get("size",16)) if def.get("from_player",false) else 8.0,"life":flight,"elapsed":0.0,"gravity":gravity,"distance_left":1000.0,"trap_carrier":true,"landing":landing,"visual_id":str(def.get("visual_id","")),"hazard_visual_id":str(def.get("hazard_visual_id","")),"weapon_id":str(def.get("id","")),"definition":def.duplicate(true),"group":str(def.get("group","biological")),"from_player":bool(def.get("from_player",false)),"owner_uid":en["uid"],"color":def["color"],"kind":"throw","sprite":"fruit","hits":{},"pierce":false,"damage":0.0,"bounces":0,"boss_biome":str(def.get("boss_biome",""))})
+		projectiles.append({"pos":start,"vel":velocity,"launch_angle":Vector2(target-start).angle(),"radius":float(def.get("size",16))*1.20 if def.get("from_player",false) else 8.0,"life":flight,"elapsed":0.0,"gravity":gravity,"distance_left":1000.0,"trap_carrier":true,"landing":landing,"visual_id":str(def.get("visual_id","")),"hazard_visual_id":str(def.get("hazard_visual_id","")),"weapon_id":str(def.get("id","")),"definition":def.duplicate(true),"group":str(def.get("group","biological")),"from_player":bool(def.get("from_player",false)),"owner_uid":en["uid"],"color":def["color"],"kind":"throw","sprite":"fruit","hits":{},"pierce":false,"damage":0.0,"bounces":0,"boss_biome":str(def.get("boss_biome",""))})
 
 func _update_hazards(delta:float) -> void:
 	if not perf_log.active:
@@ -1594,9 +1690,13 @@ func _block_effect(at:Vector2,clip:String="block") -> void:
 	_particles(at,Color("fff1b3"),10,150);_float(at,"擋彈",Color("fff1b3"));_sound("parry")
 
 func _enemy_defeated(en: Dictionary) -> void:
+	if en.has("tutorial_respawn"):
+		en["tutorial_respawn"]=3.0
+		return
 	if en.get("corpse_created",false):return
 	en["corpse_created"]=true;corpses.append(CorpseField.create(en));room["corpses"]=corpses
 	if corpse_layer!=null:corpse_layer.invalidate()
+	if lab_mode=="tutorial":return
 	kills+=1
 	var gold: int=150+int(room.get("map_index",0))*25 if int(en["model"])==4 else 3
 	if int(en["model"])==4:
@@ -1605,11 +1705,12 @@ func _enemy_defeated(en: Dictionary) -> void:
 	if rng.randf()<.1: _drop("item",en["pos"]-Vector2(25,20),rng.randi_range(0,Data.ITEMS.size()-1))
 	if rng.randf()<(.32 if mode=="musou" else .07): _drop("heal",en["pos"]+Vector2(25,-20),1)
 	if rng.randf()<.24:_drop("rune",en["pos"]+Vector2(10,-45),_random_rune_index())
-	if rng.randf()<(.60 if mode=="musou" else .25):_drop("weapon",en["pos"]+Vector2(15,-35),Arsenal.random_index(rng))
+	if int(en["model"])==4 or rng.randf()<(.10 if en.get("elite",false) or int(en["model"])==3 else .02):
+		_drop("weapon",en["pos"]+Vector2(15,-35),Arsenal.random_index(rng))
 	if rng.randf()<_rune_effect("leech"): _restore_vital("hp",1)
 	if int(en["model"])==4:
 		_drop("rune",en["pos"]-Vector2(35,40),Data.RUNES.size()+rng.randi_range(0,Data.STRONG_RUNES.size()-1))
-		_drop("weapon",en["pos"]+Vector2(55,-40),Arsenal.random_index(rng))
+		room["boss_defeated"]=true
 	_check_room_clear()
 
 func _check_room_clear() -> void:
@@ -1679,6 +1780,7 @@ func _give_drop(kind: String, value: int) -> void:
 		"heal": _restore_vital("hp",1);_float(p["pos"]-Vector2(0,50),"+1 生命",Color("a9ecc1"))
 		"rune":
 			var id:String=Data.all_runes()[value]["id"]
+			if lab_mode.is_empty():_collect_trophy("runes",id)
 			bag_runes[id]=int(bag_runes.get(id,0))+1
 			var equipped:bool=_auto_equip_rune(id)
 			_toast(("自動裝備：" if equipped else "取得符文：")+Data.all_runes()[value]["name"]+"；存入倉庫後永久保存")
@@ -1706,18 +1808,29 @@ func _use_item(index: int, from_bag: bool=true,open_bag:bool=true) -> void:
 	match item["id"]:
 		"heal": _restore_vital("hp",2)
 		"energy": p["energy"]=p["max_energy"]
-		"shield": p["shield"]=5.0
-		"freeze": freeze_timer=4.0
-		"bomb":
-			p_attack.cancel()
-			var definition:Dictionary={"kind":"item_bomb","primary":false,"windup":.12,"active":.10,"recovery":.24,"damage":7.0+float(upgrades["power"]),"range":420.0,"color":Color("ffd18d")}
-			p_attack.begin(Dream.instant(definition) if mode=="musou" else definition)
+		"shield":p["shield_item_left"]=60.0
+		"power":p["power_item_left"]=120.0
+		"freeze":
+			for enemy:Dictionary in enemies:
+				if float(enemy["hp"])>0 and Vector2(enemy["pos"]).distance_to(p["pos"])<=900:
+					enemy["frost_pose_clock"]=_enemy_pose_clock(enemy)
+					enemy["frost_left"]=2.0
+		"shock":
+			var center:Vector2=p["pos"]
+			for enemy:Dictionary in enemies:
+				if float(enemy["hp"])<=0 or Vector2(enemy["pos"]).distance_to(center)>640/_view_zoom():continue
+				var away:Vector2=(Vector2(enemy["pos"])-center).normalized()
+				enemy["push_left"]=.55;enemy["push_velocity"]=Vector2(away.x*1050,-200)
+				enemy["push_base_y"]=0.0
+			_effect(center,Color("d7faff"),640/_view_zoom(),.35)
+
 	_effect(p["pos"]-Vector2(0,20),item["color"],100,.45)
 	_toast("施放："+item["name"])
 	if from_bag and open_bag:_show_bag()
 	_update_hud()
 
 func new_run(chosen_mode: String, seed_value: int=-1) -> void:
+	if lab_mode=="tutorial":_leave_lab()
 	_return_trial(false)
 	Tuning.activate(meta.get("rd_tuning",{}))
 	mode=chosen_mode;screen="game";weapon_index=1;home_atmosphere.set_active(false);spring_particles.clear();_clear_keys();ui.close_panel()
@@ -1737,7 +1850,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 
 func _enter_room(id: int, from_dir: String="center") -> void:
 	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
-	_return_trial(false);bath.reset();spring_particles.clear()
+	_return_trial(false);bath.reset();spring_particles.clear();poison_clouds.clear()
 	if dream_visual!=null:dream_visual.clear_waves()
 	if not room.is_empty():
 		room["enemies"]=enemies;room["drops"]=drops;room["corpses"]=corpses
@@ -1751,6 +1864,10 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	meta["best_map"]=maxi(int(meta["best_map"]),int(room["map_index"])+1)
 	if not room.has("layout"):
 		room["layout"]=Layout.generate(room,int(tower["seed"]))
+		var forced_hazard:String=room.get("practice_hazard","")
+		if not forced_hazard.is_empty() or (room["type"]=="combat" and not room.get("spring",false) and not room.get("laboratory",false)):
+			HazardRoom.prepare(room["layout"],id,forced_hazard)
+			if room["layout"].has("hazard_room"):room["fountain"]=false
 	layout=room["layout"]
 	if room.get("fountain",false) and not layout.has("fountain_pos"):preload("res://scripts/spring_v33.gd").prepare(layout)
 	NewBiome.prepare(layout,int(layout.get("seed",0)))
@@ -1773,6 +1890,10 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 		elif room["type"]=="boss":
 			plan.append({"model":4,"pos":Vector2(_room_size().x*.5,_room_floor()),"platform":0})
 
+		if layout.has("hazard_room"):
+			plan.clear()
+			for i in 3:
+				plan.append({"model":3,"pos":Vector2(_room_size().x*(.29+i*.20),_room_floor()*.66),"platform":0,"flying_elite":true})
 		if room["type"]=="elite":
 			for entry:Dictionary in plan:entry["model"]=3
 			if plan.is_empty():
@@ -1787,7 +1908,11 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			var model:int=int(plan[i]["model"])
 			var spawn_rng:=RandomNumberGenerator.new();spawn_rng.seed=int(layout["seed"])+i*827+spawn_serial*3571
 			var def:Dictionary=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][int(room["map_index"])]) if model==4 else (MonsterRoster.elite(int(room["map_index"])) if model==3 else MonsterRoster.regular(str(biome["id"]),int(plan[i].get("roster_variant",(i+id)%5))))
-			if room["type"]!="elite" and model!=4 and model!=3 and i==0 and int(layout["seed"])%3==0:def=Arms.cute_wanderer(spawn_rng)
+			if model!=4 and spawn_rng.randf()<.5:
+				def=NewRoster.create(str(biome["id"]),spawn_rng.randi_range(3,4) if model==3 else spawn_rng.randi_range(0,2),int(room["map_index"]))
+			if plan[i].get("flying_elite",false):
+				def["move"]="fly";def["movements"]=["hover","drift"];def["visual_movement"]="hover";def["movement_logic"]="roam"
+			if room["type"]!="elite" and model!=4 and model!=3 and i==0 and int(layout["seed"])%3==0 and not def.has("v55_row"):def=Arms.cute_wanderer(spawn_rng)
 			if model==4:
 				for attack in def["attacks"]:attack["damage"]*=2;attack["knockback"]=120.0
 			def["uid"]=id*100+i+1
@@ -1815,7 +1940,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			var guard_rng:=RandomNumberGenerator.new()
 			guard_rng.seed=int(layout["seed"])+4251
 			_spawn_boss_reinforcements(room["enemies"],6,true,guard_rng)
-		if room["type"] in ["merchant","start"]:
+		if room["type"] in ["merchant","start"] and lab_mode!="tutorial":
 			for i in (2 if room["type"]=="start" else 1):
 				var dummy_rng:=RandomNumberGenerator.new();dummy_rng.seed=int(layout["seed"])+i
 				var dummy:Dictionary=Arms.enemy("walk",dummy_rng,false,true)
@@ -1825,7 +1950,10 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 		if room["type"]=="start" and int(room["map_index"])==0 and not room.get("gift_given",false):
 			room["gift_given"]=true
 			room["drops"].append({"kind":"weapon","pos":_furniture_offset()+Vector2(620,1050-90),"value":Arsenal.random_index(rng),"seed":0.0,"taken":false,"gift":true,"display_only":true,"display_anchor":_furniture_offset()+Vector2(620,1050-90)})
-	if not room.has("props"):room["props"]=_make_props()
+	if not room.has("props"):
+		room["props"]=_make_props()
+		for rect:Rect2 in layout.get("spike_rects",[]):
+			room["props"].append({"kind":"spikes","pos":rect.get_center(),"rect":rect,"hurt":0.0})
 	props.assign(room["props"])
 	var loaded_enemies:Array[Dictionary]=[]
 	loaded_enemies.assign(room["enemies"])
@@ -1837,7 +1965,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	projectiles.clear();hazards.clear();effects.clear();
 	if combat_feedback!=null:combat_feedback.clear()
 	if atmosphere!=null:
-		atmosphere.room_bounds=_room_size();atmosphere.configure(str(room["ecology"]["id"]),int(layout["seed"]),true,room["type"]=="merchant",room["type"] in ["start","merchant","reward"] or room.get("spring",false),layout)
+		atmosphere.room_bounds=_room_size();atmosphere.configure(str(room["ecology"]["id"]),int(layout["seed"]),true,room["type"]=="merchant",room["type"] in ["start","merchant","reward"] or room.get("spring",false),layout,_background_rect())
 	p_attack.cancel();p["slam"]=false;p["dash_t"]=0
 	var spawn: Vector2=layout["spawn_positions"].get(from_dir,layout["spawn_positions"]["center"])
 	drop_through_timer=0.0
@@ -1849,6 +1977,11 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 func _interact(allow_panel:bool=true) -> void:
 	if _action_locked():return
 	if room_cooldown>0: return
+	if lab_mode=="tutorial" and allow_panel:
+		for i in TUTORIAL_STATIONS.size():
+			if Vector2(p["pos"]).distance_to(_tutorial_station_position(i))<85:
+				_show_tutorial_station(i)
+				return
 	if screen=="hub":
 		_home_interact();return
 	if screen!="game":return
@@ -1996,7 +2129,34 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"reforge_clear":reforge_selection.clear();_show_reforge(false)
 		"reforge_confirm":_reforge_runes();_show_reforge(false)
 		"lab_tools":_show_practice()
+		"lab_page":
+			if lab_mode=="practice":
+				practice_page=str(payload)
+				_show_practice()
+		"lab_room":
+			if lab_mode=="practice":
+				var parameters:Dictionary=practice_rd_settings.duplicate()
+				parameters["room_kind"]=str(payload)
+				_close_panel()
+				_regenerate_practice(parameters)
+		"lab_terrain":
+			if lab_mode=="practice":
+				_close_panel()
+				_open_practice_rd()
 		"lab_enter":_enter_practice()
+		"tutorial_guide":_show_tutorial()
+		"tutorial_demo":
+			if lab_mode=="tutorial":_tutorial_demo(str(payload))
+		"tutorial_rune":
+			if lab_mode=="tutorial":
+				for rune in Data.all_runes():
+					var id:String=rune["id"]
+					if id!=str(payload):continue
+					bag_runes[id]=int(bag_runes.get(id,0))+1
+					_toast("取得 "+str(rune["name"])+" ×1")
+					break
+		"tutorial_reset":
+			if lab_mode=="tutorial":_leave_lab();_enter_practice(true)
 		"lab_art":_open_rd()
 		"lab_tuning":_open_tuning()
 		"developer_tools":_show_developer_tools()
@@ -2011,7 +2171,9 @@ func _ui_action(action:String,payload:Variant) -> void:
 			if not lab_mode.is_empty():_leave_lab();return
 			_return_trial(false);_close_panel();screen="hub";home_sleeping=true;home_wake_left=0;room={};tower={};enemies=[];drops=[];projectiles=[];hazards=[];run_coins=0;bag_items.clear();bag_runes.clear();bag_weapons.clear();rune_slots.clear();strong_slots.clear();sub_growth.clear();feather={};injured=false;current_room=-1;_reset_player(Vector2(640,600));camera_pos=Vector2.ZERO;room_music.select("hub","branches");atmosphere.configure("branches",0,false);atmosphere.set_audio_enabled(audio_enabled);combat_feedback.clear();_configure_home();_invalidate_scene()
 		"start_musou":new_run("musou")
-		"start_rogue":new_run("rogue")
+		"start_rogue":
+			if screen!="hub" or _at_rogue_gate():new_run("rogue")
+			else:_close_panel();_toast("肉鴿入口在鳥巢中上方，下砍蘑菇反彈後再二段跳")
 		"restart":new_run(mode)
 		"bag":_show_equipment(0)
 		"runes":_show_equipment(3)
@@ -2023,6 +2185,9 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"rebind":capturing_key=str(payload);_show_keybindings()
 		"reset_keys":key_bindings=Bindings.DEFAULTS.duplicate();capturing_key="";_save_settings();_show_keybindings()
 		"speed":world_speed=clampf(float(payload),.4,1.5);_save_settings()
+		"display_fit":
+			display_fit="cover" if str(payload)=="cover" else "contain"
+			_apply_display_fit();_save_settings();_show_settings()
 		"zoom":
 			camera_zoom=clampf(float(payload),.8,2.0);camera_pos=_camera_target(p["pos"]) if screen=="game" else Vector2.ZERO;_save_settings()
 		"feedback":
@@ -2079,7 +2244,7 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"effects":low_effects=not low_effects;terrain.invalidate();_show_settings()
 		"timing_slower":phase_multiplier=1.6 if phase_multiplier<1.2 else 1.0;_show_settings()
 		"reward":_claim_reward(int(payload))
-		"minimap":pass
+		"minimap":_cycle_map()
 		"hot_item":_use_item(int(payload),true,false)
 		"claim_gift":_claim_gift();_show_forge()
 		"trial_buy":
@@ -2163,7 +2328,7 @@ func _show_skills() -> void:
 	_panel("羽翼技能樹",rows)
 
 func _show_map() -> void:
-	if tower.is_empty():_toast("開始冒險後可查看全塔地圖");return
+	if tower.get("maps",[]).is_empty():_toast("開始冒險後可查看全塔地圖");return
 	var rows:Array[Dictionary]=[{"tower_graph":{"tower":tower,"current":current_room}},{"text":"全塔採同一套位置。上 40%%／下 30%%／左右各 15%%，每圖 20%% 機率獎勵房。種子 %d"%int(tower["seed"])}]
 	for m in tower["maps"]:
 		var start:Dictionary=tower["rooms"][int(m["start_id"])];var boss:Dictionary=tower["rooms"][int(m["boss_id"])];var visited:int=0
@@ -2246,7 +2411,7 @@ func _update_hud() -> void:
 func _update_hud_profiled_body() -> void:
 	if ui==null:return
 	var phase_name:String=p_attack.phase
-	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"map":int(room.get("map_index",-1))+1,"room":current_room+1,"biome":_biome_name(),"mode":"鳥巢" if screen=="hub" else _mode_name(),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"revive":not revive_used,"audio_enabled":audio_enabled,"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"seed":tower.get("seed",0),"fps":fps_smoothed,"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
+	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"map":int(room.get("map_index",-1))+1,"room":current_room+1,"biome":_biome_name(),"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"revive":not revive_used,"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"seed":tower.get("seed",0),"fps":fps_smoothed,"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
 	ui.update_quickbar(bag_items,Data.ITEMS)
 	ui.quickbar.visible=screen=="game" and not ui.is_panel_open()
@@ -2256,15 +2421,20 @@ func _biome_name() -> String:
 	if screen=="hub":return "鳥巢與樹"
 	return str(_ecology()["name"])
 
+func _background_rect() -> Rect2:
+	if _is_start():
+		return preload("res://scripts/scene_art_v33.gd").safehouse_rect(str(_ecology()["id"]),_room_size(),_room_floor())
+	return preload("res://scripts/depth_style_v32.gd").backdrop_rect()
+
 func _paint_background(canvas:CanvasItem) -> void:
 	if screen=="hub":backdrop.material=null;HomeArt.background(canvas);return
 	if _is_start():
 		backdrop.material=preload("res://scripts/depth_style_v32.gd").material(str(_ecology()["id"]),"far",low_effects);preload("res://scripts/scene_art_v33.gd").safehouse(canvas,str(_ecology()["id"]),_room_size(),_room_floor());return
 	var id:String=str(_ecology()["id"])
 	backdrop.material=preload("res://scripts/depth_style_v32.gd").material(id,"far",low_effects)
-	canvas.draw_rect(preload("res://scripts/depth_style_v32.gd").backdrop_rect(),Color("193751") if id=="sky" else (Color("173e31") if id=="trunk" else Color("493521")))
-	BiomeArt.layer(canvas,id,"far",preload("res://scripts/depth_style_v32.gd").backdrop_rect())
-	if room.get("type","")=="merchant":BiomeArt.layer(canvas,"merchant","far",preload("res://scripts/depth_style_v32.gd").backdrop_rect())
+	canvas.draw_rect(_background_rect(),Color("193751") if id=="sky" else (Color("173e31") if id=="trunk" else Color("493521")))
+	BiomeArt.layer(canvas,id,"far",_background_rect())
+	if room.get("type","")=="merchant":BiomeArt.layer(canvas,"merchant","far",_background_rect())
 
 func _paint_terrain(canvas:CanvasItem) -> void:
 	if screen=="hub":
@@ -2279,7 +2449,8 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 			for solid:Rect2 in solids:canvas.draw_rect(solid,Color(1,.3,.1,.5),false,1)
 		return
 	if layout.get("single_screen",false):SanctuaryArt.background(canvas,room)
-	for plat in platforms:Art.draw_platform(canvas,plat,_height(),show_hitboxes)
+	if layout.get("hazard_room","")!="mushroom_air":
+		for plat in platforms:Art.draw_platform(canvas,plat,_height(),show_hitboxes)
 	_draw_terrain_details(canvas)
 
 
@@ -2329,7 +2500,14 @@ func _draw_profiled_body() -> void:
 	if charge_timer>.15 and show_hitboxes:
 		var threshold:float=_charge_threshold()
 		draw_arc(p["pos"]-Vector2(0,25),34,0,TAU*minf(1,charge_timer/threshold),32,Color("fff0a5") if charge_timer>=threshold else Color("90dccd"),3,true)
-	if float(p["shield"])>0:draw_arc(p["pos"]-Vector2(0,23),36,0,TAU,40,Color("b9c4ff"),2,true)
+	for cloud:Dictionary in poison_clouds:
+		var fog:=Color(.75,.29,.8,.67) if cloud.get("hostile",false) else Color(.55,.82,.30,.64)
+		fog.a*=float(cloud["left"])/3.0
+		draw_texture_rect(preload("res://assets/v55/effects/mist.svg"),Rect2(Vector2(cloud["pos"])-Vector2(58,38),Vector2(116,76)),false,fog)
+
+	if float(p.get("power_item_left",0))>0:
+		draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(45,67),Vector2(90,90)),false,Color(1,.22,.12,.78))
+	if float(p["shield"])>0:draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(44,67),Vector2(88,88)),false,Color(.69,.79,1,.8))
 	for hazard in hazards:
 		if hazard.get("fire",false):
 			GroundFire.draw(self,hazard,clock,world_transform);continue
@@ -2341,7 +2519,8 @@ func _draw_profiled_body() -> void:
 		if WeaponArt.Animated.has(str(pr.get("weapon_id",""))) or (pr.get("from_player",false) and WeaponArt.texture(str(pr.get("weapon_id","")),true)!=null):
 			WeaponArt.draw(self,str(pr["weapon_id"]),pr["pos"],pr["vel"],float(visual["radius"]),true,world_transform,float(pr.get("elapsed",0)),float(pr.get("launch_angle",0)));draw_set_transform_matrix(world_transform);continue
 		if not MonsterDesign.draw_projectile(self,visual,clock,world_transform) and not FX.projectile(self,visual,clock,world_transform) and not BossVisual.projectile(self,visual,clock,world_transform) and not Sprites.projectile(self,visual,clock,world_transform):
-			draw_circle(pr["pos"],float(visual["radius"]),pr["color"]);draw_circle(pr["pos"],2,Color.WHITE)
+			var size:float=float(visual["radius"])*2.3
+			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(pr["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,pr["color"])
 	for e in effects:
 		if not view_rect.has_point(e["pos"]):continue
 		var c:Color=e["color"];c.a=clampf(float(e["life"])/float(e["max"]),0,1)
@@ -2357,13 +2536,18 @@ func _draw_profiled_body() -> void:
 		elif e.has("combat_fx"):
 			var extent:float=float(e.get("fx_extent",65))
 			FX.fitted(self,e["combat_fx"],1-float(e["life"])/float(e["max"]),Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,c.a))
-		elif bool(e["ring"]):draw_arc(e["pos"],float(e["radius"])*(1-c.a*.75),0,TAU,40,c,3,true)
-		else:draw_circle(e["pos"],float(e["radius"])*c.a,c)
+		elif bool(e["ring"]):
+			var radius:float=float(e["radius"])*(1-c.a*.75)
+			draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(e["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),false,c)
+		else:
+			var size:float=float(e["radius"])*c.a*2.0
+			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(e["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,c)
 	for f in floaters:_text(f["pos"],f["text"],16,Color(f["color"],minf(1,float(f["life"])*2)))
 	if show_hitboxes:
 		draw_rect(_body_box(p["pos"]),Color("9ff5de"),false,1)
 		for en in enemies:
 			if en["hp"]>0:draw_rect(_enemy_body_box(en),Color("f6aa82"),false,1)
+	if lab_mode=="tutorial":_draw_tutorial_stations()
 	draw_set_transform(Vector2.ZERO)
 	if combat_feedback!=null:combat_feedback.draw_screen(self,world_transform)
 	_draw_boss_bar()
@@ -2393,6 +2577,7 @@ func _draw_enemy_warning(en:Dictionary) -> void:
 	var atk=en["attack"]
 	if atk.phase!="windup":return
 	var def:Dictionary=atk.attack
+	if BossDirector.draw_tell(self,en,def,atk.progress(),world_transform,world_speed):return
 	var kind:String=def.get("library_kind","")
 	var color:Color=Color(def.get("color",Color.WHITE),.4+.3*atk.progress())
 	if kind=="trap":
@@ -2435,15 +2620,23 @@ func _draw_player_body() -> void:
 		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash","charge"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
 		elif dream_progress>=0 and anim not in ["hurt","heal","wall"]:FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
 		elif anim=="charge":
-			var pose:Texture2D=preload("res://assets/v47/pigeon_quickdraw.webp")
-			var windup:float=clampf((charge_timer-.15)/.22,0,1)
-			var breath:float=sin(clock*8.0)*.015
-			var stride:float=sin(clock*19.0)*.06 if bool(p["grounded"]) and absf(p["vel"].x)>30 else 0.0
-			var shape:=Vector2(lerpf(.90,1.0,windup),lerpf(1.08,.96,windup)+breath)
-			var size:Vector2=pose.get_size()*(51.0/pose.get_height())
 			var feet:Vector2=p["pos"]
-			draw_set_transform_matrix(player_base*Transform2D(0,Vector2(float(p["face"])*shape.x,shape.y),stride,feet))
-			draw_texture_rect(pose,Rect2(Vector2(-size.x*.50,-size.y),size),false,tint)
+			if walker.moving and bool(p["grounded"]) and absf(p["vel"].x)>30:
+				var atlas:Texture2D=preload("res://assets/v48/pigeon_quickdraw_walk.webp")
+				var frame:int=floori(walker.phase*.5)%6
+				var cell:=Vector2(112,83)
+				var source:=Rect2(Vector2(frame%3,floori(frame/3.0))*cell,cell)
+				var size:Vector2=cell*(51.0/cell.y)
+				draw_set_transform_matrix(player_base*Transform2D(0,Vector2(float(p["face"]),1),0,feet))
+				draw_texture_rect_region(atlas,Rect2(Vector2(-size.x*.5,-size.y),size),source,tint)
+			else:
+				var pose:Texture2D=preload("res://assets/v47/pigeon_quickdraw.webp")
+				var windup:float=clampf((charge_timer-.15)/.22,0,1)
+				var breath:float=sin(clock*8.0)*.015
+				var shape:=Vector2(lerpf(.90,1.0,windup),lerpf(1.08,.96,windup)+breath)
+				var size:Vector2=pose.get_size()*(51.0/pose.get_height())
+				draw_set_transform_matrix(player_base*Transform2D(0,Vector2(float(p["face"])*shape.x,shape.y),0,feet))
+				draw_texture_rect(pose,Rect2(Vector2(-size.x*.5,-size.y),size),false,tint)
 			draw_set_transform_matrix(world_transform)
 		elif anim in ["idle","rest"]:IdleArt.draw(self,p["pos"],float(p["face"]),idle_time,player_base,tint)
 		else:Art.draw_pigeon(self,p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim,tint,1.0,(1-float(p["hurt"])/.25) if anim=="hurt" else p_attack.progress(),player_base,str(p_attack.attack.get("style","quick")),p_attack.attack)
@@ -2451,7 +2644,9 @@ func _draw_player_body() -> void:
 	if p_attack.is_busy() and p_attack.attack.get("kind","")=="secondary":WorldItems.secondary(self,p_attack.attack,p["pos"],float(p["face"]),world_transform)
 
 func _draw_hub() -> void:
+	if trophy_room:_draw_trophy_room();return
 	HomeArt.gates(self,clock,p["pos"]);HomeArt.nest(self)
+	Adventure.portal(self,Vector2(620,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",108,low_effects)
 	preload("res://scripts/home_visual_v33.gd").prop(self,"records",Vector2(790,600),Vector2(90,105))
 	for prop:Dictionary in props:
 		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(Transform2D.IDENTITY))
@@ -2461,17 +2656,20 @@ func _draw_hub() -> void:
 		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),Transform2D.IDENTITY)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	HomeArt.nest(self,true)
-	_text(Vector2(510,100),"枝間鴿行",42,Color("fff2cf"))
-	_text(Vector2(484,132),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
-	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1000,650),"肉鴿",25,Color("c6ddf7"))
+	_text(Vector2(510,180),"枝間鴿行",42,Color("fff2cf"))
+	_text(Vector2(484,212),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
+	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1020,650),"新手教學",25,Color("a4f3cf"))
+	_text(Vector2(580,570),"戰利品房 · %s"%_tutorial_key("up"),15,Color("e6c78f"))
+	_text(Vector2(581,HomeArt.ROGUE_PLATFORM_Y+25),"肉鴿 · %s 進入"%_tutorial_key("up"),20,Color("c6ddf7"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
-	_text(Vector2(365,495),"彈跳花 · 砍擊跳更高",14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.47",13,Color("a6c1b6"))
+	_text(Vector2(365,495),"跳起後 %s＋%s 下砍蘑菇，反彈到最高點再 %s 二段跳"%[_tutorial_key("down"),_tutorial_key("attack"),_tutorial_key("jump")],14,Color("c0dfae"))
+	_text(Vector2(1185,710),"v0.56",13,Color("a6c1b6"))
 
 func _configure_home() -> void:
+	trophy_room=false
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
 	layout={"size":Vector2(1280,720),"floor_y":600.0,"pool":Rect2(),"spawn_positions":{"center":Vector2(640,600)}}
-	platforms.assign([Rect2(40,600,1200,9)])
+	platforms.assign([Rect2(40,600,1200,9),HomeArt.ROGUE_PLATFORM])
 	solids.assign([Rect2(0,600,1280,120),Rect2(18,0,22,600),Rect2(1240,0,22,600),Rect2(0,-20,1280,20)])
 	_rebuild_projectile_surfaces()
 	props.assign([{"kind":"adventure_records","pos":Vector2(790,600),"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
@@ -2479,11 +2677,61 @@ func _configure_home() -> void:
 	if home_atmosphere!=null:home_atmosphere.set_active(true)
 	if spring_particles!=null:spring_particles.clear()
 
+func _at_rogue_gate() -> bool:
+	var at:Vector2=p["pos"]
+	return absf(at.x-HomeArt.ROGUE_GATE.get_center().x)<86.0 and absf(at.y-HomeArt.ROGUE_PLATFORM_Y)<=12.0 and bool(p["grounded"])
+
+func _collect_trophy(kind:String,id:String) -> void:
+	if not meta.has("trophies"):meta["trophies"]={"weapons":[],"runes":[]}
+	if not meta["trophies"].has(kind):meta["trophies"][kind]=[]
+	if not meta["trophies"][kind].has(id):meta["trophies"][kind].append(id)
+
+func _enter_trophy_room() -> void:
+	trophy_room=true
+	home_sleeping=false;home_wake_left=0
+	_clear_keys()
+	props.clear()
+	platforms.assign([Rect2(40,600,1200,9),Rect2(200,475,880,12)])
+	_reset_player(Vector2(113,600))
+	_rebuild_projectile_surfaces()
+
+func _leave_trophy_room() -> void:
+	_clear_keys()
+	_configure_home()
+	_reset_player(Vector2(620,600))
+
+func _draw_trophy_room() -> void:
+	draw_rect(Rect2(0,0,1280,720),Color("162323"))
+	var slot:Texture2D=preload("res://assets/v55/ui/etched_slot.svg")
+	var trophies:Dictionary=meta.get("trophies",{})
+	var clips:Array[String]=[]
+	for weapon:Dictionary in Data.SECONDARY:
+		if weapon["id"] in trophies.get("weapons",[]) or weapon["id"] in meta.get("blueprints",[]):clips.append(UI.Icons.secondary(weapon))
+	for rune:Dictionary in Data.all_runes():
+		if rune["id"] in trophies.get("runes",[]) or meta.get("runes",{}).has(rune["id"]):clips.append(UI.Icons.rune(rune["id"]))
+	for i in maxi(12,clips.size()):
+		var at:=Vector2(202+(i%12)*74,240+(i/12)*72)
+		draw_texture_rect(slot,Rect2(at,Vector2(63,63)),false)
+		if i<clips.size():
+			var icon:Texture2D=UI.Icons.texture(clips[i])
+			if icon!=null:draw_texture_rect(icon,Rect2(at+Vector2(9,9),Vector2(45,45)),false)
+	draw_rect(Rect2(40,600,1200,120),Color("322920"))
+	draw_rect(Rect2(200,475,880,12),Color("755a39"))
+	Adventure.portal(self,Vector2(72,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",96,low_effects)
+	_text(Vector2(510,168),"戰利品房",34,Color("efdaaa"))
+	_text(Vector2(45,632),"回鳥巢 · "+_tutorial_key("up"),16,Color("dfca9b"))
+	_draw_player_body()
+
 func _home_interact() -> bool:
 	if home_sleeping:_wake_home();return true
+	if trophy_room:
+		if float(p["pos"].x)<145:_leave_trophy_room();return true
+		return false
+	if _at_rogue_gate():new_run("rogue");return true
+	if Vector2(p["pos"]).distance_to(Vector2(620,600))<65:_enter_trophy_room();return true
 	if Vector2(p["pos"]).distance_to(Vector2(790,600))<100:_show_records();return true
 	if Vector2(p["pos"]).distance_to(Vector2(200,600))<100:new_run("musou");return true
-	if Vector2(p["pos"]).distance_to(Vector2(1080,600))<100:new_run("rogue");return true
+	if Vector2(p["pos"]).distance_to(Vector2(1080,600))<100:_enter_practice(true);return true
 	return false
 
 func _update_home(delta:float) -> void:
@@ -2508,9 +2756,12 @@ func _update_home_profiled_body(delta:float) -> void:
 	walker.step_turn(float(p["face"]),delta,bool(p["grounded"]))
 	walker.advance(absf(p["pos"].x-before.x),bool(p["grounded"]) and absf(p["vel"].x)>30,"wood",audio_enabled)
 	_update_hud()
+	if trophy_room:
+		if axis<0 and p["pos"].x<55:_leave_trophy_room()
+		return
 	if p["pos"].y>530:
 		if axis<0 and absf(p["pos"].x-200)<35:new_run("musou")
-		elif axis>0 and absf(p["pos"].x-1080)<35:new_run("rogue")
+		elif axis>0 and absf(p["pos"].x-1080)<35:_enter_practice(true)
 
 func _wake_home() -> void:
 	home_sleeping=false;home_wake_left=.48
@@ -2637,14 +2888,22 @@ func _paint_minimap(canvas:CanvasItem) -> void:
 	if tower.is_empty() or not minimap_open:return
 	canvas.draw_rect(Rect2(0,0,1280,720),Color(0,.025,.045,.75))
 	canvas.draw_rect(Rect2(150,65,980,590),Color("0e2432",.98))
-	var heading:String="練習房" if tower.get("maps",[]).is_empty() else ("全塔路線 · 六關連通" if minimap_full_tower else "第 %d 關 · %s"%[int(room.get("map_index",0))+1,tower["maps"][room.get("map_index",0)]["stage_name"]])
+	var heading:String=["房間地形","本關探索","全塔地圖"][mini(minimap_page,2)]
 	_text_on(canvas,Vector2(178,103),heading,22,Color("eef5e6"))
-	_text_on(canvas,Vector2(178,128),"按住 Tab ＋ ←／→ 切換章節／全塔 · 放開 Tab 返回",15,Color("b7d0d2"))
-	if minimap_full_tower:TowerMap.draw_full_tower(canvas,tower,current_room,Rect2(180,155,915,422),font)
-	else:
-		TowerMap.draw_chapter(canvas,tower,current_room,Rect2(180,155,700,422),font)
-		TowerMap.draw_stage_list(canvas,tower,current_room,Rect2(904,169,195,400),font)
-	_text_on(canvas,Vector2(180,616),"安 安全屋　王 首領　商 商人　寶 獎勵　泉 泉水　· 戰鬥",16,Color("dceade"))
+	_text_on(canvas,Vector2(178,128),"Tab 切換地圖 · 第四次返回",15,Color("b7d0d2"))
+	var area:=Rect2(180,155,915,422)
+	canvas.draw_rect(area,Color("080b0e"))
+	match minimap_page:
+		0:
+			var factor:float=minf(area.size.x/_room_size().x,area.size.y/_room_size().y)
+			var origin:Vector2=area.get_center()-_room_size()*factor*.5
+			for surface:Rect2 in solids+platforms:
+				canvas.draw_rect(Rect2(origin+surface.position*factor,surface.size*factor),Color("78988d"))
+			for prop:Dictionary in props:
+				if prop["kind"] in ["launcher","spikes"]:canvas.draw_circle(origin+Vector2(prop["pos"])*factor,3,Color("f0b88d"))
+			canvas.draw_circle(origin+Vector2(p["pos"])*factor,6,Color("fff0a6"))
+		1:TowerMap.draw_chapter(canvas,tower,current_room,area,font,true)
+		2:TowerMap.draw_full_tower(canvas,tower,current_room,area,font,true)
 
 func _effect_static(at:Vector2,color:Color,radius:float) -> void:
 	draw_line(at,at-Vector2(0,100),Color(color,.12),36,true)
@@ -2742,6 +3001,24 @@ func _update_passives(delta:float) -> void:
 	_update_passives_profiled_body(delta)
 	perf_log.span("physics.passives",Time.get_ticks_usec()-measured)
 func _update_passives_profiled_body(delta:float) -> void:
+	poison_left-=delta
+	if _rune_effect("poison_trail")>0 and poison_left<=0 and Vector2(p["vel"]).length_squared()>100:
+		poison_left=.35
+		poison_clouds.append({"pos":Vector2(p["pos"])-Vector2(float(p["face"])*26,18),"left":3.0})
+	for cloud:Dictionary in poison_clouds:cloud["left"]-=delta
+	poison_clouds=poison_clouds.filter(func(cloud:Dictionary)->bool:return cloud["left"]>0)
+	for cloud:Dictionary in poison_clouds:
+		if cloud.get("hostile",false) and Vector2(cloud["pos"]).distance_squared_to(Vector2(p["pos"])-Vector2(0,22))<58*58:
+			_hurt_player(1,cloud["pos"])
+			break
+	for enemy:Dictionary in enemies:
+		if poison_clouds.is_empty():break
+		if float(enemy["hp"])<=0:continue
+		enemy["poison_tick"]=maxf(0.0,float(enemy.get("poison_tick",1.0))-delta) if poison_clouds.any(func(cloud:Dictionary)->bool:return not cloud.get("hostile",false) and Vector2(cloud["pos"]).distance_squared_to(enemy["pos"])<65*65) else 1.0
+		if float(enemy["poison_tick"])<=0:
+			enemy["poison_tick"]=1.0
+			enemy["hp"]-=1.0
+			if float(enemy["hp"])<=0:_enemy_defeated(enemy)
 	passive_energy+=delta*_rune_effect("energy_regen")
 	while passive_energy>=1:passive_energy-=1;_restore_vital("energy",1)
 	blood_timer-=delta
@@ -2792,7 +3069,13 @@ func _check_portals() -> void:
 		return
 
 func _make_props() -> Array[Dictionary]:
+	if lab_mode=="tutorial":
+		return [{"kind":"launcher","pos":Vector2(1040,_room_floor()),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0}]
 	var result:Array[Dictionary]=[]
+	if layout.has("hazard_room"):
+		for at:Vector2 in layout["launcher_spawns"]:
+			result.append({"kind":"launcher","pos":at,"hurt":0.0})
+		return result
 	if room["type"]=="start":
 		if int(room.get("map_index",0))==0:result.append({"kind":"gift_pedestal","pos":_furniture_offset()+Vector2(620,1050),"used":false,"hurt":0.0})
 		result.append({"kind":"wardrobe","pos":_furniture_offset()+Vector2(360,850),"used":false,"hurt":0.0})
@@ -2847,6 +3130,9 @@ func _update_props_profiled_body(delta:float) -> void:
 	for prop in props:
 		prop["hurt"]=maxf(0,float(prop["hurt"])-delta)
 		for timer in ["break_left","event_left","launch_left","launch_cooldown","launch_hit_cooldown"]:prop[timer]=maxf(0,float(prop.get(timer,0))-delta)
+		if prop["kind"]=="spikes":
+			if _body_box(p["pos"]).intersects(prop["rect"]):_hurt_player(1,prop["pos"])
+			continue
 		if prop["kind"]=="launcher":
 			var body:Rect2=LaunchArt.body_box(prop,str(_ecology()["id"]))
 			var proximity:float=body.position.y-Vector2(p["pos"]).y
@@ -2861,6 +3147,11 @@ func _update_props_profiled_body(delta:float) -> void:
 func _hit_props(box:Rect2,damage:float,attack_id:int=-1) -> void:
 	for i in props.size():
 		var prop:Dictionary=props[i]
+		if prop["kind"]=="spikes":
+			if attack_id<0 and p_attack.attack.get("direction","")=="down" and box.intersects(prop["rect"]) and p_attack.mark_hit(-10000-i):
+				_pogo()
+				if p.get("_motion_step",false):p["launch_pending_velocity"]=p["vel"]
+			continue
 		if prop.get("used",false) or prop["kind"] not in ["fountain","dummy","shop_dummy","energy_infinite","energy","health","grass","ecology_object","coin_urn","launcher"]:continue
 		if prop["kind"]=="fountain":
 			if box.intersects(preload("res://scripts/spring_v33.gd").body(prop["pos"])) and float(prop.get("water_cd",0))<=0:
@@ -3101,6 +3392,8 @@ func _draw_props() -> void:
 		if kind=="fountain":
 			if at.distance_to(p["pos"])<160:_text(at-Vector2(75,90),"泉水 · 回復生命與能量",14,accent)
 			continue
+		if kind=="spikes":
+			HazardRoom.draw_spikes(self,prop["rect"]);continue
 		if kind=="launcher":
 			LaunchArt.draw(self,prop,biome,prop_base);continue
 		if kind=="coin_urn":
@@ -3131,7 +3424,7 @@ func _draw_props() -> void:
 			_text(at-Vector2(text_width*.5,label_height),caption,14,Color("fff0c6") if focused else Color("b0c2b3"))
 		else:_text(at-Vector2(40,label_height),label,14,accent)
 	draw_set_transform_matrix(world_transform)
-	if _rune_effect("orbit_shield")>0:
+	if _rune_effect("orbit_shield")>0 or float(p.get("shield_item_left",0))>0:
 		for i in 2:
 			var at:Vector2=p["pos"]-Vector2(0,24)+Vector2.from_angle(draw_clock*2+i*PI)*52
 			FX.fitted(self,"orbit_shield_fly",0,Rect2(at-Vector2.ONE*15,Vector2.ONE*30),world_transform,"right","idle",Color.WHITE,clock)
@@ -3315,11 +3608,7 @@ func _merchant_buy(index:int) -> void:
 func _adapt_boss(en:Dictionary) -> void:
 	if en.get("adapted",false) or float(en.get("hp",0))<=0:return
 	en["adapted"]=true
-	# Phase two adds one authored ecology attack, never an unrelated random move.
-	var biome:String=str(en.get("biome","underground"))
-	var kind:String={"sky":"linear","canopy":"flying_slash","branches":"arc","trunk":"flying_slash","grass":"arc","underground":"arc"}.get(biome,"arc")
-	var attack:Dictionary=Combat.attack(kind,{"damage":1.0,"range":720.0,"size":23.0,"count":2,"speed":240.0,"spread":.3,"gravity":500.0,"launch_y":-260.0,"windup":1.05,"active":.16,"recovery":1.05,"color":en["color"],"group":"biological"})
-	MonsterDesign.decorate_adaptation(attack,en);en["attacks"].append(attack)
+	en["attacks"].append(Combat.boss_phase_two(en))
 	en["adaptations"]=["新攻擊"]
 	_float(en["pos"]-Vector2(0,110),"首領覺醒",Color("ffbd89"));_toast(str(en["name"])+"進入第二階段：新招式已解放")
 
@@ -3327,7 +3616,7 @@ func _cast_special(at:Vector2,dir:Vector2,def:Dictionary) -> void:
 	var kind:String=def["weapon_kind"]
 	if kind=="laser":
 		var direction:Vector2=dir.normalized()
-		var beam_width:float=float(def.get("size",ProjectileReadability.BASE_RADIUS))*2
+		var beam_width:float=float(def.get("size",ProjectileReadability.BASE_RADIUS))*2.40
 		for i in int(def.get("count",1)):
 			var start:Vector2=at+direction.orthogonal()*(i-float(int(def.get("count",1))-1)*.5)*maxf(20,beam_width*1.25)
 			var finish:Vector2=start+direction*float(def.get("range",900))
@@ -3380,21 +3669,126 @@ func _open_rd() -> void:
 	var layer:=CanvasLayer.new();layer.layer=60;add_child(layer)
 	rd_view=RD.new();layer.add_child(rd_view)
 	rd_view.closed.connect(func()->void:lab_mode="";layer.queue_free();rd_view=null;_clear_keys();_invalidate_scene())
-func _enter_practice() -> void:
+func _enter_practice(tutorial:bool=false) -> void:
 	if screen!="hub":return
 	Tuning.activate(meta.get("rd_tuning",{}))
-	lab_meta=meta.duplicate(true);lab_mode="practice";lab_ai=true;practice_mode=true
+	lab_meta=meta.duplicate(true)
+	if tutorial:tutorial_previous_practice=practice_mode
+	lab_mode="tutorial" if tutorial else "practice";lab_ai=true;practice_mode=true;practice_page="rooms"
 	_close_panel();_clear_keys();bag_weapons.clear();bag_runes.clear();rune_slots.clear();strong_slots.clear();bag_items.clear();sub_growth.clear()
 	for id:String in Arsenal.IDS:bag_weapons.append(Data.secondary_attack(Arsenal.index_of(id)))
-	for rune in Data.all_runes():bag_runes[rune["id"]]=99;meta["runes"][rune["id"]]=99
-	for i in Data.ITEMS.size():bag_items[str(i)]=99
+	if not tutorial:
+		for rune in Data.all_runes():bag_runes[rune["id"]]=99;meta["runes"][rune["id"]]=99
+		for i in Data.ITEMS.size():bag_items[str(i)]=99
 	secondary_index=0;weapon_index=1;run_coins=9999;mode="rogue";screen="game";room={};current_room=-1;injured=false;life_event.clear();feather.clear()
 	tower={"seed":160016,"rooms":[{"id":0,"map_index":2,"type":"start","laboratory":true,"width":25,"height":15,"neighbors":{},"doors_config":{},"coord":Vector2i.ZERO,"visited":false,"initialized":false}],"maps":[]}
-	_reset_player(Vector2(300,896));_enter_room(0);_toast("練習房：全部武器、符文與怪物。能量無限，角色無敵。")
+	if tutorial:tower["rooms"][0]["layout"]=_tutorial_layout()
+	_reset_player(Vector2(300,896));_enter_room(0)
+	if tutorial:
+		upgrades={"count":0,"power":0.0,"reach":0.0,"haste":0.0,"charge":0.0,"shots":0,"subpower":0.0}
+		run_coins=0
+		for i in layout["one_way"].size():
+			var ledge:Rect2=layout["one_way"][i]
+			var anchor:=Vector2(ledge.get_center().x,ledge.position.y)
+			var target:Dictionary=MonsterRoster.regular("trunk",[0,1,3][i])
+			target.merge({"uid":i+1,"pos":anchor,"anchor":anchor,"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":0.0,"attack":Attack.new(),"contact_damage":0.0,"max_hp":target["hp"],"tutorial_respawn":0.0},true)
+			enemies.append(target)
+		_update_hud()
+	else:_toast("練習房：全部武器、符文與怪物。能量無限，角色無敵。")
+
+const TUTORIAL_STATIONS=["副武器試用","符文領取","動作與特效"]
+
+func _tutorial_layout() -> Dictionary:
+	var floor_rect:=Rect2(0,768,2304,96)
+	var ledges:Array[Rect2]=[Rect2(1280,675,192,18),Rect2(1570,592,192,18),Rect2(1870,645,224,18)]
+	var collision_platforms:Array[Rect2]=[floor_rect]
+	collision_platforms.append_array(ledges)
+	var walls:Array[Rect2]=[floor_rect,Rect2(0,0,96,768),Rect2(2208,0,96,768),Rect2(0,0,2304,96)]
+	return {"size":Vector2(2304,864),"floor_y":768.0,"ceiling_y":96.0,"seed":160016,"platforms":collision_platforms,"one_way":ledges,"platform_art_runs":ledges,"solids":walls,"spawn_positions":{"center":Vector2(175,768)}}
+
+func _tutorial_key(action:String) -> String:
+	return Bindings.label(int(key_bindings[action]))
+
+func _tutorial_station_position(index:int) -> Vector2:
+	return Vector2(360+index*235,_room_floor())
+
+func _show_tutorial_station(index:int) -> void:
+	match index:
+		0:
+			var rows:Array[Dictionary]=[{"text":"%s 切換副武器，%s 使用。選一把後，到右邊的平台試打。"%[_tutorial_key("cycle"),_tutorial_key("sub")]}]
+			for i in bag_weapons.size():
+				var weapon:Dictionary=bag_weapons[i]
+				rows.append({"text":str(weapon["description"]),"buttons":[{"label":str(weapon["name"]),"action":"lab_secondary","payload":i}]})
+			_panel("副武器試用",rows)
+		1:
+			var rows:Array[Dictionary]=[{"text":"每按一次就領一枚，可以重複領取。","buttons":[{"label":"開啟符文盤","action":"runes","payload":false}]}]
+			for rune in Data.all_runes():
+				rows.append({"buttons":[{"label":"領取 "+str(rune["name"]),"action":"tutorial_rune","payload":rune["id"]}]})
+			_panel("符文領取",rows)
+		2:_show_tutorial()
+
+func _show_tutorial() -> void:
+	if lab_mode!="tutorial":return
+	var jump:String=_tutorial_key("jump")
+	var dash:String=_tutorial_key("dash")
+	var attack:String=_tutorial_key("attack")
+	var down:String=_tutorial_key("down")
+	var rows:Array[Dictionary]=[{"text":"%s／%s 移動。短按跳得低，長按跳得高。靠牆後跳躍可以蹬牆。"%[_tutorial_key("left"),_tutorial_key("right")]}]
+	for entry in [
+		["jump","%s 跳躍"%jump],["double_jump","空中再按 %s 二段跳"%jump],
+		["dash","單按 %s 衝刺"%dash],["pierce","連按兩次 %s 穿刺"%dash],
+		["slam","空中按住 %s 並連按兩次 %s 下砸"%[down,dash]],
+		["attack","%s 普攻，配合方向鍵瞄準"%attack],["down_attack","空中 %s＋%s 下劈"%[down,attack]],
+		["charged","長按 %s，集氣完成後放開拔刀斬"%attack],["sub","%s 使用目前的副武器"%_tutorial_key("sub")]
+	]:
+		rows.append({"buttons":[{"label":entry[1]+" · 示範","action":"tutorial_demo","payload":entry[0]}]})
+	_panel("動作與特效",rows)
+
+func _tutorial_demo(action:String) -> void:
+	_close_panel()
+	_clear_keys()
+	p_attack.cancel();pending_attack.clear();p["dash_t"]=0;dash_chain_open=false
+	match action:
+		"jump","double_jump":
+			p["jump_buffer_left"]=.1;p["jump_released"]=false
+			if action=="double_jump":
+				p["pos"].y-=65;p["grounded"]=false;p["coyote_left"]=0;p["jumps"]=1
+			else:
+				p["grounded"]=true
+		"dash":_dash_pressed()
+		"pierce":_begin_dash_followup(Vector2(float(p["face"]),0))
+		"slam":
+			p["pos"].y-=145;p["grounded"]=false
+			_begin_dash_followup(Vector2.DOWN)
+		"attack","charged","down_attack":
+			var direction:String="right" if float(p["face"])>0 else "left"
+			if action=="down_attack":
+				p["pos"].y-=135;p["grounded"]=false
+				direction="down"
+			_begin_primary({"dir":direction,"charged":action=="charged"})
+		"sub":_begin_secondary()
+
+func _draw_tutorial_stations() -> void:
+	for i in TUTORIAL_STATIONS.size():
+		var at:Vector2=_tutorial_station_position(i)
+		var color:Color=[Color("b3e2f4"),Color("efcd88"),Color("a8ebcd")][i]
+		draw_rect(Rect2(at-Vector2(87,101),Vector2(174,70)),Color(.035,.075,.08,.94))
+		draw_rect(Rect2(at-Vector2(87,101),Vector2(174,70)),Color(color,.65),false,2)
+		draw_rect(Rect2(at-Vector2(33,10),Vector2(66,10)),color)
+		_text(at-Vector2(60,72),TUTORIAL_STATIONS[i],20,color)
+		_text(at-Vector2(60,46),"按 %s 互動"%_tutorial_key("up"),15,Color.WHITE)
+	_text(Vector2(118,_room_floor()-130),"新手教學 · 由左往右探索",22,Color("b9f5d6"))
+	_text(Vector2(118,_room_floor()-103),"在這裡可以安全試打，能量會自動補滿。",16,Color.WHITE)
+	_text(Vector2(1270,_room_floor()-255),"試打區 · 怪物無害，擊倒後 3 秒重生",20,Color("b9f5d6"))
+	for en in enemies:
+		if en.has("tutorial_respawn") and float(en["hp"])<=0:
+			_text(Vector2(en["anchor"])-Vector2(37,24),"%.1f 秒"%float(en["tutorial_respawn"]),16,Color("b9f5d6"))
+
 func _leave_lab() -> void:
 	if lab_mode in ["rd","tuning"]:return
-	if lab_mode=="practice":meta=lab_meta.duplicate(true);lab_meta.clear()
-	lab_mode="";practice_mode=false;lab_ai=true;freeze_timer=0;_close_panel();_ui_action("hub",null);_update_hud()
+	if lab_mode in ["practice","tutorial"]:meta=lab_meta.duplicate(true);lab_meta.clear()
+	practice_mode=tutorial_previous_practice if lab_mode=="tutorial" else false
+	lab_mode="";lab_ai=true;freeze_timer=0;_close_panel();_ui_action("hub",null);_update_hud()
 
 func _open_practice_rd() -> void:
 	if lab_mode!="practice" or practice_rd_panel!=null:return
@@ -3407,10 +3801,16 @@ func _open_practice_rd() -> void:
 func _regenerate_practice(parameters:Dictionary) -> void:
 	if lab_mode!="practice":return
 	practice_rd_settings=PracticeRD.DEFAULTS.duplicate();practice_rd_settings.merge(parameters,true)
+	var kind:String=practice_rd_settings["room_kind"]
+	if not parameters.has("room_kind") and parameters.get("arena",false):kind="arena"
+	if not PracticeRD.ROOM_TYPES.any(func(option:Array)->bool:return option[1]==kind):kind="combat"
+	practice_rd_settings["room_kind"]=kind
+	var actual_type:String=kind if kind in ["elite","boss","start","merchant","reward"] else "combat"
+	var forced_hazard:String=kind if kind in ["spike_islands","mushroom_air"] else ""
 	var options:Dictionary=practice_rd_settings;var seed_value:int=int(options["seed"])
 	if seed_value<=0:seed_value=rng.randi_range(1,2000000000)
 	var biome:String=str(options["biome"]);var stage:int={"underground":0,"trunk":2,"sky":4}.get(biome,2)
-	var definition:Dictionary={"id":0,"map_index":stage,"type":"combat","laboratory":true,"practice_arena":bool(options["arena"]),"practice_density":float(options["enemy_density"]),"layout_profile":str(options["profile"]),"plaza_scale":float(options["plaza_scale"]),"maze_config":{"straight_bias":float(options["straight_bias"]),"braid_rate":float(options["braid_rate"]),"corridor_width_mode":"random","dead_end_chance":clampf(float(options.get("dead_end_chance",.25)),.2,1)},"maze_seed":seed_value,"width":clampi(int(options["width"])|1,17,25),"height":clampi(int(options["height"])|1,11,17),"neighbors":{},"doors_config":{},"coord":Vector2i.ZERO,"visited":false,"initialized":false}
+	var definition:Dictionary={"id":0,"map_index":stage,"type":actual_type,"laboratory":true,"practice_hazard":forced_hazard,"practice_arena":kind=="arena","practice_density":float(options["enemy_density"]),"layout_profile":str(options["profile"]),"plaza_scale":float(options["plaza_scale"]),"maze_config":{"straight_bias":float(options["straight_bias"]),"braid_rate":float(options["braid_rate"]),"corridor_width_mode":"random","dead_end_chance":clampf(float(options.get("dead_end_chance",.25)),.2,1)},"maze_seed":seed_value,"width":clampi(int(options["width"])|1,17,25),"height":clampi(int(options["height"])|1,11,17),"neighbors":{},"doors_config":{},"coord":Vector2i.ZERO,"visited":false,"initialized":false}
 	# This is an isolated laboratory room; keep the current loadout and bag.
 	room={};enemies=[];drops=[];corpses=[];props=[];current_room=-1;life_event.clear();feather.clear()
 	tower={"seed":seed_value,"rooms":[definition],"maps":[]}
@@ -3418,13 +3818,35 @@ func _regenerate_practice(parameters:Dictionary) -> void:
 	_toast("練習房已重生 · "+_ecology()["name"]+" · 種子 %d"%seed_value)
 func _show_practice() -> void:
 	if lab_mode!="practice":return
-	var sections:Array[Dictionary]=[{"text":"自由試用所有裝備；練習結果不寫入冒險紀錄。","buttons":[{"label":"符文配置（全部可用）","action":"lab_runes"},{"label":"清空怪物與彈體","action":"lab_clear"},{"label":"怪物AI："+("開" if lab_ai else "停"),"action":"lab_ai"}]}]
-	var primary_buttons:Array=[]
-	for i in [1]:primary_buttons.append({"label":Data.PRIMARY[i]["name"],"action":"lab_primary","payload":i})
-	sections.append({"text":"主武器","buttons":primary_buttons})
-	for i in Data.SECONDARY.size():sections.append({"text":Data.SECONDARY[i]["description"],"buttons":[{"label":"裝備 "+Data.SECONDARY[i]["name"],"action":"lab_secondary","payload":i}]})
-	for i in _lab_monsters().size():sections.append({"text":"召喚實際遊戲敵人","buttons":[{"label":_lab_monsters()[i],"action":"lab_monster","payload":i}]})
-	_panel("練習工具 · 裝備與怪物",sections)
+	var tabs:Array[Dictionary]=[]
+	for entry in [["rooms","房型生成"],["monsters","怪物召喚"],["equipment","武器與符文"],["controls","測試控制"]]:
+		tabs.append({"label":("◆ " if practice_page==entry[0] else "")+entry[1],"action":"lab_page","payload":entry[0]})
+	var sections:Array[Dictionary]=[{"buttons":tabs}]
+	match practice_page:
+		"rooms":
+			var room_buttons:Array[Dictionary]=[]
+			for entry:Array in PracticeRD.ROOM_TYPES:
+				room_buttons.append({"label":entry[0],"action":"lab_room","payload":entry[1]})
+			sections.append({"heading":"選擇並生成房型","text":"會清空目前房間內的怪物與掉落物，保留你的裝備。","buttons":room_buttons})
+			sections.append({"buttons":[{"label":"生態、地形與種子","action":"lab_terrain"}]})
+		"monsters":
+			var names:Array[String]=_lab_monsters()
+			var regular:Array[Dictionary]=[];var elites:Array[Dictionary]=[];var bosses:Array[Dictionary]=[]
+			for index in names.size():
+				var button:Dictionary={"label":names[index],"action":"lab_monster","payload":index}
+				if names[index].begins_with("Boss"):bosses.append(button)
+				elif names[index].begins_with("菁英"):elites.append(button)
+				else:regular.append(button)
+			sections.append({"heading":"小怪","buttons":regular})
+			sections.append({"heading":"菁英怪","buttons":elites})
+			sections.append({"heading":"首領","buttons":bosses})
+		"equipment":
+			sections.append({"heading":"武器與符文","buttons":[{"label":"符文配置","action":"lab_runes"}]})
+			for i in bag_weapons.size():
+				sections.append({"text":bag_weapons[i]["description"],"buttons":[{"label":"裝備 "+str(bag_weapons[i]["name"]),"action":"lab_secondary","payload":i}]})
+		"controls":
+			sections.append({"heading":"測試控制","buttons":[{"label":"清空怪物與彈體","action":"lab_clear"},{"label":"怪物 AI："+("開" if lab_ai else "停"),"action":"lab_ai"}]})
+	_panel("練習工具",sections)
 func _lab_monsters() -> Array[String]:
 	var names:Array[String]=[]
 	for i in 5:names.append(MonsterRoster.regular("underground",i)["name"])
@@ -3434,11 +3856,18 @@ func _lab_monsters() -> Array[String]:
 	for biome:String in ["trunk","sky"]:
 		for i in 5:names.append(MonsterRoster.regular(biome,i)["name"])
 	names.append("菁英："+str(MonsterRoster.elite(5)["name"]))
+	for biome:String in ["underground","trunk","sky"]:
+		for row in 5:
+			names.append(("菁英：" if row>=3 else "")+str(NewRoster.create(biome,row,0)["name"]))
 	return names
-func _summon_monster(index:int) -> void:
-	if lab_mode!="practice" or index<0 or index>=_lab_monsters().size():return
+func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
+	if lab_mode not in ["practice","tutorial"] or index<0 or index>=_lab_monsters().size():return
 	var definition:Dictionary
-	if index>=11 and index<=16:definition=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][index-11])
+	if index>=28:
+		var offset:int=index-28
+		var family:int=offset/5
+		definition=NewRoster.create(["underground","trunk","sky"][family],offset%5,family*2)
+	elif index>=11 and index<=16:definition=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][index-11])
 	elif index==10:definition=Arms.cute_wanderer(rng)
 	elif index<5:definition=MonsterRoster.regular("underground",index)
 	elif index<10:definition=MonsterRoster.elite(index-5)
@@ -3447,7 +3876,7 @@ func _summon_monster(index:int) -> void:
 	if definition.get("elite",false):definition["hp"]*=3.0
 	definition["hp"]*=Tuning.value("enemy_hp");definition["speed"]*=Tuning.value("enemy_speed")
 	spawn_serial+=1
-	var at:=Vector2(clampf(p["pos"].x+float(p["face"])*240,260,_room_size().x-260),_room_floor())
+	var at:=anchor if anchor.is_finite() else Vector2(clampf(p["pos"].x+float(p["face"])*240,260,_room_size().x-260),_room_floor())
 	if definition["move"]=="fly":at.y-=180
 	definition.merge({"uid":100000+spawn_serial,"pos":at,"anchor":at,"spawn_platform":0,"biome":definition.get("biome",_ecology()["id"]),"ecology_id":_ecology()["id"],"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":1.0,"attack":Attack.new(),"contact_damage":float(definition.get("contact_damage",1.0)),"max_hp":definition["hp"]},true)
 	var placement:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if definition["move"]=="fly" else _fit_enemy_ground(definition)
@@ -3464,11 +3893,25 @@ func _paint_static_props(c:CanvasItem) -> void:
 	if room.get("fountain",false) and layout.has("fountain_pos"):preload("res://scripts/spring_v33.gd").draw(c,layout["fountain_pos"],str(_ecology()["id"]),preload("res://scripts/world_placement_v27.gd").prop_base())
 	if room.get("spring",false):SanctuaryArt.pool_back(c,layout.get("pool",Rect2()),0,Transform2D.IDENTITY)
 
+func _enemy_pose_clock(en:Dictionary) -> float:
+	return float(en["frost_pose_clock"]) if float(en.get("frost_left",0))>0 else (float(en["impact_pose_clock"]) if float(en.get("impact_freeze_left",0))>0 else draw_clock)
+
 func _paint_enemy_body(canvas:CanvasItem,en:Dictionary) -> void:
+	_paint_enemy_actor(canvas,en)
+	var melt:float=clampf(float(en.get("frost_left",0))/2.0,0.0,1.0)
+	if melt<=0:return
+	var ice:Rect2=_enemy_body_box(en).grow(6)
+	var height:float=ice.size.y*lerpf(.15,1.25,melt)
+	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
+	canvas.draw_texture_rect(preload("res://assets/v55/effects/frost.svg"),Rect2(Vector2(ice.position.x-4,ice.end.y-height),Vector2(ice.size.x+8,height)),false,Color(1,1,1,.50))
+
+func _paint_enemy_actor(canvas:CanvasItem,en:Dictionary) -> void:
+	var pose_clock:float=_enemy_pose_clock(en)
+	if NewMonsterArt.draw_actor(canvas,en,pose_clock,Transform2D.IDENTITY):return
 	var atk=en["attack"]
 	var kind:String={0:"melee",1:"ranged",2:"fly",3:"elite",4:"boss",5:"elite"}.get(int(en["model"]),"melee")
-	if int(en["model"])==4:BossVisual.draw(canvas,en,draw_clock,Transform2D.IDENTITY)
-	elif not MonsterDesign.draw_actor(canvas,en,draw_clock,Transform2D.IDENTITY):
+	if int(en["model"])==4:BossVisual.draw(canvas,en,pose_clock,Transform2D.IDENTITY)
+	elif not MonsterDesign.draw_actor(canvas,en,pose_clock,Transform2D.IDENTITY):
 		var phase:String="hurt" if float(en["hurt"])>0 else atk.phase
 		var progress:float=1-float(en["hurt"])/.2 if phase=="hurt" else atk.progress()
 		if phase=="idle" and str(en.get("visual_movement",""))=="dash":
@@ -3476,8 +3919,8 @@ func _paint_enemy_body(canvas:CanvasItem,en:Dictionary) -> void:
 			elif float(en.get("motion_dash_wait",0))>0:phase="brake";progress=1-float(en["motion_dash_wait"])/.9
 		if phase=="idle" and str(en.get("visual_movement",""))=="drift" and float(en.get("turn_left",0))>0:phase="turn";progress=1-float(en["turn_left"])/.25
 		var clip:String=FX.enemy_clip(en,phase)
-		if not FX.actor(canvas,clip,progress,en["pos"],Transform2D.IDENTITY,float(en["face"]),float(en["scale"]),Color.WHITE,phase,draw_clock if phase=="idle" else -1,str(en.get("visual_movement",en.get("movements",["walk"])[0])) in ["hover","drift"]):
-			Sprites.enemy(canvas,en["pos"],float(en["face"]),draw_clock,kind,phase,atk.progress(),Transform2D.IDENTITY,not bool(atk.attack.get("primary",true)),float(en["scale"]))
+		if not FX.actor(canvas,clip,progress,en["pos"],Transform2D.IDENTITY,float(en["face"]),float(en["scale"]),Color.WHITE,phase,pose_clock if phase=="idle" else -1,str(en.get("visual_movement",en.get("movements",["walk"])[0])) in ["hover","drift"]):
+			Sprites.enemy(canvas,en["pos"],float(en["face"]),pose_clock,kind,phase,atk.progress(),Transform2D.IDENTITY,not bool(atk.attack.get("primary",true)),float(en["scale"]))
 		if en.get("elite",false):
 			var weapon:String=str(en["attacks"][1].get("weapon_visual","weapon_heavy"))
 			if not FX.frame(canvas,weapon,0,en["pos"]+Vector2(float(en["face"])*23,-28),Transform2D.IDENTITY,float(en["face"]),46):
@@ -3493,7 +3936,6 @@ func _sync_enemy_canvases() -> void:
 
 func _sync_enemy_canvases_profiled_body() -> void:
 	var alive:Dictionary={}
-	var stamp:int=int(draw_clock*30)
 	for en:Dictionary in enemies:
 		if en.get("training",false) or float(en["hp"])<=0:continue
 		var id:int=int(en["uid"]);alive[id]=true
@@ -3503,10 +3945,12 @@ func _sync_enemy_canvases_profiled_body() -> void:
 			var fresh=EnemyCanvas.new();fresh.profiler=perf_log;fresh.local_origin=true;fresh.paint=_paint_enemy_body;add_child(fresh);enemy_canvases[id]=fresh
 		var sprite=enemy_canvases[id];sprite.actor=en
 		var attack=en["attack"]
-		var signature:Array=[stamp,en.get("face",1),attack.phase,int(attack.progress()*60),int(float(en.get("hurt",0))*60),en.get("scale",1),int(float(en.get("turn_left",0))*60)]
+		var pose_clock:float=_enemy_pose_clock(en)
+		var signature:Array=[int(pose_clock*30),en.get("face",1),attack.phase,int(attack.progress()*60),int(float(en.get("hurt",0))*60),en.get("scale",1),int(float(en.get("turn_left",0))*60)]
 		if en.has("roster_id"):
-			var sample:Dictionary=preload("res://scripts/monster_art_v36.gd").actor_sample(en,draw_clock)
+			var sample:Dictionary=NewMonsterArt.actor_sample(en,pose_clock) if en.has("v55_row") else preload("res://scripts/monster_art_v36.gd").actor_sample(en,pose_clock)
 			signature=[sample["sheet"],sample["row"],sample["column"],en.get("face",1),float(en.get("hurt",0))>0,en.get("scale",1)]
+		signature.append(ceili(float(en.get("frost_left",0))*15))
 		sprite.refresh(world_transform,enabled,signature)
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
@@ -3609,7 +4053,15 @@ func _unlock_blueprint(id:String) -> void:
 
 func _acquire_weapon(weapon:Dictionary) -> String:
 	_unlock_blueprint(str(weapon.get("id","")))
-	var result:String=Arsenal.acquire(bag_weapons,weapon,mode)
+	if lab_mode.is_empty():_collect_trophy("weapons",str(weapon.get("id","")))
+	var result:String
+	if mode=="rogue" and lab_mode.is_empty() and not bag_weapons.is_empty():
+		var held:Dictionary=bag_weapons[posmod(secondary_index,bag_weapons.size())]
+		var bonus:int=int(held.get("duplicate_bonus",0))
+		result="max" if bonus>=Arsenal.MAX_DUPLICATES else "upgrade"
+		held["duplicate_bonus"]=mini(bonus+1,Arsenal.MAX_DUPLICATES)
+		weapon=held
+	else:result=Arsenal.acquire(bag_weapons,weapon,mode)
 	match result:
 		"new":_toast("取得副武器："+str(weapon["name"])+(" · 一次發動 %d / 16把"%bag_weapons.size() if mode=="musou" else " · 藍圖已解鎖"))
 		"upgrade":_toast(str(weapon["name"])+" · 重複強化，投射物 +1（最多 +8）")

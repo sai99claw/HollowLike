@@ -73,8 +73,8 @@ func run() -> void:
 	var body:Dictionary=Corpses.create({"roster_id":"test","roster_biome":"sky","roster_row":0,"roster_elite":false,"pos":Vector2(500,500),"face":-1,"death_direction":Vector2.RIGHT,"death_knockback":76,"body_size":Vector2(34,45)})
 	check(is_equal_approx(body["vel"].x,76*1.5) and body["factor"]==1,"Corpse preserves hit direction with1.5x lethal knockback and no scaling")
 	g.atmosphere.configure("trunk",37,true,false,true,g.layout);g.atmosphere.depth_origin=Vector2.ZERO;g.atmosphere.depth_origin_ready=true
-	var world:=Transform2D(0,Vector2.ONE*1.3,0,Vector2(-130,-260));g.atmosphere.update_view(Vector2(100,200),1.3,world,Vector2(500,500),1,1,false)
-	check(g.atmosphere.middle_objects.transform==Atmosphere.parallax(Vector2(100,200),1.3,Atmosphere.MID_FACTOR),"Quiet-room middle objects also use independent parallax")
+	var world:=Transform2D(0,Vector2.ONE*1.3,0,Vector2(-130,-260));g.atmosphere.backdrop_transform=Atmosphere.parallax(Vector2(100,200),1.3,Atmosphere.FAR_FACTOR);g.atmosphere.update_view(Vector2(100,200),1.3,world,Vector2(500,500),1,1,false)
+	check(is_equal_approx(g.atmosphere.middle_objects.transform.origin.y,g.atmosphere.backdrop_transform.origin.y),"Quiet-room middle objects share backdrop vertical parallax")
 	var before:Vector2=g.atmosphere.middle_objects.transform.origin;g.atmosphere.update_view(Vector2(300,200),1.3,world,Vector2(500,500),1,1,false)
 	check(is_equal_approx(g.atmosphere.middle_objects.transform.origin.x-before.x,-200*1.3*.42),"200px camera move displaces middle objects by42percent")
 	check(g.atmosphere.middle_objects.transform!=world and Atmosphere.MID_FACTOR>Atmosphere.FAR_FACTOR,"Middle/background/foreground have three different camera speeds")

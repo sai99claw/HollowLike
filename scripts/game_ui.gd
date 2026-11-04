@@ -174,7 +174,7 @@ func _build_header() -> void:
 	prep_button.position = Vector2(20,190)
 	prep_button.visible = false
 	ui_root.add_child(prep_button)
-	minimap_button=_button("按住 Tab 查看小地圖","",null);minimap_button.disabled=true;minimap_button.focus_mode=Control.FOCUS_NONE;minimap_button.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	minimap_button=_button("Tab 切換地圖","",null);minimap_button.disabled=true;minimap_button.focus_mode=Control.FOCUS_NONE;minimap_button.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	minimap_button.position=Vector2(950,86);minimap_button.custom_minimum_size=Vector2(312,32)
 	ui_root.add_child(minimap_button)
 	quickbar=HBoxContainer.new();quickbar.position=Vector2(20,642);quickbar.add_theme_constant_override("separation",6);ui_root.add_child(quickbar)
@@ -304,7 +304,7 @@ func update_hud(info: Dictionary) -> void:
 	if home:header.reset_size()
 	var revive_value:String="重傷 · 回安全屋急救" if info.get("injured",false) else "健全"
 	weapon_label.text = "主武器 %s  ·  %s" % [str(info.get("weapon", "—")), str(revive_value)]
-	secondary_label.text="副武器 %s  ·  %s 切換"%[str(info.get("sub","尚未裝備")),str(info.get("cycle_key","Q"))]
+	secondary_label.text="附武器 %s ×%d  ·  %s 切換"%[str(info.get("sub","尚未裝備")),int(info.get("sub_count",0)),str(info.get("cycle_key","Q"))]
 	secondary_art.texture=Icons.texture(str(info.get("sub_icon","")))
 	mute_button.text="聲音：開" if info.get("audio_enabled",true) else "聲音：靜音"
 	var phase: String = str(info.get("phase", "idle"))
@@ -400,7 +400,7 @@ func update_shortcuts(names:Dictionary) -> void:
 	prep_button.text="安全屋 "+str(names.get("up","↑"))
 	for action in shortcut_buttons:
 		shortcut_buttons[action].text={"bag":"裝備","runes":"符文","settings":"選單"}[action]+" "+str(names.get("interact" if action=="bag" else action,""))
-	minimap_button.text="按住 "+str(names.get("map","Tab"))+" 查看小地圖"
+	minimap_button.text=str(names.get("map","Tab"))+" 切換地圖"
 	legend_label.text="移動 %s %s %s %s    跳 %s    攻擊 %s    衝刺 %s ×2    副武器 %s    回血 %s    地圖 %s"%[names.get("up","↑"),names.get("down","↓"),names.get("left","←"),names.get("right","→"),names.get("jump","Space"),names.get("attack","X"),names.get("dash","C"),names.get("sub","Z"),names.get("heal","A"),names.get("map","Tab")]
 
 
@@ -598,7 +598,15 @@ func _bar(color: Color, minimum: Vector2) -> ProgressBar:
 	return bar
 
 
-func _box(background: Color, border: Color, radius: int, padding: int) -> StyleBoxFlat:
+func _box(background: Color, border: Color, radius: int, padding: int) -> StyleBox:
+	if border.a>0 and background.a>0 and padding<=12:
+		var illustrated:=StyleBoxTexture.new()
+		illustrated.texture=preload("res://assets/v55/ui/etched_slot.svg")
+		illustrated.modulate_color=Color(.72+background.r*.7,.72+background.g*.7,.72+background.b*.7,background.a)
+		for side in [SIDE_LEFT,SIDE_TOP,SIDE_RIGHT,SIDE_BOTTOM]:
+			illustrated.set_texture_margin(side,23)
+			illustrated.set_content_margin(side,padding)
+		return illustrated
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
 	style.border_color = border
@@ -674,15 +682,18 @@ func navigate(action:String) -> bool:
 
 func update_quickbar(items:Dictionary,definitions:Array) -> void:
 	var counts:PackedStringArray=[]
-	for i in mini(9,definitions.size()):counts.append(str(items.get(str(i),0)))
+	for i in mini(5,definitions.size()):counts.append(str(items.get(str(i),0)))
 	var signature:String=",".join(counts)
 	if signature==_quickbar_signature:return
 	_quickbar_signature=signature;quickbar_rebuilds+=1
 	for child in quickbar.get_children():quickbar.remove_child(child);child.queue_free()
-	for i in mini(9,definitions.size()):
+	for i in mini(5,definitions.size()):
 		var count:int=int(items.get(str(i),0))
-		var b:=_button("⇧%d  %s ×%d"%[i+1,definitions[i]["name"],count],"hot_item",i)
-		b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.custom_minimum_size=Vector2(110,30);b.disabled=count<=0
+		var b:=_button("%d   ×%d"%[i+1,count],"hot_item",i)
+		var id:String=definitions[i]["id"]
+		b.icon=Icons.texture("items_"+id)
+		b.expand_icon=true;b.tooltip_text=definitions[i]["name"]
+		b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.custom_minimum_size=Vector2(78,42);b.disabled=count<=0
 		quickbar.add_child(b)
 
 func update_trial(trial:Dictionary,stock:Array,coins:int) -> void:

@@ -11,7 +11,7 @@ static func texture() -> Texture2D:
 	return image
 static func pose(at:Vector2,angle:float,length:float) -> Transform2D:
 	var factor:float=length/float(info()["reference_height"])
-	return Transform2D(angle,Vector2(-factor,factor),0,at)
+	return Transform2D(angle,Vector2(-factor*.85,factor*1.20),0,at)
 static func draw(c:CanvasItem,at:Vector2,angle:float,length:float,base:Transform2D,alpha:float) -> void:
 	var d:Dictionary=info();var p:Array=d["pivot"];var r:Array=d["source_rect"]
 	c.draw_set_transform_matrix(base*pose(at,angle,length))

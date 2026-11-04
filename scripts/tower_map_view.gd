@@ -78,17 +78,23 @@ static func chapter_layout(data:Dictionary,id:int,rect:Rect2) -> Dictionary:
 	for room:Dictionary in selected:points[int(room["id"])]=rect.get_center()+(Vector2(room["coord"])-center)*Vector2(stride,stride_y)
 	return {"rooms":selected,"points":points,"stage":stage,"stride":stride,"stride_y":stride_y}
 
-static func draw_chapter(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Font) -> void:
+static func draw_chapter(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Font,fog:bool=false) -> void:
 	var graph:Dictionary=chapter_layout(data,id,rect)
 	if graph.is_empty():return
 	var points:Dictionary=graph["points"];var extent:=Vector2(48,30)
+	if fog:
+		for candidate:Dictionary in graph["rooms"]:
+			if not candidate.get("visited",false) and int(candidate["id"])!=id:points.erase(candidate["id"])
 	for room:Dictionary in graph["rooms"]:
 		var rid:int=room["id"]
+		if not points.has(rid):continue
 		for next:int in room["neighbors"].values():
 			if next<rid or not points.has(next):continue
 			c.draw_line(points[rid],points[next],Color("7c9eaa"),4,true)
 	for room:Dictionary in graph["rooms"]:
-		var rid:int=room["id"];var at:Vector2=points[rid];var color:Color=room_color(room,-1)
+		var rid:int=room["id"]
+		if not points.has(rid):continue
+		var at:Vector2=points[rid];var color:Color=room_color(room,-1)
 		var box:=Rect2(at-extent*.5,extent)
 		c.draw_rect(box,Color("183640") if room.get("visited",false) else Color("0d202b"))
 		c.draw_rect(box,color,false,2 if rid!=id else 3)
@@ -97,7 +103,7 @@ static func draw_chapter(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Fon
 		if rid==id:
 			c.draw_rect(box.grow(5),Color("fff0a6"),false,3)
 			c.draw_colored_polygon(PackedVector2Array([at+Vector2(-5,-26),at+Vector2(5,-26),at+Vector2(0,-18)]),Color("fff0a6"))
-		if room["type"]=="boss":
+		if not fog and room["type"]=="boss":
 			for direction:String in room["neighbors"]:
 				var next:int=room["neighbors"][direction]
 				if points.has(next):continue
@@ -138,22 +144,33 @@ static func full_tower_layout(data:Dictionary,rect:Rect2) -> Array[Dictionary]:
 		result.append({"stage":stage,"rect":bounds,"graph":{"rooms":selected,"points":points,"extent":extent,"stride":stride}})
 	return result
 
-static func draw_full_tower(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Font) -> void:
+static func draw_full_tower(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Font,fog:bool=false) -> void:
 	var chapters:Array[Dictionary]=full_tower_layout(data,rect);var points:Dictionary={}
 	for chapter:Dictionary in chapters:points.merge(chapter["graph"]["points"])
 	if points.is_empty():return
 	var rooms:Array=data["rooms"];var extent:Vector2=chapters[0]["graph"]["extent"]
+	if fog:
+		var revealed:Dictionary={}
+		for candidate:Dictionary in rooms:
+			if candidate.get("boss_defeated",false):revealed[candidate["map_index"]]=true
+		for candidate:Dictionary in rooms:
+			if int(candidate["id"])!=id and not candidate.get("visited",false) and not revealed.has(candidate["map_index"]):points.erase(candidate["id"])
 	for room:Dictionary in rooms:
+		if not points.has(room["id"]):continue
 		for next:int in room["neighbors"].values():
-			if next<int(room["id"]):continue
+			if next<int(room["id"]) or not points.has(next):continue
 			var cross:bool=int(room["map_index"])!=int(rooms[next]["map_index"])
 			c.draw_line(points[room["id"]],points[next],Color("ffd581") if cross else Color("7595a3"),3 if cross else 2,true)
 	for room:Dictionary in rooms:
-		var rid:int=room["id"];var at:Vector2=points[rid];var color:Color=room_color(room,-1);var node:=Rect2(at-extent*.5,extent)
+		var rid:int=room["id"]
+		if not points.has(rid):continue
+		var at:Vector2=points[rid];var color:Color=room_color(room,-1);var node:=Rect2(at-extent*.5,extent)
 		c.draw_rect(node,Color("18313b"));c.draw_rect(node,color,false,1.5)
 		var symbol:String={"start":"整","elite":"菁","boss":"王","merchant":"商","reward":"寶"}.get(str(room["type"]),"泉" if room.get("fountain",false) else "")
 		if not symbol.is_empty():c.draw_string(font,at+Vector2(-5,4),symbol,HORIZONTAL_ALIGNMENT_LEFT,-1,clampi(int(extent.y),9,12),color)
 		if rid==id:c.draw_rect(node.grow(3),Color("fff0a6"),false,2)
 	for chapter:Dictionary in chapters:
-		var stage:Dictionary=chapter["stage"];var at:Vector2=points[stage["start_id"]]
+		var stage:Dictionary=chapter["stage"]
+		if not points.has(stage["start_id"]):continue
+		var at:Vector2=points[stage["start_id"]]
 		c.draw_string(font,at+Vector2(extent.x*.5+7,4),str(int(stage["index"])+1),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("b4d6d3"))

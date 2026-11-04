@@ -41,9 +41,23 @@ static func build(ui,data:Dictionary,page:int) -> void:
 		description+=("\n無雙夢境齊射：%d / 16把\n按Z消耗1格能量，全部武器同時發動。"%data["weapons"].size() if data["mode"]=="musou" else "\n重複武器增加投射物，最多 +8。\n遊戲中Q切換；面板內↓進入清單，X裝備。")
 		if data["mode"]=="musou":description+="\n齊射週期 %.2f秒（基礎0.60秒），受攻速符文調整；前搖0，不隨選取武器改變。"%float(data.get("musou_cycle_seconds",.6))
 		if not data["weapons"].is_empty():description+="\n目前重複強化 +%d"%int(definition.get("duplicate_bonus",0))
-	if page==2:description+="\n快捷：Shift＋1～9 使用消耗品。\n未綁定的數字鍵也可使用消耗品。"
+	if page==2:description+="\n快捷：Shift＋1～5 使用消耗品。\n未綁定的數字鍵也可使用消耗品。"
 	var text:Label=ui._label(description,16,ui.MUTED);text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;hero.add_child(text)
 	list.add_child(ui._label(["主武器動作","附武器清單","隨身補給"][clampi(page,0,2)],20,ui.MINT))
+	if page==1 and data["mode"]=="musou":
+		var sockets:=GridContainer.new()
+		sockets.columns=8
+		list.add_child(sockets)
+		for i in 16:
+			var socket:=PanelContainer.new()
+			socket.custom_minimum_size=Vector2(43,43)
+			socket.add_theme_stylebox_override("panel",ui._box(Color("20352d"),ui.GOLD,6,3))
+			sockets.add_child(socket)
+			if i<data["weapons"].size():
+				var weapon:Dictionary=data["weapons"][i]
+				socket.add_child(ui._icon(Icons.secondary(weapon),34))
+				socket.tooltip_text=weapon["name"]
+			else:socket.add_child(ui._label("·",15,ui.MUTED))
 	var scroll:=ScrollContainer.new();scroll.custom_minimum_size=Vector2(490,310);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;list.add_child(scroll)
 	var rows:=VBoxContainer.new();rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL;rows.add_theme_constant_override("separation",8);scroll.add_child(rows)
 	if page==0:

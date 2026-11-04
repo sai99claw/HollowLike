@@ -10,6 +10,11 @@ static var icons:Dictionary={}
 
 static func texture(clip:String) -> Texture2D:
 	if icons.has(clip):return icons[clip]
+	if clip in ["items_shock","items_power"]:
+		var icon:Texture2D=load("res://assets/v54/"+clip+".svg")
+		icons[clip]=icon
+		return icon
+	clip={"strong_single_pierce":"strong_swiftblade","strong_held_flight":"strong_heartplus","strong_poison_trail":"runes_pierce","strong_steady_energy":"strong_motion_energy"}.get(clip,clip)
 	if clip.begins_with("runes_sub_"):
 		var path:String="res://assets/v24/runes/rune_"+clip.trim_prefix("runes_")+".png"
 		if ResourceLoader.exists(path):

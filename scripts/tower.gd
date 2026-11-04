@@ -176,9 +176,9 @@ static func _assign_dimensions(rooms:Array[Dictionary],rng:RandomNumberGenerator
 	for room:Dictionary in rooms:
 		if room["type"] in ["start","merchant","reward"] or room.get("spring",false):safe_columns[room["coord"].x]=true;safe_rows[room["coord"].y]=true
 	# Equal column widths / row heights stitch independently random rectangles.
-	for x in range(bounds.position.x,bounds.end.x+1):widths[x]=maxi(17,roundi(WIDTHS[rng.randi_range(0,WIDTHS.size()-1)]*room_scale)|1);widths[x]=17 if safe_columns.has(x) else widths[x];xs[x]=at;at+=widths[x]-1
+	for x in range(bounds.position.x,bounds.end.x+1):widths[x]=maxi(17,roundi(WIDTHS[rng.randi_range(0,WIDTHS.size()-1)]*room_scale*1.20)|1);widths[x]=17 if safe_columns.has(x) else widths[x];xs[x]=at;at+=widths[x]-1
 	at=0
-	for y in range(bounds.position.y,bounds.end.y+1):heights[y]=clampi(roundi(HEIGHTS[rng.randi_range(0,HEIGHTS.size()-1)]*room_scale)|1,9,15);heights[y]=11 if safe_rows.has(y) else heights[y];ys[y]=at;at+=heights[y]-1
+	for y in range(bounds.position.y,bounds.end.y+1):heights[y]=clampi(roundi((HEIGHTS[rng.randi_range(0,HEIGHTS.size()-1)]*room_scale*1.20-1.0)*.5)*2+1,9,15);heights[y]=11 if safe_rows.has(y) else heights[y];ys[y]=at;at+=heights[y]-1
 	var origin:Vector2i=Vector2i(xs.get(0,0),ys.get(0,0))
 	for room in rooms:
 		var coord:Vector2i=room["coord"];room["width"]=widths[coord.x];room["height"]=heights[coord.y]

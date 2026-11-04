@@ -36,7 +36,7 @@ func run() -> void:
 	for biome:String in ["sky","trunk","underground"]:
 		var far:ShaderMaterial=Depth.material(biome,"far");var mid:ShaderMaterial=Depth.material(biome,"middle");var low:ShaderMaterial=Depth.material(biome,"middle",true)
 		check(float(far.get_shader_parameter("contrast"))<float(mid.get_shader_parameter("contrast")),"Depth planes preserve separate contrast groups")
-		check(float(far.get_shader_parameter("blur_radius"))>float(mid.get_shader_parameter("blur_radius")) and float(low.get_shader_parameter("blur_radius"))==0,"Farther is softer; reduced mode skips blur offsets")
+		check(float(far.get_shader_parameter("blur_radius"))>float(mid.get_shader_parameter("blur_radius")) and float(low.get_shader_parameter("blur_radius"))<float(mid.get_shader_parameter("blur_radius")),"Farther is softer; reduced mode weakens midground blur")
 	check(is_equal_approx(Depth.backdrop_rect().size.aspect(),1.5),"Far art retains original three-to-two aspect ratio")
 	print("v32 checked ",rooms_checked," layouts; ",failures)
 	quit(0 if failures.is_empty() else 1)

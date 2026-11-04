@@ -62,12 +62,16 @@ const STRONG_RUNES:Array[Dictionary]=[
 	{"id":"reflect","name":"返羽","effect":"reflect","value":1.0,"desc":"斬擊反彈投射物","description":"斬擊反彈投射物","icon":"↗","color":Color("c9e9ff"),"strong":true},
 	{"id":"longblade","name":"長空","effect":"reach_mult","value":.5,"desc":"攻擊距離 ×1.5","description":"攻擊距離 ×1.5","icon":"↔","color":Color("d5c5ff"),"strong":true},
 	{"id":"swiftblade","name":"瞬羽","effect":"haste_mult","value":.5,"desc":"前後搖縮短三分之一","description":"前後搖縮短三分之一","icon":"»","color":Color("9de4ce"),"strong":true},
-	{"id":"sanctuary","name":"靜癒","effect":"heal_guard","value":1.0,"desc":"持續回血引導時無敵","description":"持續回血引導時無敵","icon":"+","color":Color("b5e7b5"),"strong":true},
+	{"id":"sanctuary","name":"靜癒","effect":"heal_guard","value":1.0,"desc":"回血引導時無法移動並無敵","description":"回血引導時無法移動並無敵","icon":"+","color":Color("b5e7b5"),"strong":true},
 	{"id":"orbit_shield","name":"環羽盾","effect":"orbit_shield","value":1.0,"desc":"身邊環繞的盾可攔截投射物","description":"身邊環繞的盾可攔截投射物","icon":"◇","color":Color("b4d0ff"),"strong":true},
 	{"id":"orbit_bee","name":"蜜使","effect":"orbit_bee","value":1.0,"desc":"環繞蜜蜂自動攻擊可見敵人","description":"環繞蜜蜂自動攻擊可見敵人","icon":"B","color":Color("ffe09a"),"strong":true},
 	{"id":"motion_energy","name":"行風","effect":"motion_energy","value":1.0,"desc":"實際移動累積距離回復能量","description":"實際移動累積距離回復能量","icon":"E","color":Color("a3eadc"),"strong":true},
 	{"id":"bloodblade","name":"汲命","effect":"lifesteal","value":.12,"desc":"有效命中時12%機率回復1格生命","description":"有效命中時12%機率回復1格生命","icon":"♥","color":Color("efa6b5"),"strong":true},
-	{"id":"heartplus","name":"豐羽","effect":"max_hp","value":1.0,"desc":"最大生命 +1","description":"最大生命 +1","icon":"♥+","color":Color("f3c9a4"),"strong":true}
+	{"id":"heartplus","name":"豐羽","effect":"max_hp","value":1.0,"desc":"最大生命 +1","description":"最大生命 +1","icon":"♥+","color":Color("f3c9a4"),"strong":true},
+	{"id":"single_pierce","name":"穿風","effect":"single_pierce","value":1.0,"desc":"單按衝刺直接穿刺","description":"單按衝刺直接穿刺","icon":"»","color":Color("c9e9ff"),"strong":true},
+	{"id":"held_flight","name":"浮翼","effect":"held_flight","value":1.0,"desc":"長按跳躍飛行","description":"長按跳躍飛行","icon":"↑","color":Color("d5c5ff"),"strong":true},
+	{"id":"poison_trail","name":"毒羽","effect":"poison_trail","value":1.0,"desc":"移動留下毒氣三秒，每秒扣一血","description":"移動留下毒氣三秒，每秒扣一血","icon":"◇","color":Color("a1d68a"),"strong":true},
+	{"id":"steady_energy","name":"蓄風","effect":"energy_regen","value":.5,"desc":"每兩秒回復一格能量","description":"每兩秒回復一格能量","icon":"E","color":Color("a3eadc"),"strong":true}
 ]
 static func all_runes() -> Array:
 	return RUNES+STRONG_RUNES
@@ -79,9 +83,10 @@ static func is_strong(id:String) -> bool:
 const ITEMS: Array[Dictionary] = [
 	{"id": "heal", "name": "暖心莓果", "desc": "回復兩格生命", "description": "回復兩格生命", "color": Color("99dca2")},
 	{"id": "energy", "name": "晨露瓶", "desc": "補滿能量", "description": "補滿能量", "color": Color("88d5f4")},
-	{"id": "bomb", "name": "爆裂橡實", "desc": "範圍攻擊周圍敵人", "description": "範圍攻擊周圍敵人", "color": Color("f6b072")},
-	{"id": "shield", "name": "羽絨護盾", "desc": "短暫傷害保護", "description": "短暫傷害保護", "color": Color("c3bbfa")},
-	{"id": "freeze", "name": "霜葉", "desc": "短暫凍結敵人", "description": "短暫凍結敵人", "color": Color("b2e5ee")}
+	{"id": "shock", "name": "震波果", "desc": "強力擊退半個畫面的敵人", "description": "強力擊退半個畫面的敵人", "color": Color("f6b072")},
+	{"id": "shield", "name": "羽絨護盾", "desc": "召喚兩面旋轉護盾，持續一分鐘", "description": "召喚兩面旋轉護盾，持續一分鐘", "color": Color("c3bbfa")},
+	{"id": "freeze", "name": "霜葉", "desc": "大範圍凍結敵人兩秒", "description": "大範圍凍結敵人兩秒", "color": Color("b2e5ee")},
+	{"id":"power","name":"赤羽果","desc":"普通攻擊傷害增加20%，持續兩分鐘","description":"普通攻擊傷害增加20%，持續兩分鐘","color":Color("ff705d")}
 ]
 
 ## A short first adventure opens the whole movement language.

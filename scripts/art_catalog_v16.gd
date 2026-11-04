@@ -36,10 +36,11 @@ static func entry(id:String) -> Dictionary:
 
 static func _art_v37() -> void:
 	var data:Dictionary=_json(ROOT+"v37/effects/feather-crescent.json")
-	for kind:String in ["feathers"]:
-		var frames:Array=[]
-		for f:Dictionary in data.get("animations",{}).get(kind,[]):frames.append(_descriptor(ROOT+"v37/effects/"+data["path"],f["source_rect"]))
-		_add("v37:"+kind,"命中碎羽" if kind=="feathers" else "大型月牙","戰鬥特效",frames,16,"三張獨立貼圖，命中點噴出碎羽與亮色月牙。")
+	var feathers:Array=[]
+	var source_frames:Array=data.get("animations",{}).get("feathers",[])
+	for i in mini(source_frames.size(),2):
+		feathers.append(_descriptor(ROOT+"v37/effects/"+data["path"],source_frames[i]["source_rect"]))
+	_add("v37:feathers","命中碎羽","戰鬥特效",feathers,16,"兩張命中碎羽，每幀 1/16 秒。")
 	data=_json(ROOT+"v37/player/ledge-mantle.json");var frames:Array=[]
 	for f:Dictionary in data.get("frames",[]):frames.append(_descriptor(ROOT+"v37/player/"+data["path"],f["source_rect"]))
 	_add("v37:mantle","攀上平台","主角",frames,12.5,"牆邊接觸不足51%時，四張關鍵姿勢攀上平台。")

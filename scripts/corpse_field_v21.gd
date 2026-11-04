@@ -4,6 +4,8 @@ const Motion=preload("res://scripts/monster_motion_v18.gd")
 const Appearance=preload("res://scripts/monster_appearance.gd")
 const Collision=preload("res://scripts/world_collision.gd")
 const Atlas=preload("res://scripts/atlas_v22.gd")
+const NewMonsterArt=preload("res://scripts/monster_art_v55.gd")
+const NewBossArt=preload("res://scripts/boss_art_v55.gd")
 static func death_velocity(en:Dictionary) -> Vector2:
 	var direction:Vector2=en.get("death_direction",Vector2(-float(en.get("face",1)),0))
 	if direction.length_squared()<.01:direction=Vector2.LEFT
@@ -12,20 +14,28 @@ static func death_velocity(en:Dictionary) -> Vector2:
 	return Vector2(direction.x*speed,-160+minf(0,direction.y)*speed) if direction.y<=.5 else Vector2(direction.x*speed,speed)
 static func create(en:Dictionary) -> Dictionary:
 	if en.has("roster_id"):
-		var size:Vector2=preload("res://scripts/monster_art_v36.gd").corpse_extent(en)
-		return {"identity":str(en["roster_id"]),"roster_actor":{"roster_biome":en["roster_biome"],"roster_row":en["roster_row"],"roster_elite":en["roster_elite"]},"pos":Vector2(en["pos"]),"vel":death_velocity(en),"factor":1.0,"visual_size":size,"body_size":size*.9,"age":0.0,"land_age":-1.0,"frame":0,"face":float(en.get("face",1)),"settled":false}
+		var actor:Dictionary={"roster_biome":en["roster_biome"],"roster_row":en.get("roster_row",0),"roster_elite":en["roster_elite"]}
+		var size:Vector2
+		if en.has("v55_row"):
+			actor["v55_row"]=en["v55_row"]
+			actor["world_height"]=en["world_height"]
+			size=NewMonsterArt.corpse_extent(en)
+		else:size=preload("res://scripts/monster_art_v36.gd").corpse_extent(en)
+		return {"identity":str(en["roster_id"]),"roster_actor":actor,"pos":Vector2(en["pos"]),"vel":death_velocity(en),"factor":1.0,"visual_size":size,"body_size":size*.9,"age":0.0,"land_age":-1.0,"frame":0,"face":float(en.get("face",1)),"settled":false}
 	var identity:String=Motion.identity(en);var clip:Dictionary=Atlas.clip("death",identity)
 	var factor:float=float(clip.get("world_width",80))/maxf(1,float(clip.get("reference_width",400)))
 	if not Appearance.is_boss(en):factor*=float(en.get("scale",1))
 	var rest:Dictionary=clip["frames"][7] if not clip.is_empty() else {}
 	var extent:Vector2=Atlas.bounds(rest).size*factor if not rest.is_empty() else Vector2(60,25)
+	var painted_extent:Vector2=NewBossArt.corpse_extent(identity) if Appearance.is_boss(en) else Vector2.ZERO
+	if painted_extent!=Vector2.ZERO:extent=painted_extent
 	var direction:Vector2=en.get("death_direction",Vector2(-float(en.get("face",1)),0))
 	if direction.length_squared()<.01:direction=Vector2(-float(en.get("face",1)),0)
 	direction=direction.normalized()
 	var force:float=clampf(float(en.get("death_knockback",90))*.85,65,120)
 	var velocity:Vector2=death_velocity(en)
 	var face:float=float(en.get("face",1))
-	return {"identity":identity,"pos":Vector2(en["pos"]),"vel":velocity,"factor":factor,"visual_size":extent,"body_size":extent*Vector2(.9,.9),"age":0.0,"land_age":-1.0,"frame":0,"face":face,"settled":false}
+	return {"identity":identity,"boss_v55":painted_extent!=Vector2.ZERO,"pos":Vector2(en["pos"]),"vel":velocity,"factor":factor,"visual_size":extent,"body_size":extent*Vector2(.9,.9),"age":0.0,"land_age":-1.0,"frame":0,"face":face,"settled":false}
 static func step(body:Dictionary,delta:float,solids:Array,platforms:Array,bounds:Vector2) -> bool:
 	if body.get("settled",false):return false
 	var dt:float=minf(delta,1.0/30);var remaining:float=delta
@@ -53,6 +63,7 @@ static func _step(body:Dictionary,delta:float,solids:Array,platforms:Array,bound
 		if float(body["land_age"])>=.5:body["settled"]=true;body["vel"]=Vector2.ZERO;body["frame"]=7
 	else:body["frame"]=mini(3,int(float(body["age"])*12))
 static func draw(c:CanvasItem,body:Dictionary) -> void:
+	if NewMonsterArt.draw_corpse(c,body) or NewBossArt.draw_corpse(c,body):return
 	if preload("res://scripts/monster_art_v36.gd").draw_corpse(c,body):return
 	# Flight, impact and slack rest are authored poses, never a rotated standing sprite.
 	Atlas.draw(c,"death",str(body["identity"]),int(body["frame"]),body["pos"],float(body["factor"]),float(body["face"]))

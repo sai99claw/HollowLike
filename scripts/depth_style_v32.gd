@@ -7,11 +7,11 @@ static func material(biome:String,role:String,reduced:bool=false) -> ShaderMater
 	if materials.has(key):return materials[key]
 	var result:=ShaderMaterial.new();result.shader=load("res://shaders/depth_grade_v32.gdshader")
 	result.set_shader_parameter("fog_color",FOG.get(biome,FOG["trunk"]))
-	result.set_shader_parameter("blur_radius",0.0 if reduced else (2.4 if role=="far" else 1.2))
-	result.set_shader_parameter("saturation",.58 if role=="far" else .66)
+	result.set_shader_parameter("blur_radius",(0.0 if reduced else 2.4) if role=="far" else (.65 if reduced else 1.05))
+	result.set_shader_parameter("saturation",.58 if role=="far" else .34)
 	result.set_shader_parameter("contrast",.62 if role=="far" else .78)
-	result.set_shader_parameter("fog_amount",.25 if role=="far" else .12)
-	result.set_shader_parameter("brightness",.92 if role=="far" else .82)
+	result.set_shader_parameter("fog_amount",.25 if role=="far" else .08)
+	result.set_shader_parameter("brightness",.92 if role=="far" else .55)
 	materials[key]=result
 	return result
 static func backdrop_rect() -> Rect2:
