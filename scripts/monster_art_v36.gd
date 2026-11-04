@@ -52,7 +52,8 @@ static func actor_bounds(en:Dictionary,time:float=0) -> Rect2:
 	var data:Dictionary=manifest(str(en["roster_biome"]));var sample:Dictionary=actor_sample(en,time)
 	var sheet:String=sample["sheet"];var row:int=sample["row"];var item:Dictionary=frame(data,sheet,row,int(sample["column"]))
 	var b:Array=item["bounds"];var pivot:Array=item["pivot"]
-	var factor:float=50.9375*(sqrt(2.0) if en.get("roster_elite",false) else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
+	if sample["phase"]=="move":pivot=[pivot[0],float(b[1])+float(b[3])]
+	var factor:float=50.9375*(2.0 if en.get("roster_elite",false) else 1)/maxf(1,float(data["sheets"][sheet]["reference_heights"][row]))
 	var face:float=float(en.get("face",1));var center:=Vector2((float(b[0])+float(b[2])*.5-float(pivot[0]))*face,float(b[1])+float(b[3])*.5-float(pivot[1]))*factor+Vector2(en["pos"])
 	var size:=Vector2(b[2],b[3])*factor
 	return Rect2(center-size*.5,size)
@@ -63,8 +64,13 @@ static func draw_actor(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=Tr
 	if data.is_empty():return false
 	var sample:Dictionary=actor_sample(en,time);var sheet:String=sample["sheet"];var row:int=sample["row"]
 	var reference:float=float(data["sheets"][sheet]["reference_heights"][row])
-	var height:float=50.9375*(sqrt(2.0) if bool(en.get("roster_elite",false)) else 1.0)
-	return _draw(c,data,sheet,frame(data,sheet,row,int(sample["column"])),en["pos"],height/maxf(1,reference),float(en.get("face",1)),base,Color("f8d8c4") if float(en.get("hurt",0))>0 else Color.WHITE)
+	var height:float=50.9375*(2.0 if bool(en.get("roster_elite",false)) else 1.0)
+	var item:Dictionary=frame(data,sheet,row,int(sample["column"]))
+	if sample["phase"]=="move" and not item.is_empty():
+		item=item.duplicate(false)
+		var bounds:Array=item["bounds"]
+		item["pivot"]=[item["pivot"][0],float(bounds[1])+float(bounds[3])]
+	return _draw(c,data,sheet,item,en["pos"],height/maxf(1,reference),float(en.get("face",1)),base,Color("f8d8c4") if float(en.get("hurt",0))>0 else Color.WHITE)
 static func draw_projectile(c:CanvasItem,pr:Dictionary,base:Transform2D) -> bool:
 	var key:Dictionary=identity(str(pr.get("visual_id","")))
 	if key.is_empty():return false

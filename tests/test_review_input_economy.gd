@@ -14,15 +14,17 @@ func run() -> void:
 	game.set_process(false);game.set_physics_process(false);game.practice_mode=true;game.new_run("rogue",350171);game._close_panel();game._clear_keys();game.p_attack.cancel()
 	var needle:Dictionary=Data.secondary_attack(Arsenal.index_of("needle"))
 	var laser:Dictionary=Data.secondary_attack(Arsenal.index_of("piercing_laser"))
-	# The same physical key reaches the configured gameplay action first.
+	# Bare number keys use the quickbar before gameplay bindings.
 	game.bag_items={"0":2};game.p["hp"]=1;game.weapon_index=1
-	game._unhandled_input(key_event(KEY_1))
-	check(game.weapon_index==1 and game.bag_items["0"]==2,"Bare1 preserves the only independent primary without consuming inventory")
-	game._unhandled_input(key_event(KEY_3));check(game.weapon_index==1,"Bare3 cannot restore the removed heavy primary")
-	game._unhandled_input(key_event(KEY_1,true))
-	check(game.weapon_index==1 and game.bag_items["0"]==1 and game.p["hp"]==3,"Shift1 explicitly consumes slot1 without changing weapon or opening panel")
+	game._input(key_event(KEY_1))
+	check(game.weapon_index==1 and game.bag_items["0"]==1 and game.p["hp"]==3,"Bare 1 consumes slot 1 and heals without changing weapons")
+	game._input(key_event(KEY_3))
+	check(game.weapon_index==1 and not game.ui.is_panel_open(),"An empty slot leaves gameplay open")
+	game._input(key_event(KEY_1,true))
+	check(game.bag_items["0"]==1,"Modified key does not consume a quickbar item")
 	game.Bindings.assign(game.key_bindings,"primary_2",KEY_4);game.bag_items["3"]=2
-	game._unhandled_input(key_event(KEY_4));check(game.weapon_index==1 and game.bag_items["3"]==2,"A custom binding on4 is not intercepted by consumables")
+	game._input(key_event(KEY_4))
+	check(game.bag_items["3"]==1,"Bare 4 still consumes slot 4 with an existing number binding")
 	# Capped purchases keep the stock and coins, including while trial equipment is present.
 	game.room["type"]="merchant";game.room["stock"]=[{"kind":"weapon","value":Arsenal.index_of("needle"),"price":30,"sold":false,"pos":game.p["pos"]}]
 	game.run_coins=100;game.bag_weapons.assign([needle.duplicate(true)]);game.bag_weapons[0]["duplicate_bonus"]=8

@@ -139,7 +139,7 @@ static func boss(biome_id: String) -> Dictionary:
 
 
 static func _boss_attack(biome:String,slot:int,kind:String,title:String,style:String,settings:Dictionary) -> Dictionary:
-	var params:Dictionary={"name":title,"style_id":style,"boss_biome":biome,"boss_sound":"%s_%d"%[biome,slot],"attack_cooldown":1.2,"recovery":.88}
+	var params:Dictionary={"name":title,"style_id":style,"boss_biome":biome,"boss_animation_slot":slot,"boss_sound":"%s_%d"%[biome,slot],"attack_cooldown":1.2,"recovery":.88}
 	params.merge(settings,true)
 	return attack(kind,params)
 
@@ -154,7 +154,7 @@ static func boss_phase_two(en:Dictionary) -> Dictionary:
 		"trunk":definition=_boss_attack(biome,3,"linear","琥珀碎槍","amber_resin",{"size":25,"range":915,"speed":530,"count":2,"spread":.18,"damage":2,"windup":1.22,"origin_y":-55,"boss_tell":"ray"})
 		"grass":definition=_boss_attack(biome,3,"trap","落露泥沼","dew_pool",{"size":54,"range":460,"count":3,"damage":1,"arming_time":.9,"lifetime":4.0,"windup":1.04,"origin_y":0})
 		_:definition=_boss_attack(biome,3,"slash","潛鑽破根","root_claw",{"size":46,"range":365,"ram":true,"ram_speed":510,"damage":2,"windup":1.12,"active":.7,"origin_y":-46,"boss_tell":"ram"})
-	definition["visual_id"]=Design.BOSS_VISUALS.get(definition["style_id"],"root_spear")
+	definition["visual_id"]="v57:%s:3"%biome
 	definition["hazard_visual_id"]=definition["visual_id"]
 	definition["color"]=en["color"]
 	if definition["library_kind"]=="trap":definition["hp"]=1.0

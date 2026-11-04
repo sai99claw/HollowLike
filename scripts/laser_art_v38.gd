@@ -17,5 +17,5 @@ static func draw(c:CanvasItem,e:Dictionary,base:Transform2D) -> void:
 	var f:Dictionary=info()["frames"][frame_index(elapsed)];var r:Array=f["source_rect"];var p:Array=f["pivot"]
 	var scale_value:=Vector2(delta.length()/float(f["reference_width"]),float(e.get("width",18))/float(f["reference_height"]))
 	c.draw_set_transform_matrix(base*Transform2D(delta.angle(),scale_value,0,e["pos"]))
-	c.draw_texture_rect_region(texture(),Rect2(-Vector2(p[0],p[1]),Vector2(r[2],r[3])),Rect2(r[0],r[1],r[2],r[3]),Color(1,1,1,clampf(float(e["life"])/.08,0,1)))
+	c.draw_texture_rect_region(texture(),Rect2(-Vector2(p[0],p[1]),Vector2(r[2],r[3])),Rect2(r[0],r[1],r[2],r[3]))
 	c.draw_set_transform_matrix(base)

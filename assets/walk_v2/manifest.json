@@ -6,7 +6,7 @@
       "fps": 20,
       "loop": true,
       "loop_start": 0,
-      "loop_end": 11,
+      "loop_end": 9,
       "frames": [
         {
           "path": "common/pigeon/walk_00.png",
@@ -75,17 +75,6 @@
           ]
         },
         {
-          "path": "common/pigeon/walk_06.png",
-          "pivot": [
-            164,
-            224
-          ],
-          "size": [
-            256,
-            256
-          ]
-        },
-        {
           "path": "common/pigeon/walk_07.png",
           "pivot": [
             164,
@@ -128,29 +117,6 @@
             256,
             256
           ]
-        },
-        {
-          "path": "common/pigeon/walk_11.png",
-          "pivot": [
-            164,
-            224
-          ],
-          "size": [
-            256,
-            256
-          ]
-        }
-      ],
-      "events": [
-        {
-          "frame": 0,
-          "event": "footstep",
-          "foot": "near"
-        },
-        {
-          "frame": 6,
-          "event": "footstep",
-          "foot": "far"
         }
       ]
     },

@@ -4,6 +4,11 @@ extends RefCounted
 const ROOT: String = "res://assets/v55/monsters/"
 const CELL := Vector2(144, 112)
 const ANCHOR := Vector2(72, 106)
+const MOVEMENT_BASELINES: Dictionary = {
+	"underground": [[106,105],[106,106],[106,105],[106,106],[106,106]],
+	"trunk": [[105,105],[105,105],[105,105],[105,105],[105,105]],
+	"sky": [[105,106],[105,105],[105,105],[105,105],[105,105]],
+}
 const REFERENCE_HEIGHT: float = 74.0
 const POSE_BOUNDS: Dictionary = {
 	"sky": [
@@ -91,6 +96,8 @@ static func _draw(c: CanvasItem, en: Dictionary, column: int, at: Vector2, face:
 	var factor: float = float(en.get("world_height", 51.0)) / REFERENCE_HEIGHT
 	var source := Rect2(Vector2(column, row) * CELL, CELL)
 	c.draw_set_transform_matrix(base * Transform2D(0.0, Vector2(face * factor, factor), 0.0, at))
-	c.draw_texture_rect_region(sheets[biome], Rect2(-ANCHOR, CELL), source, tint)
+	var anchor:Vector2=ANCHOR
+	if column<2:anchor.y=MOVEMENT_BASELINES[biome][row][column]
+	c.draw_texture_rect_region(sheets[biome], Rect2(-anchor, CELL), source, tint)
 	c.draw_set_transform_matrix(base)
 	return true

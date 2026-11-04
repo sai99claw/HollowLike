@@ -65,11 +65,11 @@ func run() -> void:
 	var before:Vector2=emitter.emission_points[0];scene._update_projectiles(.05)
 	check(emitter.emission_points[0]!=before and emitter.position==Vector2.ZERO,"Emission follows the real curved path without dragging previous particles")
 	scene.combat_feedback.finish_trail(pr);check(not emitter.emitting,"Finished projectile stops adding trail particles")
-	check(Walk.clip()["frames"].size()==12 and Walk.clip()["fps"]==20,"New 12-frame walk manifest replaces old four-frame cycle")
+	check(Walk.clip()["frames"].size()==10 and Walk.clip()["fps"]==20,"Walk uses the ten enabled frames at the authored preview rate")
 	for f in Walk.clip()["frames"]:check(Vector2(f["pivot"][0],f["pivot"][1]).is_equal_approx(Vector2(164,224)) and ResourceLoader.exists(Walk.ROOT+f["path"]),"Walk uses a shared authored foot pivot and all delivered PNGs")
 	var walk=scene.walker;walk.reset();walk.emitted_events=0
-	walk.advance(16.5*5,true,"wood",false);check(Walk.frame_index==5 and walk.emitted_events==1,"Walking starts at frame zero and advances by distance")
-	walk.advance(16.5*14,true,"wood",false);check(Walk.frame_index==7 and walk.emitted_events==4,"Low frame rate crossing multiple footfalls does not miss or duplicate events")
+	walk.advance(16.5*4,true,"wood",false);check(Walk.frame_index==4 and walk.emitted_events==1,"Walking starts at frame zero and advances by distance")
+	walk.advance(16.5*14,true,"wood",false);check(Walk.frame_index==8 and walk.emitted_events==4,"Low frame rate crossing multiple footfalls does not miss or duplicate events")
 	walk.advance(20,false,"stone",false);check(Walk.frame_index==0 and walk.emitted_events==4,"Stopping, jumping or being hurt resets phase without footsteps")
 	for ground in ["wood","stone","grass"]:
 		var last:int=0
@@ -77,7 +77,7 @@ func run() -> void:
 			walk._footstep(ground,false);var current:int=walk.last_variants[ground];check(current!=last,"Footstep variations never repeat consecutively");last=current
 		for variant in range(1,5):check(ResourceLoader.exists("res://assets/audio/footsteps/footstep_%s_%02d.wav"%[ground,variant]),"Delivered footstep WAV is available")
 	scene.meta=saved;scene._save_meta();scene.queue_free();await process_frame
-	print("Controls v0.7: ","passed: variable jump, 20% primary geometry/time, Z migration, integer vital cells, separated E stations, tower map orientation, particle trails, 12-frame walking and synchronized footsteps" if failures.is_empty() else failures)
+	print("Controls v0.7: ","passed: variable jump, 20% primary geometry/time, Z migration, integer vital cells, separated E stations, tower map orientation, particle trails, 10-frame walking and synchronized footsteps" if failures.is_empty() else failures)
 	quit(0 if failures.is_empty() else 1)
 func collect_buttons(node:Node,result:Array[String]) -> void:
 	if node is Button:result.append(node.text)

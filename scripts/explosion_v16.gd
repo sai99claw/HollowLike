@@ -14,7 +14,7 @@ static func draw(c:CanvasItem,e:Dictionary,base:Transform2D) -> void:
 	var width:float=float(e["radius"])*2.7;var extent:=Vector2(width,width*image.get_height()/image.get_width())
 	var angle:float=normal.angle()+PI*.5 if surface else 0
 	c.draw_set_transform_matrix(base*Transform2D(angle,e["pos"]))
-	c.draw_texture_rect(image,Rect2(Vector2(-extent.x*.5,-extent.y if surface else -extent.y*.5),extent),false,Color(1,1,1,.30))
+	c.draw_texture_rect(image,Rect2(Vector2(-extent.x*.5,-extent.y if surface else -extent.y*.5),extent),false,Color(1,1,1,.10))
 	c.draw_set_transform_matrix(base)
 static func contact(at:Vector2,velocity:Vector2,world:Array,radius:float) -> Dictionary:
 	var best:Dictionary={};var nearest:float=INF

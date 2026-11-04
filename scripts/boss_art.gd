@@ -6,6 +6,7 @@ const FX=preload("res://scripts/combat_visual.gd")
 const Appearance=preload("res://scripts/monster_appearance.gd")
 const MotionV18=preload("res://scripts/monster_motion_v18.gd")
 const Actions=preload("res://scripts/monster_actions_v22.gd")
+const NewActionArt=preload("res://scripts/boss_art_v57.gd")
 const ActionArt=preload("res://scripts/boss_art_v55.gd")
 const Art=preload("res://scripts/art.gd")
 const INK=Color("172c36")
@@ -41,6 +42,11 @@ static func frame(c:CanvasItem,clip:String,index:int,at:Vector2,base:Transform2D
 static func draw(c:CanvasItem,en:Dictionary,time:float,base:Transform2D) -> void:
 	var identity:String=Appearance.biome(en)
 	if identity.is_empty():return
+	var atk=en["attack"]
+	if NewActionArt.draw_actor(c,en,time,base):
+		if atk.phase=="active" and (atk.attack.get("primary",false) or atk.attack.get("library_kind","")=="explosion"):
+			NewActionArt.draw_release(c,en,atk.attack,atk.progress(),base)
+		return
 	var charge:String=en.get("charge_phase","idle")
 	if charge in ["windup","active","recovery"]:
 		var t:float=1-clampf(float(en.get("charge_left",0))/maxf(.01,float(en.get("dash_windup",.8))),0,1)
@@ -48,7 +54,6 @@ static func draw(c:CanvasItem,en:Dictionary,time:float,base:Transform2D) -> void
 		var stretch:=Vector2(1.08,.94) if charge=="active" else Vector2(1+t*.06,1-t*.06)
 		var offset:Vector2=-Vector2(en.get("charge_vector",Vector2.RIGHT))*t*5 if charge=="windup" else Vector2.ZERO
 		base=base*Transform2D(lean,stretch,0,en["pos"]+offset)*Transform2D(0,-Vector2(en["pos"]))
-	var atk=en["attack"]
 	if ActionArt.draw_actor(c,en,time,base) or Actions.boss(c,en,time,base):
 		if atk.is_busy() and (bool(atk.attack.get("primary",false)) or atk.attack.get("animation_role","")=="melee") and atk.phase in ["active","recovery"]:
 			var origin:Vector2=en["pos"]+Vector2(float(en["face"])*float(atk.attack.get("range",190))*.35,float(atk.attack.get("origin_y",-60)))

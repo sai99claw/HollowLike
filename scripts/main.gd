@@ -43,6 +43,8 @@ const Coins = preload("res://scripts/coin_physics.gd")
 const Bindings = preload("res://scripts/input_settings.gd")
 const Combat = preload("res://scripts/combat_library.gd")
 const BossVisual = preload("res://scripts/boss_art.gd")
+const SkillArt=preload("res://scripts/skill_art_v59.gd")
+const BossActionArt=preload("res://scripts/boss_art_v57.gd")
 const BossDirector=preload("res://scripts/boss_director_v35.gd")
 const MonsterRoster=preload("res://scripts/monster_roster_v36.gd")
 const Motion = preload("res://scripts/enemy_motion.gd")
@@ -216,6 +218,10 @@ var atmosphere:Node2D
 var combat_feedback:Node2D
 var minimap_open:bool=false
 var minimap_page:int=-1
+var map_held:bool=false
+var map_pinned:bool=false
+var display_probe:float=0.0
+var display_safe:=Rect2(0,0,1280,720)
 var poison_clouds:Array[Dictionary]=[]
 var poison_left:float=0.0
 const NewRoster=preload("res://scripts/monster_roster_v55.gd")
@@ -239,6 +245,7 @@ var tutorial_previous_practice:bool=false
 var lab_meta:Dictionary={}
 var lab_ai:bool=true
 var rd_view:Control
+var home_pressed_gate:String=""
 var lab_buttons:HBoxContainer
 var practice_tools:HBoxContainer
 var practice_rd_panel:Control
@@ -280,7 +287,7 @@ func _ready() -> void:
 	_setup_labs()
 	critical_warning=ColorRect.new();critical_warning.name="CriticalCorners";critical_warning.size=Vector2(1280,720);critical_warning.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	var warning_material:=ShaderMaterial.new();warning_material.shader=load("res://shaders/critical_health.gdshader");critical_warning.material=warning_material
-	ui.ui_root.add_child(critical_warning);ui.ui_root.move_child(critical_warning,0);critical_warning.visible=false
+	ui.ui_root.add_child(critical_warning);critical_warning.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.ui_root.move_child(critical_warning,0);critical_warning.visible=false
 	ui.action_requested.connect(_ui_action)
 	ui.touch_action.connect(_set_action)
 	touch_enabled = bool(meta.get("settings",{}).get("touch_enabled",preload("res://scripts/screen_touch_v29.gd").mobile_default()))
@@ -315,6 +322,7 @@ func _reset_player(at: Vector2) -> void:
 	pending_attack.clear()
 
 func _input(event:InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:home_pressed_gate=""
 	if perf_paused:return
 	if practice_rd_panel!=null:
 		if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE:practice_rd_panel.closed.emit();get_viewport().set_input_as_handled()
@@ -327,11 +335,26 @@ func _input(event:InputEvent) -> void:
 		return
 	# Capture before GUI navigation so Space, Tab and arrow keys can be rebound.
 	if capturing_key.is_empty():
-		if event is InputEventKey and Bindings.action_for(key_bindings,int(event.physical_keycode))=="map":
-			if event.pressed and not event.echo:_cycle_map()
-			get_viewport().set_input_as_handled();return
+		if event is InputEventKey:
+			var code:int=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+			if code==KEY_ESCAPE and minimap_open and event.pressed:
+				map_pinned=false;_set_map_held(false)
+				get_viewport().set_input_as_handled();return
+			if code==KEY_M and (minimap_open or _can_open_map()):
+				if event.pressed and not event.echo:
+					map_pinned=not map_pinned
+					_refresh_map_visibility()
+				get_viewport().set_input_as_handled();return
+			var item_index:int=code-KEY_1 if code>=KEY_1 and code<=KEY_5 else (code-KEY_KP_1 if code>=KEY_KP_1 and code<=KEY_KP_5 else -1)
+			if item_index>=0 and not event.shift_pressed and screen=="game" and not minimap_open and not ui.is_panel_open() and life_event.is_empty():
+				if event.pressed and not event.echo:_use_item(item_index,true,false)
+				get_viewport().set_input_as_handled();return
+			if code==KEY_TAB or Bindings.action_for(key_bindings,code)=="map":
+				if not event.echo:_set_map_held(event.pressed)
+				get_viewport().set_input_as_handled();return
 		if minimap_open and event is InputEventKey:
-			var map_action:String=Bindings.action_for(key_bindings,int(event.physical_keycode))
+			var map_code:int=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+			var map_action:String={KEY_LEFT:"left",KEY_RIGHT:"right"}.get(map_code,Bindings.action_for(key_bindings,map_code))
 			if map_action in ["left","right"]:
 				if not event.echo:_set_action(map_action,event.pressed)
 				get_viewport().set_input_as_handled();return
@@ -372,10 +395,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e:InputEventKey=event
 		if e.echo:return
 		var action:String=Bindings.action_for(key_bindings,int(e.physical_keycode))
-		# Assigned actions win over bare-number item shortcuts. Shift+number is
-		# the explicit route to every consumable, including slots1–3.
-		if e.pressed and screen=="game" and not ui.is_panel_open() and e.physical_keycode>=KEY_1 and e.physical_keycode<=KEY_5 and (e.shift_pressed or action.is_empty()):
-			_use_item(int(e.physical_keycode-KEY_1),true,false);get_viewport().set_input_as_handled();return
+
 		if action.is_empty():return
 		if ui.is_panel_open() and action in ["primary_1","primary_2","primary_3","cycle","skills"]:get_viewport().set_input_as_handled();return
 		get_viewport().set_input_as_handled()
@@ -396,16 +416,33 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		_set_action(action,e.pressed)
 
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and screen == "hub" and not ui.is_panel_open():
-		var mouse: Vector2 = get_global_mouse_position()
-		if HomeArt.LEFT_GATE.has_point(mouse): new_run("musou")
-		elif HomeArt.RIGHT_GATE.has_point(mouse):_enter_practice(true)
-		elif HomeArt.ROGUE_GATE.has_point(mouse):
+	elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
+		var gate:String=_home_pointer_gate()
+		if event.pressed:
+			home_pressed_gate=gate
+		else:
+			var selected:String=home_pressed_gate
+			home_pressed_gate=""
+			if not selected.is_empty() and selected==gate:_activate_home_gate(selected)
+
+func _home_controls_visible() -> bool:
+	return screen=="hub" and not trophy_room and lab_mode not in ["rd","tuning"] and ui!=null and not ui.is_panel_open()
+
+func _home_pointer_gate() -> String:
+	if not _home_controls_visible() or get_viewport().gui_get_hovered_control()!=null:return ""
+	return HomeArt.gate_at(get_global_mouse_position())
+
+func _activate_home_gate(gate:String) -> void:
+	if not _home_controls_visible():return
+	match gate:
+		"musou":new_run("musou")
+		"tutorial":_enter_practice(true)
+		"rogue":
 			if _at_rogue_gate():new_run("rogue")
-			else:_toast("跳起後下砍蘑菇，反彈到最高點再二段跳")
+			else:_toast("肉鴿入口在上方：下砍蘑菇反彈，再二段跳")
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_keys()
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_keys(false)
 
 func _set_action(action: String, pressed: bool) -> void:
 	if perf_paused:return
@@ -482,20 +519,40 @@ func _cycle_map() -> void:
 	ui.header.visible=not minimap_open
 	minimap.invalidate()
 
-func _set_map_held(pressed:bool) -> void:
-	if pressed and not minimap_open:minimap_page=0
-	if not pressed:minimap_page=-1
-	minimap_open=pressed and screen=="game" and life_event.is_empty() and not ui.is_panel_open()
-	if ui!=null:ui.header.visible=not minimap_open
+func _can_open_map() -> bool:
+	return screen=="game" and ui!=null and not ui.is_panel_open() and life_event.is_empty()
+
+func _refresh_map_visibility() -> void:
+	var previously_open:bool=minimap_open
+	minimap_open=(map_held or map_pinned) and _can_open_map()
+	if minimap_open and not previously_open:
+		minimap_page=0
+		keys.clear()
+		jump_request=false
+		p["jump_buffer_left"]=0.0
+	if not minimap_open:minimap_page=-1
+	if ui!=null:
+		ui.header.visible=not minimap_open
+		ui.quickbar.visible=_can_open_map() and not minimap_open
 	if minimap!=null:minimap.invalidate()
 
-func _clear_keys() -> void:
+func _set_map_held(pressed:bool) -> void:
+	map_held=pressed and _can_open_map()
+	_refresh_map_visibility()
+
+func _clear_keys(close_map:bool=true) -> void:
+	home_pressed_gate=""
+	if close_map:map_pinned=false
 	_set_map_held(false)
 	keys.clear(); jump_request=false;
 	if not p.is_empty():p["jump_buffer_left"]=0.0;p["coyote_left"]=0.0
 	charge_timer=0.0; pending_attack.clear(); dash_chain_open=false
 
 func _process(delta: float) -> void:
+	display_probe-=delta
+	if display_probe<=0:
+		display_probe=.30
+		_update_safe_interface()
 	if not perf_log.active:
 		_process_profiled_body(delta);return
 	perf_log.begin_frame()
@@ -505,7 +562,7 @@ func _process(delta: float) -> void:
 	if perf_log.finish_frame(_performance_context):call_deferred("_show_performance_report")
 
 func _process_profiled_body(delta: float) -> void:
-	if lab_buttons!=null:lab_buttons.visible=screen=="hub" and lab_mode not in ["rd","tuning"] and not ui.is_panel_open()
+	if lab_buttons!=null:lab_buttons.visible=_home_controls_visible()
 	if practice_tools!=null:practice_tools.visible=lab_mode=="practice" and not ui.is_panel_open() and practice_rd_panel==null
 	if lab_mode in ["rd","tuning"]:return
 	metrics_timer+=delta
@@ -520,7 +577,7 @@ func _process_profiled_body(delta: float) -> void:
 	world_transform=Transform2D(0,Vector2.ONE*zoom,0,-render_camera*zoom+jitter)
 	if edge_background!=null:edge_background.transform=world_transform
 	if edge_foreground!=null:edge_foreground.transform=world_transform
-	if corpse_layer!=null:corpse_layer.transform=world_transform
+	if corpse_layer!=null:corpse_layer.transform=world_transform.translated_local(Vector2(0,5))
 	if terrain!=null: terrain.transform=world_transform
 	if static_props!=null:static_props.transform=world_transform
 	if backdrop!=null:backdrop.transform=(atmosphere.depth_transform(render_camera,zoom,Atmosphere.FAR_FACTOR) if _is_start() else Atmosphere.parallax(render_camera,1.0,Atmosphere.FAR_FACTOR)) if screen=="game" else Transform2D.IDENTITY
@@ -669,6 +726,31 @@ func _apply_display_fit() -> void:
 		var dimensions:Vector2=Vector2(window.size)
 		var ratio:float=dimensions.x/maxf(1.0,dimensions.y)
 		window.content_scale_factor=maxf(ratio/(16.0/9.0),(16.0/9.0)/maxf(.01,ratio)) if display_fit=="cover" else 1.0
+	display_probe=0.0
+
+func _update_safe_interface() -> void:
+	if ui==null or ui.ui_root==null:return
+	var logical:=Vector2(1280,720)
+	var visible:Vector2=logical
+	if display_fit=="cover":
+		var ratio:float=float(JavaScriptBridge.eval("window.innerWidth/Math.max(1,window.innerHeight)")) if OS.has_feature("web") else float(get_window().size.x)/maxf(1,get_window().size.y)
+		if ratio>0:visible=Vector2(minf(logical.x,logical.y*ratio),minf(logical.y,logical.x/ratio))
+	var safe:=Rect2((logical-visible)*.5,visible)
+	if safe==display_safe:return
+	display_safe=safe
+	ui.set_safe_rect(safe)
+	var fit:Transform2D=_safe_canvas_transform()
+	if minimap!=null:minimap.transform=fit
+	for panel in [rd_view,tuning_view,practice_rd_panel]:
+		if is_instance_valid(panel):panel.get_parent().transform=fit
+	if lab_buttons!=null:lab_buttons.position=Vector2((ui.ui_root.size.x-330)*.5,ui.ui_root.size.y-80)
+	if practice_tools!=null:practice_tools.position.x=(ui.ui_root.size.x-492)*.5
+
+func _safe_canvas_transform() -> Transform2D:
+	var logical:=Vector2(1280,720)
+	if not display_safe.has_area():return Transform2D.IDENTITY
+	var factor:float=minf(display_safe.size.x/logical.x,display_safe.size.y/logical.y)
+	return Transform2D(0,Vector2.ONE*factor,0,display_safe.get_center()-logical*factor*.5)
 
 func _save_settings() -> void:
 	meta["settings"]={"zoom":camera_zoom,"speed":world_speed,"keys":key_bindings.duplicate(),"bindings_version":2,"audio_enabled":audio_enabled,"touch_enabled":touch_enabled,"display_fit":display_fit}
@@ -1214,8 +1296,7 @@ func _spawn_boss_reinforcements(roster:Array, count:int, elite:bool, random:Rand
 		var definition:Dictionary=MonsterRoster.elite(random.randi_range(0,5)) if elite else MonsterRoster.regular(biome,random.randi_range(0,4))
 		var at:=Vector2(lerpf(260.0,_room_size().x-260.0,float(index)/maxi(1,count-1)),_room_floor())
 		definition["pos"]=at
-		var spawn:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if definition["move"]=="fly" else _fit_enemy_ground(definition)
-		if not spawn.is_finite():spawn=_fit_enemy_ground(definition)
+		var spawn:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if Motion.airborne(definition) else _fit_enemy_ground(definition)
 		if not spawn.is_finite():continue
 		spawn_serial+=1
 		var health:float=(float(definition["hp"])+float(room["map_index"])*.5)*(3.0 if elite else 1.0)*Tuning.value("enemy_hp")
@@ -1435,12 +1516,18 @@ func _air_spawn(anchor:Vector2,scale_value:float,actual_size:Vector2=Vector2.ZER
 func _fit_enemy_ground(en:Dictionary) -> Vector2:
 	var desired:Vector2=en["pos"];var body:Vector2=MonsterMotion.body_size(en)
 	var best:=Vector2.INF;var distance:float=INF
-	for surface:Rect2 in platforms:
-		if surface.size.x<body.x+2 or absf(surface.position.y-desired.y)>192:continue
-		var x:float=clampf(desired.x,surface.position.x+body.x*.5+1,surface.end.x-body.x*.5-1)
+	var edge:float=400.0 if int(en.get("model",0))==4 else 28.0+body.x*.5
+	var spikes:Array=layout.get("spike_rects",[])
+	for surface:Rect2 in platforms+solids:
+		if surface.position.y<55+body.y or absf(surface.position.y-desired.y)>192:continue
+		var left:float=maxf(edge,surface.position.x+body.x*.5+1)
+		var right:float=minf(_room_size().x-edge,surface.end.x-body.x*.5-1)
+		if left>right:continue
+		var x:float=clampf(desired.x,left,right)
 		if absf(x-desired.x)>192:continue
 		var at:=Vector2(x,surface.position.y);var box:=Rect2(at-Vector2(body.x*.5,body.y),body).grow(-.01)
 		if solids.any(func(rock:Rect2)->bool:return box.intersects(rock)):continue
+		if spikes.any(func(spike:Rect2)->bool:return box.intersects(spike)):continue
 		if doors.any(func(door:Dictionary)->bool:return at.distance_to(door["pos"])<180):continue
 		var cost:float=absf(at.x-desired.x)+absf(at.y-desired.y)*2
 		if cost<distance:distance=cost;best=at
@@ -1704,7 +1791,9 @@ func _enemy_defeated(en: Dictionary) -> void:
 	else:_drop("coin",en["pos"]-Vector2(0,15),gold)
 	if rng.randf()<.1: _drop("item",en["pos"]-Vector2(25,20),rng.randi_range(0,Data.ITEMS.size()-1))
 	if rng.randf()<(.32 if mode=="musou" else .07): _drop("heal",en["pos"]+Vector2(25,-20),1)
-	if rng.randf()<.24:_drop("rune",en["pos"]+Vector2(10,-45),_random_rune_index())
+	if rng.randf()<.24:
+		var major_chance:float=.75 if layout.get("hazard_room","")=="spike_islands" else .15
+		_drop("rune",en["pos"]+Vector2(10,-45),_random_rune_index(major_chance))
 	if int(en["model"])==4 or rng.randf()<(.10 if en.get("elite",false) or int(en["model"])==3 else .02):
 		_drop("weapon",en["pos"]+Vector2(15,-35),Arsenal.random_index(rng))
 	if rng.randf()<_rune_effect("leech"): _restore_vital("hp",1)
@@ -1908,10 +1997,11 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			var model:int=int(plan[i]["model"])
 			var spawn_rng:=RandomNumberGenerator.new();spawn_rng.seed=int(layout["seed"])+i*827+spawn_serial*3571
 			var def:Dictionary=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][int(room["map_index"])]) if model==4 else (MonsterRoster.elite(int(room["map_index"])) if model==3 else MonsterRoster.regular(str(biome["id"]),int(plan[i].get("roster_variant",(i+id)%5))))
-			if model!=4 and spawn_rng.randf()<.5:
-				def=NewRoster.create(str(biome["id"]),spawn_rng.randi_range(3,4) if model==3 else spawn_rng.randi_range(0,2),int(room["map_index"]))
 			if plan[i].get("flying_elite",false):
-				def["move"]="fly";def["movements"]=["hover","drift"];def["visual_movement"]="hover";def["movement_logic"]="roam"
+				# Use winged species with their authored flight animations.
+				def=NewRoster.create("sky",spawn_rng.randi_range(3,4),int(room["map_index"])) if spawn_rng.randf()<.5 else MonsterRoster.elite(spawn_rng.randi_range(4,5))
+			elif model!=4 and spawn_rng.randf()<.5:
+				def=NewRoster.create(str(biome["id"]),spawn_rng.randi_range(3,4) if model==3 else spawn_rng.randi_range(0,2),int(room["map_index"]))
 			if room["type"]!="elite" and model!=4 and model!=3 and i==0 and int(layout["seed"])%3==0 and not def.has("v55_row"):def=Arms.cute_wanderer(spawn_rng)
 			if model==4:
 				for attack in def["attacks"]:attack["damage"]*=2;attack["knockback"]=120.0
@@ -1922,8 +2012,8 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			def["ecology_id"]=biome["id"]
 			if not def.has("roster_id"):def["contact_damage"]=0.0 if def.get("passive",false) else CONTACT_DAMAGE
 
-			if def["move"]=="fly":def["pos"]=_air_spawn(def["pos"]-Vector2(0,140 if model==4 else 0),float(def["scale"]),MonsterMotion.body_size(def))
-			elif model!=4:
+			if Motion.airborne(def):def["pos"]=_air_spawn(def["pos"]-Vector2(0,140 if model==4 else 0),float(def["scale"]),MonsterMotion.body_size(def))
+			else:
 				var grounded_spawn:Vector2=_fit_enemy_ground(def)
 				if not grounded_spawn.is_finite():continue
 				def["pos"]=grounded_spawn
@@ -1947,9 +2037,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 				var anchor:=_furniture_offset()+Vector2(870 if i==0 and room["type"]=="start" else (1110 if i==1 else 1360),1050-(35 if i==1 else 0))
 				dummy.merge({"training":true,"floating":i==1,"anchor":anchor,"training_age":0.0,"contact_damage":0.0,"uid":id*100+98+i,"pos":anchor,"vel":Vector2.ZERO,"face":-1.0,"hp":999999.0,"max_hp":999999.0,"body_size":Vector2(84,120),"hurt":0.0,"stun":0.0,"cooldown":1000.0,"attack":Attack.new(),"training_total":0.0},true)
 				room["enemies"].append(dummy)
-		if room["type"]=="start" and int(room["map_index"])==0 and not room.get("gift_given",false):
-			room["gift_given"]=true
-			room["drops"].append({"kind":"weapon","pos":_furniture_offset()+Vector2(620,1050-90),"value":Arsenal.random_index(rng),"seed":0.0,"taken":false,"gift":true,"display_only":true,"display_anchor":_furniture_offset()+Vector2(620,1050-90)})
+
 	if not room.has("props"):
 		room["props"]=_make_props()
 		for rect:Rect2 in layout.get("spike_rects",[]):
@@ -1960,6 +2048,8 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	var loaded_drops:Array[Dictionary]=[]
 	loaded_drops.assign(room["drops"])
 	enemies=loaded_enemies;drops=loaded_drops
+	if room["type"]=="start" and (room.get("refresh_gift",false) or (int(room["map_index"])==0 and not room.get("gift_given",false))):
+		_refresh_checkpoint_gift()
 	var loaded_corpses:Array[Dictionary]=[];loaded_corpses.assign(room.get("corpses",[]));corpses=loaded_corpses
 	if corpse_layer!=null:corpse_layer.invalidate()
 	projectiles.clear();hazards.clear();effects.clear();
@@ -2414,8 +2504,7 @@ func _update_hud_profiled_body() -> void:
 	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"map":int(room.get("map_index",-1))+1,"room":current_room+1,"biome":_biome_name(),"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"revive":not revive_used,"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"seed":tower.get("seed",0),"fps":fps_smoothed,"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
 	ui.update_quickbar(bag_items,Data.ITEMS)
-	ui.quickbar.visible=screen=="game" and not ui.is_panel_open()
-	ui.minimap_button.visible=screen=="game" and not ui.is_panel_open()
+	ui.quickbar.visible=screen=="game" and not ui.is_panel_open() and not minimap_open
 
 func _biome_name() -> String:
 	if screen=="hub":return "鳥巢與樹"
@@ -2449,8 +2538,12 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 			for solid:Rect2 in solids:canvas.draw_rect(solid,Color(1,.3,.1,.5),false,1)
 		return
 	if layout.get("single_screen",false):SanctuaryArt.background(canvas,room)
-	if layout.get("hazard_room","")!="mushroom_air":
-		for plat in platforms:Art.draw_platform(canvas,plat,_height(),show_hitboxes)
+	if layout.has("hazard_room"):
+		var biome:String=_ecology()["id"]
+		for solid:Rect2 in solids:BiomeArt.terrain(canvas,biome,solid)
+		for ledge:Rect2 in layout.get("one_way",[]):BiomeArt.terrain(canvas,biome,ledge,true)
+		return
+	for plat in platforms:Art.draw_platform(canvas,plat,_height(),show_hitboxes)
 	_draw_terrain_details(canvas)
 
 
@@ -2479,15 +2572,16 @@ func _draw_profiled_body() -> void:
 		if view_rect.has_point(drops[i]["pos"]): _draw_drop(drops[i],i==drop_label_target)
 	for en in enemies:
 		if float(en["hp"])<=0 or not view_rect.has_point(en["pos"]):continue
-		if en.get("training",false):SanctuaryArt.dummy(self,en["pos"],clock,preload("res://scripts/world_placement_v27.gd").prop_base(world_transform));continue
+		if en.get("training",false):SanctuaryArt.dummy(self,en["pos"]+Vector2(0,5),clock,preload("res://scripts/world_placement_v27.gd").prop_base(world_transform));continue
 		var atk=en["attack"]
 
 		MonsterDesign.draw_charge(self,en,clock,world_transform)
-		_draw_attack(en["pos"],atk,float(en["face"]),false)
+		_draw_attack(en["pos"]+Vector2(0,5),atk,float(en["face"]),false)
 		_draw_enemy_warning(en)
-		var hpw:float=70 if int(en["model"])==4 else 36
-		draw_rect(Rect2(en["pos"]-Vector2(hpw*.5,60 if int(en["model"])!=4 else 100),Vector2(hpw,4)),Color("20383b"))
-		draw_rect(Rect2(en["pos"]-Vector2(hpw*.5,60 if int(en["model"])!=4 else 100),Vector2(hpw*maxf(0,float(en["hp"])/float(en["max_hp"])),4)),Color("e9b97d"))
+		var hpw:float=70 if int(en["model"])==4 else (54 if en.get("elite",false) else 36)
+		var health_at:=Vector2(float(en["pos"].x)-hpw*.5,_enemy_body_box(en).position.y-10)
+		draw_rect(Rect2(health_at,Vector2(hpw,4)),Color("20383b"))
+		draw_rect(Rect2(health_at,Vector2(hpw*maxf(0,float(en["hp"])/float(en["max_hp"])),4)),Color("e9b97d"))
 	_draw_player_body()
 	if room.get("fountain",false) and layout.has("fountain_pos"):
 		preload("res://scripts/spring_v33.gd").draw_water(self,layout["fountain_pos"],str(_ecology()["id"]),world_transform,bath,draw_clock)
@@ -2502,8 +2596,7 @@ func _draw_profiled_body() -> void:
 		draw_arc(p["pos"]-Vector2(0,25),34,0,TAU*minf(1,charge_timer/threshold),32,Color("fff0a5") if charge_timer>=threshold else Color("90dccd"),3,true)
 	for cloud:Dictionary in poison_clouds:
 		var fog:=Color(.75,.29,.8,.67) if cloud.get("hostile",false) else Color(.55,.82,.30,.64)
-		fog.a*=float(cloud["left"])/3.0
-		draw_texture_rect(preload("res://assets/v55/effects/mist.svg"),Rect2(Vector2(cloud["pos"])-Vector2(58,38),Vector2(116,76)),false,fog)
+		SkillArt.draw(self,SkillArt.POISON,1.0-float(cloud["left"])/3.0,Rect2(Vector2(cloud["pos"])-Vector2(58,38),Vector2(116,76)),fog)
 
 	if float(p.get("power_item_left",0))>0:
 		draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(45,67),Vector2(90,90)),false,Color(1,.22,.12,.78))
@@ -2535,10 +2628,11 @@ func _draw_profiled_body() -> void:
 		elif e.has("boss_fx"):BossVisual.impact(self,e,world_transform)
 		elif e.has("combat_fx"):
 			var extent:float=float(e.get("fx_extent",65))
-			FX.fitted(self,e["combat_fx"],1-float(e["life"])/float(e["max"]),Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,c.a))
+			var alpha:float=.10 if str(e["combat_fx"]).begins_with("explosion_") else 1.0
+			FX.fitted(self,e["combat_fx"],1-float(e["life"])/float(e["max"]),Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,alpha))
 		elif bool(e["ring"]):
-			var radius:float=float(e["radius"])*(1-c.a*.75)
-			draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(e["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),false,c)
+			var radius:float=float(e["radius"])
+			SkillArt.draw_ring(self,1.0-c.a,Rect2(Vector2(e["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),e["color"])
 		else:
 			var size:float=float(e["radius"])*c.a*2.0
 			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(e["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,c)
@@ -2645,7 +2739,10 @@ func _draw_player_body() -> void:
 
 func _draw_hub() -> void:
 	if trophy_room:_draw_trophy_room();return
-	HomeArt.gates(self,clock,p["pos"]);HomeArt.nest(self)
+	HomeArt.gates(self,clock,low_effects)
+	var hovered:String=_home_pointer_gate()
+	if not hovered.is_empty():HomeArt.draw_gate_focus(self,hovered,home_pressed_gate==hovered and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
+	HomeArt.nest(self)
 	Adventure.portal(self,Vector2(620,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",108,low_effects)
 	preload("res://scripts/home_visual_v33.gd").prop(self,"records",Vector2(790,600),Vector2(90,105))
 	for prop:Dictionary in props:
@@ -2656,14 +2753,26 @@ func _draw_hub() -> void:
 		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),Transform2D.IDENTITY)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	HomeArt.nest(self,true)
-	_text(Vector2(510,180),"枝間鴿行",42,Color("fff2cf"))
-	_text(Vector2(484,212),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
-	_text(Vector2(150,650),"無雙夢境",25,Color("ffe1a6"));_text(Vector2(1020,650),"新手教學",25,Color("a4f3cf"))
+	_text(Vector2(510,208),"枝間鴿行",42,Color("fff2cf"))
+	_text(Vector2(484,236),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
 	_text(Vector2(580,570),"戰利品房 · %s"%_tutorial_key("up"),15,Color("e6c78f"))
-	_text(Vector2(581,HomeArt.ROGUE_PLATFORM_Y+25),"肉鴿 · %s 進入"%_tutorial_key("up"),20,Color("c6ddf7"))
+	_home_gate_sign(Vector2(200,608),"無雙夢境","靠近按 %s 進入"%_tutorial_key("up"),Color("ffe1a6"))
+	_home_gate_sign(Vector2(1080,608),"新手教學","靠近按 %s 進入"%_tutorial_key("up"),Color("a4f3cf"))
+	_home_gate_sign(Vector2(640,HomeArt.ROGUE_PLATFORM_Y+1),"肉鴿","跳上來按 %s 進入"%_tutorial_key("up"),Color("c6ddf7"))
+	_home_gate_sign(Vector2(640,250),"按鍵上下左右走到想去的門","",Color("fff2cf"))
 	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
 	_text(Vector2(365,495),"跳起後 %s＋%s 下砍蘑菇，反彈到最高點再 %s 二段跳"%[_tutorial_key("down"),_tutorial_key("attack"),_tutorial_key("jump")],14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.56",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.61",13,Color("a6c1b6"))
+
+func _home_gate_sign(at:Vector2,title:String,hint:String,tint:Color) -> void:
+	var width:float=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,22).x
+	var hint_width:float=font.get_string_size(hint,HORIZONTAL_ALIGNMENT_LEFT,-1,14).x
+	var plate_width:float=maxf(width,hint_width)+24
+	var plate:=Rect2(at-Vector2(plate_width*.5,0),Vector2(plate_width,34 if hint.is_empty() else 50))
+	draw_rect(plate,Color("#101b19ed"))
+	draw_line(plate.position,Vector2(plate.end.x,plate.position.y),Color(tint,.78),2)
+	_text(at+Vector2(-width*.5,25),title,22,tint)
+	if not hint.is_empty():_text(at+Vector2(-hint_width*.5,43),hint,14,Color("e0e8d7"))
 
 func _configure_home() -> void:
 	trophy_room=false
@@ -2833,9 +2942,12 @@ func _draw_drop(drop:Dictionary,show_label:bool=false) -> void:
 
 func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 	if not atk.is_busy():return
-	if not is_player and atk.attack.has("melee_visual_id"):
-		if bool(atk.attack.get("primary",false)):preload("res://scripts/monster_art_v36.gd").draw_melee(self,at,atk,face,world_transform)
-		if show_hitboxes and atk.is_active():draw_rect(_attack_box(at,atk.attack,face),Color("ffe3a0"),false,1)
+	if not is_player:
+		if atk.is_active():
+			var body_fx:bool=atk.attack.has("boss_animation_slot") and (atk.attack.get("primary",false) or atk.attack.get("library_kind","")=="explosion") and BossActionArt.has_actor(str(atk.attack.get("boss_biome","")))
+			var authored:bool=body_fx or preload("res://scripts/monster_art_v36.gd").draw_melee(self,at,atk,face,world_transform)
+			if not authored:_draw_enemy_release(at,atk,face)
+			if show_hitboxes:draw_rect(_attack_box(at-Vector2(0,5),atk.attack,face),Color("ffe3a0"),false,1)
 		return
 	if is_player and atk.attack.get("kind","") in ["pierce","slam"]:
 		if atk.is_active() or bool(p.get("slam",false)):Wind.wind_form(self,at-Vector2(0,22),atk.attack["dir"],atk.elapsed,float(atk.attack["active"]),world_transform,atk.attack["kind"]=="slam")
@@ -2854,7 +2966,6 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 	var color:Color=def.get("color",Color("f4b175"))
 	if atk.phase=="windup":
 		if show_hitboxes:draw_arc(at-Vector2(0,22),30,0,TAU*atk.progress(),22,Color(color,.7),2,true)
-		if not is_player and show_hitboxes:draw_rect(rect,Color(color,.12));draw_rect(rect,Color(color,.55),false,1)
 	elif atk.phase=="active":
 		if def.get("kind","") in ["pierce","slam"]:
 			var dir:Vector2=def.get("dir",Vector2(face,0))
@@ -2884,26 +2995,51 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 	else:
 		if show_hitboxes:draw_arc(at-Vector2(0,23),25,0,TAU*(1-atk.progress()),16,Color(color,.35),1,true)
 
+func _draw_enemy_release(at:Vector2,atk:Variant,face:float) -> void:
+	var def:Dictionary=atk.attack
+	var progress:float=atk.progress()
+	var at_fx:=at+Vector2(face*26,float(def.get("origin_y",-24)))
+	var extent:=Vector2(62,50)
+	var row:int=SkillArt.attack_row(def)
+	match row:
+		SkillArt.POISON:extent=Vector2(94,62)
+		SkillArt.RUSH:
+			extent=Vector2(134,56)
+			at_fx.x-=face*38
+		SkillArt.SWIPE:
+			extent=Vector2(clampf(float(def.get("range",65)),42,155),clampf(float(def.get("size",32))*2,40,108))
+			at_fx.x=at.x+face*extent.x*.5
+	var tint:Color=Color.WHITE.lerp(def.get("color",Color.WHITE),.35)
+	tint.a=.10 if def.get("library_kind","")=="explosion" else 1.0
+	draw_set_transform_matrix(world_transform*Transform2D(0,Vector2(face,1),0,at_fx))
+	SkillArt.draw(self,row,progress,Rect2(-extent*.5,extent),tint)
+	draw_set_transform_matrix(world_transform)
+
 func _paint_minimap(canvas:CanvasItem) -> void:
 	if tower.is_empty() or not minimap_open:return
 	canvas.draw_rect(Rect2(0,0,1280,720),Color(0,.025,.045,.75))
 	canvas.draw_rect(Rect2(150,65,980,590),Color("0e2432",.98))
 	var heading:String=["房間地形","本關探索","全塔地圖"][mini(minimap_page,2)]
 	_text_on(canvas,Vector2(178,103),heading,22,Color("eef5e6"))
-	_text_on(canvas,Vector2(178,128),"Tab 切換地圖 · 第四次返回",15,Color("b7d0d2"))
+	_text_on(canvas,Vector2(178,128),"左右切換 · Esc 關閉",15,Color("b7d0d2"))
 	var area:=Rect2(180,155,915,422)
-	canvas.draw_rect(area,Color("080b0e"))
+	canvas.draw_texture_rect(preload("res://assets/v57/maps/paper.svg"),area,false)
 	match minimap_page:
 		0:
 			var factor:float=minf(area.size.x/_room_size().x,area.size.y/_room_size().y)
 			var origin:Vector2=area.get_center()-_room_size()*factor*.5
-			for surface:Rect2 in solids+platforms:
-				canvas.draw_rect(Rect2(origin+surface.position*factor,surface.size*factor),Color("78988d"))
+			var map_transform:=Transform2D(0,Vector2.ONE*factor,0,origin)
+			var biome:String=_ecology()["id"]
+			for surface:Rect2 in solids:BiomeArt.terrain(canvas,biome,surface,false,map_transform)
+			for surface:Rect2 in platforms:BiomeArt.terrain(canvas,biome,surface,true,map_transform)
+			canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
 			for prop:Dictionary in props:
 				if prop["kind"] in ["launcher","spikes"]:canvas.draw_circle(origin+Vector2(prop["pos"])*factor,3,Color("f0b88d"))
 			canvas.draw_circle(origin+Vector2(p["pos"])*factor,6,Color("fff0a6"))
 		1:TowerMap.draw_chapter(canvas,tower,current_room,area,font,true)
-		2:TowerMap.draw_full_tower(canvas,tower,current_room,area,font,true)
+		2:
+			if tower.get("maps",[]).is_empty():TowerMap.draw_chapter(canvas,tower,current_room,area,font,true)
+			else:TowerMap.draw_full_tower(canvas,tower,current_room,area,font,true)
 
 func _effect_static(at:Vector2,color:Color,radius:float) -> void:
 	draw_line(at,at-Vector2(0,100),Color(color,.12),36,true)
@@ -3130,6 +3266,7 @@ func _update_props_profiled_body(delta:float) -> void:
 	for prop in props:
 		prop["hurt"]=maxf(0,float(prop["hurt"])-delta)
 		for timer in ["break_left","event_left","launch_left","launch_cooldown","launch_hit_cooldown"]:prop[timer]=maxf(0,float(prop.get(timer,0))-delta)
+		if prop.has("open_left"):prop["open_left"]=maxf(0,float(prop["open_left"])-delta)
 		if prop["kind"]=="spikes":
 			if _body_box(p["pos"]).intersects(prop["rect"]):_hurt_player(1,prop["pos"])
 			continue
@@ -3183,8 +3320,8 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1) -> void:
 			pass # Training props never apply recoil to the player.
 	if not feather.is_empty() and int(feather["room"])==current_room and box.intersects(Rect2(feather["pos"]-Vector2(80,132),Vector2(160,132))):_recover_feather()
 
-func _random_rune_index() -> int:
-	return Data.RUNES.size()+rng.randi_range(0,Data.STRONG_RUNES.size()-1) if rng.randf()<.15 else rng.randi_range(0,Data.RUNES.size()-1)
+func _random_rune_index(major_chance:float=.15) -> int:
+	return Data.RUNES.size()+rng.randi_range(0,Data.STRONG_RUNES.size()-1) if rng.randf()<major_chance else rng.randi_range(0,Data.RUNES.size()-1)
 
 func _grow_secondary(index:int=-1) -> void:
 	var id:String=Arms.GROWTH[rng.randi_range(0,Arms.GROWTH.size()-1) if index<0 else posmod(index,Arms.GROWTH.size())]
@@ -3270,12 +3407,21 @@ func _respawn_from_soul() -> void:
 	for candidate in tower["rooms"]:
 		if candidate["type"] in ["combat","elite"] or (candidate["type"]=="boss" and not candidate.get("cleared",false)):
 			candidate["initialized"]=false;candidate["enemies"]=[];candidate["drops"]=[];candidate["corpses"]=[]
+			candidate.erase("cleared")
+			candidate.erase("boss_defeated")
+			if candidate.has("props"):
+				# Clear rewards are earned again when the newly spawned elites fall.
+				candidate["props"]=candidate["props"].filter(func(prop:Dictionary)->bool:return not (prop["kind"]=="chest" and prop.get("guaranteed_strong",false)))
+				for prop:Dictionary in candidate["props"]:
+					if prop["kind"]=="chest":prop["used"]=false
+	var checkpoint:int=last_checkpoint if last_checkpoint>=0 else int(tower["maps"][0]["start_id"])
+	tower["rooms"][checkpoint]["refresh_gift"]=true
 	# Room entry saves the outgoing arrays. Detach them before entering so the
 	# old enemies cannot overwrite the freshly reset room state.
 	room={};enemies=[];drops=[];corpses=[];projectiles.clear();hazards.clear();effects.clear();hitstop=0
 	combat_feedback.clear()
 	_reset_player(Vector2(230,FLOOR_Y));_sync_vitals();p["hp"]=p["max_hp"];p["energy"]=3
-	_enter_room(last_checkpoint if last_checkpoint>=0 else int(tower["maps"][0]["start_id"]));p["invul"]=2
+	_enter_room(checkpoint);p["invul"]=2
 	_toast("靈魂已返回最近安全屋。小怪重生；找回發光羽毛可取回背包")
 
 func _recover_feather() -> void:
@@ -3408,7 +3554,7 @@ func _draw_props() -> void:
 			continue # Pool masonry and steam use a retained draw list.
 		if kind=="shop_dummy":SanctuaryArt.dummy(self,at,clock,prop_base);continue
 		if kind=="merchant":Adventure.merchant(self,at,clock,prop_base);continue
-		elif kind=="chest":Adventure.chest(self,at,clock,prop_base,bool(prop.get("used",false)))
+		elif kind=="chest":preload("res://scripts/chest_art_v59.gd").draw(self,prop,biome,prop_base)
 		elif _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:pass # Station paintings live in the retained static layer.
 		elif kind in ["gift_pedestal","wardrobe"]:preload("res://scripts/adventure_art_v29.gd").station(self,kind,at,prop_base)
 		elif kind in ["forge","reforge","mail"]:preload("res://scripts/station_art_v26.gd").draw(self,kind,at,prop_base)
@@ -3501,6 +3647,18 @@ func _world_confirm() -> bool:
 	if room.get("type","")=="boss" and room.get("cleared",false) and int(room["map_index"])==5 and absf(p["pos"].x-_room_size().x*.5)<150:_complete_run();return true
 	return false
 
+func _refresh_checkpoint_gift() -> void:
+	room.erase("refresh_gift")
+	room["gift_given"]=true
+	var rack:Vector2=_furniture_offset()+Vector2(620,1050)
+	if not props.any(func(prop:Dictionary)->bool:return prop["kind"]=="gift_pedestal"):
+		props.append({"kind":"gift_pedestal","pos":rack,"used":false,"hurt":0.0})
+		room["props"]=props
+	drops=drops.filter(func(drop:Dictionary)->bool:return not drop.get("gift",false))
+	var display:Vector2=rack-Vector2(0,90)
+	drops.append({"kind":"weapon","pos":display,"value":Arsenal.random_index(rng),"seed":0.0,"taken":false,"gift":true,"display_only":true,"display_anchor":display})
+	room["drops"]=drops
+
 func _claim_gift() -> void:
 	for drop in drops:
 		if drop.get("gift",false) and not drop.get("taken",false):
@@ -3523,6 +3681,7 @@ func _damage_traps(box:Rect2,damage:float,gain_dream:bool=true) -> void:
 func _open_chest(chest:Dictionary) -> void:
 	if chest.get("used",false):return
 	chest["used"]=true
+	chest["open_left"]=preload("res://scripts/chest_art_v59.gd").DURATION
 	var at:Vector2=chest["pos"]
 	_drop("coin",at-Vector2(0,25),rng.randi_range(12,28))
 	_drop("item",at-Vector2(35,30),rng.randi_range(0,Data.ITEMS.size()-1))
@@ -3650,7 +3809,7 @@ func _show_records() -> void:
 
 func _lab_button(label:String,callback:Callable) -> Button:
 	var button:=Button.new();button.text=label;button.custom_minimum_size=Vector2(156,42);button.add_theme_font_override("font",font);button.add_theme_font_size_override("font_size",18)
-	var style:=StyleBoxFlat.new();style.bg_color=Color("183d36");style.border_color=Color("b9ac74");style.set_border_width_all(1);style.set_corner_radius_all(8);button.add_theme_stylebox_override("normal",style);button.pressed.connect(callback);return button
+	ui.style_button(button,UI.GOLD,7);button.pressed.connect(callback);return button
 func _setup_labs() -> void:
 	lab_buttons=HBoxContainer.new();lab_buttons.position=Vector2(475,640);lab_buttons.add_theme_constant_override("separation",18);ui.ui_root.add_child(lab_buttons)
 	lab_buttons.add_child(_lab_button("練習房",_enter_practice));lab_buttons.add_child(_lab_button("RD 美術室",_open_rd))
@@ -3666,7 +3825,7 @@ func _show_developer_tools() -> void:
 func _open_rd() -> void:
 	if screen!="hub":return
 	_close_panel();_clear_keys();lab_mode="rd";lab_buttons.hide();atmosphere.configure("branches",0,false)
-	var layer:=CanvasLayer.new();layer.layer=60;add_child(layer)
+	var layer:=CanvasLayer.new();layer.layer=60;layer.transform=_safe_canvas_transform();add_child(layer)
 	rd_view=RD.new();layer.add_child(rd_view)
 	rd_view.closed.connect(func()->void:lab_mode="";layer.queue_free();rd_view=null;_clear_keys();_invalidate_scene())
 func _enter_practice(tutorial:bool=false) -> void:
@@ -3793,7 +3952,7 @@ func _leave_lab() -> void:
 func _open_practice_rd() -> void:
 	if lab_mode!="practice" or practice_rd_panel!=null:return
 	_close_panel();_clear_keys()
-	var layer:=CanvasLayer.new();layer.layer=61;add_child(layer)
+	var layer:=CanvasLayer.new();layer.layer=61;layer.transform=_safe_canvas_transform();add_child(layer)
 	practice_rd_panel=PracticeRD.new();layer.add_child(practice_rd_panel);practice_rd_panel.setup(practice_rd_settings)
 	practice_rd_panel.regenerate.connect(_regenerate_practice)
 	practice_rd_panel.closed.connect(func()->void:practice_rd_panel=null;layer.queue_free();_clear_keys();_invalidate_scene())
@@ -3877,9 +4036,9 @@ func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
 	definition["hp"]*=Tuning.value("enemy_hp");definition["speed"]*=Tuning.value("enemy_speed")
 	spawn_serial+=1
 	var at:=anchor if anchor.is_finite() else Vector2(clampf(p["pos"].x+float(p["face"])*240,260,_room_size().x-260),_room_floor())
-	if definition["move"]=="fly":at.y-=180
+	if Motion.airborne(definition):at.y-=180
 	definition.merge({"uid":100000+spawn_serial,"pos":at,"anchor":at,"spawn_platform":0,"biome":definition.get("biome",_ecology()["id"]),"ecology_id":_ecology()["id"],"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":1.0,"attack":Attack.new(),"contact_damage":float(definition.get("contact_damage",1.0)),"max_hp":definition["hp"]},true)
-	var placement:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if definition["move"]=="fly" else _fit_enemy_ground(definition)
+	var placement:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if Motion.airborne(definition) else _fit_enemy_ground(definition)
 	if not placement.is_finite():_toast("附近沒有足夠空間，請換個位置召喚這隻怪物");return
 	definition["pos"]=placement;definition["anchor"]=placement
 	enemies.append(definition);_toast("召喚："+_lab_monsters()[index])
@@ -3951,7 +4110,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 			var sample:Dictionary=NewMonsterArt.actor_sample(en,pose_clock) if en.has("v55_row") else preload("res://scripts/monster_art_v36.gd").actor_sample(en,pose_clock)
 			signature=[sample["sheet"],sample["row"],sample["column"],en.get("face",1),float(en.get("hurt",0))>0,en.get("scale",1)]
 		signature.append(ceili(float(en.get("frost_left",0))*15))
-		sprite.refresh(world_transform,enabled,signature)
+		sprite.refresh(world_transform.translated_local(Vector2(0,5)),enabled,signature)
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
@@ -3998,7 +4157,7 @@ func _confine_boss(en:Dictionary) -> void:
 func _open_tuning() -> void:
 	if screen!="hub":return
 	_close_panel();_clear_keys();lab_mode="tuning";lab_buttons.hide()
-	var layer:=CanvasLayer.new();layer.layer=60;add_child(layer)
+	var layer:=CanvasLayer.new();layer.layer=60;layer.transform=_safe_canvas_transform();add_child(layer)
 	tuning_view=TuningPanel.new();layer.add_child(tuning_view);tuning_view.setup(meta.get("rd_tuning",{}))
 	tuning_view.saved.connect(func(parameters:Dictionary)->void:meta["rd_tuning"]=parameters;_save_meta())
 	tuning_view.closed.connect(func()->void:lab_mode="";layer.queue_free();tuning_view=null;_clear_keys();_invalidate_scene())

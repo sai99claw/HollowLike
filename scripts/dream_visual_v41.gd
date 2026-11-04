@@ -1,5 +1,6 @@
 class_name DreamVisualV41
 extends Node2D
+const SkillArt=preload("res://scripts/skill_art_v59.gd")
 const FX=preload("res://scripts/combat_visual.gd")
 var middle_bubbles:CPUParticles2D
 var front_bubbles:CPUParticles2D
@@ -55,10 +56,11 @@ func _draw() -> void:
 	for wave:Dictionary in waves:
 		var progress:float=clampf(float(wave["age"])/float(wave["duration"]),0,1)
 		var radius:float=float(wave["radius"])*(.15+.85*progress)
+		var bounds:=Rect2(Vector2(wave["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2)
 		if wave["injury"]:
 			draw_set_transform_matrix(world)
-			draw_circle(wave["pos"],radius,Color(.55,.7,1,(1-progress)*.10))
-			for i in 3:draw_arc(wave["pos"],radius*(1-float(i)*.08),0,TAU,64,Color(.65,.8,1,(1-progress)*(.8-i*.18)),4-i,true)
+			SkillArt.draw_ring(self,progress,bounds,Color(.72,.86,1))
 		else:
-			FX.fitted(self,"feather_charge",progress,Rect2(Vector2(wave["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),world,"right","active",Color(.8,.9,1,1-progress*.5))
+			FX.fitted(self,"feather_charge",progress,bounds,world,"right","active",Color(.8,.9,1))
+
 	draw_set_transform_matrix(Transform2D.IDENTITY)

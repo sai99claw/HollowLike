@@ -44,7 +44,7 @@ static func _weapons(ui,data:Dictionary,left:VBoxContainer,right:VBoxContainer) 
 	if not weapons.is_empty() and selected>=0 and selected<weapons.size():
 		var weapon:Dictionary=weapons[selected];_tile(ui,left,str(weapon["name"]),weapon_description(weapon),Icons.secondary(weapon),"inspect",null,weapon.get("color",PURPLE),true)
 	else:left.add_child(ui._label("尚未裝備副武器",14,ui.MUTED))
-	left.add_child(ui._label("補給快捷鍵 Shift+1–9",15,ui.MINT))
+	left.add_child(ui._label("補給快捷鍵 1–5",15,ui.MINT))
 	var items:Dictionary=data.get("items",{});var supply:=HFlowContainer.new();supply.add_theme_constant_override("h_separation",6);left.add_child(supply)
 	for key in items:
 		if int(items[key])<=0:continue

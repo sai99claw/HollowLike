@@ -44,7 +44,7 @@ var _last_message: String = ""
 var shortcut_buttons:Dictionary={}
 var primary_art:TextureRect
 var coin_art:TextureRect
-var minimap_button:Button
+var edge_tools:HBoxContainer
 var quickbar:HBoxContainer
 var _focus_index:int=0
 var mute_button:Button
@@ -99,6 +99,18 @@ func setup() -> void:
 	_build_touch()
 	set_touch_visible(OS.has_feature("mobile"))
 
+
+func set_safe_rect(safe:Rect2) -> void:
+	var logical:=Vector2(1280,720)
+	var factor:float=minf(safe.size.x/logical.x,safe.size.y/logical.y)
+	ui_root.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	ui_root.position=safe.position
+	ui_root.scale=Vector2.ONE*factor
+	ui_root.size=safe.size/factor
+	var extra:Vector2=ui_root.size-logical
+	edge_tools.position=Vector2(944+extra.x,18)
+	mute_button.position=Vector2(809+extra.x,18)
+	quickbar.position=Vector2(20,642+extra.y)
 
 func _build_header() -> void:
 	# Compact floating vitals; no full-width bar obscures the room.
@@ -159,6 +171,7 @@ func _build_header() -> void:
 	for i in 20:
 		var cell:=ColorRect.new();cell.custom_minimum_size=Vector2(9,7);cell.mouse_filter=Control.MOUSE_FILTER_IGNORE;cells.add_child(cell);dream_cells.append(cell)
 	var tools := HBoxContainer.new()
+	edge_tools=tools
 	tools.position = Vector2(944,18)
 	tools.add_theme_constant_override("separation",6)
 	ui_root.add_child(tools)
@@ -174,9 +187,7 @@ func _build_header() -> void:
 	prep_button.position = Vector2(20,190)
 	prep_button.visible = false
 	ui_root.add_child(prep_button)
-	minimap_button=_button("Tab 切換地圖","",null);minimap_button.disabled=true;minimap_button.focus_mode=Control.FOCUS_NONE;minimap_button.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	minimap_button.position=Vector2(950,86);minimap_button.custom_minimum_size=Vector2(312,32)
-	ui_root.add_child(minimap_button)
+
 	quickbar=HBoxContainer.new();quickbar.position=Vector2(20,642);quickbar.add_theme_constant_override("separation",6);ui_root.add_child(quickbar)
 
 
@@ -194,7 +205,7 @@ func _build_messages() -> void:
 	message_label.add_theme_constant_override("shadow_offset_y", 2)
 	message_label.visible = false
 	ui_root.add_child(message_label)
-	legend_label = _label("移動 方向鍵    跳躍 Space    攻擊 X    衝刺 C ×2    副武器 Z    回血 A    地圖 Tab", 12, INK)
+	legend_label = _label("移動 方向鍵    跳躍 Space    攻擊 X    衝刺 C ×2    副武器 Z    回血 A    地圖 按住 Tab ／ M", 12, INK)
 	legend_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	legend_label.offset_left = 20
 	legend_label.offset_right = -20
@@ -400,8 +411,7 @@ func update_shortcuts(names:Dictionary) -> void:
 	prep_button.text="安全屋 "+str(names.get("up","↑"))
 	for action in shortcut_buttons:
 		shortcut_buttons[action].text={"bag":"裝備","runes":"符文","settings":"選單"}[action]+" "+str(names.get("interact" if action=="bag" else action,""))
-	minimap_button.text=str(names.get("map","Tab"))+" 切換地圖"
-	legend_label.text="移動 %s %s %s %s    跳 %s    攻擊 %s    衝刺 %s ×2    副武器 %s    回血 %s    地圖 %s"%[names.get("up","↑"),names.get("down","↓"),names.get("left","←"),names.get("right","→"),names.get("jump","Space"),names.get("attack","X"),names.get("dash","C"),names.get("sub","Z"),names.get("heal","A"),names.get("map","Tab")]
+	legend_label.text="移動 %s %s %s %s    跳 %s    攻擊 %s    衝刺 %s ×2    副武器 %s    回血 %s    地圖 按住 %s ／ M"%[names.get("up","↑"),names.get("down","↓"),names.get("left","←"),names.get("right","→"),names.get("jump","Space"),names.get("attack","X"),names.get("dash","C"),names.get("sub","Z"),names.get("heal","A"),names.get("map","Tab")]
 
 
 func _inventory_nav(active:String) -> void:
@@ -554,14 +564,37 @@ func _button(text: String, action: String, payload: Variant) -> Button:
 	b.add_theme_color_override("font_hover_color", INK)
 	b.add_theme_color_override("font_pressed_color", INK)
 	b.add_theme_color_override("font_disabled_color", Color("657a71"))
-	b.add_theme_stylebox_override("normal", _box(Color("203c37"), LINE, 9, 10))
-	b.add_theme_stylebox_override("hover", _box(Color("304f43"), MINT, 9, 10))
-	b.add_theme_stylebox_override("pressed", _box(Color("40654f"), MINT, 9, 10))
-	b.add_theme_stylebox_override("focus", _box(Color(0,0,0,0), GOLD, 9, 10))
-	b.add_theme_stylebox_override("disabled", _box(Color("192f2d"), Color("2a403a"), 9, 10))
+	style_button(b)
 	if not action.is_empty():b.pressed.connect(_dispatch.bind(action, payload))
 	return b
 
+
+func style_button(button:Button,accent:Color=MINT,padding:int=10) -> void:
+	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
+	button.add_theme_stylebox_override("normal",_button_face(Color("203c37"),accent.darkened(.42),padding,0))
+	button.add_theme_stylebox_override("hover",_button_face(Color("34584a"),accent,padding,0))
+	button.add_theme_stylebox_override("pressed",_button_face(Color("132a24"),accent.lightened(.18),padding,3))
+	var focus:=StyleBoxFlat.new()
+	focus.bg_color=Color.TRANSPARENT
+	focus.border_color=GOLD
+	focus.set_border_width_all(2)
+	focus.set_corner_radius_all(9)
+	button.add_theme_stylebox_override("focus",focus)
+	button.add_theme_stylebox_override("disabled",_button_face(Color("192f2d"),Color("2a403a"),padding,0,false))
+
+func _button_face(fill:Color,edge:Color,padding:int,depth:int,raised:bool=true) -> StyleBoxFlat:
+	var face:=StyleBoxFlat.new()
+	face.bg_color=fill
+	face.border_color=edge
+	face.set_corner_radius_all(9)
+	face.set_border_width_all(2)
+	face.set_content_margin_all(padding)
+	face.content_margin_top=padding+depth
+	face.content_margin_bottom=padding-depth
+	face.shadow_color=Color("#071310b8")
+	face.shadow_size=3 if raised and depth==0 else 0
+	face.shadow_offset=Vector2(0,4)
+	return face
 
 func _touch_button(text: String, action: String) -> Button:
 	var b := Button.new()

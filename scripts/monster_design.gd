@@ -6,10 +6,19 @@ const FX=preload("res://scripts/combat_visual.gd")
 const Appearance=preload("res://scripts/monster_appearance.gd")
 const MotionV18=preload("res://scripts/monster_motion_v18.gd")
 const TrapArt=preload("res://scripts/trap_visual_v22.gd")
+const BossArtV57=preload("res://scripts/boss_art_v57.gd")
 const Actions=preload("res://scripts/monster_actions_v22.gd")
 const CELLS={"moss_shard":0,"spring_seed":1,"lamp_pollen":2,"mist_spore":3,"root_spear":4,"storm_feather":5,"leaf_moon":6,"silk_cocoon":7,"amber_resin":8,"dew_bubble":9,"root_wave":10,"cute_pillbug":11,"moss_thorns":12,"pollen_flower":13,"silk_web":14,"dew_pool":15}
 const REGIONS={"moss_shard":[28,60,325,179],"spring_seed":[407,68,274,155],"lamp_pollen":[742,50,295,176],"mist_spore":[1113,72,302,163],"root_spear":[19,316,335,172],"storm_feather":[394,304,339,204],"leaf_moon":[762,293,287,241],"silk_cocoon":[1102,322,313,164],"amber_resin":[20,579,322,190],"dew_bubble":[397,580,287,196],"root_wave":[738,581,365,198],"cute_pillbug":[1138,572,260,206],"moss_thorns":[22,809,313,244],"pollen_flower":[370,818,340,236],"silk_web":[732,830,347,225],"dew_pool":[1101,824,328,231]}
 const BOSS_VISUALS={"cloud_crescent":"storm_feather","storm_feather":"storm_feather","mantis_shear":"leaf_moon","leaf_moon":"leaf_moon","silk_stitch":"silk_cocoon","silk_cocoon":"silk_cocoon","silk_web":"silk_web","amber_pincers":"amber_resin","amber_resin":"amber_resin","reed_slash":"dew_bubble","dew_bubble":"dew_bubble","dew_pool":"dew_pool","root_claw":"root_wave","root_wave":"root_wave","root_spike":"moss_thorns"}
+const BOSS_EFFECT_FALLBACKS={
+	"underground":["root_wave","root_wave","moss_thorns","root_wave"],
+	"grass":["dew_bubble","dew_bubble","dew_pool","dew_pool"],
+	"trunk":["amber_resin","amber_resin","amber_resin","amber_resin"],
+	"branches":["silk_cocoon","silk_cocoon","silk_web","silk_cocoon"],
+	"canopy":["leaf_moon","leaf_moon","leaf_moon","leaf_moon"],
+	"sky":["storm_feather","storm_feather","storm_feather","storm_feather"]
+}
 static var atlas:Texture2D
 static var sprites:Dictionary={}
 
@@ -39,7 +48,7 @@ static func decorate_boss(result:Dictionary) -> void:
 	result["stop_radius"]=110.0;result["resume_margin"]=32.0;result["facing_deadzone"]=40.0
 	result["charge_name"]={"sky":"收翼雷襲","canopy":"伏鐮突進","branches":"抱繭衝撞","trunk":"低角破木","grass":"鼓腹躍撞","underground":"伏地鑽進"}.get(result["biome"],"蓄勢衝鋒")
 	for definition:Dictionary in result["attacks"]:
-		definition["visual_id"]=BOSS_VISUALS.get(definition.get("style_id",""),"root_spear")
+		definition["visual_id"]=BossArtV57.effect_key(result["biome"],int(definition.get("boss_animation_slot",0)))
 		definition["hazard_visual_id"]=definition["visual_id"]
 		if definition["library_kind"]=="trap":definition["hp"]=1.0
 
@@ -54,6 +63,14 @@ static func decorate_adaptation(definition:Dictionary,boss:Dictionary) -> void:
 	if definition.get("library_kind","")=="trap":definition["hp"]=1.0
 
 static func texture_for(id:String) -> Texture2D:
+	if id.begins_with("v57:"):
+		var updated:Texture2D=BossArtV57.effect_texture(id)
+		if updated!=null:return updated
+		var key:PackedStringArray=id.split(":")
+		if key.size()!=3 or not BOSS_EFFECT_FALLBACKS.has(key[1]) or not key[2].is_valid_int():return null
+		var slot:int=int(key[2])
+		if slot<0 or slot>3:return null
+		id=BOSS_EFFECT_FALLBACKS[key[1]][slot]
 	if not CELLS.has(id):return null
 	if sprites.has(id):return sprites[id]
 	if atlas==null:
@@ -70,7 +87,7 @@ static func draw_projectile(c:CanvasItem,pr:Dictionary,time:float,base:Transform
 	if tex==null:return false
 	var radius:float=float(pr.get("radius",12));var velocity:Vector2=pr.get("vel",Vector2.RIGHT)
 	var angle:float=velocity.angle()
-	if pr.get("visual_id","") in ["spring_seed","mist_spore","amber_resin","dew_bubble"]:angle=time*1.3
+	if pr.get("visual_id","") in ["spring_seed","mist_spore","amber_resin","dew_bubble","v57:trunk:1","v57:grass:1","v57:branches:3"]:angle=time*1.3
 	c.draw_set_transform_matrix(base*Transform2D(angle,pr["pos"]))
 	var size:Vector2=tex.get_size()/maxf(tex.get_width(),tex.get_height())*radius*3.0
 	c.draw_texture_rect(tex,Rect2(-size*.5,size),false)
@@ -78,8 +95,8 @@ static func draw_projectile(c:CanvasItem,pr:Dictionary,time:float,base:Transform
 
 static func draw_hazard(c:CanvasItem,h:Dictionary,time:float,base:Transform2D=Transform2D.IDENTITY) -> bool:
 	if preload("res://scripts/monster_art_v36.gd").draw_hazard(c,h,base):return true
-	if TrapArt.draw(c,h,base):return true
 	var id:String=str(h.get("hazard_visual_id",h.get("visual_id","")))
+	if not id.begins_with("v57:") and TrapArt.draw(c,h,base):return true
 	if id=="mist_spore":id="pollen_flower"
 	var tex:Texture2D=texture_for(id)
 	if tex==null:return false
@@ -141,12 +158,14 @@ static func draw_charge(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=T
 			var endpoint:Vector2=at+dir*float(en["dash_speed"])*float(en["dash_duration"])
 			c.draw_line(at,endpoint,Color(1,.32,.13,.20),25,true)
 			c.draw_line(at,endpoint,Color("ffdfa3"),2,true)
+			if BossArtV57.draw_movement_charge(c,en,phase,time,base):return
 		var progress:float=1-float(en.get("charge_left",0))/maxf(.01,float(en.get("dash_windup",.6)))
 		for i in 5:
 			var angle:float=time*3+i*TAU/5;var distance:float=lerpf(34,8,fmod(progress+float(i)*.2,1))
 			c.draw_circle(at+Vector2.from_angle(angle)*distance,1.5,Color(color,.65))
 		c.draw_circle(at+dir*13,3+progress*2,Color("fff2c2",.3+.45*progress))
 	else:
+		if Appearance.is_boss(en) and BossArtV57.draw_movement_charge(c,en,phase,time,base):return
 		for i in 4:
 			var tail:Vector2=at-dir*(12+i*12)+dir.orthogonal()*sin(time*17+i)*6
 			c.draw_line(tail-dir*14,tail,Color(color,.5-float(i)*.1),2,false)

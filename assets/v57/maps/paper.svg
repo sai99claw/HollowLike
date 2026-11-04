@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="150" viewBox="0 0 320 150">
+<defs><radialGradient id="paper"><stop stop-color="#243d3d"/><stop offset="1" stop-color="#101e26"/></radialGradient><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0v24" fill="none" stroke="#b6c9a8" opacity=".13"/></pattern></defs>
+<rect width="320" height="150" fill="url(#paper)"/><rect width="320" height="150" fill="url(#grid)"/>
+<path d="M8 26V8h18m268 0h18v18m0 98v18h-18m-268 0H8v-18" fill="none" stroke="#ad9d68" stroke-width="1.2"/>
+<path d="m160 5 5 4-5 4-5-4zm0 132 5 4-5 4-5-4z" fill="#ad9d68"/>
+</svg>

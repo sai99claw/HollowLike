@@ -78,24 +78,52 @@ static func chapter_layout(data:Dictionary,id:int,rect:Rect2) -> Dictionary:
 	for room:Dictionary in selected:points[int(room["id"])]=rect.get_center()+(Vector2(room["coord"])-center)*Vector2(stride,stride_y)
 	return {"rooms":selected,"points":points,"stage":stage,"stride":stride,"stride_y":stride_y}
 
+static func known_rooms(rooms:Array,id:int,revealed:Dictionary={}) -> Dictionary:
+	var known:Dictionary={}
+	for candidate:Dictionary in rooms:
+		if int(candidate["id"])==id or candidate.get("visited",false) or revealed.has(candidate["map_index"]):
+			known[candidate["id"]]=true
+	return known
+
+static func neighboring_rooms(rooms:Array,known:Dictionary) -> Dictionary:
+	var hinted:Dictionary={}
+	for candidate:Dictionary in rooms:
+		if not known.has(candidate["id"]):continue
+		for next:int in candidate["neighbors"].values():
+			if not known.has(next):hinted[next]=true
+	return hinted
+
+static func _draw_hint(c:CanvasItem,rect:Rect2) -> void:
+	var tint:=Color("9aacaa",.70)
+	c.draw_dashed_line(rect.position,Vector2(rect.end.x,rect.position.y),tint,1.0,4.0)
+	c.draw_dashed_line(Vector2(rect.end.x,rect.position.y),rect.end,tint,1.0,4.0)
+	c.draw_dashed_line(rect.end,Vector2(rect.position.x,rect.end.y),tint,1.0,4.0)
+	c.draw_dashed_line(Vector2(rect.position.x,rect.end.y),rect.position,tint,1.0,4.0)
+
 static func draw_chapter(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:Font,fog:bool=false) -> void:
 	var graph:Dictionary=chapter_layout(data,id,rect)
 	if graph.is_empty():return
 	var points:Dictionary=graph["points"];var extent:=Vector2(48,30)
+	var hints:Dictionary={}
 	if fog:
-		for candidate:Dictionary in graph["rooms"]:
-			if not candidate.get("visited",false) and int(candidate["id"])!=id:points.erase(candidate["id"])
+		var known:Dictionary=known_rooms(graph["rooms"],id)
+		hints=neighboring_rooms(graph["rooms"],known)
+		for rid in points.keys():
+			if not known.has(rid) and not hints.has(rid):points.erase(rid)
 	for room:Dictionary in graph["rooms"]:
 		var rid:int=room["id"]
 		if not points.has(rid):continue
 		for next:int in room["neighbors"].values():
 			if next<rid or not points.has(next):continue
-			c.draw_line(points[rid],points[next],Color("7c9eaa"),4,true)
+			if hints.has(rid) or hints.has(next):
+				if not (hints.has(rid) and hints.has(next)):c.draw_dashed_line(points[rid],points[next],Color("779695"),2,5)
+			else:c.draw_line(points[rid],points[next],Color("7c9eaa"),4,true)
 	for room:Dictionary in graph["rooms"]:
 		var rid:int=room["id"]
 		if not points.has(rid):continue
 		var at:Vector2=points[rid];var color:Color=room_color(room,-1)
 		var box:=Rect2(at-extent*.5,extent)
+		if hints.has(rid):_draw_hint(c,box);continue
 		c.draw_rect(box,Color("183640") if room.get("visited",false) else Color("0d202b"))
 		c.draw_rect(box,color,false,2 if rid!=id else 3)
 		var symbol:String={"start":"整","elite":"菁","boss":"王","merchant":"商","reward":"寶"}.get(str(room["type"]),"泉" if room.get("fountain",false) else "·")
@@ -149,28 +177,34 @@ static func draw_full_tower(c:CanvasItem,data:Dictionary,id:int,rect:Rect2,font:
 	for chapter:Dictionary in chapters:points.merge(chapter["graph"]["points"])
 	if points.is_empty():return
 	var rooms:Array=data["rooms"];var extent:Vector2=chapters[0]["graph"]["extent"]
+	var hints:Dictionary={}
 	if fog:
 		var revealed:Dictionary={}
 		for candidate:Dictionary in rooms:
 			if candidate.get("boss_defeated",false):revealed[candidate["map_index"]]=true
-		for candidate:Dictionary in rooms:
-			if int(candidate["id"])!=id and not candidate.get("visited",false) and not revealed.has(candidate["map_index"]):points.erase(candidate["id"])
+		var known:Dictionary=known_rooms(rooms,id,revealed)
+		hints=neighboring_rooms(rooms,known)
+		for rid in points.keys():
+			if not known.has(rid) and not hints.has(rid):points.erase(rid)
 	for room:Dictionary in rooms:
 		if not points.has(room["id"]):continue
 		for next:int in room["neighbors"].values():
 			if next<int(room["id"]) or not points.has(next):continue
 			var cross:bool=int(room["map_index"])!=int(rooms[next]["map_index"])
-			c.draw_line(points[room["id"]],points[next],Color("ffd581") if cross else Color("7595a3"),3 if cross else 2,true)
+			if hints.has(room["id"]) or hints.has(next):
+				if not (hints.has(room["id"]) and hints.has(next)):c.draw_dashed_line(points[room["id"]],points[next],Color("779695"),1,4)
+			else:c.draw_line(points[room["id"]],points[next],Color("ffd581") if cross else Color("7595a3"),3 if cross else 2,true)
 	for room:Dictionary in rooms:
 		var rid:int=room["id"]
 		if not points.has(rid):continue
 		var at:Vector2=points[rid];var color:Color=room_color(room,-1);var node:=Rect2(at-extent*.5,extent)
+		if hints.has(rid):_draw_hint(c,node);continue
 		c.draw_rect(node,Color("18313b"));c.draw_rect(node,color,false,1.5)
 		var symbol:String={"start":"整","elite":"菁","boss":"王","merchant":"商","reward":"寶"}.get(str(room["type"]),"泉" if room.get("fountain",false) else "")
 		if not symbol.is_empty():c.draw_string(font,at+Vector2(-5,4),symbol,HORIZONTAL_ALIGNMENT_LEFT,-1,clampi(int(extent.y),9,12),color)
 		if rid==id:c.draw_rect(node.grow(3),Color("fff0a6"),false,2)
 	for chapter:Dictionary in chapters:
 		var stage:Dictionary=chapter["stage"]
-		if not points.has(stage["start_id"]):continue
+		if not points.has(stage["start_id"]) or hints.has(stage["start_id"]):continue
 		var at:Vector2=points[stage["start_id"]]
 		c.draw_string(font,at+Vector2(extent.x*.5+7,4),str(int(stage["index"])+1),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("b4d6d3"))

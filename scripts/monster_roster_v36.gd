@@ -27,7 +27,7 @@ static func elite(stage:int) -> Dictionary:
 	return result
 static func _actor(biome:String,row:int,id:String,title:String,movement:String,is_elite:bool) -> Dictionary:
 	var tint:Color={"underground":Color("ddb46e"),"trunk":Color("8edca4"),"sky":Color("9cdbff")}[biome]
-	var scale_value:float=sqrt(2.0) if is_elite else 1.0
+	var scale_value:float=2.0 if is_elite else 1.0
 	return {"id":id,"name":title,"roster_id":id,"roster_biome":biome,"roster_row":row,"roster_elite":is_elite,"species":id,"biome":biome,
 		"model":3 if is_elite else (2 if movement in ["hover","drift"] else 1 if movement=="jump" else 0),"elite":is_elite,"passive":false,
 		"move":"fly" if movement in ["hover","drift"] else "walk","visual_movement":movement,"movements":[movement],

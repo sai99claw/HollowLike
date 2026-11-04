@@ -5,6 +5,7 @@ const Appearance=preload("res://scripts/monster_appearance.gd")
 const Collision=preload("res://scripts/world_collision.gd")
 const Atlas=preload("res://scripts/atlas_v22.gd")
 const NewMonsterArt=preload("res://scripts/monster_art_v55.gd")
+const RevisedBossArt=preload("res://scripts/boss_art_v57.gd")
 const NewBossArt=preload("res://scripts/boss_art_v55.gd")
 static func death_velocity(en:Dictionary) -> Vector2:
 	var direction:Vector2=en.get("death_direction",Vector2(-float(en.get("face",1)),0))
@@ -27,7 +28,12 @@ static func create(en:Dictionary) -> Dictionary:
 	if not Appearance.is_boss(en):factor*=float(en.get("scale",1))
 	var rest:Dictionary=clip["frames"][7] if not clip.is_empty() else {}
 	var extent:Vector2=Atlas.bounds(rest).size*factor if not rest.is_empty() else Vector2(60,25)
-	var painted_extent:Vector2=NewBossArt.corpse_extent(identity) if Appearance.is_boss(en) else Vector2.ZERO
+	var painted_extent:Vector2=Vector2.ZERO
+	var revised:bool=false
+	if Appearance.is_boss(en):
+		painted_extent=RevisedBossArt.corpse_extent(identity)
+		revised=painted_extent!=Vector2.ZERO
+		if not revised:painted_extent=NewBossArt.corpse_extent(identity)
 	if painted_extent!=Vector2.ZERO:extent=painted_extent
 	var direction:Vector2=en.get("death_direction",Vector2(-float(en.get("face",1)),0))
 	if direction.length_squared()<.01:direction=Vector2(-float(en.get("face",1)),0)
@@ -35,7 +41,7 @@ static func create(en:Dictionary) -> Dictionary:
 	var force:float=clampf(float(en.get("death_knockback",90))*.85,65,120)
 	var velocity:Vector2=death_velocity(en)
 	var face:float=float(en.get("face",1))
-	return {"identity":identity,"boss_v55":painted_extent!=Vector2.ZERO,"pos":Vector2(en["pos"]),"vel":velocity,"factor":factor,"visual_size":extent,"body_size":extent*Vector2(.9,.9),"age":0.0,"land_age":-1.0,"frame":0,"face":face,"settled":false}
+	return {"identity":identity,"boss_v57":revised,"boss_v55":not revised and painted_extent!=Vector2.ZERO,"pos":Vector2(en["pos"]),"vel":velocity,"factor":factor,"visual_size":extent,"body_size":extent*Vector2(.9,.9),"age":0.0,"land_age":-1.0,"frame":0,"face":face,"settled":false}
 static func step(body:Dictionary,delta:float,solids:Array,platforms:Array,bounds:Vector2) -> bool:
 	if body.get("settled",false):return false
 	var dt:float=minf(delta,1.0/30);var remaining:float=delta
@@ -63,7 +69,7 @@ static func _step(body:Dictionary,delta:float,solids:Array,platforms:Array,bound
 		if float(body["land_age"])>=.5:body["settled"]=true;body["vel"]=Vector2.ZERO;body["frame"]=7
 	else:body["frame"]=mini(3,int(float(body["age"])*12))
 static func draw(c:CanvasItem,body:Dictionary) -> void:
-	if NewMonsterArt.draw_corpse(c,body) or NewBossArt.draw_corpse(c,body):return
+	if NewMonsterArt.draw_corpse(c,body) or RevisedBossArt.draw_corpse(c,body) or NewBossArt.draw_corpse(c,body):return
 	if preload("res://scripts/monster_art_v36.gd").draw_corpse(c,body):return
 	# Flight, impact and slack rest are authored poses, never a rotated standing sprite.
 	Atlas.draw(c,"death",str(body["identity"]),int(body["frame"]),body["pos"],float(body["factor"]),float(body["face"]))
