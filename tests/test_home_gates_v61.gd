@@ -30,6 +30,17 @@ func run() -> void:
 	check(not game._home_interact() and game.screen=="hub","Rogue still requires reaching the elevated gate")
 	check(HomeArt.LEFT_GATE.size==HomeArt.ROGUE_GATE.size and HomeArt.RIGHT_GATE.size==HomeArt.ROGUE_GATE.size,"All three portals share dimensions")
 	check(game._camera_target(Vector2(640,114)).y<0,"Vertical camera tracks the upper landing")
+	var credits:HBoxContainer=game.ui.ui_root.get_node("HomeCredits")
+	var repository:LinkButton=credits.get_child(1)
+	check(repository.uri=="https://github.com/sai99claw/HollowLike" and credits.get_child(0).text==game.PerfLog.VERSION,"Homepage footer links to the project beside the current version")
+	var footer_position:Vector2=credits.global_position
+	game.camera_pos=game._camera_target(HomeArt.STATIONS["rogue"])
+	game._process_profiled_body(0.0)
+	check(game.world_transform*HomeArt.STATIONS["rogue"]==HomeArt.STATIONS["rogue"]-game.camera_pos,"Upper gate and its world-space anchor follow the same camera transform")
+	check(credits.global_position==footer_position,"Homepage footer remains fixed during vertical scrolling")
+	game.camera_pos=Vector2.ZERO
+	game._process_profiled_body(0.0)
+	check(HomeArt.PROJECTION_SCREEN.end.y+24.0<451.0,"Projection trim clears the projector and ground-level props")
 	var lamp:Vector2=HomeArt.lamp_center(game.home_projector,game.clock)
 	var strike:=Rect2(lamp-Vector2.ONE*5,Vector2.ONE*10)
 	for hit in range(1,4):

@@ -69,6 +69,9 @@ const Sanctuary=preload("res://scripts/sanctuary_room.gd")
 const Ledge=preload("res://scripts/ledge_mantle_v37.gd")
 const Bath=preload("res://scripts/bath_water.gd")
 const WorldItems=preload("res://scripts/world_item_art.gd")
+const PROJECT_URL: String = "https://github.com/sai99claw/HollowLike"
+const PROJECTION_FONT = preload("res://assets/v65/home/NotoSerifTC-Projection.ttf")
+const PROJECTION_TRIM = preload("res://assets/v65/home/projection_bottom.png")
 const HomeArt=preload("res://scripts/home_art.gd")
 const Wind=preload("res://scripts/wind_art.gd")
 const SanctuaryArt=preload("res://scripts/sanctuary_art.gd")
@@ -247,6 +250,7 @@ var lab_meta:Dictionary={}
 var lab_ai:bool=true
 var rd_view:Control
 var home_projector:Dictionary={}
+var home_credits:HBoxContainer
 var home_hint_fade_at:float=INF
 var home_backdrop_y:float=INF
 var lab_buttons:HBoxContainer
@@ -288,6 +292,7 @@ func _ready() -> void:
 	add_child(ui)
 	ui.setup()
 	_setup_labs()
+	_setup_home_credits()
 	critical_warning=ColorRect.new();critical_warning.name="CriticalCorners";critical_warning.size=Vector2(1280,720);critical_warning.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	var warning_material:=ShaderMaterial.new();warning_material.shader=load("res://shaders/critical_health.gdshader");critical_warning.material=warning_material
 	ui.ui_root.add_child(critical_warning);critical_warning.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.ui_root.move_child(critical_warning,0);critical_warning.visible=false
@@ -539,6 +544,7 @@ func _process(delta: float) -> void:
 
 func _process_profiled_body(delta: float) -> void:
 	if lab_buttons!=null:lab_buttons.visible=_home_controls_visible()
+	if home_credits!=null:home_credits.visible=screen=="hub" and not trophy_room and lab_mode.is_empty() and not ui.is_panel_open()
 	if practice_tools!=null:practice_tools.visible=lab_mode=="practice" and not ui.is_panel_open() and practice_rd_panel==null
 	if lab_mode in ["rd","tuning"]:return
 	metrics_timer+=delta
@@ -2807,10 +2813,10 @@ func _draw_hub() -> void:
 	if trophy_room:_draw_trophy_room();return
 	var focus:String=_home_station()
 	if not focus.is_empty():HomeArt.station_light(self,HomeArt.STATIONS[focus])
-	HomeArt.gates(self,clock,low_effects)
+	HomeArt.gates(self,clock,low_effects,world_transform)
 	HomeArt.nest(self)
 	HomeArt.fixture(self,1,HomeArt.STATIONS["trophy"]+HomeArt.STATION_SINK,Vector2(134,121))
-	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"]+HomeArt.STATION_SINK,Vector2(90,105))
+	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"]+HomeArt.STATION_SINK,Vector2(90,105),world_transform)
 	_draw_home_projector()
 	for prop:Dictionary in props:
 		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(world_transform))
@@ -2825,8 +2831,6 @@ func _draw_hub() -> void:
 	for entry:Array in [["musou","無雙夢境"],["tutorial","新手教學"],["rogue","肉鴿"],["trophy","戰利品房"],["records","冒險紀錄"]]:
 		var feet:Vector2=HomeArt.STATIONS[entry[0]]
 		_home_gate_sign(feet+Vector2(0,8),entry[1],"按 %s 互動"%_tutorial_key("up") if focus==entry[0] else "",Color("ffe1a6"))
-	draw_set_transform_matrix(Transform2D.IDENTITY)
-	_text(Vector2(1185,710),"v0.64",13,Color("a6c1b6"))
 
 func _draw_home_keys() -> void:
 	var opacity:float=1.0-clampf((clock-home_hint_fade_at)/.65,0,1)
@@ -2858,15 +2862,20 @@ func _draw_home_projector() -> void:
 	var opacity:float=1.0-clampf((clock-float(home_projector.get("broken_at",clock)))/.55,0,1)
 	if opacity>0:
 		var origin:Vector2=Vector2(home_projector.get("break_origin",at))+Vector2(21,5)
-		var screen_rect:=Rect2(444,342,390,146)
+		var screen_rect:Rect2=HomeArt.PROJECTION_SCREEN
 		var beam:=Color(.68,.94,.83,.22*opacity)
 		var edge:=Color(.69,.95,.84,.63*opacity)
 		draw_polygon(PackedVector2Array([origin+Vector2(0,-5),screen_rect.position,Vector2(screen_rect.position.x,screen_rect.end.y),origin+Vector2(0,6)]),PackedColorArray([beam,Color(beam,0),Color(beam,0),beam]))
-		draw_rect(screen_rect,Color(.06,.19,.17,.80*opacity))
+		draw_rect(screen_rect,Color(.04,.12,.11,.92*opacity))
 		draw_rect(screen_rect,edge,false,1.0)
-		for line:Array in [["枝間鴿行",34,384],["樹梢之巢 · 冒險的起點",15,408],["你是一隻鴿子 可以繼續睡",17,440],["也可以舉起羽毛冒險",17,463]]:
-			var width:float=font.get_string_size(line[0],HORIZONTAL_ALIGNMENT_LEFT,-1,line[1]).x
-			_text(Vector2(screen_rect.get_center().x-width*.5,line[2]),line[0],line[1],Color(.88,1,.92,opacity))
+		var trim_size:Vector2=PROJECTION_TRIM.get_size()*((screen_rect.size.x+16.0)/PROJECTION_TRIM.get_width())
+		draw_texture_rect(PROJECTION_TRIM,Rect2(Vector2(screen_rect.get_center().x-trim_size.x*.5,screen_rect.end.y-5),trim_size),false,Color(1,1,1,opacity))
+		var center_x:float=screen_rect.get_center().x
+		draw_line(Vector2(center_x-62,screen_rect.position.y+66),Vector2(center_x+62,screen_rect.position.y+66),Color(.81,.67,.42,.52*opacity),1,true)
+		for line:Array in [["枝間鴿行",32,38],["樹梢之巢 · 冒險的起點",14,59],["你是一隻鴿子 可以繼續睡",16,89],["也可以舉起羽毛冒險",16,112]]:
+			var width:float=PROJECTION_FONT.get_string_size(line[0],HORIZONTAL_ALIGNMENT_LEFT,-1,line[1]).x
+			var tint:=Color(1,.92,.72,opacity) if line[1]==32 else Color(.88,.98,.91,opacity)
+			draw_string(PROJECTION_FONT,Vector2(center_x-width*.5,screen_rect.position.y+line[2]),line[0],HORIZONTAL_ALIGNMENT_LEFT,-1,line[1],tint)
 	var hit_age:float=clock-float(home_projector.get("hit_at",-10.0))
 	var flashing:bool=hit_age<.075
 	HomeArt.fixture(self,0,at+Vector2(0,29),Vector2(69,60),Color("fff2bb") if flashing else (Color("84746a") if broken else Color.WHITE))
@@ -3937,6 +3946,26 @@ func _show_records() -> void:
 func _lab_button(label:String,callback:Callable) -> Button:
 	var button:=Button.new();button.text=label;button.custom_minimum_size=Vector2(156,42);button.add_theme_font_override("font",font);button.add_theme_font_size_override("font_size",18)
 	ui.style_button(button,UI.GOLD,7);button.pressed.connect(callback);return button
+func _setup_home_credits() -> void:
+	home_credits=HBoxContainer.new()
+	home_credits.name="HomeCredits"
+	home_credits.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	home_credits.add_theme_constant_override("separation",10)
+	var version:=Label.new()
+	version.text=PerfLog.VERSION
+	version.add_theme_color_override("font_color",Color("b9cdc4"))
+	version.add_theme_font_size_override("font_size",14)
+	home_credits.add_child(version)
+	var repository:=LinkButton.new()
+	repository.text="GitHub"
+	repository.uri=PROJECT_URL
+	repository.tooltip_text="github.com/sai99claw/HollowLike"
+	repository.add_theme_font_size_override("font_size",14)
+	repository.add_theme_color_override("font_color",Color("ffe1a6"))
+	home_credits.add_child(repository)
+	ui.ui_root.add_child(home_credits)
+	home_credits.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT,Control.PRESET_MODE_MINSIZE,12)
+
 func _setup_labs() -> void:
 	lab_buttons=HBoxContainer.new();lab_buttons.position=Vector2(475,640);lab_buttons.add_theme_constant_override("separation",18);ui.ui_root.add_child(lab_buttons)
 	lab_buttons.add_child(_lab_button("練習房",_enter_practice));lab_buttons.add_child(_lab_button("RD 美術室",_open_rd))

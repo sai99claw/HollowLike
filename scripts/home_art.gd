@@ -7,6 +7,7 @@ const RIGHT_GATE:=Rect2(960,315,240,285)
 const ROGUE_PLATFORM_Y:float=64.44+50.0
 const ROGUE_PLATFORM:=Rect2(505,ROGUE_PLATFORM_Y,270,9)
 const ROGUE_GATE:=Rect2(520,ROGUE_PLATFORM_Y-285,240,285)
+const PROJECTION_SCREEN:=Rect2(444,248,390,128)
 const STATION_SINK:=Vector2(0,10)
 const CEILING_Y:float=-260.0
 const STATIONS={"musou":Vector2(200,600),"tutorial":Vector2(1080,600),"rogue":Vector2(640,ROGUE_PLATFORM_Y),"trophy":Vector2(925,600),"records":Vector2(790,600),"exit":Vector2(72,600)}
@@ -23,13 +24,14 @@ static func background(c:CanvasItem,camera_y:float=0.0) -> void:
 	preload("res://scripts/home_visual_v33.gd").background(c,camera_y)
 static var openings:Dictionary={}
 
-static func gates(c:CanvasItem,time:float,reduced:bool) -> void:
+static func gates(c:CanvasItem,time:float,reduced:bool,base:Transform2D) -> void:
+	c.draw_set_transform_matrix(base)
 	var home_visual=preload("res://scripts/home_visual_v33.gd")
 	for entry:Array in [["rogue",ROGUE_GATE],["musou",LEFT_GATE],["rogue",RIGHT_GATE]]:
 		var box:Rect2=entry[1]
 		var feet:=Vector2(box.get_center().x,box.end.y)
 		_draw_opening(c,feet,Vector2(95,147),time+feet.x*.002,reduced)
-		home_visual.gate(c,entry[0],feet+STATION_SINK)
+		home_visual.gate(c,entry[0],feet+STATION_SINK,base)
 	preload("res://scripts/terrain_art_v24.gd").platform(c,"trunk",ROGUE_PLATFORM)
 
 static func falling_mote(feet:Vector2,size:Vector2,time:float,index:int) -> Vector2:

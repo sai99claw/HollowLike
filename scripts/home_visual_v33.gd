@@ -23,6 +23,8 @@ static func background(c:CanvasItem,camera_y:float=0.0) -> void:
 		c.draw_set_transform_matrix(Transform2D.IDENTITY)
 	c.draw_texture_rect_region(image,Rect2(0,canopy_top,1280,canopy_height),Rect2(0,0,image.get_width(),floor_source))
 	c.draw_texture_rect_region(image,Rect2(0,floor_screen,1280,(float(original[1])-float(data.get("authored_floor_y",730)))*scale_value),Rect2(0,floor_source,image.get_width(),image.get_height()-floor_source))
-static func prop(c:CanvasItem,id:String,at:Vector2,size:Vector2) -> void:Art.prop(c,ROOT+"props.json",id,at,size)
-static func gate(c:CanvasItem,id:String,at:Vector2) -> void:prop(c,id,at,Vector2(205,280))
+static func prop(c:CanvasItem,id:String,at:Vector2,size:Vector2,base:Transform2D) -> void:
+	Art.prop(c,ROOT+"props.json",id,at,size,base)
+static func gate(c:CanvasItem,id:String,at:Vector2,base:Transform2D) -> void:
+	prop(c,id,at,Vector2(205,280),base)
 static func body() -> Rect2:return Rect2(BOUNCE-Vector2(36,55),Vector2(72,55))
