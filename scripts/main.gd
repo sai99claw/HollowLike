@@ -247,6 +247,8 @@ var lab_meta:Dictionary={}
 var lab_ai:bool=true
 var rd_view:Control
 var home_projector:Dictionary={}
+var home_hint_fade_at:float=INF
+var home_backdrop_y:float=INF
 var lab_buttons:HBoxContainer
 var practice_tools:HBoxContainer
 var practice_rd_panel:Control
@@ -554,9 +556,12 @@ func _process_profiled_body(delta: float) -> void:
 	if corpse_layer!=null:corpse_layer.transform=world_transform.translated_local(Vector2(0,5))
 	if terrain!=null: terrain.transform=world_transform
 	if static_props!=null:static_props.transform=world_transform
-	if backdrop!=null:backdrop.transform=(atmosphere.depth_transform(render_camera,zoom,Atmosphere.FAR_FACTOR) if _is_start() else Atmosphere.parallax(render_camera,1.0,Atmosphere.FAR_FACTOR)) if screen=="game" else world_transform
+	if backdrop!=null:backdrop.transform=(atmosphere.depth_transform(render_camera,zoom,Atmosphere.FAR_FACTOR) if _is_start() else Atmosphere.parallax(render_camera,1.0,Atmosphere.FAR_FACTOR)) if screen=="game" else Transform2D.IDENTITY
+	if screen=="hub" and absf(render_camera.y-home_backdrop_y)>.25:
+		home_backdrop_y=render_camera.y
+		backdrop.invalidate()
 	if home_atmosphere!=null:
-		home_atmosphere.transform=world_transform;home_atmosphere.set_active(screen=="hub" and not trophy_room);home_atmosphere.focus_x=float(p["pos"].x)
+		home_atmosphere.set_active(screen=="hub" and not trophy_room)
 	if spring_particles!=null:spring_particles.transform=world_transform
 	if atmosphere!=null:
 		atmosphere.set_audio_enabled(audio_enabled and life_event.is_empty() and not ui.is_panel_open())
@@ -2567,7 +2572,7 @@ func _background_rect() -> Rect2:
 	return preload("res://scripts/depth_style_v32.gd").backdrop_rect()
 
 func _paint_background(canvas:CanvasItem) -> void:
-	if screen=="hub":backdrop.material=null;HomeArt.background(canvas);return
+	if screen=="hub":backdrop.material=null;HomeArt.background(canvas,render_camera.y);return
 	if _is_start():
 		backdrop.material=preload("res://scripts/depth_style_v32.gd").material(str(_ecology()["id"]),"far",low_effects);preload("res://scripts/scene_art_v33.gd").safehouse(canvas,str(_ecology()["id"]),_room_size(),_room_floor());return
 	var id:String=str(_ecology()["id"])
@@ -2804,8 +2809,8 @@ func _draw_hub() -> void:
 	if not focus.is_empty():HomeArt.station_light(self,HomeArt.STATIONS[focus])
 	HomeArt.gates(self,clock,low_effects)
 	HomeArt.nest(self)
-	HomeArt.fixture(self,1,HomeArt.STATIONS["trophy"],Vector2(134,121))
-	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"],Vector2(90,105))
+	HomeArt.fixture(self,1,HomeArt.STATIONS["trophy"]+HomeArt.STATION_SINK,Vector2(134,121))
+	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"]+HomeArt.STATION_SINK,Vector2(90,105))
 	_draw_home_projector()
 	for prop:Dictionary in props:
 		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(world_transform))
@@ -2816,15 +2821,35 @@ func _draw_hub() -> void:
 		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	draw_set_transform_matrix(world_transform)
-	HomeArt.nest(self,true)
-	_text(Vector2(510,208),"枝間鴿行",42,Color("fff2cf"))
-	_text(Vector2(548,236),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
+	_draw_home_keys()
 	for entry:Array in [["musou","無雙夢境"],["tutorial","新手教學"],["rogue","肉鴿"],["trophy","戰利品房"],["records","冒險紀錄"]]:
 		var feet:Vector2=HomeArt.STATIONS[entry[0]]
 		_home_gate_sign(feet+Vector2(0,8),entry[1],"按 %s 互動"%_tutorial_key("up") if focus==entry[0] else "",Color("ffe1a6"))
-	_home_gate_sign(Vector2(640,252),"按鍵上下左右走到想去的門","",Color("fff2cf"))
 	draw_set_transform_matrix(Transform2D.IDENTITY)
-	_text(Vector2(1185,710),"v0.63",13,Color("a6c1b6"))
+	_text(Vector2(1185,710),"v0.64",13,Color("a6c1b6"))
+
+func _draw_home_keys() -> void:
+	var opacity:float=1.0-clampf((clock-home_hint_fade_at)/.65,0,1)
+	if opacity<=0.0 or ui.is_panel_open():return
+	var center:Vector2=Vector2(p["pos"])-Vector2(0,108+sin(clock*2.6)*3)
+	var tint:=Color(.92,.98,.87,opacity*(.88+sin(clock*2.6)*.12))
+	for entry:Array in [["up",Vector2(0,-24)],["left",Vector2(-35,5)],["down",Vector2(0,5)],["right",Vector2(35,5)]]:
+		var at:Vector2=center+entry[1]
+		var cap:=Rect2(at-Vector2(15,12),Vector2(30,24))
+		draw_rect(Rect2(cap.position+Vector2(0,3),cap.size),Color(.06,.10,.09,opacity*.9))
+		draw_rect(cap,Color(.16,.26,.23,opacity*.94))
+		draw_rect(cap,Color(tint,opacity*.75),false,1.0)
+		var direction:Vector2={KEY_UP:Vector2.UP,KEY_LEFT:Vector2.LEFT,KEY_DOWN:Vector2.DOWN,KEY_RIGHT:Vector2.RIGHT}.get(int(key_bindings[entry[0]]),Vector2.ZERO)
+		if direction!=Vector2.ZERO:
+			var tip:Vector2=at+direction*6
+			var wing:Vector2=direction.orthogonal()*4
+			draw_line(at-direction*6,tip,tint,1.8,true)
+			draw_polyline(PackedVector2Array([at+wing,tip,at-wing]),tint,1.8,true)
+		else:
+			var key:String=_tutorial_key(entry[0])
+			var size:int=12
+			var width:float=font.get_string_size(key,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x
+			_text(at+Vector2(-width*.5,4),key,size,tint)
 
 func _draw_home_projector() -> void:
 	if home_projector.is_empty():return
@@ -2833,12 +2858,24 @@ func _draw_home_projector() -> void:
 	var opacity:float=1.0-clampf((clock-float(home_projector.get("broken_at",clock)))/.55,0,1)
 	if opacity>0:
 		var origin:Vector2=Vector2(home_projector.get("break_origin",at))+Vector2(21,5)
-		var beam:=Color(.68,.94,.83,.24*opacity)
-		var clear:=Color(beam,0)
-		draw_polygon(PackedVector2Array([origin+Vector2(0,-5),Vector2(856,456),Vector2(856,504),origin+Vector2(0,6)]),PackedColorArray([beam,clear,clear,beam]))
-		var width:float=font.get_string_size(HomeArt.PROJECTION,HORIZONTAL_ALIGNMENT_LEFT,-1,20).x
-		_text(Vector2(635-width*.5,488),HomeArt.PROJECTION,20,Color(.86,1,.91,opacity))
-	HomeArt.fixture(self,0,at+Vector2(0,29),Vector2(69,60),Color("84746a") if broken else Color.WHITE)
+		var screen_rect:=Rect2(444,342,390,146)
+		var beam:=Color(.68,.94,.83,.22*opacity)
+		var edge:=Color(.69,.95,.84,.63*opacity)
+		draw_polygon(PackedVector2Array([origin+Vector2(0,-5),screen_rect.position,Vector2(screen_rect.position.x,screen_rect.end.y),origin+Vector2(0,6)]),PackedColorArray([beam,Color(beam,0),Color(beam,0),beam]))
+		draw_rect(screen_rect,Color(.06,.19,.17,.80*opacity))
+		draw_rect(screen_rect,edge,false,1.0)
+		for line:Array in [["枝間鴿行",34,384],["樹梢之巢 · 冒險的起點",15,408],["你是一隻鴿子 可以繼續睡",17,440],["也可以舉起羽毛冒險",17,463]]:
+			var width:float=font.get_string_size(line[0],HORIZONTAL_ALIGNMENT_LEFT,-1,line[1]).x
+			_text(Vector2(screen_rect.get_center().x-width*.5,line[2]),line[0],line[1],Color(.88,1,.92,opacity))
+	var hit_age:float=clock-float(home_projector.get("hit_at",-10.0))
+	var flashing:bool=hit_age<.075
+	HomeArt.fixture(self,0,at+Vector2(0,29),Vector2(69,60),Color("fff2bb") if flashing else (Color("84746a") if broken else Color.WHITE))
+	if hit_age<.18:
+		var impact:Vector2=home_projector["hit_point"]
+		for i in 7:
+			var ray:=Vector2.from_angle(i*TAU/7.0+.25)
+			var tail:Vector2=impact+ray*(9+hit_age*145)
+			draw_line(tail,tail+ray*maxf(2,13-hit_age*55),Color("fff0aa"),2.0,true)
 
 func _home_gate_sign(at:Vector2,title:String,hint:String,tint:Color) -> void:
 	var width:float=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,22).x
@@ -2858,7 +2895,9 @@ func _configure_home(reset_lamp:bool=true) -> void:
 	solids.assign([Rect2(0,600,1280,120),Rect2(18,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(1240,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(0,HomeArt.CEILING_Y-20,1280,20)])
 	_rebuild_projectile_surfaces()
 	props.assign([{"kind":"adventure_records","pos":Vector2(790,600),"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
-	if reset_lamp:home_projector={"kind":"home_projector","pos":Vector2(365,451),"used":false,"hurt":0.0}
+	if reset_lamp:
+		home_projector={"kind":"home_projector","pos":Vector2(365,451),"used":false,"hurt":0.0,"hits":0}
+		home_hint_fade_at=INF
 	props.append(home_projector)
 	p_attack.cancel();pending_attack.clear();charge_timer=0;room_cooldown=0;weapon_index=1
 	if home_atmosphere!=null:home_atmosphere.set_active(true)
@@ -2907,7 +2946,7 @@ func _draw_trophy_room() -> void:
 	draw_rect(Rect2(200,475,880,12),Color("755a39"))
 	var focused:bool=_home_station()=="exit"
 	if focused:HomeArt.station_light(self,HomeArt.STATIONS["exit"])
-	Adventure.portal(self,Vector2(72,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",96,low_effects)
+	Adventure.portal(self,HomeArt.STATIONS["exit"]+HomeArt.STATION_SINK,Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",96,low_effects)
 	_text(Vector2(510,168),"戰利品房",34,Color("efdaaa"))
 	_text(Vector2(45,632),"回鳥巢 · "+_tutorial_key("up") if focused else "回鳥巢",16,Color("dfca9b"))
 	_draw_player_body()
@@ -2956,6 +2995,8 @@ func _update_home_profiled_body(delta:float) -> void:
 	p_attack.tick(delta)
 	var before:Vector2=p["pos"]
 	_update_player(delta*world_speed);_update_idle(delta);_process_player_attack()
+	if not trophy_room and is_inf(home_hint_fade_at) and Vector2(p["pos"]).distance_squared_to(before)>.25:
+		home_hint_fade_at=clock+3.0
 	_update_props(delta)
 	walker.step_turn(float(p["face"]),delta,bool(p["grounded"]))
 	walker.advance(absf(p["pos"].x-before.x),bool(p["grounded"]) and absf(p["vel"].x)>30,"wood",audio_enabled)
@@ -3378,7 +3419,12 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1) -> void:
 			if not prop["used"] and damage>0:
 				var center:Vector2=HomeArt.lamp_center(prop,clock)
 				if box.intersects(Rect2(center-Vector2(21,27),Vector2(42,54))):
-					prop["break_origin"]=center;prop["broken_at"]=clock;prop["used"]=true
+					if attack_id<0 and p_attack.is_active() and not p_attack.mark_hit(-10000-i):continue
+					prop["hits"]=int(prop["hits"])+1
+					prop["hit_point"]=center
+					prop["hit_at"]=clock
+					if int(prop["hits"])>=3:
+						prop["break_origin"]=center;prop["broken_at"]=clock;prop["used"]=true
 					_sound("metal_hit")
 			continue
 		if prop["kind"]=="spikes":

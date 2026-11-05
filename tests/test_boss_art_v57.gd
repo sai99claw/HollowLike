@@ -22,11 +22,20 @@ func sheet(name:String,columns:int,rows:int) -> void:
 	check(source!=null,"CPU atlas image readable "+name)
 	if source==null:return
 	var size:Vector2i=source.get_size()/Vector2i(columns,rows)
+	var redraw:bool=name!="effects" and Art._is_redraw(texture)
+	if redraw:
+		check(size==Vector2i(Art.REDRAW_CELL),"Correct full-body redraw grid "+name)
+		check(source.get_width()<=2048 and source.get_height()<=2048,"Web-safe redraw atlas dimensions "+name)
 	for row in rows:
 		var hashes:Dictionary={}
 		for col in columns:
 			var cell:Image=source.get_region(Rect2i(Vector2i(col,row)*size,size))
-			check(cell.get_used_rect().has_area(),"Missing frame "+name+" %d,%d"%[row,col])
+			var used:Rect2i=cell.get_used_rect()
+			check(used.has_area(),"Missing frame "+name+" %d,%d"%[row,col])
+			if redraw:
+				check(used.size.x>=100 and used.size.y>=35,"Full redraw silhouette "+name+" %d,%d"%[row,col])
+				check(used.end.y==int(Art.REDRAW_ANCHOR.y),"Consistent redraw foot anchor "+name+" %d,%d"%[row,col])
+				if row==0 and rows==9:check(used.size.y>=90,"Higher native neutral silhouette "+name+" %d"%col)
 			hashes[hash(cell.get_data())]=true
 		check(hashes.size()==columns,"Repeated frame "+name+" row %d"%row)
 

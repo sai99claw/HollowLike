@@ -7,6 +7,8 @@ const MotionArt=preload("res://scripts/monster_motion_v18.gd")
 const ROOT="res://assets/v57/bosses/"
 const CELL=Vector2(144,112)
 const ANCHOR=Vector2(72,106)
+const REDRAW_CELL:=Vector2(320,224)
+const REDRAW_ANCHOR:=Vector2(160,216)
 const BIOMES=["underground","grass","trunk","branches","canopy","sky"]
 const PHASE_START={"windup":0,"active":2,"recovery":4}
 const DASH_DURATION={"windup":"dash_windup","active":"dash_duration","recovery":"dash_recovery"}
@@ -71,7 +73,7 @@ static func draw_actor(c:CanvasItem,en:Dictionary,time:float,base:Transform2D) -
 	elif selection.z==2:
 		sheet+="-hover";row=0
 	var tint:Color=Color("ffbdab") if float(en.get("hurt",0.0))>0 else Color.WHITE
-	if selection.z==0 and row<=1 and biome in ["sky","trunk"]:
+	if selection.z==0 and row<=1 and biome in ["sky","trunk"] and not _is_redraw(_texture(biome)):
 		if _draw_hd_motion(c,en,biome,row,time,base,tint):return true
 	return _draw(c,biome,sheet,Vector2i(selection.x,row),en["pos"],float(en["face"]),base,tint)
 
@@ -89,12 +91,18 @@ static func _draw_hd_motion(c:CanvasItem,en:Dictionary,biome:String,row:int,time
 	c.draw_set_transform_matrix(base)
 	return true
 
+static func _is_redraw(texture:Texture2D) -> bool:
+	return texture.get_width()==int(REDRAW_CELL.x)*6
+
 static func _draw(c:CanvasItem,biome:String,sheet:String,cell:Vector2i,at:Vector2,face:float,base:Transform2D,tint:Color) -> bool:
 	var tex:Texture2D=_texture(sheet)
 	if tex==null:return false
 	var scale_value:float=_factor(biome)
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face,1)*scale_value,0,at))
-	c.draw_texture_rect_region(tex,Rect2(-ANCHOR,CELL),Rect2(Vector2(cell)*CELL,CELL),tint)
+	var redraw:bool=_is_redraw(tex)
+	var pixels:Vector2=REDRAW_CELL if redraw else CELL
+	var anchor:Vector2=REDRAW_ANCHOR if redraw else ANCHOR
+	c.draw_texture_rect_region(tex,Rect2(-anchor,pixels),Rect2(Vector2(cell)*pixels,pixels),tint)
 	c.draw_set_transform_matrix(base)
 	return true
 
@@ -103,8 +111,9 @@ static func _measure(biome:String) -> Dictionary:
 		var tex:Texture2D=_texture(biome)
 		if tex==null:return {}
 		var source:Image=tex.get_image()
-		var neutral:=source.get_region(Rect2i(Vector2i.ZERO,Vector2i(CELL))).get_used_rect()
-		var fallen:=source.get_region(Rect2i(Vector2i(CELL)*Vector2i(5,8),Vector2i(CELL))).get_used_rect()
+		var pixels:=Vector2i(REDRAW_CELL if _is_redraw(tex) else CELL)
+		var neutral:=source.get_region(Rect2i(Vector2i.ZERO,pixels)).get_used_rect()
+		var fallen:=source.get_region(Rect2i(pixels*Vector2i(5,8),pixels)).get_used_rect()
 		geometry[biome]={"neutral":neutral.size,"fallen":fallen.size}
 	return geometry[biome]
 

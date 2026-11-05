@@ -7,10 +7,10 @@ const RIGHT_GATE:=Rect2(960,315,240,285)
 const ROGUE_PLATFORM_Y:float=64.44+50.0
 const ROGUE_PLATFORM:=Rect2(505,ROGUE_PLATFORM_Y,270,9)
 const ROGUE_GATE:=Rect2(520,ROGUE_PLATFORM_Y-285,240,285)
+const STATION_SINK:=Vector2(0,10)
 const CEILING_Y:float=-260.0
 const STATIONS={"musou":Vector2(200,600),"tutorial":Vector2(1080,600),"rogue":Vector2(640,ROGUE_PLATFORM_Y),"trophy":Vector2(925,600),"records":Vector2(790,600),"exit":Vector2(72,600)}
 const STATION_ATLAS=preload("res://assets/v63/home/stations.webp")
-const PROJECTION="你是一隻鴿子 可以繼續睡 也可以舉起羽毛冒險"
 static var textures:Dictionary={}
 static func texture(id:String) -> Texture2D:
 	if not textures.has(id):
@@ -19,8 +19,8 @@ static func texture(id:String) -> Texture2D:
 		elif id in ["musou","rogue"]:textures[id]=preload("res://scripts/scene_art_v33.gd").region("res://assets/v33/home/props.json",id)
 		else:textures[id]=load(ROOT+id+".png")
 	return textures[id]
-static func background(c:CanvasItem) -> void:
-	preload("res://scripts/home_visual_v33.gd").background(c,CEILING_Y)
+static func background(c:CanvasItem,camera_y:float=0.0) -> void:
+	preload("res://scripts/home_visual_v33.gd").background(c,camera_y)
 static var openings:Dictionary={}
 
 static func gates(c:CanvasItem,time:float,reduced:bool) -> void:
@@ -29,7 +29,7 @@ static func gates(c:CanvasItem,time:float,reduced:bool) -> void:
 		var box:Rect2=entry[1]
 		var feet:=Vector2(box.get_center().x,box.end.y)
 		_draw_opening(c,feet,Vector2(95,147),time+feet.x*.002,reduced)
-		home_visual.gate(c,entry[0],feet)
+		home_visual.gate(c,entry[0],feet+STATION_SINK)
 	preload("res://scripts/terrain_art_v24.gd").platform(c,"trunk",ROGUE_PLATFORM)
 
 static func falling_mote(feet:Vector2,size:Vector2,time:float,index:int) -> Vector2:
@@ -72,12 +72,9 @@ static func lamp_center(lamp:Dictionary,time:float) -> Vector2:
 	var elapsed:float=time-float(lamp["broken_at"])
 	return Vector2(lamp["break_origin"])+Vector2(0,minf(580.0-float(lamp["break_origin"].y),480.0*elapsed*elapsed))
 
-static func nest(c:CanvasItem,front:bool=false) -> void:
-	var tex:Texture2D=texture("nest");var box:=Rect2(510,532,260,100)
-	if front:
-		var fraction:float=.70
-		c.draw_texture_rect_region(tex,Rect2(box.position+Vector2(0,box.size.y*fraction),Vector2(box.size.x,box.size.y*(1-fraction))),Rect2(0,tex.get_height()*fraction,tex.get_width(),tex.get_height()*(1-fraction)))
-	else:c.draw_texture_rect(tex,box,false)
+static func nest(c:CanvasItem) -> void:
+	c.draw_texture_rect(texture("nest"),Rect2(510,532,260,100),false)
+
 static func resting(c:CanvasItem,time:float,waking:float) -> void:
 	var tex:Texture2D=texture("sleep");var index:int=0 if waking<0 else mini(3,1+int((1-waking/.48)*3))
 	var regions=[Rect2(43,339,500,238),Rect2(543,301,531,274),Rect2(1122,132,495,458),Rect2(1657,178,477,406)]

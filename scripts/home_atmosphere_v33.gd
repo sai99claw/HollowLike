@@ -5,8 +5,6 @@ const Home=preload("res://scripts/home_visual_v33.gd")
 const FX=preload("res://scripts/combat_visual.gd")
 var particles:Array[CPUParticles2D]=[]
 var active:bool=false
-var focus_x:float=640
-var last_focus_x:float=INF
 func _ready() -> void:
 	z_index=6
 	for near in [false,true]:
@@ -24,14 +22,5 @@ func _ready() -> void:
 	set_active(false)
 func set_active(value:bool) -> void:
 	if active==value and visible==value:return
-	active=value;visible=value;set_process(value)
+	active=value;visible=value
 	for p in particles:p.emitting=value;p.visible=value;p.process_mode=Node.PROCESS_MODE_INHERIT if value else Node.PROCESS_MODE_DISABLED
-func _process(_delta:float) -> void:
-	if focus_x==last_focus_x:return
-	last_focus_x=focus_x;queue_redraw()
-func _draw() -> void:
-	if not active:return
-	var image:Texture2D=Art.texture(Home.ROOT+"framing.png")
-	if image!=null:
-		var size:Vector2=image.get_size()*(1320.0/image.get_width())
-		draw_texture_rect(image,Rect2(Vector2(-20-(focus_x-640)*.025,-100),size),false,Color(.38,.50,.43,.65))
