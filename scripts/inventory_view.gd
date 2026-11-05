@@ -33,7 +33,7 @@ static func _tile(ui,parent:Node,title:String,description:String,icon:String,act
 	var art:TextureRect=ui._icon(icon,50);art.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(art)
 	var words:=VBoxContainer.new();words.mouse_filter=Control.MOUSE_FILTER_IGNORE;words.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(words)
 	var caption:Label=ui._label(title,15,color);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;words.add_child(caption)
-	var hint:Label=ui._label("使用中" if selected else {"sub_select":"裝備副武器","use_item":"使用一次","stash_item":"從家中取用一次","stash_weapon":"從家中取出並裝備","rune_equip":"裝入選定空槽","rune_take":"取出一枚並裝入","primary_inventory":"更換主武器"}.get(action,"選中查看說明"),11,ui.MUTED);words.add_child(hint)
+	var hint:Label=ui._label("使用中" if selected else {"sub_select":"裝備副武器","lab_secondary":"裝備後試用","tutorial_rune":"領取一枚","use_item":"使用一次","stash_item":"從家中取用一次","stash_weapon":"從家中取出並裝備","rune_equip":"裝入選定空槽","rune_take":"取出一枚並裝入","primary_inventory":"更換主武器"}.get(action,"選中查看說明"),11,ui.MUTED);words.add_child(hint)
 	ui.bind_description(button,title,description,icon);parent.add_child(button);return button
 static func _weapons(ui,data:Dictionary,left:VBoxContainer,right:VBoxContainer) -> void:
 	left.add_child(ui._label("目前裝備",18,ui.INK))

@@ -77,7 +77,8 @@ static func lamp_center(lamp:Dictionary,time:float) -> Vector2:
 static func nest(c:CanvasItem) -> void:
 	c.draw_texture_rect(texture("nest"),Rect2(510,532,260,100),false)
 
-static func resting(c:CanvasItem,time:float,waking:float) -> void:
+static func resting(c:CanvasItem,time:float,waking:float,base:Transform2D) -> void:
+	if waking<0 and preload("res://scripts/pigeon_motion_v22.gd").draw_drowsy(c,Vector2(640,588),1.0,6.0+time,base,Color.WHITE):return
 	var tex:Texture2D=texture("sleep");var index:int=0 if waking<0 else mini(3,1+int((1-waking/.48)*3))
 	var regions=[Rect2(43,339,500,238),Rect2(543,301,531,274),Rect2(1122,132,495,458),Rect2(1657,178,477,406)]
 	var region:Rect2=regions[index];var size:Vector2=region.size*.14

@@ -30,7 +30,7 @@ func run() -> void:
 	game._ui_action("lab_page","monsters")
 	var monsters:Array[String]=labels(game.ui.panel_rows)
 	check(monsters.has("小怪") and monsters.has("菁英怪") and monsters.has("首領") and not monsters.has("漂浮香菇房"),"Summoning has its own page and enemy groups")
-	check(game._lab_monsters().size()==43,"The practice catalog includes all 15 new monsters")
+	check(game._lab_monsters().size()==46,"The practice catalog includes the three new air lancers")
 	game._ui_action("lab_page","equipment")
 	check(labels(game.ui.panel_rows).has("符文配置"),"Equipment has a separate page")
 	game._ui_action("lab_page","controls")

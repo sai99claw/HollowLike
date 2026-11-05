@@ -13,6 +13,8 @@ func run() -> void:
 	root.add_child(game)
 	await process_frame
 	game.audio_enabled=false
+	var drowsy=preload("res://scripts/pigeon_motion_v22.gd")
+	check(game.home_sleeping and drowsy.drowsy_index(6.0)!=drowsy.drowsy_index(6.2),"The home opens asleep and samples multiple sleep frames")
 	check(game.ui.ui_root.get_node_or_null("HomeModeButtons")==null,"Homepage has no separate mode buttons")
 	var lab:Button=game.lab_buttons.get_child(0)
 	var normal:StyleBoxFlat=lab.get_theme_stylebox("normal")

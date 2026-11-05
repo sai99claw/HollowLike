@@ -70,7 +70,7 @@ static func draw_actor(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=Tr
 		item=item.duplicate(false)
 		var bounds:Array=item["bounds"]
 		item["pivot"]=[item["pivot"][0],float(bounds[1])+float(bounds[3])]
-	return _draw(c,data,sheet,item,en["pos"],height/maxf(1,reference),float(en.get("face",1)),base,Color("f8d8c4") if float(en.get("hurt",0))>0 else Color.WHITE)
+	return _draw(c,data,sheet,item,en["pos"],height/maxf(1,reference),float(en.get("face",1)),base,Color("f8d8c4") if float(en.get("hurt",0))>0 else en.get("sprite_tint",Color.WHITE))
 static func draw_projectile(c:CanvasItem,pr:Dictionary,base:Transform2D) -> bool:
 	var key:Dictionary=identity(str(pr.get("visual_id","")))
 	if key.is_empty():return false

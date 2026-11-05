@@ -1291,7 +1291,7 @@ func _update_enemies(delta:float,movement_delta:float=-1) -> void:
 func _spawn_boss_reinforcements(roster:Array, count:int, elite:bool, random:RandomNumberGenerator) -> void:
 	var biome:String=str(_ecology()["id"])
 	for index in count:
-		var definition:Dictionary=MonsterRoster.elite(random.randi_range(0,5)) if elite else MonsterRoster.regular(biome,random.randi_range(0,4))
+		var definition:Dictionary=MonsterRoster.elite(random.randi_range(0,5)) if elite else MonsterRoster.regular(biome,random.randi_range(0,MonsterRoster.REGULAR_COUNT-1))
 		var edge:float=minf(440.0,_room_size().x*.28)
 		var center:float=lerpf(edge,_room_size().x-edge,float(index)/maxi(1,count-1))
 		var spawn:=Vector2.INF
@@ -1300,7 +1300,7 @@ func _spawn_boss_reinforcements(roster:Array, count:int, elite:bool, random:Rand
 			var x:float=center+offset_x
 			if x<96 or x>_room_size().x-96:continue
 			definition["pos"]=Vector2(x,_room_floor())
-			var candidate:Vector2=_enemy_spawn(definition)
+			var candidate:Vector2=_enemy_spawn(definition,104.0 if definition.get("air_lunge",false) else 0.0)
 			if not candidate.is_finite():continue
 			definition["pos"]=candidate
 			var body:Rect2=_enemy_body_box(definition).grow(8)
@@ -1355,8 +1355,17 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 				if en["tutorial_respawn"]<=0:
 					en["hp"]=en["max_hp"];en["pos"]=en["anchor"];en["vel"]=Vector2.ZERO
 					for key in ["hurt","stun","flash_left","push_left","impact_freeze_left"]:en[key]=0.0
+					en["tutorial_patrol_age"]=0.0
 			else:
 				for key in ["hurt","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
+				var age:float=float(en.get("tutorial_patrol_age",0))+movement_delta
+				en["tutorial_patrol_age"]=age
+				var previous:Vector2=en["pos"]
+				var patrol:Vector2=en.get("tutorial_patrol",Vector2.ZERO)
+				en["pos"]=Vector2(en["anchor"])+Vector2(sin(age*1.45)*patrol.x,sin(age*2.1)*patrol.y)
+				var travel:Vector2=en["pos"]-previous
+				en["vel"]=travel/maxf(.0001,movement_delta)
+				if absf(travel.x)>.01:en["face"]=signf(travel.x)
 			continue
 		if float(en["hp"])<=0:continue
 		if en.get("training",false):
@@ -1384,6 +1393,8 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			en.erase("wall_spawn_face")
 			en["vel"]=Vector2(launch*180,-230)
 		if resting and (Motion.airborne(en) or _enemy_support(en).has_area()):
+			if en.get("air_lunge",false) and en["charge_phase"]!="idle":
+				en["charge_phase"]="idle";en["charge_left"]=0.0;en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
 			en["vel"]=Vector2.ZERO
 			continue
 
@@ -2051,13 +2062,13 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 		for i in plan.size():
 			var model:int=int(plan[i]["model"])
 			var spawn_rng:=RandomNumberGenerator.new();spawn_rng.seed=int(layout["seed"])+i*827+spawn_serial*3571
-			var def:Dictionary=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][int(room["map_index"])]) if model==4 else (MonsterRoster.elite(int(room["map_index"])) if model==3 else MonsterRoster.regular(str(biome["id"]),int(plan[i].get("roster_variant",(i+id)%5))))
+			var def:Dictionary=Combat.boss(["underground","grass","trunk","branches","canopy","sky"][int(room["map_index"])]) if model==4 else (MonsterRoster.elite(int(room["map_index"])) if model==3 else MonsterRoster.regular(str(biome["id"]),int(plan[i].get("roster_variant",(i+id)%MonsterRoster.REGULAR_COUNT))))
 			if plan[i].get("flying_elite",false):
 				# Use winged species with their authored flight animations.
 				def=NewRoster.create("sky",spawn_rng.randi_range(3,4),int(room["map_index"])) if spawn_rng.randf()<.5 else MonsterRoster.elite(spawn_rng.randi_range(4,5))
-			elif model!=4 and spawn_rng.randf()<.5:
+			elif model!=4 and not def.get("air_lunge",false) and spawn_rng.randf()<.5:
 				def=NewRoster.create(str(biome["id"]),spawn_rng.randi_range(3,4) if model==3 else spawn_rng.randi_range(0,2),int(room["map_index"]))
-			if room["type"]!="elite" and model!=4 and model!=3 and i==0 and int(layout["seed"])%3==0 and not def.has("v55_row"):def=Arms.cute_wanderer(spawn_rng)
+			if room["type"]!="elite" and model!=4 and model!=3 and i==0 and int(layout["seed"])%3==0 and not def.has("v55_row") and not def.get("air_lunge",false):def=Arms.cute_wanderer(spawn_rng)
 			if model==4:
 				for attack in def["attacks"]:attack["damage"]*=2;attack["knockback"]=120.0
 			def["uid"]=id*100+i+1
@@ -2067,7 +2078,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			def["ecology_id"]=biome["id"]
 			if not def.has("roster_id"):def["contact_damage"]=0.0 if def.get("passive",false) else CONTACT_DAMAGE
 
-			def["pos"]=_enemy_spawn(def,140.0 if model==4 else 0.0)
+			def["pos"]=_enemy_spawn(def,140.0 if model==4 else 104.0 if def.get("air_lunge",false) else 0.0)
 			if not Vector2(def["pos"]).is_finite():continue
 			if model!=4 and doors.any(func(door:Dictionary)->bool:return def["pos"].distance_to(door["pos"])<180):continue
 			def["vel"]=Vector2.ZERO;def["face"]=-1.0;def["stun"]=0.0;def["hurt"]=0.0;def["cooldown"]=1.0+i*.15;def["attack"]=Attack.new()
@@ -2821,7 +2832,7 @@ func _draw_hub() -> void:
 	for prop:Dictionary in props:
 		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(world_transform))
 	draw_set_transform_matrix(world_transform)
-	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1)
+	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1,world_transform)
 	else:
 		_draw_player_body()
 		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
@@ -3194,8 +3205,11 @@ func _text_on(canvas:CanvasItem,at:Vector2,message:String,size:int,color:Color) 
 # v0.5 expedition, props and lifecycle orchestration.
 func _in_aggro(en:Dictionary) -> bool:
 	if int(en.get("model",0))==4 and en.get("combat_engaged",false):return true
-	var visible:Rect2=Rect2(camera_pos,Vector2(1280,720)/_view_zoom()).grow(-24)
-	var seen:bool=visible.has_point(_enemy_body_box(en).get_center())
+	var zoom:float=_view_zoom()
+	var visible:=Rect2(camera_pos,Vector2(1280,720)/zoom)
+	if display_safe.has_area():visible=Rect2(camera_pos+display_safe.position/zoom,display_safe.size/zoom)
+	if en.get("elite",false):return visible.intersects(_enemy_body_box(en))
+	var seen:bool=visible.grow(-24).has_point(_enemy_body_box(en).get_center())
 	if seen and int(en.get("model",0))==4:en["combat_engaged"]=true
 	return seen
 
@@ -4010,12 +4024,20 @@ func _enter_practice(tutorial:bool=false) -> void:
 			var ledge:Rect2=layout["one_way"][i]
 			var anchor:=Vector2(ledge.get_center().x,ledge.position.y)
 			var target:Dictionary=MonsterRoster.regular("trunk",[0,1,4][i])
-			target.merge({"uid":i+1,"pos":anchor,"anchor":anchor,"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":0.0,"attack":Attack.new(),"contact_damage":0.0,"max_hp":target["hp"],"tutorial_respawn":0.0},true)
-			enemies.append(target)
+			var patrol_x:float=ledge.size.x*.5-MonsterMotion.body_size(target).x*.5-12.0
+			_add_tutorial_target(target,anchor,Vector2(patrol_x,0))
+		var flyer:Dictionary=MonsterRoster.regular("trunk",MonsterRoster.REGULAR_COUNT-1)
+		_add_tutorial_target(flyer,Vector2(1745,425),Vector2(155,36))
 		_update_hud()
 	else:_toast("練習房：全部武器、符文與怪物。能量無限，角色無敵。")
 
-const TUTORIAL_STATIONS=["副武器試用","符文領取","動作與特效"]
+func _add_tutorial_target(target:Dictionary,anchor:Vector2,patrol:Vector2) -> void:
+	target.merge({"uid":enemies.size()+1,"pos":anchor,"anchor":anchor,"vel":Vector2.ZERO,
+		"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":0.0,"attack":Attack.new(),
+		"contact_damage":0.0,"max_hp":target["hp"],"tutorial_respawn":0.0,"tutorial_patrol":patrol},true)
+	enemies.append(target)
+
+const TUTORIAL_STATIONS=["附武器試用","符文領取","動作與特效"]
 const TutorialArt=preload("res://scripts/tutorial_art_v62.gd")
 
 func _tutorial_layout() -> Dictionary:
@@ -4038,19 +4060,24 @@ func _nearby_tutorial_station() -> int:
 	return -1
 
 func _show_tutorial_station(index:int) -> void:
-	match index:
-		0:
-			var rows:Array[Dictionary]=[{"text":"%s 切換副武器，%s 使用。選一把後，到右邊的平台試打。"%[_tutorial_key("cycle"),_tutorial_key("sub")]}]
-			for i in bag_weapons.size():
-				var weapon:Dictionary=bag_weapons[i]
-				rows.append({"text":str(weapon["description"]),"buttons":[{"label":str(weapon["name"]),"action":"lab_secondary","payload":i}]})
-			_panel("副武器試用",rows)
-		1:
-			var rows:Array[Dictionary]=[{"text":"每按一次就領一枚，可以重複領取。","buttons":[{"label":"開啟符文盤","action":"runes","payload":false}]}]
-			for rune in Data.all_runes():
-				rows.append({"buttons":[{"label":"領取 "+str(rune["name"]),"action":"tutorial_rune","payload":rune["id"]}]})
-			_panel("符文領取",rows)
-		2:_show_tutorial()
+	if lab_mode!="tutorial" or index<0 or index>=TUTORIAL_STATIONS.size():return
+	if index==2:
+		_show_tutorial()
+		return
+	var entries:Array[Dictionary]=[]
+	if index==0:
+		for i in bag_weapons.size():
+			var weapon:Dictionary=bag_weapons[i]
+			var detail:String="%s\n傷害 %.1f · 投射物 %d · 能量 1"%[weapon["description"],weapon["damage"],int(weapon.get("count",1))]
+			entries.append({"name":weapon["name"],"detail":detail,"icon":UI.Icons.secondary(weapon),"color":weapon.get("color",UI.MINT),"action":"lab_secondary","payload":i,"selected":i==secondary_index})
+		_panel(TUTORIAL_STATIONS[index],[])
+		ui.show_tutorial_items("%s 切換附武器，%s 出招。選好後到右邊的平台試打。"%[_tutorial_key("cycle"),_tutorial_key("sub")],entries,false)
+	else:
+		for rune in Data.all_runes():
+			var strong:bool=rune.get("strong",false)
+			entries.append({"name":rune["name"],"detail":rune["description"],"icon":UI.Icons.rune(rune["id"],strong),"color":UI.GOLD if strong else UI.Inventory.PURPLE,"action":"tutorial_rune","payload":rune["id"]})
+		_panel(TUTORIAL_STATIONS[index],[])
+		ui.show_tutorial_items("每次領取一枚，可重複領取。符文只用於本次教學。",entries,true)
 
 func _show_tutorial() -> void:
 	if lab_mode!="tutorial":return
@@ -4058,16 +4085,21 @@ func _show_tutorial() -> void:
 	var dash:String=_tutorial_key("dash")
 	var attack:String=_tutorial_key("attack")
 	var down:String=_tutorial_key("down")
-	var rows:Array[Dictionary]=[{"text":"%s／%s 移動。短按跳得低，長按跳得高。靠牆後跳躍可以蹬牆。"%[_tutorial_key("left"),_tutorial_key("right")]}]
-	for entry in [
-		["jump","%s 跳躍"%jump],["double_jump","空中再按 %s 二段跳"%jump],
-		["dash","單按 %s 衝刺"%dash],["pierce","連按兩次 %s 穿刺"%dash],
-		["slam","空中按住 %s 並連按兩次 %s 下砸"%[down,dash]],
-		["attack","%s 普攻，配合方向鍵瞄準"%attack],["down_attack","空中 %s＋%s 下劈"%[down,attack]],
-		["charged","長按 %s，集氣完成後放開拔刀斬"%attack],["sub","%s 使用目前的副武器"%_tutorial_key("sub")]
-	]:
-		rows.append({"buttons":[{"label":entry[1]+" · 示範","action":"tutorial_demo","payload":entry[0]}]})
-	_panel("動作與特效",rows)
+	var sub:String=_tutorial_key("sub")
+	var hold:float=_charge_threshold()
+	var lessons:Array[Dictionary]=[
+		{"id":"jump","name":"跳躍","detail":"地面按 %s。短按跳得低，長按跳得高；貼牆後可蹬牆。"%jump,"duration":1.7,"events":[[.55,"按下 %s"%jump],[.86,"放開 %s"%jump]]},
+		{"id":"double_jump","name":"二段跳","detail":"離地後再按一次 %s，可在空中補一段高度。"%jump,"duration":2.1,"events":[[.55,"按下 %s"%jump],[.85,"空中再按 %s"%jump]]},
+		{"id":"dash","name":"短衝刺","detail":"單按 %s，朝面向方向短衝。"%dash,"duration":1.5,"events":[[.55,"按下 %s"%dash]]},
+		{"id":"pierce","name":"雙衝穿刺","detail":"第一次 %s 後半秒內再按一次，化成風向前穿刺。"%dash,"duration":1.8,"events":[[.55,"第一次 %s"%dash],[.79,"第二次 %s"%dash]]},
+		{"id":"slam","name":"下砸","detail":"在空中按住 %s，半秒內連按兩次 %s，直落地面。"%[down,dash],"duration":1.9,"events":[[.25,"按住 %s"%down],[.55,"%s ＋ 第一次 %s"%[down,dash]],[.79,"%s ＋ 第二次 %s"%[down,dash]],[1.18,"落地衝擊"]]},
+		{"id":"attack","name":"普通攻擊","detail":"按 %s 揮刀，可搭配方向鍵改變攻擊方向。"%attack,"duration":1.5,"events":[[.55,"按下 %s"%attack]]},
+		{"id":"down_attack","name":"下劈","detail":"空中按住 %s 再按 %s，向下攻擊。"%[down,attack],"duration":1.7,"events":[[.30,"按住 %s"%down],[.55,"%s ＋ %s"%[down,attack]]]},
+		{"id":"charged","name":"集氣拔刀斬","detail":"長按 %s 約 %.1f 秒，集氣完成後放開。"%[attack,hold],"duration":1.5+hold,"hold":hold,"events":[[.55,"按住 %s"%attack],[.55+hold,"放開 %s"%attack]]},
+		{"id":"sub","name":"附武器","detail":"按 %s 使用目前裝備的附武器，空中也能施放。"%sub,"duration":1.9,"events":[[.55,"按下 %s"%sub]]},
+	]
+	_panel("動作與特效",[])
+	ui.show_tutorial_lessons(lessons,str(_secondary()["id"]),"%s／%s 移動。選擇左側項目，右側會循環展示。"%[_tutorial_key("left"),_tutorial_key("right")])
 
 func _tutorial_demo(action:String) -> void:
 	_close_panel()
@@ -4180,11 +4212,13 @@ func _lab_monsters() -> Array[String]:
 	for biome:String in ["underground","trunk","sky"]:
 		for row in 5:
 			names.append(("菁英：" if row>=3 else "")+str(NewRoster.create(biome,row,0)["name"]))
+	for biome:String in Ecology.IDS:names.append(MonsterRoster.regular(biome,MonsterRoster.REGULAR_COUNT-1)["name"])
 	return names
 func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
 	if lab_mode not in ["practice","tutorial"] or index<0 or index>=_lab_monsters().size():return
 	var definition:Dictionary
-	if index>=28:
+	if index>=43:definition=MonsterRoster.regular(Ecology.IDS[index-43],MonsterRoster.REGULAR_COUNT-1)
+	elif index>=28:
 		var offset:int=index-28
 		var family:int=offset/5
 		definition=NewRoster.create(["underground","trunk","sky"][family],offset%5,family*2)

@@ -1,5 +1,6 @@
 class_name MusouDreamV41
 extends RefCounted
+const Roster=preload("res://scripts/monster_roster_v36.gd")
 const CAPACITY:int=20
 const RAGE_SECONDS:float=120.0
 var energy:int=0
@@ -39,6 +40,6 @@ static func expand_plan(base:Array[Dictionary],layout:Dictionary,stage:int,seed_
 		var candidate:Dictionary=candidates.pop_at(random.randi_range(0,candidates.size()-1))
 		if result.any(func(entry:Dictionary)->bool:return Vector2(entry["pos"]).distance_to(candidate["pos"])<36):continue
 		var entry:Dictionary=ordinary[(result.size()-base.size())%ordinary.size()].duplicate(true)
-		entry["pos"]=candidate["pos"];entry["platform"]=candidate["platform"];entry["roster_variant"]=posmod(result.size()+seed_value,5)
+		entry["pos"]=candidate["pos"];entry["platform"]=candidate["platform"];entry["roster_variant"]=posmod(result.size()+seed_value,Roster.REGULAR_COUNT)
 		result.append(entry)
 	return result

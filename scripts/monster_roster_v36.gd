@@ -3,6 +3,8 @@ extends RefCounted
 ## The behavior roster consumes the same frozen anatomy brief used by image generation.
 const Combat=preload("res://scripts/combat_library.gd")
 const BIOMES:Array[String]=["underground","trunk","sky"]
+const REGULAR_COUNT:int=6
+const DART_NAMES={"underground":"晶刺夜蛾","trunk":"樹脂槍蜂","sky":"裂空針燕"}
 const STAGES:Array[String]=["underground","underground","trunk","trunk","sky","sky"]
 static var briefs:Dictionary={}
 static func brief(biome:String) -> Dictionary:
@@ -10,7 +12,18 @@ static func brief(biome:String) -> Dictionary:
 	if not briefs.has(id):briefs[id]=JSON.parse_string(FileAccess.get_file_as_string("res://assets/v36/monsters/"+id+"-brief.json"))
 	return briefs[id]
 static func regular(biome:String,index:int) -> Dictionary:
-	var data:Dictionary=brief(biome);var row:int=posmod(index,5);var spec:Array=data["regular"][row]
+	var data:Dictionary=brief(biome)
+	var variant:int=posmod(index,REGULAR_COUNT)
+	if variant==5:
+		var family:String=data["biome"]
+		var dart:Dictionary=_actor(family,2,"dart_"+family,DART_NAMES[family],"drift",false)
+		dart.merge({"air_lunge":true,"movement_logic":"approach","speed":100.0,"hover_height":65.0,
+			"dash_windup":.34,"dash_duration":.57,"dash_recovery":.45,"dash_cooldown":1.8,
+			"dash_speed":540.0,"dash_accel":1800.0,"dash_trigger":205.0,
+			"sprite_tint":Color("e8b88f") if family=="underground" else Color("d2ffc1") if family=="trunk" else Color("b7e3ff")},true)
+		dart["attacks"]=[]
+		return dart
+	var row:int=variant;var spec:Array=data["regular"][row]
 	var result:Dictionary=_actor(str(data["biome"]),row,str(spec[0]),str(spec[1]),str(spec[2]),false)
 	result["attacks"]=[_attack(str(data["biome"]),str(spec[3]),str(spec[6]),0,false)]
 	if spec[3]=="ram":result["stop_radius"]=36.0
@@ -31,7 +44,7 @@ static func _actor(biome:String,row:int,id:String,title:String,movement:String,i
 	return {"id":id,"name":title,"roster_id":id,"roster_biome":biome,"roster_row":row,"roster_elite":is_elite,"species":id,"biome":biome,
 		"model":3 if is_elite else (2 if movement in ["hover","drift"] else 1 if movement=="jump" else 0),"elite":is_elite,"passive":false,
 		"spawn_surface":"flight" if movement in ["hover","drift"] else "ground","move":"fly" if movement in ["hover","drift"] else "walk","visual_movement":movement,"movements":[movement],
-		"movement_logic":"roam" if movement in ["jump","hover","drift"] else "approach","movement_period":3.0,"speed":78.0 if is_elite else 62.0,
+		"movement_logic":"roam" if not is_elite and movement in ["jump","hover","drift"] else "approach","movement_period":3.0,"speed":78.0 if is_elite else 62.0,
 		"hp":10.0 if is_elite else 5.0,"scale":scale_value,"body_size":Vector2(34,45)*scale_value,"world_height":50.9375*scale_value,
 		"contact_damage":1.0,"damage":1.0,"attack_speed":1.0,"range":100.0,"jump_speed":460.0,"hover_height":95.0,"roam_radius":150.0,
 		"stop_radius":80.0,"resume_margin":24.0,"turn_delay":.18,"color":tint}

@@ -3,6 +3,7 @@ extends RefCounted
 ## The global tower coordinate owns ecology, independent of chapter / entry order.
 ## Art can be replaced by biome id without changing room generation or combat.
 
+const Roster=preload("res://scripts/monster_roster_v36.gd")
 const IDS:Array[String]=["underground","trunk","sky"]
 static func from_stage(stage_index:int) -> Dictionary:
 	return _definition(IDS[clampi(stage_index/2,0,2)])
@@ -48,7 +49,7 @@ static func spawn_plan(layout: Dictionary, biome: Dictionary, mode: String, seed
 	# Spread the three basic combat roles over randomly selected supports.
 	for i in mini(3,plan.size()): plan[i]["model"]=[0,1,2][i]
 	# Species variation is stable per support and independent of old role weights.
-	for i in plan.size():plan[i]["roster_variant"]=posmod(i+seed_value,5)
+	for i in plan.size():plan[i]["roster_variant"]=posmod(i+seed_value,Roster.REGULAR_COUNT)
 	return plan.slice(0,ceili((14 if mode=="musou" else 8)*density))
 
 static func _choose(weights: Array, rng: RandomNumberGenerator) -> int:

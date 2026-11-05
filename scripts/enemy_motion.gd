@@ -72,7 +72,8 @@ static func _charge_velocity(en:Dictionary,target:Vector2,delta:float,flying:boo
 		if float(en["charge_left"])<=0:
 			en["charge_phase"]="active";en["charge_left"]=float(en.get("dash_duration",.4));en["motion_dash_left"]=en["charge_left"];en["motion_dash_wait"]=0.0
 	elif phase=="active":
-		velocity=en["charge_vector"]*float(en.get("dash_speed",380))
+		var burst:Vector2=en["charge_vector"]*float(en.get("dash_speed",380))
+		velocity=velocity.move_toward(burst,float(en["dash_accel"])*delta) if en.has("dash_accel") else burst
 		en["charge_left"]=maxf(0,float(en["charge_left"])-delta);en["motion_dash_left"]=en["charge_left"]
 		if float(en["charge_left"])<=0:_finish_charge(en)
 	elif phase=="recovery":
@@ -99,7 +100,7 @@ static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGe
 	if busy and not flying and not charging:
 		result.x=move_toward(result.x,0,delta*600);result.y=minf(800,result.y+GRAVITY*delta);return result
 	var target:Vector2=player
-	var roaming:bool=str(en.get("movement_logic","approach"))=="roam"
+	var roaming:bool=not en.get("elite",false) and en.get("movement_logic","approach")=="roam"
 	if roaming and not charging:
 		en["roam_left"]-=delta
 		if en["roam_left"]<=0:
@@ -110,7 +111,10 @@ static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGe
 			if absf(horizontal-float(en["pos"].x))<50:horizontal=clampf(float(en["pos"].x)+direction*90,80,1420)
 			en["roam_target"]=Vector2(horizontal,float(en["home"].y)+(rng.randf_range(-radius*.45,radius*.3) if flying else 0.0))
 		target=en["roam_target"]
-	if current(en)=="dash" or charging:return _charge_velocity(en,player,delta,flying)
+	var lunge_target:Vector2=player+Vector2(0,body_size.y*.5-21.0)
+	var in_lunge_range:bool=en.get("air_lunge",false) and float(en["charge_cooldown"])<=0 and lunge_target.distance_squared_to(en["pos"])<=pow(float(en.get("dash_trigger",205.0)),2)
+	if current(en)=="dash" or charging or in_lunge_range:
+		return _charge_velocity(en,lunge_target if en.get("air_lunge",false) else player,delta,flying)
 	var toward:Vector2=target-en["pos"]
 	update_facing(en,target.x,delta)
 	var stop:float=18.0 if roaming else float(en.get("stop_radius",48.0))

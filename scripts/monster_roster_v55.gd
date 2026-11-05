@@ -22,7 +22,7 @@ static func create(biome:String,row:int,stage:int) -> Dictionary:
 	enemy.merge({"id":"v55_%s_%d"%[biome,row],"roster_id":"v55_%s_%d"%[biome,row],"roster_biome":biome,
 		"name":NAMES[biome][row],"v55_row":row,"visual_movement":movement,"movements":[movement],
 		"spawn_surface":"wall" if biome=="trunk" and row==2 else ("flight" if movement in ["hover","drift"] else "ground"),
-		"move":"fly" if movement in ["hover","drift"] else "walk","movement_logic":"roam" if movement!="walk" else "approach",
+		"move":"fly" if movement in ["hover","drift"] else "walk","movement_logic":"roam" if not elite and movement!="walk" else "approach",
 		"projectile_riposte":elite},true)
 	var common:Dictionary={"damage":1.0,"attack_cooldown":1.3,"windup":.5,"active":.22,"recovery":.48,"color":enemy["color"],"parryable":true}
 	var charge:Dictionary=Combat.attack("slash",common.merged({"ram":true,"ram_speed":440.0,"range":270.0,"active":.37},true))

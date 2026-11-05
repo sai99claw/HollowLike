@@ -46,11 +46,17 @@ func run() -> void:
 		g.p["pos"]=g._tutorial_station_position(i)
 		check(g._nearby_tutorial_station()==i,"Only the nearby station is selected")
 	check(station_hashes.size()==3,"The three tutorial stations use distinct images")
-	check(g.enemies.size()==3 and g.layout["one_way"].size()==3,"One harmless target per platform")
+	check(g.enemies.size()==4 and g.layout["one_way"].size()==3,"Three platform targets and one flying target")
 	for i in g.enemies.size():
 		var target:Dictionary=g.enemies[i]
-		var platform:Rect2=g.layout["one_way"][i]
-		check(target["contact_damage"]==0.0 and target["pos"].y==platform.position.y,"Target starts on its platform")
+		var anchor:Vector2=target["anchor"]
+		check(target["contact_damage"]==0.0,"Every tutorial target is harmless")
+		if i<3:
+			var platform:Rect2=g.layout["one_way"][i]
+			check(anchor.y==platform.position.y,"Ground target starts on its platform")
+		else:check(target["spawn_surface"]=="flight" and anchor.y<g.layout["one_way"][1].position.y,"Flying target starts above the platforms")
+		g._update_enemies_profiled_body(.07)
+		check(Vector2(target["pos"]).distance_to(anchor)>0.0,"Every tutorial target patrols")
 		g._hit_enemy(target,target["hp"],Color.WHITE)
 		g._update_enemies_profiled_body(2.99)
 		check(target["hp"]<=0.0,"Target stays defeated for nearly three seconds")
@@ -59,17 +65,20 @@ func run() -> void:
 	check(g.bag_weapons.size()>=3 and not g._hurt_player(100,Vector2.ZERO),"Tutorial supplies weapon examples and prevents all damage")
 	g.room_cooldown=0
 	g.p["pos"]=g._tutorial_station_position(1);g._interact()
-	check(g.ui.is_panel_open(),"Rune station opens when interacted with nearby")
+	check(g.ui.is_panel_open() and g.ui.inspector.visible and g.ui.inspect_art.texture!=null,"Rune station shows the equipment inspector with art")
 	var rune_id:String=g.Data.all_runes()[0]["id"]
 	g._ui_action("tutorial_rune",rune_id);g._ui_action("tutorial_rune",rune_id)
 	check(g.bag_runes.get(rune_id,0)==2,"Rune station supports repeat pickups")
 	g._close_panel()
 	g.p["pos"]=g._tutorial_station_position(0);g._interact()
-	check(g.ui.is_panel_open(),"Weapon station opens when interacted with nearby")
+	check(g.ui.is_panel_open() and g.ui.inspector.visible and g.ui.inspect_art.texture!=null,"Weapon station shows the equipment inspector with art")
 	g._ui_action("lab_secondary",2);g._begin_secondary()
 	check(g.secondary_index==2 and g.p_attack.attack.get("kind","")=="secondary","A station weapon can be selected and fired")
 	g.p["pos"]=g._tutorial_station_position(2);g._interact()
-	check(g.ui.is_panel_open(),"Effect station opens when interacted with nearby")
+	var preview=g.ui.panel_rows.find_child("TutorialMotionPreview",true,false)
+	check(g.ui.is_panel_open() and preview!=null,"Effect station embeds an animated preview")
+	preview._process(.56)
+	check(g._tutorial_key("jump") in preview.timing.text and preview.clock>.55,"The input cue advances with the preview clock")
 	g._ui_action("tutorial_demo","pierce")
 	check(not g.ui.is_panel_open() and g.p_attack.attack.get("kind","")=="pierce","Effect station plays the real piercing action")
 	g._leave_lab()

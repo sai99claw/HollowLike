@@ -455,6 +455,57 @@ func _card(parent:Node,title:String,body:String,color:Color,button:Dictionary={}
 		b.disabled=bool(button.get("disabled",false))
 		col.add_child(b)
 
+func show_tutorial_items(instructions:String,entries:Array[Dictionary],runes:bool) -> void:
+	var body:=HBoxContainer.new()
+	body.add_theme_constant_override("separation",22)
+	panel_rows.add_child(body)
+	var left:=_column(body,350)
+	_card(left,"領取方式" if runes else "試用方式",instructions,MINT)
+	if runes:left.add_child(_button("開啟符文盤","runes",false))
+	var right:=_column(body,440)
+	right.add_child(_label("可領取的符文" if runes else "可試用的附武器",18,INK))
+	var list:=Inventory._list(self,right)
+	for item in entries:
+		Inventory._tile(self,list,item["name"],item["detail"],item["icon"],item["action"],item["payload"],item["color"],item.get("selected",false))
+	inspector.visible=true
+	inspect_item(entries[0]["name"],entries[0]["detail"],entries[0]["icon"])
+
+func show_tutorial_lessons(lessons:Array[Dictionary],weapon_id:String,instructions:String) -> void:
+	var body:=HBoxContainer.new()
+	body.add_theme_constant_override("separation",22)
+	panel_rows.add_child(body)
+	var left:=_column(body,370)
+	left.add_child(_label("操作說明",18,INK))
+	var intro:=_label(instructions,14,MUTED)
+	intro.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	left.add_child(intro)
+	var list:=Inventory._list(self,left)
+	var right:=_column(body,415)
+	var heading:=_label("動畫展示",19,INK)
+	right.add_child(heading)
+	var preview=preload("res://scripts/tutorial_motion_preview.gd").new()
+	preview.name="TutorialMotionPreview"
+	right.add_child(preview)
+	var timing:=_label("",22,GOLD)
+	timing.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	right.add_child(timing)
+	preview.timing=timing
+	preview.weapon_id=weapon_id
+	var try_action:=_button("關閉後在場內演示","",null)
+	right.add_child(try_action)
+	try_action.pressed.connect(func()->void:action_requested.emit("tutorial_demo",preview.lesson["id"]))
+	for lesson in lessons:
+		var button:=_button(lesson["name"],"",null)
+		list.add_child(button)
+		var description:=_label(lesson["detail"],14,MUTED)
+		description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(description)
+		button.pressed.connect(func()->void:
+			heading.text="動畫展示  ·  "+str(lesson["name"])
+			preview.select_lesson(lesson))
+	preview.select_lesson(lessons[0])
+	heading.text="動畫展示  ·  "+str(lessons[0]["name"])
+
 func show_inventory(data:Dictionary) -> void:
 	Inventory.build(self,data,"weapons")
 func show_rune_board(data:Dictionary) -> void:

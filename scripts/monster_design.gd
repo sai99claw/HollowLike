@@ -159,6 +159,10 @@ static func draw_charge(c:CanvasItem,en:Dictionary,time:float,base:Transform2D=T
 			c.draw_line(at,endpoint,Color(1,.32,.13,.20),25,true)
 			c.draw_line(at,endpoint,Color("ffdfa3"),2,true)
 			if BossArtV57.draw_movement_charge(c,en,phase,time,base):return
+		if en.get("air_lunge",false):
+			var tip:Vector2=at+dir*float(en["dash_trigger"])
+			c.draw_line(at,tip,Color(color,.23),7,true)
+			c.draw_line(at,tip,Color(color,.83),1.5,true)
 		var progress:float=1-float(en.get("charge_left",0))/maxf(.01,float(en.get("dash_windup",.6)))
 		for i in 5:
 			var angle:float=time*3+i*TAU/5;var distance:float=lerpf(34,8,fmod(progress+float(i)*.2,1))

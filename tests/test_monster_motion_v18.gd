@@ -35,5 +35,23 @@ func run() -> void:
 			en["vel"]=Vector2(40,-150);check(Motion.sample_index(en,.3)==3,"Airborne ascent holds a readable extension")
 			en["vel"]=Vector2(40,150);check(Motion.sample_index(en,.3)==4,"Airborne descent holds a readable landing pose")
 	check(Motion.definition("unknown").is_empty(),"Unknown actors never borrow a different monster's atlas")
+	var steering=preload("res://scripts/enemy_motion.gd")
+	var roster=preload("res://scripts/monster_roster_v36.gd")
+	var updated_roster=preload("res://scripts/monster_roster_v55.gd")
+	for biome:String in roster.BIOMES:
+		var dart:Dictionary=roster.regular(biome,roster.REGULAR_COUNT-1)
+		dart["pos"]=Vector2(300,260);dart["vel"]=Vector2.ZERO;dart["face"]=-1.0
+		check(dart["spawn_surface"]=="flight" and not dart["elite"],"Air lancer is an ordinary flying enemy: "+biome)
+		for step in 40:
+			dart["vel"]=steering.velocity(dart,Vector2(435,305),.01,rng,false)
+		var first_speed:float=Vector2(dart["vel"]).length()
+		var locked:Vector2=dart["charge_vector"]
+		for step in 8:
+			dart["vel"]=steering.velocity(dart,Vector2(100,200),.01,rng,false)
+		check(dart["charge_phase"]=="active" and Vector2(dart["vel"]).length()>first_speed and dart["charge_vector"]==locked and locked.x>0,"Flight lunge accelerates without retargeting: "+biome)
+		for row in [3,4]:
+			var elite:Dictionary=updated_roster.create(biome,row,0)
+			elite["pos"]=Vector2(300,260);elite["vel"]=Vector2.ZERO
+			check(steering.velocity(elite,Vector2(560,300),.1,rng,true).x>0,"Elite follows the player instead of roaming: "+biome)
 	print("Monster motion v0.18: ","passed (12 identities, 96 unique authored poses, 17 normal/elite/cute/Boss runtime cases)" if failures.is_empty() else str(failures))
 	quit(0 if failures.is_empty() else 1)
