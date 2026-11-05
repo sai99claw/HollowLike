@@ -48,16 +48,17 @@ func run() -> void:
 	check(game.p["energy"]==4,"Each whole salvo costs one energy")
 	game.p_attack.cancel();game.bag_runes={"gale":1};game.rune_slots.assign(["gale"]);game.p["energy"]=6;game._begin_secondary()
 	check(is_equal_approx(game._musou_cycle_seconds(),game.p_attack.attack["active"]+game.p_attack.attack["recovery"]),"Displayed salvo cycle tracks the actual rune-adjusted cast")
-	# Up and attack share nearest-station selection, but attacking practice props remains combat.
+	# Up and the floor light use the same station. Attacks remain combat.
 	game.p_attack.cancel();game._close_panel();game._clear_keys();game.drops.clear();game.room_cooldown=0;game.p["pos"]=Vector2(500,500)
 	game.props.assign([{"kind":"forge","pos":Vector2(604,500)},{"kind":"reforge","pos":Vector2(424,500)}])
-	check(game._world_confirm() and game.prep_station=="reforge","Attack opens the nearest reforge instead of the first prop in the array")
-	game._close_panel();game.prep_station="";game._interact(true)
+	check(not game._world_confirm() and game._game_station().get("kind")=="reforge","Only the nearest reforge is lit, and attack does not confirm it")
+	game._close_panel();game.prep_station="";game._interact()
 	check(game.prep_station=="reforge","Up opens the same nearest station")
 	game._close_panel();game.props.assign([{"kind":"forge","pos":Vector2(580,500)},{"kind":"dummy","pos":Vector2(510,500)}]);game.prep_station=""
 	check(not game._world_confirm() and not game.ui.is_panel_open(),"Nearest dummy lets the attack through without opening a forge behind it")
 	game.props.assign([{"kind":"aid","pos":Vector2(510,500)}]);game.p["hp"]=1
-	check(game._world_confirm() and game.p["hp"]==game.p["max_hp"] and not game.ui.is_panel_open(),"Attack-confirm on aid heals directly without a menu")
+	game._interact()
+	check(game.p["hp"]==game.p["max_hp"] and not game.ui.is_panel_open(),"Up at aid heals directly without a menu")
 	# Real touch stick events: diagonal travel is not an upward command, but deliberate Up and Down retain their meaning.
 	var touch=preload("res://scripts/screen_touch_v29.gd").new();root.add_child(touch);touch.action_changed.connect(game._set_action);await process_frame
 	game._close_panel();game._clear_keys();game.p_attack.cancel();game.props.clear();game.p["air_dash"]=false;game.p["grounded"]=true;game.p["dash_t"]=0;game.dash_chain_open=false;game.clock+=2

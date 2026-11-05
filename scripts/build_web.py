@@ -1,6 +1,7 @@
 """Export outside the checkout, test the pack, then copy finalized host assets."""
 from pathlib import Path
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -32,6 +33,10 @@ with tempfile.TemporaryDirectory(prefix='pigeon-web-export-') as directory:
         data = b''.join((output/part).read_bytes() for part in manifest['parts'])
         assert len(data) == manifest['size']
         assert hashlib.sha256(data).hexdigest() == manifest['sha256']
+        if manifest.get('encoding') == 'gzip':
+            decoded = gzip.decompress(data)
+            assert len(decoded) == manifest['decoded_size']
+            assert hashlib.sha256(decoded).hexdigest() == manifest['decoded_sha256']
     # Check the finished candidate, including Worker/manifest allowance, before
     # touching the last successful build. Stale chunks and interrupted copies
     # never enter this newly exported directory.

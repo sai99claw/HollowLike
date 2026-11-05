@@ -30,7 +30,7 @@ static func _actor(biome:String,row:int,id:String,title:String,movement:String,i
 	var scale_value:float=2.0 if is_elite else 1.0
 	return {"id":id,"name":title,"roster_id":id,"roster_biome":biome,"roster_row":row,"roster_elite":is_elite,"species":id,"biome":biome,
 		"model":3 if is_elite else (2 if movement in ["hover","drift"] else 1 if movement=="jump" else 0),"elite":is_elite,"passive":false,
-		"move":"fly" if movement in ["hover","drift"] else "walk","visual_movement":movement,"movements":[movement],
+		"spawn_surface":"flight" if movement in ["hover","drift"] else "ground","move":"fly" if movement in ["hover","drift"] else "walk","visual_movement":movement,"movements":[movement],
 		"movement_logic":"roam" if movement in ["jump","hover","drift"] else "approach","movement_period":3.0,"speed":78.0 if is_elite else 62.0,
 		"hp":10.0 if is_elite else 5.0,"scale":scale_value,"body_size":Vector2(34,45)*scale_value,"world_height":50.9375*scale_value,
 		"contact_damage":1.0,"damage":1.0,"attack_speed":1.0,"range":100.0,"jump_speed":460.0,"hover_height":95.0,"roam_radius":150.0,

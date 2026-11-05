@@ -5,10 +5,16 @@ const ROOT:String="res://assets/v33/home/"
 const FLOOR:float=600
 const BOUNCE:=Vector2(455,600)
 const RECORDS:=Vector2(790,600)
-static func background(c:CanvasItem) -> void:
+static func background(c:CanvasItem,ceiling:float=0) -> void:
 	var image:Texture2D=Art.texture(ROOT+"background.png")
 	if image==null:return
 	var d:Dictionary=Art.info(ROOT+"background.json");var original:Array=d.get("original_size",[1536,1024]);var source_y:float=float(d.get("authored_floor_y",730));var factor:float=1280.0/float(original[0])
+	var top:float=FLOOR-source_y*factor
+	var extension:float=maxf(0,top-ceiling)
+	if extension>0:
+		c.draw_set_transform_matrix(Transform2D(Vector2.RIGHT,Vector2.UP,Vector2(0,top*2)))
+		c.draw_texture_rect_region(image,Rect2(0,top,1280,extension),Rect2(0,0,image.get_width(),extension*image.get_height()/(float(original[1])*factor)))
+		c.draw_set_transform_matrix(Transform2D.IDENTITY)
 	c.draw_texture_rect(image,Rect2(Vector2(0,FLOOR-source_y*factor),Vector2(original[0],original[1])*factor),false)
 static func prop(c:CanvasItem,id:String,at:Vector2,size:Vector2) -> void:Art.prop(c,ROOT+"props.json",id,at,size)
 static func gate(c:CanvasItem,id:String,at:Vector2) -> void:prop(c,id,at,Vector2(205,280))

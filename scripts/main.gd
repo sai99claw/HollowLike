@@ -164,11 +164,12 @@ var audio_enabled:bool=true:
 	set(value):
 		audio_enabled=value
 		AudioServer.set_bus_mute(0,not value)
-		if not value and audio_player!=null:audio_player.stop();audio_player.stream=null
+		if not value and combat_audio!=null:combat_audio.stop_all()
 		if room_music!=null:room_music.set_enabled(value)
 		if atmosphere!=null:atmosphere.set_audio_enabled(value)
 var walker:Node
-var audio_player: AudioStreamPlayer
+const AudioCues = preload("res://scripts/combat_audio_v63.gd")
+var combat_audio: AudioCues
 var sounds: Dictionary = {}
 var room_music:AudioStreamPlayer
 var hud_timer: float = 0.0
@@ -245,7 +246,7 @@ var tutorial_previous_practice:bool=false
 var lab_meta:Dictionary={}
 var lab_ai:bool=true
 var rd_view:Control
-var home_pressed_gate:String=""
+var home_projector:Dictionary={}
 var lab_buttons:HBoxContainer
 var practice_tools:HBoxContainer
 var practice_rd_panel:Control
@@ -294,15 +295,13 @@ func _ready() -> void:
 	ui.set_touch_visible(touch_enabled)
 	p_attack.active_started.connect(_player_active_started)
 	walker=Walk.new();add_child(walker)
-	audio_player = AudioStreamPlayer.new()
-	add_child(audio_player)
+	combat_audio = AudioCues.new()
+	add_child(combat_audio)
 	room_music=Music.new();add_child(room_music);room_music.set_enabled(audio_enabled);room_music.select("hub","branches")
 	for sound_name in ["hit","slash","parry","coin","jump","metal_hit","explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh","charge_build","charge_release","impact_hit","impact_heavy"]:
 		var path: String = "res://assets/v30/audio/"+sound_name+".wav" if sound_name in ["charge_build","charge_release","impact_hit","impact_heavy"] else ("res://assets/v29/audio/" if sound_name in ["explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh"] else "res://assets/")+sound_name+".wav"
 		if ResourceLoader.exists(path): sounds[sound_name] = load(path)
-	for id:String in Arsenal.IDS:
-		var shot_path:String="res://assets/v54/shot_audio/"+id+".wav"
-		if ResourceLoader.exists(shot_path):sounds["shot_"+id]=load(shot_path)
+	AudioCues.load_cues(sounds)
 	_configure_home()
 	_update_hud()
 	_update_shortcuts()
@@ -322,7 +321,6 @@ func _reset_player(at: Vector2) -> void:
 	pending_attack.clear()
 
 func _input(event:InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:home_pressed_gate=""
 	if perf_paused:return
 	if practice_rd_panel!=null:
 		if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE:practice_rd_panel.closed.emit();get_viewport().set_input_as_handled()
@@ -416,30 +414,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		_set_action(action,e.pressed)
 
-	elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
-		var gate:String=_home_pointer_gate()
-		if event.pressed:
-			home_pressed_gate=gate
-		else:
-			var selected:String=home_pressed_gate
-			home_pressed_gate=""
-			if not selected.is_empty() and selected==gate:_activate_home_gate(selected)
-
 func _home_controls_visible() -> bool:
-	return screen=="hub" and not trophy_room and lab_mode not in ["rd","tuning"] and ui!=null and not ui.is_panel_open()
-
-func _home_pointer_gate() -> String:
-	if not _home_controls_visible() or get_viewport().gui_get_hovered_control()!=null:return ""
-	return HomeArt.gate_at(get_global_mouse_position())
-
-func _activate_home_gate(gate:String) -> void:
-	if not _home_controls_visible():return
-	match gate:
-		"musou":new_run("musou")
-		"tutorial":_enter_practice(true)
-		"rogue":
-			if _at_rogue_gate():new_run("rogue")
-			else:_toast("肉鴿入口在上方：下砍蘑菇反彈，再二段跳")
+	return screen=="hub" and not trophy_room and camera_pos.y>-24.0 and lab_mode not in ["rd","tuning"] and ui!=null and not ui.is_panel_open()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_keys(false)
@@ -491,14 +467,13 @@ func _set_action(action: String, pressed: bool) -> void:
 			"dash":
 				if screen in ["game","hub"]: _dash_pressed()
 			"attack":
-				if _world_confirm():keys["attack"]=false;return
 				charge_timer=0.0
 				if screen in ["game","hub"]:
 					_begin_primary({"dir":_aim_string(),"charged":false});_process_player_attack()
 			"sub":
 				if screen=="game": _begin_secondary()
 			"interact": _show_equipment(0)
-			"up": _interact(true)
+			"up": _interact()
 	if action=="jump" and not pressed and was:
 		p["jump_released"]=true
 		if bool(p.get("jump_cut_allowed",false)) and p["vel"].y<0:p["vel"].y=PlayerMotion.cut(p["vel"].y);p["jump_cut_allowed"]=false
@@ -541,7 +516,6 @@ func _set_map_held(pressed:bool) -> void:
 	_refresh_map_visibility()
 
 func _clear_keys(close_map:bool=true) -> void:
-	home_pressed_gate=""
 	if close_map:map_pinned=false
 	_set_map_held(false)
 	keys.clear(); jump_request=false;
@@ -580,9 +554,9 @@ func _process_profiled_body(delta: float) -> void:
 	if corpse_layer!=null:corpse_layer.transform=world_transform.translated_local(Vector2(0,5))
 	if terrain!=null: terrain.transform=world_transform
 	if static_props!=null:static_props.transform=world_transform
-	if backdrop!=null:backdrop.transform=(atmosphere.depth_transform(render_camera,zoom,Atmosphere.FAR_FACTOR) if _is_start() else Atmosphere.parallax(render_camera,1.0,Atmosphere.FAR_FACTOR)) if screen=="game" else Transform2D.IDENTITY
+	if backdrop!=null:backdrop.transform=(atmosphere.depth_transform(render_camera,zoom,Atmosphere.FAR_FACTOR) if _is_start() else Atmosphere.parallax(render_camera,1.0,Atmosphere.FAR_FACTOR)) if screen=="game" else world_transform
 	if home_atmosphere!=null:
-		home_atmosphere.set_active(screen=="hub");home_atmosphere.focus_x=float(p["pos"].x)
+		home_atmosphere.transform=world_transform;home_atmosphere.set_active(screen=="hub" and not trophy_room);home_atmosphere.focus_x=float(p["pos"].x)
 	if spring_particles!=null:spring_particles.transform=world_transform
 	if atmosphere!=null:
 		atmosphere.set_audio_enabled(audio_enabled and life_event.is_empty() and not ui.is_panel_open())
@@ -666,7 +640,9 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if was_piercing and not p_attack.is_active():p["dash_t"]=0.0
 	var initial_room:int=current_room
 	var previous:Vector2=p["pos"]
+	var was_in_bath:bool=_in_bath()
 	_update_player(delta*world_speed)
+	if _in_bath() and not was_in_bath:_sound("water_splash")
 	_update_idle(delta)
 	var walking:bool=bool(p["grounded"]) and absf(p["vel"].x)>30 and float(p["hurt"])<=0 and float(p["dash_t"])<=0 and float(p["recoil_left"])<=0 and (not p_attack.is_busy() or p_attack.phase=="recovery")
 	Walk.limping=injured
@@ -699,6 +675,7 @@ func _view_zoom() -> float:
 	var fit:float=maxf(1280.0/bounds.x,720.0/bounds.y)
 	return maxf(Scale.MIN_ZOOM,maxf(camera_zoom,fit))
 func _camera_target(at:Vector2) -> Vector2:
+	if screen=="hub":return Vector2(0,clampf(at.y-410.0,HomeArt.CEILING_Y,0)) if not trophy_room else Vector2.ZERO
 	var visible:Vector2=Vector2(1280,720)/_view_zoom();var bounds:Vector2=_room_size()
 	return Vector2(clampf(at.x-visible.x*.5,0,maxf(0,bounds.x-visible.x)),clampf(at.y-visible.y*.57,0,maxf(0,bounds.y-visible.y)))
 func _in_bath() -> bool:return Bath.contains(_active_pool(),p.get("pos",Vector2.ZERO))
@@ -874,21 +851,26 @@ func _step_player(delta: float) -> void:
 			pos.x-=int(p["wall"])*8
 			p["wall_kick_left"]=.09;p["wall_kick_velocity"]=vel.x
 			p["wall_lock"]=.17;p["wall"]=0;p["jumps"]=1;p["grounded"]=false
-			_sound("jump")
+			_sound("wall_jump")
 		elif bool(p["grounded"]) or float(p.get("coyote_left",0))>0:
 			jumped=true
 			if _key("down") and pos.y<_room_floor()-15:
 				drop_through_y=pos.y;drop_through_timer=.22
-				pos.y+=3;vel.y=130;p["grounded"]=false
+				pos.y+=3;vel.y=130;p["grounded"]=false;_sound("drop_through")
 			else:
 				vel.y=-JUMP_SPEED*(1.0+_rune_effect("wing"))*Tuning.value("jump_speed");p["grounded"]=false;p["jumps"]=1;_sound("jump")
 		elif _skill("doublejump") and int(p["jumps"])<2:
 			jumped=true
-			vel.y=-JUMP_SPEED*.92*Tuning.value("jump_speed");p["jumps"]=2;p["flap_left"]=.32;p["gust_left"]=.20;combat_feedback.double_jump(pos-Vector2(0,10));_sound("jump")
+			vel.y=-JUMP_SPEED*.92*Tuning.value("jump_speed");p["jumps"]=2;p["flap_left"]=.32;p["gust_left"]=.20;combat_feedback.double_jump(pos-Vector2(0,10));_sound("double_jump")
 		if jumped:
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
-	if _rune_effect("held_flight")>0 and _key("jump") and not p["grounded"] and not _wind_form_active() and not knocked:vel.y=minf(vel.y,-230.0)
+	var floating:bool=_rune_effect("held_flight")>0 and _key("jump") and not p["grounded"] and not _wind_form_active() and not knocked
+	if floating and vel.y>-230.0:
+		if not p.get("flight_boosting",false):_sound("flight_boost")
+		p["flight_boosting"]=true
+		vel.y=-230.0
+	elif not floating:p["flight_boosting"]=false
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
@@ -907,7 +889,7 @@ func _step_player(delta: float) -> void:
 	var contact:Dictionary=Ledge.contact(pos,wall_contact,solids) if wall_allowed else {}
 	p["wall"]=wall_contact if float(contact.get("ratio",0.0))+.000001>=Ledge.ATTACH_RATIO else 0
 	if wall_allowed and contact.has("target"):
-		p["pos"]=pos;p["face"]=wall_contact;Ledge.begin(p,contact["target"]);p_attack.cancel();pending_attack.clear();charge_timer=0;p["_motion_step"]=false;return
+		p["pos"]=pos;p["face"]=wall_contact;Ledge.begin(p,contact["target"]);_sound("mantle");p_attack.cancel();pending_attack.clear();charge_timer=0;p["_motion_step"]=false;return
 	if p["grounded"]:_restore_ground_movement()
 
 	if pos.x<4:
@@ -924,18 +906,20 @@ func _step_player(delta: float) -> void:
 	if int(p["wall"])!=0:
 		# Clamp the real physics velocity, never shift the rendered sprite toward
 		# a wall. Both sides use the same feet anchor and the same AABB solver.
-		if not was_attached:p["wall_hold_left"]=1.0
+		if not was_attached:p["wall_hold_left"]=1.0;_sound("wall_attach")
 		vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED;_restore_ground_movement()
 		if dashed_into:p["dash_t"]=0;vel.y=0;p["wall_lock"]=0
 	if int(p["wall"])==0:p["wall_hold_left"]=0.0
 	if bool(p["grounded"]) and bool(p["slam"]):_slam_impact(pos)
-	if pos.y<0:pos.y=0;vel.y=maxf(0,vel.y)
+	var ceiling:float=HomeArt.CEILING_Y if screen=="hub" and not trophy_room else 0.0
+	if pos.y<ceiling:pos.y=ceiling;vel.y=maxf(0,vel.y)
 	if pos.y>_room_size().y+80 and (layout.has("hazard_room") or not room.get("neighbors",{}).has("down")):_hurt_player(2,pos);pos=layout.get("spawn_positions",{}).get("center",Vector2(230,_room_floor()))
 	if not was_grounded and not was_slam:p["fall_distance"]=float(p.get("fall_distance",0))+maxf(0,pos.y-old_pos.y)
 	if bool(p["grounded"]) and not was_grounded and not was_slam:
 		p["landing_left"]=.09
 		if float(p.get("fall_distance",0))>float(layout.get("tile_size",96))*6.0 and not p.has("launch_pending_velocity") and not _in_bath():
 			_begin_heavy_landing(pos);vel.x=0
+		elif not p.has("launch_pending_velocity"):_sound("land")
 		p["fall_distance"]=0.0
 	if p.has("launch_pending_velocity"):
 		vel=p["launch_pending_velocity"];p.erase("launch_pending_velocity")
@@ -1025,7 +1009,6 @@ func _begin_primary(request:Dictionary) -> void:
 	if def.get("charged",false):p["recoil_left"]=0;p["impact_root"]=0
 	if p_attack.begin(def):
 		combo_index=(combo_index+1)%3;combo_deadline=clock+float(def["windup"])+float(def["active"])+float(def["recovery"])+.65;charge_timer=0
-		if not def.get("charged",false):_sound("attack_whoosh")
 		ui.clear_attack_feedback();_update_hud()
 
 func _secondary_at(index:int) -> Dictionary:
@@ -1092,19 +1075,20 @@ func _player_active_started() -> void:
 	if _in_bath():
 		var pool:Rect2=_active_pool()
 		spring_particles.splash(Vector2(p["pos"].x,pool.position.y),str(_ecology()["id"]),_attack_direction(def))
-		bath.attack(pool,p["pos"])
+		bath.attack(pool,p["pos"]);_sound("water_splash")
 	match str(def.get("kind","")):
 		"secondary":
 			if def.has("salvo"):
 				for weapon:Dictionary in def["salvo"]:_emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),weapon,true)
-			elif def.get("weapon_kind","")=="sword":_sound("shot_"+str(def.get("id","")))
+			elif def.get("weapon_kind","")=="sword":_sound("attack_whoosh")
 			else: _emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),def,true)
 		"pierce","slam":
-			p["slam_speed"]=520.0;_sound("double_dash_wind")
+			p["slam_speed"]=520.0;_sound("slam_wind" if def["kind"]=="slam" else "double_dash_wind")
 			p["dash_dir"]=def["dir"];p["dash_t"]=float(def["active"]);p["air_dash"]=true
 			p["slam"]=def["kind"]=="slam"
 			# The eight-frame wind-form body replaces the pigeon while this skill is active.
 		"item_bomb":
+			_sound("explosion")
 			_contact_fx("explosion_artificial",p["pos"]-Vector2(0,25))
 			effects[-1]["fx_extent"]=840.0
 			for en in enemies:
@@ -1112,6 +1096,7 @@ func _player_active_started() -> void:
 			_effect(p["pos"],Color("ffca8d"),420,.6);shake=10
 		_:
 			if bool(def.get("dash_charge",false)): p["vel"]=_aim_vector()*500
+			if def.get("primary",false) and not def.get("charged",false):_sound("attack_heavy" if def.get("style","")=="heavy" else "attack_whoosh")
 
 func _attack_box(pos: Vector2, def: Dictionary, face: float) -> Rect2:
 	var reach: float=float(def.get("range",70))
@@ -1202,10 +1187,11 @@ func _update_heal(delta: float) -> void:
 	perf_log.span("physics.heal",Time.get_ticks_usec()-measured)
 func _update_heal_profiled_body(delta: float) -> void:
 	if _key("heal") and float(p["energy"])>=3 and float(p["hp"])<float(p["max_hp"]) and not p_attack.is_busy():
+		if heal_timer==0:_sound("heal_build")
 		heal_timer+=delta
 		if rng.randf()<.3: _particles(p["pos"]-Vector2(0,20),Color("8de4ac"),1,25)
 		if heal_timer>=.7:
-			heal_timer=0;p["energy"]-=3;_restore_vital("hp",1);_float(p["pos"]-Vector2(0,55),"+1",Color("9df3b4"));_sound("coin")
+			heal_timer=0;p["energy"]-=3;_restore_vital("hp",1);_float(p["pos"]-Vector2(0,55),"+1",Color("9df3b4"));_sound("heal_finish")
 	else: heal_timer=0
 
 func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true) -> void:
@@ -1254,7 +1240,7 @@ func _hurt_player(amount:float,source:Vector2) -> bool:
 		if away==0:away=-float(p["face"])
 		p["knockback_t"]=KNOCKBACK_TIME;p["knockback_dir"]=away;p["vel"]=Vector2(away*CONTACT_KNOCKBACK/KNOCKBACK_TIME,-100)
 		p_attack.cancel();pending_attack.clear();jump_request=false;charge_timer=0;heal_timer=0;p["slam"]=false;p["dash_t"]=0
-	hitstop=maxf(hitstop,.045);_float(p["pos"]-Vector2(0,65),"受傷 -%d"%int(amount),Color("ffb0a4"));shake=9;_sound("hit")
+	hitstop=maxf(hitstop,.045);_float(p["pos"]-Vector2(0,65),"受傷 -%d"%int(amount),Color("ffb0a4"));shake=9;_sound("hurt")
 	if float(p["hp"])<=0:_death()
 	return true
 
@@ -1265,7 +1251,7 @@ func _death() -> void:
 	var first_down:bool=not revive_used
 	if first_down and mode=="musou":
 		revive_used=true;injured=true;_sync_vitals();p["hp"]=p["max_hp"];p["invul"]=2.0;p["hurt"]=0;p["knockback_t"]=0
-		dream.injure();shake=maxf(shake,20);hitstop=maxf(hitstop,.08)
+		dream.injure();shake=maxf(shake,20);hitstop=maxf(hitstop,.08);_sound("dream_burst")
 		var center:Vector2=p["pos"]-Vector2(0,24)
 		dream_visual.pulse(center,640/_view_zoom(),true)
 		for en:Dictionary in enemies:
@@ -1280,6 +1266,7 @@ func _death() -> void:
 		var payload:Dictionary=Bag.snapshot(run_coins,bag_runes,bag_items,bag_weapons)
 		payload["growth"]=sub_growth.duplicate(true)
 		feather={"room":current_room,"pos":Vector2(p["pos"]),"payload":payload}
+	_sound("death")
 	life_event={"kind":"injury" if first_down else "death","elapsed":0.0,"origin":p["pos"],"room":current_room,"face":p["face"],"trail":[],"velocity":Vector2(-float(p["face"])*440,-280)}
 	_toast("首次倒下：重傷後醒來，這一局再倒下便會死亡" if first_down else "羽翼碎落……選一枚符文返回安全屋，其餘背包留在發光羽毛")
 
@@ -1294,9 +1281,21 @@ func _spawn_boss_reinforcements(roster:Array, count:int, elite:bool, random:Rand
 	var biome:String=str(_ecology()["id"])
 	for index in count:
 		var definition:Dictionary=MonsterRoster.elite(random.randi_range(0,5)) if elite else MonsterRoster.regular(biome,random.randi_range(0,4))
-		var at:=Vector2(lerpf(260.0,_room_size().x-260.0,float(index)/maxi(1,count-1)),_room_floor())
-		definition["pos"]=at
-		var spawn:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if Motion.airborne(definition) else _fit_enemy_ground(definition)
+		var edge:float=minf(440.0,_room_size().x*.28)
+		var center:float=lerpf(edge,_room_size().x-edge,float(index)/maxi(1,count-1))
+		var spawn:=Vector2.INF
+		for attempt in ceili(_room_size().x/40.0)*2:
+			var offset_x:float=ceili(attempt*.5)*40.0*(1.0 if attempt%2==1 else -1.0)
+			var x:float=center+offset_x
+			if x<96 or x>_room_size().x-96:continue
+			definition["pos"]=Vector2(x,_room_floor())
+			var candidate:Vector2=_enemy_spawn(definition)
+			if not candidate.is_finite():continue
+			definition["pos"]=candidate
+			var body:Rect2=_enemy_body_box(definition).grow(8)
+			if roster.any(func(actor:Dictionary)->bool:return float(actor["hp"])>0 and body.intersects(_enemy_body_box(actor))):continue
+			spawn=candidate
+			break
 		if not spawn.is_finite():continue
 		spawn_serial+=1
 		var health:float=(float(definition["hp"])+float(room["map_index"])*.5)*(3.0 if elite else 1.0)*Tuning.value("enemy_hp")
@@ -1319,7 +1318,7 @@ func _boss_summoning(en:Dictionary,delta:float) -> bool:
 	en["attack"].cancel()
 	en["charge_phase"]="idle";en["charge_left"]=0.0
 	en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
-	en["vel"]=Vector2.ZERO;en["summon_cast_left"]=.8
+	en["vel"]=Vector2.ZERO;en["summon_cast_left"]=.8;_sound("boss_summon")
 	_float(en["pos"]-Vector2(0,110),"召喚援軍",Color("ffbd89"))
 	return true
 
@@ -1366,11 +1365,17 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		var toward:Vector2=p["pos"]-en["pos"]
 		var engaged:bool=_in_aggro(en)
 		var body_size:Vector2=MonsterMotion.body_size(en)
-		if not engaged and not en.get("passive",false):
-			if atk.is_busy():atk.cancel()
-			if float(en.get("push_left",0))<=0:
-				en["vel"]=Vector2.ZERO
-				continue
+		var resting:bool=not engaged and not en.get("passive",false) and float(en.get("push_left",0))<=0
+		if not engaged and atk.is_busy():atk.cancel()
+		if en.has("wall_spawn_face"):
+			if not engaged:continue
+			var launch:float=en["wall_spawn_face"]
+			en.erase("wall_spawn_face")
+			en["vel"]=Vector2(launch*180,-230)
+		if resting and (Motion.airborne(en) or _enemy_support(en).has_area()):
+			en["vel"]=Vector2.ZERO
+			continue
+
 		if not frozen and int(en["model"])==4:
 			var new_phase:int=BossDirector.tick(en,delta,engaged)
 			if new_phase==2:_adapt_boss(en)
@@ -1396,7 +1401,15 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			var impulse:Vector2=en["push_velocity"]*step/maxf(movement_delta,.00001)
 			en["push_base_y"]=float(en.get("push_base_y",vel.y))+(0 if Motion.airborne(en) else GRAVITY*movement_delta)
 			vel=Vector2(impulse.x,float(en["push_base_y"])+impulse.y)
-		else:vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size)
+		elif resting:vel=Vector2(0,minf(800.0,vel.y+GRAVITY*movement_delta))
+		else:
+			var previous_charge:String=en.get("charge_phase","idle")
+			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size)
+			if engaged and previous_charge!="active" and en.get("charge_phase","idle")=="active":
+				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else "enemy_ram"
+				_sound(cue if sounds.has(cue) else "enemy_ram")
+			if engaged and grounded and vel.y<-140 and Motion.current(en)=="jump":
+				_sound("boss_jump" if int(en["model"])==4 else "enemy_jump")
 		# A ram is one deliberately telegraphed attack, not a second movement attack.
 		if not frozen and float(en["stun"])<=0 and atk.is_active() and atk.attack.get("ram",false):
 			vel.x=float(atk.attack.get("ram_direction",en["face"]))*float(atk.attack.get("ram_speed",340))
@@ -1430,7 +1443,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		if frozen:continue
 		if atk.is_active() and not bool(atk.attack.get("emitted",false)):
 			atk.attack["emitted"]=true
-			if int(en.get("model",0))==4 and audio_enabled:BossDirector.play_attack(self,atk.attack)
+			_sound(AudioCues.attack_cue(atk.attack))
 			if atk.attack.get("poison_cloud",false):
 				poison_clouds.append({"pos":Vector2(en["pos"])+Vector2(float(en["face"])*48,-26),"left":3.0,"hostile":true})
 			elif atk.attack.get("library_kind","")=="trap":_emit_traps(en,atk.attack)
@@ -1495,29 +1508,61 @@ func _start_enemy_attack(en:Dictionary,definition:Dictionary) -> void:
 	for key in ["windup","active","recovery"]:def[key]=float(def[key])*phase_multiplier/maxf(.1,float(en.get("attack_speed",1)))
 	if mode=="musou" and int(en.get("model",0))!=4 and not def.get("ram",false) and not def.get("poison_cloud",false):Dream.instant(def)
 	if not str(def.get("boss_tell","")).is_empty():def["windup"]=maxf(.42,float(def["windup"]))
-	if en["attack"].begin(def):en["cooldown"]=float(def["windup"])+float(def["active"])+float(def["recovery"])+float(def.get("attack_cooldown",1.1))/maxf(.1,float(en.get("attack_speed",1)))
+	if en["attack"].begin(def):
+		if not str(def.get("boss_tell","")).is_empty():_sound("boss_warning")
+		en["cooldown"]=float(def["windup"])+float(def["active"])+float(def["recovery"])+float(def.get("attack_cooldown",1.1))/maxf(.1,float(en.get("attack_speed",1)))
 
 func _enemy_body_box(en:Dictionary) -> Rect2:
 	var body:Vector2=MonsterMotion.body_size(en)
 	return Rect2(en["pos"]-Vector2(body.x*.5,body.y),body)
 
-func _air_spawn(anchor:Vector2,scale_value:float,actual_size:Vector2=Vector2.ZERO) -> Vector2:
-	for offset_y in [65,110,160,35,210]:
+func _enemy_spawn(en:Dictionary,flight_lift:float=0.0) -> Vector2:
+	match str(en["spawn_surface"]):
+		"flight":return _air_spawn(Vector2(en["pos"])-Vector2(0,flight_lift),MonsterMotion.body_size(en))
+		"wall":return _fit_enemy_wall(en)
+		"ground":return _fit_enemy_ground(en)
+	return Vector2.INF
+
+func _fit_enemy_wall(en:Dictionary) -> Vector2:
+	var desired:Vector2=en["pos"]
+	var body:Vector2=MonsterMotion.body_size(en)
+	var best:=Vector2.INF
+	var distance:float=INF
+	for wall:Rect2 in solids:
+		if wall.size.y<maxf(96.0,body.y+20.0):continue
+		var y:float=clampf(desired.y-55,wall.position.y+body.y+4,wall.end.y-4)
+		for face in [-1.0,1.0]:
+			var at:=Vector2((wall.end.x if face>0 else wall.position.x)+face*(body.x*.5+.03),y)
+			if at.x<body.x*.5+28 or at.x>_room_size().x-body.x*.5-28 or at.y<55+body.y:continue
+			if at.distance_to(desired)>=distance or not _spawn_space_clear(at,body):continue
+			best=at
+			distance=at.distance_to(desired)
+			en["wall_spawn_face"]=face
+	return best
+
+func _spawn_space_clear(at:Vector2,body:Vector2) -> bool:
+	var box:=Rect2(at-Vector2(body.x*.5,body.y),body).grow(-.01)
+	for rock:Rect2 in platforms+solids:
+		if box.intersects(rock):return false
+	for spike:Rect2 in layout.get("spike_rects",[]):
+		if box.intersects(spike.grow(.5)):return false
+	for door:Dictionary in doors:
+		if at.distance_to(door["pos"])<180:return false
+	return true
+
+func _air_spawn(anchor:Vector2,body:Vector2) -> Vector2:
+	var half:float=maxf(50,body.x*.5+12)
+	var top:float=maxf(65,body.y+12)
+	for offset_y in [65,110,160,35,210,-40]:
 		for offset_x in [0,55,-55,110,-110,165,-165]:
-			var half:float=maxf(50,actual_size.x*.5+12);var top:float=maxf(65,actual_size.y+12)
-			var at:Vector2=Vector2(clampf(anchor.x+offset_x,half,_room_size().x-half),clampf(anchor.y-offset_y,top,_room_floor()-60))
-			var body:Rect2=Rect2(at-Vector2(actual_size.x*.5,actual_size.y),actual_size).grow(5) if actual_size!=Vector2.ZERO else _body_box(at,scale_value).grow(5)
-			var free:bool=true
-			for surface in platforms+solids:
-				if body.intersects(surface):free=false;break
-			if free:return at
-	return Vector2.INF if actual_size!=Vector2.ZERO else anchor-Vector2(0,65)
+			var at:=Vector2(clampf(anchor.x+offset_x,half,_room_size().x-half),clampf(anchor.y-offset_y,top,_room_floor()-60))
+			if _spawn_space_clear(at,body):return at
+	return Vector2.INF
 
 func _fit_enemy_ground(en:Dictionary) -> Vector2:
 	var desired:Vector2=en["pos"];var body:Vector2=MonsterMotion.body_size(en)
 	var best:=Vector2.INF;var distance:float=INF
 	var edge:float=400.0 if int(en.get("model",0))==4 else 28.0+body.x*.5
-	var spikes:Array=layout.get("spike_rects",[])
 	for surface:Rect2 in platforms+solids:
 		if surface.position.y<55+body.y or absf(surface.position.y-desired.y)>192:continue
 		var left:float=maxf(edge,surface.position.x+body.x*.5+1)
@@ -1525,10 +1570,8 @@ func _fit_enemy_ground(en:Dictionary) -> Vector2:
 		if left>right:continue
 		var x:float=clampf(desired.x,left,right)
 		if absf(x-desired.x)>192:continue
-		var at:=Vector2(x,surface.position.y);var box:=Rect2(at-Vector2(body.x*.5,body.y),body).grow(-.01)
-		if solids.any(func(rock:Rect2)->bool:return box.intersects(rock)):continue
-		if spikes.any(func(spike:Rect2)->bool:return box.intersects(spike)):continue
-		if doors.any(func(door:Dictionary)->bool:return at.distance_to(door["pos"])<180):continue
+		var at:=Vector2(x,surface.position.y)
+		if not _spawn_space_clear(at,body):continue
 		var cost:float=absf(at.x-desired.x)+absf(at.y-desired.y)*2
 		if cost<distance:distance=cost;best=at
 	return best
@@ -1544,7 +1587,7 @@ func _enemy_begin(en:Dictionary,ranged:bool) -> void:
 		if bool(def.get("primary",false))!=ranged:_start_enemy_attack(en,def);return
 
 func _emit_weapon(at:Vector2,dir:Vector2,def:Dictionary,from_player:bool) -> void:
-	if from_player:_sound("shot_"+str(def.get("id","")))
+	if from_player:_sound(AudioCues.attack_cue(def))
 	if from_player and def.get("weapon_kind","")=="trap":
 		var trap:Dictionary=def.duplicate(true);trap["from_player"]=true;trap["group"]="biological";trap["hazard_visual_id"]="moss_thorns";trap["target"]=at+dir.normalized()*260
 		_emit_traps({"pos":at+Vector2(0,35),"uid":-1},trap);return
@@ -1571,7 +1614,6 @@ func _emit_weapon(at:Vector2,dir:Vector2,def:Dictionary,from_player:bool) -> voi
 		var distance:float=float(def.get("range",900))
 		projectiles.append({"pos":spawn,"vel":velocity,"sprite":sprite,"from_player":from_player,"damage":float(def.get("damage",3)),"life":float(def.get("lifetime",distance/maxf(1,velocity.length())+1)),"color":def.get("color",Color.WHITE),"kind":kind,"radius":radius,"gravity":gravity,"pierce":bool(def.get("piercing",false)) or (from_player and _rune_effect("pierce")>0),"hits":{},"bounces":int(def.get("bounces",0)),"distance_left":distance,"style_id":str(def.get("style_id",kind)),"boss_biome":str(def.get("boss_biome","")),"visual_id":str(def.get("visual_id","")),"group":str(def.get("group","weapon" if from_player else "biological")),"elapsed":0.0,"return_after":float(def.get("return_after",.7 if path=="return" else 0)),"origin":spawn,"launch_angle":direction.angle(),"base_velocity":velocity,"wave_amplitude":float(def.get("wave_amplitude",0)) if path=="sine" or def.get("style_id","")=="dew_bubble" else 0.0,"wave_frequency":float(def.get("wave_frequency",4)),"knockback":float(def.get("knockback",76)),"explode_on_hit":bool(def.get("explode_on_hit",false)),"explosion_radius":float(def.get("explosion_radius",80)),"parryable":bool(def.get("parryable",kind=="flying_slash")),"owner_uid":int(def.get("owner_uid",-2)),"weapon_id":str(def.get("id","")),"homing":def.get("weapon_kind","")=="homing","ground_fire":bool(def.get("ground_fire",false)),"fire_size":float(def.get("explosion_radius",100)),"dream_slash":bool(def.get("dream_slash",false))})
 	_effect(at,Color(def.get("color",Color.WHITE)),28,.15)
-	if not def.has("boss_sound"):_sound("slash")
 
 func _segment_hits_box(a:Vector2,b:Vector2,box:Rect2) -> bool:
 	var direction:Vector2=b-a
@@ -1716,7 +1758,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 			if int(pr.get("bounces",0))>0:
 				var contact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],world,radius)
 				var normal:Vector2=contact.get("normal",Vector2.LEFT)
-				pr["vel"]=Vector2(pr["vel"]).bounce(normal);pr["base_velocity"]=pr["vel"];pr["pos"]+=normal*1.0;pr["bounces"]-=1
+				pr["vel"]=Vector2(pr["vel"]).bounce(normal);pr["base_velocity"]=pr["vel"];pr["pos"]+=normal*1.0;pr["bounces"]-=1;_sound("projectile_bounce")
 			else:
 				var impact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],world,radius)
 				pr["impact_normal"]=impact.get("normal",Vector2.ZERO);pr["impact_point"]=impact.get("point",pr["pos"])
@@ -1781,6 +1823,7 @@ func _enemy_defeated(en: Dictionary) -> void:
 		en["tutorial_respawn"]=3.0
 		return
 	if en.get("corpse_created",false):return
+	_sound("boss_defeat" if int(en.get("model",0))==4 else "enemy_defeat")
 	en["corpse_created"]=true;corpses.append(CorpseField.create(en));room["corpses"]=corpses
 	if corpse_layer!=null:corpse_layer.invalidate()
 	if lab_mode=="tutorial":return
@@ -1913,6 +1956,7 @@ func _use_item(index: int, from_bag: bool=true,open_bag:bool=true) -> void:
 				enemy["push_base_y"]=0.0
 			_effect(center,Color("d7faff"),640/_view_zoom(),.35)
 
+	_sound("heal_finish" if item["id"]=="heal" else "item_"+str(item["id"]))
 	_effect(p["pos"]-Vector2(0,20),item["color"],100,.45)
 	_toast("施放："+item["name"])
 	if from_bag and open_bag:_show_bag()
@@ -2012,11 +2056,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			def["ecology_id"]=biome["id"]
 			if not def.has("roster_id"):def["contact_damage"]=0.0 if def.get("passive",false) else CONTACT_DAMAGE
 
-			if Motion.airborne(def):def["pos"]=_air_spawn(def["pos"]-Vector2(0,140 if model==4 else 0),float(def["scale"]),MonsterMotion.body_size(def))
-			else:
-				var grounded_spawn:Vector2=_fit_enemy_ground(def)
-				if not grounded_spawn.is_finite():continue
-				def["pos"]=grounded_spawn
+			def["pos"]=_enemy_spawn(def,140.0 if model==4 else 0.0)
 			if not Vector2(def["pos"]).is_finite():continue
 			if model!=4 and doors.any(func(door:Dictionary)->bool:return def["pos"].distance_to(door["pos"])<180):continue
 			def["vel"]=Vector2.ZERO;def["face"]=-1.0;def["stun"]=0.0;def["hurt"]=0.0;def["cooldown"]=1.0+i*.15;def["attack"]=Attack.new()
@@ -2035,7 +2075,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 				var dummy_rng:=RandomNumberGenerator.new();dummy_rng.seed=int(layout["seed"])+i
 				var dummy:Dictionary=Arms.enemy("walk",dummy_rng,false,true)
 				var anchor:=_furniture_offset()+Vector2(870 if i==0 and room["type"]=="start" else (1110 if i==1 else 1360),1050-(35 if i==1 else 0))
-				dummy.merge({"training":true,"floating":i==1,"anchor":anchor,"training_age":0.0,"contact_damage":0.0,"uid":id*100+98+i,"pos":anchor,"vel":Vector2.ZERO,"face":-1.0,"hp":999999.0,"max_hp":999999.0,"body_size":Vector2(84,120),"hurt":0.0,"stun":0.0,"cooldown":1000.0,"attack":Attack.new(),"training_total":0.0},true)
+				dummy.merge({"training":true,"spawn_surface":"flight" if i==1 else "ground","floating":i==1,"anchor":anchor,"training_age":0.0,"contact_damage":0.0,"uid":id*100+98+i,"pos":anchor,"vel":Vector2.ZERO,"face":-1.0,"hp":999999.0,"max_hp":999999.0,"body_size":Vector2(84,120),"hurt":0.0,"stun":0.0,"cooldown":1000.0,"attack":Attack.new(),"training_total":0.0},true)
 				room["enemies"].append(dummy)
 
 	if not room.has("props"):
@@ -2064,42 +2104,57 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	atmosphere.depth_origin=camera_pos;atmosphere.depth_origin_ready=true
 	_save_meta();_update_hud();_invalidate_scene()
 
-func _interact(allow_panel:bool=true) -> void:
-	if _action_locked():return
-	if room_cooldown>0: return
-	if lab_mode=="tutorial" and allow_panel:
-		var station:int=_nearby_tutorial_station()
-		if station>=0:
-			_show_tutorial_station(station)
-			return
+func _interact() -> void:
+	if _action_locked() or room_cooldown>0:return
 	if screen=="hub":
 		_home_interact();return
 	if screen!="game":return
-	if allow_panel and merchant_trial.is_empty() and room.get("type","")=="merchant":
-		var product:int=Sanctuary.nearest_stock(room.get("stock",[]),p["pos"])
-		if product>=0:_show_merchant(product);return
-	for prop in props:
-		if prop["pos"].distance_to(p["pos"])<110:
-			if prop["kind"]=="chest" and not prop.get("used",false):_open_chest(prop);return
-			if prop["kind"]=="merchant" and allow_panel:_show_merchant();return
-	if allow_panel:
-		for drop in drops:
-			if drop.get("gift",false) and not drop.get("taken",false) and (drop["pos"]+Vector2(0,90)).distance_to(p["pos"])<90:_claim_gift();return
-	if allow_panel and _nearest_reward()>=0:_show_reward(_nearest_reward());return
-	if room["type"]=="boss" and int(room["map_index"])==5 and bool(room.get("cleared",false)) and absf(p["pos"].x-_room_size().x*.5)<150:
-		_complete_run();return
-	if allow_panel and _is_start():
-		_activate_station(_nearest_station())
-
-func _activate_station(station:String,attack_confirm:bool=false) -> bool:
-	# Attacking the nearest practice prop must still hit it, rather than open
-	# an adjacent forge or the dummy's information panel.
-	if station.is_empty() or (attack_confirm and station in ["dummy","energy_infinite"]):return false
-	match station:
+	var focus:Dictionary=_game_station()
+	match str(focus.get("kind","")):
+		"tutorial":_show_tutorial_station(focus["index"])
+		"product":_show_merchant(focus["index"])
+		"merchant":_show_merchant()
+		"chest":_open_chest(focus["prop"])
+		"gift":_claim_gift()
+		"reward":_show_reward(focus["index"])
+		"victory":_complete_run()
 		"aid":_first_aid()
 		"wardrobe":_show_shop()
-		_:_show_prep(station)
-	return true
+		"mail","energy_infinite","dummy","forge","reforge":_show_prep(focus["kind"])
+
+func _game_station() -> Dictionary:
+	if screen!="game" or room_cooldown>0 or _action_locked() or not life_event.is_empty() or not merchant_trial.is_empty() or (ui!=null and ui.is_panel_open()):return {}
+	var at:Vector2=p["pos"]
+	if lab_mode=="tutorial":
+		var index:int=_nearby_tutorial_station()
+		if index>=0:return {"kind":"tutorial","index":index,"pos":_tutorial_station_position(index)}
+	if room.get("type","")=="merchant":
+		var stock:Array=room.get("stock",[])
+		var product:int=Sanctuary.nearest_stock(stock,at)
+		if product>=0:return {"kind":"product","index":product,"pos":Vector2(stock[product]["pos"])+Vector2(0,124)}
+	var nearest:float=110
+	var chosen:Dictionary={}
+	for prop:Dictionary in props:
+		if prop["kind"] not in ["chest","merchant"] or prop.get("used",false):continue
+		var distance:float=at.distance_to(prop["pos"])
+		if distance<nearest:
+			nearest=distance
+			chosen=prop
+	if not chosen.is_empty():return {"kind":chosen["kind"],"pos":chosen["pos"],"prop":chosen}
+	for drop:Dictionary in drops:
+		var anchor:Vector2=Vector2(drop["pos"])+Vector2(0,90)
+		if drop.get("gift",false) and not drop.get("taken",false) and anchor.distance_to(at)<90:return {"kind":"gift","pos":anchor}
+	var reward:int=_nearest_reward()
+	if reward>=0:return {"kind":"reward","index":reward,"pos":_reward_position(reward)}
+	if room.get("type","")=="boss" and int(room.get("map_index",0))==5 and bool(room.get("cleared",false)):
+		var finish:=Vector2(_room_size().x*.5,_room_floor())
+		if at.distance_to(finish)<150:return {"kind":"victory","pos":finish}
+	if _is_start():
+		var station:String=_nearest_station()
+		if not station.is_empty():
+			for prop:Dictionary in props:
+				if prop["kind"]==station:return {"kind":station,"pos":prop["pos"]}
+	return {}
 
 func _nearest_station() -> String:
 	var nearest:float=105;var chosen:String=""
@@ -2154,11 +2209,8 @@ func _load_meta() -> void:
 	for weapon in meta.get("weapons",[]):_unlock_blueprint(str(weapon.get("id","")))
 
 func _sound(id: String) -> void:
-	if audio_enabled and sounds.has(id):
-		var voice:=AudioStreamPlayer.new();voice.stream=sounds[id];voice.pitch_scale=rng.randf_range(.97,1.03);voice.volume_db=-13;voice.set_meta("combat_voice",true)
-		var voices:Array= get_children().filter(func(child:Node)->bool:return child.get_meta("combat_voice",false))
-		if voices.size()>=12:voices[0].stop();voices[0].queue_free()
-		add_child(voice);voice.finished.connect(voice.queue_free);voice.play()
+	if audio_enabled and combat_audio!=null and sounds.has(id):
+		combat_audio.play_cue(id,sounds[id])
 
 func _effect(at:Vector2,color:Color,radius:float,life:float) -> void:
 	if effects.size()>=MAX_PARTICLES: effects.pop_front()
@@ -2489,7 +2541,6 @@ func _draw_rewards() -> void:
 		var icon:String=WorldItems.stock_icon(item) if item["kind"]!="supply" else "items_heal"
 		WorldItems.draw_icon(self,icon,Rect2(at-Vector2(30,142),Vector2(60,60)),world_transform)
 		draw_set_transform_matrix(world_transform)
-		if _nearest_reward()==i:draw_arc(at-Vector2(0,112),38,0,TAU,24,Color("ffe3a1"),2,true);_text(at-Vector2(90,166),"↑／X · 查看贈禮",14,Color("ffe3a1"))
 
 func _update_hud() -> void:
 	if not perf_log.active:
@@ -2559,10 +2610,19 @@ func _draw_profiled_body() -> void:
 	if screen=="hub":_draw_hub();return
 	draw_set_transform_matrix(world_transform)
 	for door in doors:_draw_door(door)
-	_draw_props()
+	var focus:Dictionary=_game_station()
+	_draw_props(focus)
+	if not focus.is_empty():
+		draw_set_transform_matrix(world_transform)
+		HomeArt.station_light(self,focus["pos"])
+		if focus["kind"]!="tutorial":
+			var label:String="按 %s 互動"%_tutorial_key("up")
+			var width:float=font.get_string_size(label,HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
+			_text(Vector2(focus["pos"])+Vector2(-width*.5,-116),label,15,Color("fff0c6"))
 	if room.get("type","")=="boss" and int(room.get("map_index",0))==5 and bool(room.get("cleared",false)):
-		_effect_static(Vector2(740,FLOOR_Y-50),Color("fff0a5"),70)
-		_text(Vector2(620,FLOOR_Y-140),"遠行終點 · 按 "+Bindings.label(int(key_bindings["up"])),22,Color("fff0a5"))
+		var finish:=Vector2(_room_size().x*.5,_room_floor())
+		_effect_static(finish-Vector2(0,50),Color("fff0a5"),70)
+		_text(finish-Vector2(45,140),"遠行終點",22,Color("fff0a5"))
 	var nearest:float=145.0
 	drop_label_target=-1
 	for i in drops.size():
@@ -2641,7 +2701,7 @@ func _draw_profiled_body() -> void:
 		draw_rect(_body_box(p["pos"]),Color("9ff5de"),false,1)
 		for en in enemies:
 			if en["hp"]>0:draw_rect(_enemy_body_box(en),Color("f6aa82"),false,1)
-	if lab_mode=="tutorial":_draw_tutorial_stations()
+	if lab_mode=="tutorial":_draw_tutorial_stations(focus)
 	draw_set_transform(Vector2.ZERO)
 	if combat_feedback!=null:combat_feedback.draw_screen(self,world_transform)
 	_draw_boss_bar()
@@ -2738,31 +2798,47 @@ func _draw_player_body() -> void:
 	if p_attack.is_busy() and p_attack.attack.get("kind","")=="secondary":WorldItems.secondary(self,p_attack.attack,p["pos"],float(p["face"]),world_transform)
 
 func _draw_hub() -> void:
+	draw_set_transform_matrix(world_transform)
 	if trophy_room:_draw_trophy_room();return
+	var focus:String=_home_station()
+	if not focus.is_empty():HomeArt.station_light(self,HomeArt.STATIONS[focus])
 	HomeArt.gates(self,clock,low_effects)
-	var hovered:String=_home_pointer_gate()
-	if not hovered.is_empty():HomeArt.draw_gate_focus(self,hovered,home_pressed_gate==hovered and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
 	HomeArt.nest(self)
-	Adventure.portal(self,Vector2(620,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",108,low_effects)
-	preload("res://scripts/home_visual_v33.gd").prop(self,"records",Vector2(790,600),Vector2(90,105))
+	HomeArt.fixture(self,1,HomeArt.STATIONS["trophy"],Vector2(134,121))
+	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"],Vector2(90,105))
+	_draw_home_projector()
 	for prop:Dictionary in props:
-		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(Transform2D.IDENTITY))
+		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(world_transform))
+	draw_set_transform_matrix(world_transform)
 	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1)
 	else:
 		_draw_player_body()
-		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),Transform2D.IDENTITY)
+		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
+	draw_set_transform_matrix(world_transform)
 	HomeArt.nest(self,true)
 	_text(Vector2(510,208),"枝間鴿行",42,Color("fff2cf"))
-	_text(Vector2(484,236),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
-	_text(Vector2(580,570),"戰利品房 · %s"%_tutorial_key("up"),15,Color("e6c78f"))
-	_home_gate_sign(Vector2(200,608),"無雙夢境","靠近按 %s 進入"%_tutorial_key("up"),Color("ffe1a6"))
-	_home_gate_sign(Vector2(1080,608),"新手教學","靠近按 %s 進入"%_tutorial_key("up"),Color("a4f3cf"))
-	_home_gate_sign(Vector2(640,HomeArt.ROGUE_PLATFORM_Y+1),"肉鴿","跳上來按 %s 進入"%_tutorial_key("up"),Color("c6ddf7"))
-	_home_gate_sign(Vector2(640,250),"按鍵上下左右走到想去的門","",Color("fff2cf"))
-	_text(Vector2(738,465),"冒險紀錄 · ↑",16,Color("ffdc98"))
-	_text(Vector2(365,495),"跳起後 %s＋%s 下砍蘑菇，反彈到最高點再 %s 二段跳"%[_tutorial_key("down"),_tutorial_key("attack"),_tutorial_key("jump")],14,Color("c0dfae"))
-	_text(Vector2(1185,710),"v0.62",13,Color("a6c1b6"))
+	_text(Vector2(548,236),"樹梢之巢 · 冒險的起點",18,Color("d6e8da"))
+	for entry:Array in [["musou","無雙夢境"],["tutorial","新手教學"],["rogue","肉鴿"],["trophy","戰利品房"],["records","冒險紀錄"]]:
+		var feet:Vector2=HomeArt.STATIONS[entry[0]]
+		_home_gate_sign(feet+Vector2(0,8),entry[1],"按 %s 互動"%_tutorial_key("up") if focus==entry[0] else "",Color("ffe1a6"))
+	_home_gate_sign(Vector2(640,252),"按鍵上下左右走到想去的門","",Color("fff2cf"))
+	draw_set_transform_matrix(Transform2D.IDENTITY)
+	_text(Vector2(1185,710),"v0.63",13,Color("a6c1b6"))
+
+func _draw_home_projector() -> void:
+	if home_projector.is_empty():return
+	var at:Vector2=HomeArt.lamp_center(home_projector,clock)
+	var broken:bool=home_projector["used"]
+	var opacity:float=1.0-clampf((clock-float(home_projector.get("broken_at",clock)))/.55,0,1)
+	if opacity>0:
+		var origin:Vector2=Vector2(home_projector.get("break_origin",at))+Vector2(21,5)
+		var beam:=Color(.68,.94,.83,.24*opacity)
+		var clear:=Color(beam,0)
+		draw_polygon(PackedVector2Array([origin+Vector2(0,-5),Vector2(856,456),Vector2(856,504),origin+Vector2(0,6)]),PackedColorArray([beam,clear,clear,beam]))
+		var width:float=font.get_string_size(HomeArt.PROJECTION,HORIZONTAL_ALIGNMENT_LEFT,-1,20).x
+		_text(Vector2(635-width*.5,488),HomeArt.PROJECTION,20,Color(.86,1,.91,opacity))
+	HomeArt.fixture(self,0,at+Vector2(0,29),Vector2(69,60),Color("84746a") if broken else Color.WHITE)
 
 func _home_gate_sign(at:Vector2,title:String,hint:String,tint:Color) -> void:
 	var width:float=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,22).x
@@ -2774,14 +2850,16 @@ func _home_gate_sign(at:Vector2,title:String,hint:String,tint:Color) -> void:
 	_text(at+Vector2(-width*.5,25),title,22,tint)
 	if not hint.is_empty():_text(at+Vector2(-hint_width*.5,43),hint,14,Color("e0e8d7"))
 
-func _configure_home() -> void:
+func _configure_home(reset_lamp:bool=true) -> void:
 	trophy_room=false
 	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
 	layout={"size":Vector2(1280,720),"floor_y":600.0,"pool":Rect2(),"spawn_positions":{"center":Vector2(640,600)}}
 	platforms.assign([Rect2(40,600,1200,9),HomeArt.ROGUE_PLATFORM])
-	solids.assign([Rect2(0,600,1280,120),Rect2(18,0,22,600),Rect2(1240,0,22,600),Rect2(0,-20,1280,20)])
+	solids.assign([Rect2(0,600,1280,120),Rect2(18,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(1240,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(0,HomeArt.CEILING_Y-20,1280,20)])
 	_rebuild_projectile_surfaces()
 	props.assign([{"kind":"adventure_records","pos":Vector2(790,600),"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
+	if reset_lamp:home_projector={"kind":"home_projector","pos":Vector2(365,451),"used":false,"hurt":0.0}
+	props.append(home_projector)
 	p_attack.cancel();pending_attack.clear();charge_timer=0;room_cooldown=0;weapon_index=1
 	if home_atmosphere!=null:home_atmosphere.set_active(true)
 	if spring_particles!=null:spring_particles.clear()
@@ -2797,6 +2875,7 @@ func _collect_trophy(kind:String,id:String) -> void:
 
 func _enter_trophy_room() -> void:
 	trophy_room=true
+	camera_pos=Vector2.ZERO;render_camera=Vector2.ZERO;world_transform=Transform2D.IDENTITY
 	home_sleeping=false;home_wake_left=0
 	_clear_keys()
 	props.clear()
@@ -2806,8 +2885,8 @@ func _enter_trophy_room() -> void:
 
 func _leave_trophy_room() -> void:
 	_clear_keys()
-	_configure_home()
-	_reset_player(Vector2(620,600))
+	_configure_home(false)
+	_reset_player(HomeArt.STATIONS["trophy"])
 
 func _draw_trophy_room() -> void:
 	draw_rect(Rect2(0,0,1280,720),Color("162323"))
@@ -2826,22 +2905,38 @@ func _draw_trophy_room() -> void:
 			if icon!=null:draw_texture_rect(icon,Rect2(at+Vector2(9,9),Vector2(45,45)),false)
 	draw_rect(Rect2(40,600,1200,120),Color("322920"))
 	draw_rect(Rect2(200,475,880,12),Color("755a39"))
+	var focused:bool=_home_station()=="exit"
+	if focused:HomeArt.station_light(self,HomeArt.STATIONS["exit"])
 	Adventure.portal(self,Vector2(72,600),Color("d8c188"),clock,Transform2D.IDENTITY,"trunk","left",96,low_effects)
 	_text(Vector2(510,168),"戰利品房",34,Color("efdaaa"))
-	_text(Vector2(45,632),"回鳥巢 · "+_tutorial_key("up"),16,Color("dfca9b"))
+	_text(Vector2(45,632),"回鳥巢 · "+_tutorial_key("up") if focused else "回鳥巢",16,Color("dfca9b"))
 	_draw_player_body()
+
+func _home_station() -> String:
+	if home_sleeping or _action_locked() or (ui!=null and ui.is_panel_open()):return ""
+	var at:Vector2=p["pos"]
+	if trophy_room:return "exit" if at.distance_to(HomeArt.STATIONS["exit"])<85 else ""
+	if _at_rogue_gate():return "rogue"
+	var nearest:float=85
+	var selected:String=""
+	for id:String in ["musou","tutorial","trophy","records"]:
+		var distance:float=at.distance_to(HomeArt.STATIONS[id])
+		if distance<nearest:
+			nearest=distance
+			selected=id
+	return selected
 
 func _home_interact() -> bool:
 	if home_sleeping:_wake_home();return true
-	if trophy_room:
-		if float(p["pos"].x)<145:_leave_trophy_room();return true
-		return false
-	if _at_rogue_gate():new_run("rogue");return true
-	if Vector2(p["pos"]).distance_to(Vector2(620,600))<65:_enter_trophy_room();return true
-	if Vector2(p["pos"]).distance_to(Vector2(790,600))<100:_show_records();return true
-	if Vector2(p["pos"]).distance_to(Vector2(200,600))<100:new_run("musou");return true
-	if Vector2(p["pos"]).distance_to(Vector2(1080,600))<100:_enter_practice(true);return true
-	return false
+	match _home_station():
+		"exit":_leave_trophy_room()
+		"rogue":new_run("rogue")
+		"trophy":_enter_trophy_room()
+		"records":_show_records()
+		"musou":new_run("musou")
+		"tutorial":_enter_practice(true)
+		_:return false
+	return true
 
 func _update_home(delta:float) -> void:
 	if not perf_log.active:
@@ -2865,12 +2960,7 @@ func _update_home_profiled_body(delta:float) -> void:
 	walker.step_turn(float(p["face"]),delta,bool(p["grounded"]))
 	walker.advance(absf(p["pos"].x-before.x),bool(p["grounded"]) and absf(p["vel"].x)>30,"wood",audio_enabled)
 	_update_hud()
-	if trophy_room:
-		if axis<0 and p["pos"].x<55:_leave_trophy_room()
-		return
-	if p["pos"].y>530:
-		if axis<0 and absf(p["pos"].x-200)<35:new_run("musou")
-		elif axis>0 and absf(p["pos"].x-1080)<35:_enter_practice(true)
+	camera_pos=camera_pos.lerp(_camera_target(p["pos"]),1.0-exp(-delta*10.0))
 
 func _wake_home() -> void:
 	home_sleeping=false;home_wake_left=.48
@@ -3176,7 +3266,7 @@ func _update_passives_profiled_body(delta:float) -> void:
 			if candidates.is_empty():break
 			var target:Dictionary=candidates[bee%candidates.size()]
 			var at:Vector2=_bee_position(bee)
-			_emit_weapon(at,_enemy_body_box(target).get_center()-at,Combat.attack("linear",{"damage":3,"speed":400,"range":450,"size":6,"knockback":45,"color":Color("ffe49c")}),true)
+			_emit_weapon(at,_enemy_body_box(target).get_center()-at,Combat.attack("linear",{"id":"bee","damage":3,"speed":400,"range":450,"size":6,"knockback":45,"color":Color("ffe49c")}),true)
 			if not projectiles.is_empty():projectiles[-1]["bee"]=true
 
 func _bee_position(index:int) -> Vector2:
@@ -3284,6 +3374,13 @@ func _update_props_profiled_body(delta:float) -> void:
 func _hit_props(box:Rect2,damage:float,attack_id:int=-1) -> void:
 	for i in props.size():
 		var prop:Dictionary=props[i]
+		if prop["kind"]=="home_projector":
+			if not prop["used"] and damage>0:
+				var center:Vector2=HomeArt.lamp_center(prop,clock)
+				if box.intersects(Rect2(center-Vector2(21,27),Vector2(42,54))):
+					prop["break_origin"]=center;prop["broken_at"]=clock;prop["used"]=true
+					_sound("metal_hit")
+			continue
 		if prop["kind"]=="spikes":
 			if attack_id<0 and p_attack.attack.get("direction","")=="down" and box.intersects(prop["rect"]) and p_attack.mark_hit(-10000-i):
 				_pogo()
@@ -3453,7 +3550,7 @@ func _projectile_explosion(pr:Dictionary) -> void:
 		pr["fire_created"]=true
 		var at:Vector2=_trap_surface(pr)
 		var fire:Dictionary={"pos":at,"from_player":true,"elapsed":0.0,"arming_time":0.0,"lifetime":4.0,"damage":pr["damage"],"size":float(pr.get("fire_size",100)),"fire":true,"hp":1.0,"hits":{},"next_hit":{},"max_hits":8,"hit_interval":.5,"color":pr["color"]}
-		if hazards.size()<40:hazards.append(fire)
+		if hazards.size()<40:hazards.append(fire);_sound("fire_land")
 	if pr.get("explode_on_hit",false):_explode(pr["pos"],float(pr.get("explosion_radius",80)),float(pr["damage"]),170,bool(pr["from_player"]),pr["hits"],str(pr.get("group","biological")),pr.get("impact_normal",Vector2.ZERO),pr.get("impact_point",pr["pos"]))
 
 func _explode(at:Vector2,radius:float,damage:float,knockback:float,from_player:bool,exclude:Dictionary={},group:String="",normal:Vector2=Vector2.ZERO,point:Vector2=Vector2.INF) -> void:
@@ -3492,6 +3589,7 @@ func _settle_trap(carrier:Dictionary) -> void:
 	hazard["hp"]=1.0;hazard["elapsed"]=0.0;hazard["hits"]={};hazard["next_hit"]={}
 	hazard["arming_time"]=maxf(.625,float(hazard.get("arming_time",.65)))
 	hazards.append(hazard)
+	_sound("trap_land")
 
 func _planted_trap_position(hazard:Dictionary) -> Vector2:
 	var desired:Vector2=hazard["pos"];var size:Vector2=TrapArt.body_box(hazard).size
@@ -3521,7 +3619,7 @@ func _draw_terrain_details(c:CanvasItem) -> void:
 		if show_hitboxes:c.draw_rect(wall,Color(color,.35),false,1)
 	for decoration in layout.get("decorations",[]):Sprites.module(c,decoration["id"],decoration["rect"],Color(1,1,1,.8))
 
-func _draw_props() -> void:
+func _draw_props(focus:Dictionary={}) -> void:
 	var biome:String=str(_ecology()["id"])
 	var accent:Color=_ecology()["accent"]
 	var prop_base:Transform2D=preload("res://scripts/world_placement_v27.gd").prop_base(world_transform)
@@ -3559,13 +3657,13 @@ func _draw_props() -> void:
 		elif kind in ["gift_pedestal","wardrobe"]:preload("res://scripts/adventure_art_v29.gd").station(self,kind,at,prop_base)
 		elif kind in ["forge","reforge","mail"]:preload("res://scripts/station_art_v26.gd").draw(self,kind,at,prop_base)
 		else:EnvArt.prop(self,prop,biome,clock,prop_base,weapon_index)
-		var label:String={"wardrobe":"披風換裝站","gift_pedestal":"免費附武器展示台","forge":"藍圖鍛造台","reforge":"符文重鑄台","aid":"急救站","mail":"倉庫","dummy":"試打假人","energy_infinite":"無限能量花","energy":"砍破回能量","health":"砍破回滿生命","spring":"溫泉 · 回復生命與能量","chest":"寶箱 · ↑／X開啟","merchant":"貓頭鷹商人 · ↑交易"}.get(kind,kind)
+		var label:String={"wardrobe":"披風換裝站","gift_pedestal":"免費附武器展示台","forge":"藍圖鍛造台","reforge":"符文重鑄台","aid":"急救站","mail":"倉庫","dummy":"試打假人","energy_infinite":"無限能量花","energy":"砍破回能量","health":"砍破回滿生命","spring":"溫泉 · 回復生命與能量","chest":"寶箱","merchant":"貓頭鷹商人"}.get(kind,kind)
 		var label_height:float=132 if kind in ["forge","reforge","mail","wardrobe"] else 92
 		if _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe","dummy"]:
 			# One expanded prompt follows the same nearest-station target as interaction.
-			var focused:bool=kind==_nearest_station()
+			var focused:bool=kind==focus.get("kind","")
 			var short_label:String={"aid":"急救","forge":"鍛造","reforge":"重鑄","mail":"倉庫","energy_infinite":"能量","wardrobe":"披風","dummy":"試打"}.get(kind,label)
-			var caption:String=Bindings.label(int(key_bindings["up"]))+" · "+label if focused else short_label
+			var caption:String=label if focused else short_label
 			var text_width:float=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,14).x
 			_text(at-Vector2(text_width*.5,label_height),caption,14,Color("fff0c6") if focused else Color("b0c2b3"))
 		else:_text(at-Vector2(40,label_height),label,14,accent)
@@ -3628,24 +3726,7 @@ func _feather_burst(at:Vector2,count:int) -> void:
 	burst.scale_amount_min=.07;burst.scale_amount_max=.16
 
 func _world_confirm() -> bool:
-	if screen=="hub":return _home_interact()
-	if screen!="game" or room_cooldown>0:return false
-	if room.get("type","")=="merchant" and not merchant_trial.is_empty():return false
-	if room.get("type","")=="merchant" and merchant_trial.is_empty():
-		var product:int=Sanctuary.nearest_stock(room.get("stock",[]),p["pos"])
-		if product>=0:_show_merchant(product);return true
-	for drop in drops:
-		if drop.get("gift",false) and not drop.get("taken",false) and (drop["pos"]+Vector2(0,90)).distance_to(p["pos"])<90:_claim_gift();return true
-	if _is_start():return _activate_station(_nearest_station(),true)
-	for prop in props:
-		if prop["pos"].distance_to(p["pos"])>110:continue
-		match str(prop["kind"]):
-			"chest":
-				if not prop.get("used",false):_open_chest(prop);return true
-			"merchant":_show_merchant();return true
-	if _nearest_reward()>=0:_show_reward(_nearest_reward());return true
-	if room.get("type","")=="boss" and room.get("cleared",false) and int(room["map_index"])==5 and absf(p["pos"].x-_room_size().x*.5)<150:_complete_run();return true
-	return false
+	return false # World stations use the interact-up action.
 
 func _refresh_checkpoint_gift() -> void:
 	room.erase("refresh_gift")
@@ -3767,6 +3848,7 @@ func _merchant_buy(index:int) -> void:
 func _adapt_boss(en:Dictionary) -> void:
 	if en.get("adapted",false) or float(en.get("hp",0))<=0:return
 	en["adapted"]=true
+	_sound("boss_phase")
 	en["attacks"].append(Combat.boss_phase_two(en))
 	en["adaptations"]=["新攻擊"]
 	_float(en["pos"]-Vector2(0,110),"首領覺醒",Color("ffbd89"));_toast(str(en["name"])+"進入第二階段：新招式已解放")
@@ -3797,7 +3879,6 @@ func _cast_special(at:Vector2,dir:Vector2,def:Dictionary) -> void:
 			var end:Vector2=_enemy_body_box(target).get_center();hit[target["uid"]]=true
 			_hit_enemy(target,float(def["damage"]),def["color"],45,origin,(end-origin).normalized())
 			effects.append({"pos":origin,"end":end,"lightning":true,"weapon_id":str(def.get("id","")),"vel":Vector2.ZERO,"life":.3,"max":.3,"color":def["color"],"ring":false,"radius":1.0});origin=end
-	_sound("slash")
 
 func _show_records() -> void:
 	var rows:Array[Dictionary]=[{"text":"光榮返巢的冒險會在此保存武器組合、擊殺數與死亡次數，最多保留30次。"}]
@@ -3853,7 +3934,7 @@ func _enter_practice(tutorial:bool=false) -> void:
 		for i in layout["one_way"].size():
 			var ledge:Rect2=layout["one_way"][i]
 			var anchor:=Vector2(ledge.get_center().x,ledge.position.y)
-			var target:Dictionary=MonsterRoster.regular("trunk",[0,1,3][i])
+			var target:Dictionary=MonsterRoster.regular("trunk",[0,1,4][i])
 			target.merge({"uid":i+1,"pos":anchor,"anchor":anchor,"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":0.0,"attack":Attack.new(),"contact_damage":0.0,"max_hp":target["hp"],"tutorial_respawn":0.0},true)
 			enemies.append(target)
 		_update_hud()
@@ -3937,9 +4018,9 @@ func _tutorial_demo(action:String) -> void:
 			_begin_primary({"dir":direction,"charged":action=="charged"})
 		"sub":_begin_secondary()
 
-func _draw_tutorial_stations() -> void:
-	var index:int=_nearby_tutorial_station()
-	if index>=0 and not ui.is_panel_open():
+func _draw_tutorial_stations(focus:Dictionary) -> void:
+	var index:int=int(focus.get("index",-1)) if focus.get("kind","")=="tutorial" else -1
+	if index>=0:
 		var at:Vector2=_tutorial_station_position(index)+Vector2(0,14)
 		var prompt:String="%s · 按 %s 互動"%[TUTORIAL_STATIONS[index],_tutorial_key("up")]
 		var width:float=font.get_string_size(prompt,HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
@@ -4042,9 +4123,9 @@ func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
 	definition["hp"]*=Tuning.value("enemy_hp");definition["speed"]*=Tuning.value("enemy_speed")
 	spawn_serial+=1
 	var at:=anchor if anchor.is_finite() else Vector2(clampf(p["pos"].x+float(p["face"])*240,260,_room_size().x-260),_room_floor())
-	if Motion.airborne(definition):at.y-=180
+	if definition.get("spawn_surface")=="flight":at.y-=180
 	definition.merge({"uid":100000+spawn_serial,"pos":at,"anchor":at,"spawn_platform":0,"biome":definition.get("biome",_ecology()["id"]),"ecology_id":_ecology()["id"],"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,"cooldown":1.0,"attack":Attack.new(),"contact_damage":float(definition.get("contact_damage",1.0)),"max_hp":definition["hp"]},true)
-	var placement:Vector2=_air_spawn(at,float(definition["scale"]),MonsterMotion.body_size(definition)) if Motion.airborne(definition) else _fit_enemy_ground(definition)
+	var placement:Vector2=_enemy_spawn(definition)
 	if not placement.is_finite():_toast("附近沒有足夠空間，請換個位置召喚這隻怪物");return
 	definition["pos"]=placement;definition["anchor"]=placement
 	enemies.append(definition);_toast("召喚："+_lab_monsters()[index])
@@ -4211,7 +4292,7 @@ func _launch_from_object(prop:Dictionary,attacked:bool) -> void:
 	_restore_ground_movement()
 	prop["launch_left"]=.625;prop["launch_cooldown"]=.45
 	if attacked:prop["launch_hit_cooldown"]=.15
-	_contact_fx("block",prop["pos"]-Vector2(0,30));_sound("jump")
+	_contact_fx("block",prop["pos"]-Vector2(0,30));_sound("mushroom_pogo" if attacked else "mushroom_bounce")
 
 func _unlock_blueprint(id:String) -> void:
 	if Arsenal.index_of(id)<0:return
@@ -4317,7 +4398,7 @@ func _warehouse_take(entry:Dictionary) -> bool:
 	_save_meta();_update_hud();_show_warehouse();_toast("已取出至行囊");return true
 
 func _begin_heavy_landing(at:Vector2) -> void:
-	_sound("ground_slam")
+	_sound("heavy_land")
 	p["heavy_land_left"]=.5;p["landing_left"]=0;p["flap_left"]=0
 	p["dash_t"]=0;p["recoil_left"]=0;p["jump_buffer_left"]=0
 	p_attack.cancel();pending_attack.clear();charge_timer=0;heal_timer=0;jump_request=false

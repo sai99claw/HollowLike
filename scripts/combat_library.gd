@@ -122,6 +122,7 @@ static func boss(biome_id: String) -> Dictionary:
 			attacks.append(_boss_attack(selected,2,"trap","鑽土根陣","root_spike",{"size":42,"range":540,"count":3,"damage":1,"max_hits":2,"hit_interval":.8,"lifetime":3.8,"arming_time":.85,"windup":1.07,"origin_y":0}))
 	var widths:Dictionary={"sky":96.0,"canopy":84.0,"branches":144.0,"trunk":150.0,"grass":144.0,"underground":160.0}
 	result["body_size"]=Vector2(float(widths[selected]),34.0*42.0*8.0/float(widths[selected]))
+	result["spawn_surface"]="flight" if selected=="sky" else "ground"
 	result["movements"] = movements
 	result["attacks"] = attacks
 	Design.decorate_boss(result)
@@ -188,6 +189,7 @@ static func attach_regular(en: Dictionary) -> void:
 		3:
 			movements.assign(["walk", "dash"])
 			attacks.append(attack("linear", {"name": "橡實散射", "size": 6.0, "range": 760.0, "speed": 259.2, "count": 3, "damage": 1.0, "spread": 0.23, "windup": 0.55, "active": 0.12, "recovery": 0.65, "attack_cooldown": 3.0, "color": color, "sprite": "acorn", "style_id": "guardian_acorn"}))
+	en["spawn_surface"]="flight" if movements[0] in ["hover","drift"] else "ground"
 	en["movements"] = movements
 	en["attacks"] = attacks
 	en["movement_period"] = float(en.get("movement_period", 3.0))

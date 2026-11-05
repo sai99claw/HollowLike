@@ -31,7 +31,7 @@ func run() -> void:
 	root.add_child(g)
 	await process_frame
 	g.set_process(false);g.set_physics_process(false);g.audio_enabled=false
-	g.home_sleeping=false;g.home_wake_left=0;g.p["pos"]=Vector2(620,600)
+	g.home_sleeping=false;g.home_wake_left=0;g.p["pos"]=preload("res://scripts/home_art.gd").STATIONS["trophy"]
 	check(g._home_interact() and g.trophy_room and not g.ui.is_panel_open(),"Trophy entrance opens a walkable room")
 	g.p["pos"]=Vector2(400,600);g.keys["right"]=true;g._update_home(.08)
 	check(float(g.p["pos"].x)>400,"The player can walk in the trophy room")

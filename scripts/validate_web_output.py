@@ -1,5 +1,6 @@
 """Validate release chunks and remove only interrupted export/copy temporaries."""
 from pathlib import Path
+import gzip
 import hashlib
 import json
 from release_budget import validate_budget
@@ -22,5 +23,9 @@ for name in ('pck-parts.json', 'wasm-parts.json'):
         digest.update(data)
         total += len(data)
     assert total == manifest['size'] and digest.hexdigest() == manifest['sha256'], name
+    if manifest.get('encoding') == 'gzip':
+        decoded = gzip.decompress(b''.join((output / part).read_bytes() for part in manifest['parts']))
+        assert len(decoded) == manifest['decoded_size']
+        assert hashlib.sha256(decoded).hexdigest() == manifest['decoded_sha256'], name
 expanded = validate_budget(ROOT/'dist')
 print(f'Final hosting output verified: {expanded} bytes; chunk hashes match')

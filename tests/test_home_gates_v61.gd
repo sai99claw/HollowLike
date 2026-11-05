@@ -26,11 +26,23 @@ func run() -> void:
 		for step in 30:
 			var at:=HomeArt.falling_mote(feet,size,step*.1,index)
 			check(absf(at.x-feet.x)<size.x*.5 and at.y>feet.y-size.y and at.y<feet.y,"Mote stays inside the doorway")
-	game._activate_home_gate("rogue")
-	check(game.screen=="hub","Rogue still requires reaching the elevated gate")
 	game.home_sleeping=false
+	check(not game._home_interact() and game.screen=="hub","Rogue still requires reaching the elevated gate")
+	check(HomeArt.LEFT_GATE.size==HomeArt.ROGUE_GATE.size and HomeArt.RIGHT_GATE.size==HomeArt.ROGUE_GATE.size,"All three portals share dimensions")
+	check(game._camera_target(Vector2(640,114)).y<0,"Vertical camera tracks the upper landing")
+	var lamp:Vector2=HomeArt.lamp_center(game.home_projector,game.clock)
+	game._hit_props(Rect2(lamp-Vector2.ONE*5,Vector2.ONE*10),1)
+	check(game.home_projector["used"],"An attack hit knocks down the lamp")
+	game.p["pos"]=HomeArt.STATIONS["trophy"]
+	check(game._home_interact() and game.trophy_room,"Trophy shrine has an independent entrance")
+	check(game._home_interact() and not game.trophy_room and game.home_projector["used"],"Leaving the trophy room keeps the lamp knocked down")
 	game.p["pos"]=feet
-	check(game._home_interact() and game.screen=="game" and game.mode=="musou","Walking to the gate and interacting starts Musou")
+	game._set_action("left",true)
+	game._update_home(.016)
+	check(game.screen=="hub" and game._home_station()=="musou","Passing a nearby lit portal does not enter it automatically")
+	game._set_action("left",false)
+	game._set_action("up",true)
+	check(game.screen=="game" and game.mode=="musou","Up enters the nearby Musou gate")
 	game.queue_free()
 	await process_frame
 	print("v61 home gates: ",failures)
