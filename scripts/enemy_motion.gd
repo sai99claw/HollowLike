@@ -86,7 +86,7 @@ static func _charge_velocity(en:Dictionary,target:Vector2,delta:float,flying:boo
 	if not flying:velocity.y=minf(800,velocity.y+GRAVITY*delta)
 	return velocity
 
-static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGenerator,grounded:bool,obstacles:Array=[],body_size:Vector2=Vector2(34,42)) -> Vector2:
+static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGenerator,grounded:bool,obstacles:Array=[],body_size:Vector2=Vector2(34,42),engaged:bool=true,support:Rect2=Rect2()) -> Vector2:
 	prepare(en)
 	en["motion_clock"]+=delta;en["motion_left"]-=delta
 	en["charge_cooldown"]=maxf(0,float(en["charge_cooldown"])-delta)
@@ -94,44 +94,53 @@ static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGe
 	var result:Vector2=en["vel"]
 	var busy:bool=en.has("attack") and en["attack"].is_busy()
 	var charging:bool=str(en["charge_phase"]) in ["windup","active","recovery"]
+	if not engaged and charging:
+		en["charge_phase"]="idle";en["charge_left"]=0.0;en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
+		charging=false
 	if en["motion_left"]<=0 and not busy and not charging:
 		en["motion_index"]+=1;en["motion_left"]=float(en.get("movement_period",2.8));en["motion_anchor"]=en["pos"]
 	var flying:bool=airborne(en)
 	if busy and not flying and not charging:
 		result.x=move_toward(result.x,0,delta*600);result.y=minf(800,result.y+GRAVITY*delta);return result
 	var target:Vector2=player
-	var roaming:bool=not en.get("elite",false) and en.get("movement_logic","approach")=="roam"
+	var roaming:bool=not engaged or (not en.get("elite",false) and en.get("movement_logic","approach")=="roam")
 	if roaming and not charging:
 		en["roam_left"]-=delta
 		if en["roam_left"]<=0:
 			en["roam_left"]=rng.randf_range(2.4,4.0)
 			var radius:float=float(en.get("roam_radius",230))
 			var direction:float=-1.0 if rng.randf()<.5 else 1.0
-			var horizontal:float=clampf(float(en["home"].x)+direction*rng.randf_range(radius*.55,radius),80,1420)
-			if absf(horizontal-float(en["pos"].x))<50:horizontal=clampf(float(en["pos"].x)+direction*90,80,1420)
-			en["roam_target"]=Vector2(horizontal,float(en["home"].y)+(rng.randf_range(-radius*.45,radius*.3) if flying else 0.0))
+			var anchor:Vector2=en["home"] if engaged else en["pos"]
+			var horizontal:float=anchor.x+direction*rng.randf_range(radius*.55,radius)
+			if not flying and support.has_area():
+				var margin:float=maxf(body_size.x*.5,20.0*float(en.get("scale",1)))
+				var inset:float=minf(margin+2.0,support.size.x*.5)
+				var low:float=support.position.x+inset
+				var high:float=support.end.x-inset
+				horizontal=clampf(horizontal,low,high)
+				if absf(horizontal-float(en["pos"].x))<28.0:
+					horizontal=clampf(float(en["pos"].x)-direction*radius,low,high)
+			en["roam_target"]=Vector2(horizontal,anchor.y+(rng.randf_range(-radius*.45,radius*.3) if flying else 0.0))
 		target=en["roam_target"]
 	var lunge_target:Vector2=player+Vector2(0,body_size.y*.5-21.0)
 	var in_lunge_range:bool=en.get("air_lunge",false) and float(en["charge_cooldown"])<=0 and lunge_target.distance_squared_to(en["pos"])<=pow(float(en.get("dash_trigger",205.0)),2)
-	if current(en)=="dash" or charging or in_lunge_range:
+	if engaged and (current(en)=="dash" or charging or in_lunge_range):
 		return _charge_velocity(en,lunge_target if en.get("air_lunge",false) else player,delta,flying)
+	var flight_target:Vector2=target if roaming else target-Vector2(0,float(en.get("hover_height",85)))
 	var toward:Vector2=target-en["pos"]
 	update_facing(en,target.x,delta)
 	var stop:float=18.0 if roaming else float(en.get("stop_radius",48.0))
+	if roaming and toward.length()<24.0:en["roam_left"]=0.0
 	if absf(toward.x)<=stop:en["motion_stopped"]=true
 	elif absf(toward.x)>=stop+float(en.get("resume_margin",24)):en["motion_stopped"]=false
 	var direction:float=0.0 if en["motion_stopped"] else signf(toward.x)
 	var speed:float=float(en.get("speed",70))
 	match current(en):
-		"hover":
-			var desired:Vector2=en["motion_anchor"]+Vector2(0,sin(float(en["motion_clock"])*2.3)*18)
-			result=(desired-en["pos"])*3
-			if not roaming:result=(target-Vector2(0,float(en.get("hover_height",85)))-en["pos"]).limit_length(speed*.65)
-		"drift":result=(target-Vector2(0,float(en.get("hover_height",85)))-en["pos"]).limit_length(speed)
+		"hover","drift":result=(flight_target-en["pos"]).limit_length(speed*.65 if current(en)=="hover" else speed)
 		"jump":
 			en["jump_left"]-=delta;result.x=move_toward(result.x,direction*speed,delta*320);result.y=minf(800,result.y+GRAVITY*delta)
 			if grounded and en["jump_left"]<=0 and not en["motion_stopped"]:result.y=-float(en.get("jump_speed",540));en["jump_left"]=1.7
 		_:
 			result.x=move_toward(result.x,direction*speed,delta*300);result.y=minf(800,result.y+GRAVITY*delta)
-	if flying:return Flight.steer(en,target-Vector2(0,float(en.get("hover_height",85))),result,body_size,obstacles,delta)
+	if flying:return Flight.steer(en,flight_target,(flight_target-en["pos"]).limit_length(speed) if current(en)=="dash" else result,body_size,obstacles,delta)
 	return result

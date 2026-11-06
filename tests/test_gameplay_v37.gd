@@ -54,6 +54,12 @@ func run() -> void:
 			g.solids.assign([Rect2(517 if side>0 else 383,500-42*ratio,100,200)]);g._step_player(1.0/120)
 			check((g.p["mantle_left"]>0)==(ratio<.51),"Live controller uses overlap rule on either side")
 			if ratio>.51:check(g.p["wall"]==side and g.p["wall_hold_left"]==1.0,"At least51percent latches and holds for one second")
+		for input_direction:int in [0,-side]:
+			reset(g,Vector2(500,500));g.p["vel"]=Vector2(side*200,80)
+			if input_direction!=0:g.keys["right" if input_direction>0 else "left"]=true
+			g.solids.assign([Rect2(517 if side>0 else 383,483,100,200)])
+			g._step_player(1.0/120)
+			check(g.p["mantle_left"]==0,"No mantle while idle or moving away from a valid ledge")
 	var fragmented:Array=[Rect2(517,458,100,10),Rect2(517,468,100,32)]
 	check(is_equal_approx(Ledge.contact(Vector2(500,500),1,fragmented)["ratio"],1),"Adjacent collision rectangles do not double count overlap")
 	check(not Ledge.contact(Vector2(500,500),1,[Rect2(517,480,100,200),Rect2(510,420,120,35)]).has("target"),"Low ceiling blocks unsafe mantle")

@@ -40,15 +40,13 @@ func run() -> void:
 		if prop["kind"] in ["rack","mail","aid","energy_infinite"]:check(is_equal_approx(prop["pos"].y,scene._room_floor()-200),"All prep interaction stations stand on the second floor")
 	scene.p["pos"]=Vector2(420,1050);check(not scene._world_confirm(),"First-floor attacks do not trigger the rack above")
 	var targets:Array=scene.enemies.filter(func(en):return en.get("training",false))
-	check(targets.size()==2,"Prep has both fixed and floating targets using actual enemy bodies")
+	check(targets.size()==1,"Prep has one ground target using the enemy body")
 	for target in targets:
 		var before:float=target["hp"];var total:float=target["training_total"];var box:Rect2=scene._enemy_body_box(target)
-		check(target["contact_damage"]==0 and box.size==Vector2(84,120),"Training targets have zero contact damage and shared enemy hitboxes")
-		scene._clear_keys();scene.p_attack.cancel();scene.weapon_index=0;scene._reset_player(target["pos"]-Vector2(0,120));scene.p["vel"]=Vector2(0,100);scene._begin_primary({"dir":"down","charged":false});scene._process_player_attack()
+		check(target["contact_damage"]==0 and box.size==Vector2(34,45),"Training targets have zero contact damage and shared enemy hitboxes")
+		scene._clear_keys();scene.p_attack.cancel();scene.weapon_index=0;scene._reset_player(target["pos"]-Vector2(0,50));scene.p["vel"]=Vector2(0,100);scene.p["grounded"]=false;scene._begin_primary({"dir":"down","charged":false});scene._process_player_attack()
 		check(target["hp"]==before and target["training_total"]>total,"Actual downward attacks register damage without killing the dummy")
-		check(scene.p["vel"].y==100 and scene.p["recoil_left"]==0,"Hitting a training dummy never bounces or recoils the player")
-	var fixed:Vector2=targets[0]["pos"];var floating:Vector2=targets[1]["pos"];scene._update_enemies(.5,.5)
-	check(targets[0]["pos"]==fixed and targets[1]["pos"]!=floating,"Only the hovering training dummy wanders")
+		check(scene.p["vel"].y<0 and target["push_left"]>0,"The target uses normal pogo and knockback")
 	# Release input must distinguish 1.39 seconds from the exact 1.4 second threshold.
 	scene._enter_room(combat);scene.props.clear();scene.enemies.clear();scene._close_panel();scene.room_cooldown=0
 	for weapon in 3:

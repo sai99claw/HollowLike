@@ -55,7 +55,7 @@ func run() -> void:
 	var vault:Dictionary=scene.meta.duplicate(true)
 	scene.new_run("musou",4512);var start:int=scene.current_room
 	check(scene.world_speed==.8,"Default global movement speed is 0.8")
-	check(scene.props.size()>=4 and scene.enemies.filter(func(en):return en.get("training",false)).size()==2,"Preparation room has four upper-floor stations and two enemy-body targets")
+	check(scene.props.size()>=4 and scene.enemies.filter(func(en):return en.get("training",false)).size()==1,"Preparation room has four upper-floor stations and one grounded target")
 	scene.p["pos"]=Vector2(500,1050);scene.p["energy"]=0;scene.empty_energy_time=0;scene.last_motion_pos=scene.p["pos"]
 	scene._update_passives(4.99);check(scene.p["energy"]==0,"Empty energy does not regenerate early")
 	scene._update_passives(.02);check(scene.p["energy"]==1,"Empty energy restores one after five seconds")

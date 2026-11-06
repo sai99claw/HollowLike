@@ -10,7 +10,8 @@ static var icons:Dictionary={}
 
 static func texture(clip:String) -> Texture2D:
 	if icons.has(clip):return icons[clip]
-	if clip in ["items_shock","items_power"]:
+	if clip=="items_shock":return preload("res://assets/v54/items_shock.svg")
+	if clip=="items_power":
 		var icon:Texture2D=load("res://assets/v54/"+clip+".svg")
 		icons[clip]=icon
 		return icon

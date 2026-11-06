@@ -163,7 +163,7 @@ static func draw_release(c:CanvasItem,en:Dictionary,attack:Dictionary,progress:f
 	var placement:=Vector2(-width*.5,-height) if burst else Vector2(8,-height*.5)
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face,1),0,origin))
 	var tint:Color=Color.WHITE.lerp(en.get("color",Color.WHITE),.45)
-	tint.a=.10 if burst else 1.0
+	tint.a=preload("res://scripts/explosion_v16.gd").OPACITY if burst else 1.0
 	var dest:=Rect2(placement,Vector2(width,height))
 	if burst:SkillArt.draw_ring(c,progress,dest,tint)
 	else:SkillArt.draw(c,SkillArt.attack_row(attack),progress,dest,tint)

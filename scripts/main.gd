@@ -38,6 +38,7 @@ const Layout = preload("res://scripts/room_layout.gd")
 const CoinField=preload("res://scripts/coin_field_v16.gd")
 const RD=preload("res://scripts/rd_room_v16.gd")
 const PracticeRD=preload("res://scripts/practice_rd_v22.gd")
+const Stones=preload("res://scripts/throwable_stones.gd")
 const Explosion=preload("res://scripts/explosion_v16.gd")
 const Coins = preload("res://scripts/coin_physics.gd")
 const Bindings = preload("res://scripts/input_settings.gd")
@@ -885,7 +886,15 @@ func _step_player(delta: float) -> void:
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
-	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),solids,4)
+	var approach_x:float=vel.x
+	var player_solids:Array=solids
+	if screen=="game":
+		for prop:Dictionary in props:
+			if prop["kind"]!="stone" or not prop["asleep"] or prop.get("used",false):continue
+			if Vector2(prop["pos"]).distance_squared_to(pos)>180.0*180.0:continue
+			if is_same(player_solids,solids):player_solids=solids.duplicate()
+			player_solids.append(Stones.body(prop))
+	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),player_solids,4)
 	if _in_bath() and absf(vel.x)>1 and absf(resolved["vel"].x)<1:
 		for lift in [8.0,18.0,30.0]:
 			var raised:Vector2=pos-Vector2(0,lift)
@@ -899,7 +908,7 @@ func _step_player(delta: float) -> void:
 	var wall_allowed:bool=not rising and wall_contact!=0 and _skill("wall") and (float(p["wall_lock"])<=0 or dashed_into) and not bool(p["grounded"]) and not bool(p["slam"])
 	var contact:Dictionary=Ledge.contact(pos,wall_contact,solids) if wall_allowed else {}
 	p["wall"]=wall_contact if float(contact.get("ratio",0.0))+.000001>=Ledge.ATTACH_RATIO else 0
-	if wall_allowed and contact.has("target"):
+	if wall_allowed and axis*wall_contact>0 and approach_x*wall_contact>0 and not knocked and contact.has("target"):
 		p["pos"]=pos;p["face"]=wall_contact;Ledge.begin(p,contact["target"]);_sound("mantle");p_attack.cancel();pending_attack.clear();charge_timer=0;p["_motion_step"]=false;return
 	if p["grounded"]:_restore_ground_movement()
 
@@ -1148,10 +1157,10 @@ func _process_player_attack_profiled_body() -> void:
 			_parry(en)
 		if hitbox.intersects(_enemy_body_box(en)) and (p_attack.mark_timed_hit(int(en["uid"]),.5,3) if def.get("charged",false) else p_attack.mark_hit(int(en["uid"]))):
 			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def))
-			if not en.get("training",false) and float(def.get("recoil",0))>0:_recoil(float(def["recoil"]),en["pos"],-_attack_direction(def))
+			if float(def.get("recoil",0))>0:_recoil(float(def["recoil"]),en["pos"],-_attack_direction(def))
 			_restore_vital("energy",float(def.get("energy_gain",0))*(1.0+_rune_effect("energy")))
 			p["air_dash"]=false
-			if str(def.get("direction",""))=="down" and not bool(p["grounded"]) and not en.get("training",false):
+			if str(def.get("direction",""))=="down" and not bool(p["grounded"]):
 				_pogo()
 	_hit_props(hitbox,float(def.get("damage",1)))
 	_damage_traps(hitbox,float(def.get("damage",1)))
@@ -1213,14 +1222,12 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 	if int(en.get("model",0))!=4 or float(en.get("boss_impact_guard",0))<=0:
 		en["impact_freeze_left"]=.125;en["impact_pose_clock"]=draw_clock
 		if int(en.get("model",0))==4:en["boss_impact_guard"]=.45
-	if en.get("training",false):
-		en["training_total"]=float(en.get("training_total",0))+damage
-		var contact:Vector2=en["pos"]-Vector2(0,60);_float(contact-Vector2(0,65),"%.1f"%damage,color)
-		if combat_feedback!=null:combat_feedback.hit(en,contact,Vector2(float(p["face"]),0),str(p_attack.attack.get("style","quick")),false)
-		return
-	if float(en["hp"])<=0:return
-	if mode=="musou" and gain_dream and damage>0:dream.hit()
-	en["hp"]-=damage;en["hurt"]=.2
+	var training:bool=en.get("training",false)
+	if training:en["training_total"]=float(en.get("training_total",0))+damage
+	else:
+		if mode=="musou" and gain_dream and damage>0:dream.hit()
+		en["hp"]-=damage
+	en["hurt"]=.2
 	var away:float=signf(en["pos"].x-(source.x if source.is_finite() else p["pos"].x))
 	if away==0:away=float(p["face"])
 	var impulse:Vector2=direction.normalized() if direction.length_squared()>.01 else Vector2(away,0)
@@ -1234,7 +1241,7 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 	var contact:Vector2=en["pos"]-Vector2(0,_enemy_body_box(en).size.y*.5)
 	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse,str(Data.PRIMARY[weapon_index]["style"]),float(en["hp"])<=0)
 
-	if rng.randf()<clampf(_rune_effect("lifesteal"),0,1):_restore_vital("hp",1);_contact_fx("lifesteal",p["pos"]-Vector2(0,25))
+	if not training and rng.randf()<clampf(_rune_effect("lifesteal"),0,1):_restore_vital("hp",1);_contact_fx("lifesteal",p["pos"]-Vector2(0,25))
 	_float(en["pos"]-Vector2(0,55),"%.1f"%damage,color);shake=maxf(shake,2.2)
 	if float(en["hp"])<=0:_enemy_defeated(en)
 
@@ -1368,11 +1375,6 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 				if absf(travel.x)>.01:en["face"]=signf(travel.x)
 			continue
 		if float(en["hp"])<=0:continue
-		if en.get("training",false):
-			en["training_age"]=float(en.get("training_age",0))+movement_delta
-			if en.get("floating",false):
-				var t:float=en["training_age"];en["pos"]=Vector2(en["anchor"])+Vector2(sin(t*.83)*115,sin(t*1.27)*18)
-			continue
 		Motion.prepare(en)
 		if int(en["model"])==4:
 			_confine_boss(en)
@@ -1383,20 +1385,13 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		for key in ["hurt","stun","cooldown","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
 		var atk=en["attack"]
 		var toward:Vector2=p["pos"]-en["pos"]
-		var engaged:bool=_in_aggro(en)
+		var engaged:bool=not en.get("training",false) and _in_aggro(en)
 		var body_size:Vector2=MonsterMotion.body_size(en)
-		var resting:bool=not engaged and not en.get("passive",false) and float(en.get("push_left",0))<=0
 		if not engaged and atk.is_busy():atk.cancel()
 		if en.has("wall_spawn_face"):
-			if not engaged:continue
 			var launch:float=en["wall_spawn_face"]
 			en.erase("wall_spawn_face")
 			en["vel"]=Vector2(launch*180,-230)
-		if resting and (Motion.airborne(en) or _enemy_support(en).has_area()):
-			if en.get("air_lunge",false) and en["charge_phase"]!="idle":
-				en["charge_phase"]="idle";en["charge_left"]=0.0;en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
-			en["vel"]=Vector2.ZERO
-			continue
 
 		if not frozen and int(en["model"])==4:
 			var new_phase:int=BossDirector.tick(en,delta,engaged)
@@ -1423,10 +1418,10 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			var impulse:Vector2=en["push_velocity"]*step/maxf(movement_delta,.00001)
 			en["push_base_y"]=float(en.get("push_base_y",vel.y))+(0 if Motion.airborne(en) else GRAVITY*movement_delta)
 			vel=Vector2(impulse.x,float(en["push_base_y"])+impulse.y)
-		elif resting:vel=Vector2(0,minf(800.0,vel.y+GRAVITY*movement_delta))
+		elif en.get("training",false):vel=Vector2(0,minf(800.0,vel.y+GRAVITY*movement_delta))
 		else:
 			var previous_charge:String=en.get("charge_phase","idle")
-			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size)
+			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size,engaged,support)
 			if engaged and previous_charge!="active" and en.get("charge_phase","idle")=="active":
 				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else "enemy_ram"
 				_sound(cue if sounds.has(cue) else "enemy_ram")
@@ -1439,7 +1434,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		var flying:bool=Motion.airborne(en)
 		if not flying and grounded and vel.y>=0:
 			var margin:float=20.0*float(en["scale"])
-			if en["pos"].x+vel.x*movement_delta<support.position.x+margin or en["pos"].x+vel.x*movement_delta>support.end.x-margin:vel.x=0
+			if (vel.x<0 and en["pos"].x+vel.x*movement_delta<support.position.x+margin) or (vel.x>0 and en["pos"].x+vel.x*movement_delta>support.end.x-margin):vel.x=0
 		var old:Vector2=en["pos"]
 		var resolved:Dictionary=Coll.move_body(old,vel,movement_delta,body_size,world if flying else solids)
 		Motion.resolve_collision(en,vel,resolved["vel"])
@@ -1756,7 +1751,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 					_projectile_explosion(pr)
 					if not pr["pierce"]:pr["life"]=0;break
 			if float(pr["life"])>0:
-				_hit_props(Rect2(next-Vector2.ONE*radius,Vector2.ONE*radius*2),float(pr["damage"]),1)
+				_hit_props(Rect2(next-Vector2.ONE*radius,Vector2.ONE*radius*2),float(pr["damage"]),1,old,pr["hits"])
 				_damage_traps(Rect2(old.min(next),old.max(next)-old.min(next)).grow(radius),float(pr["damage"]),not pr.get("dream_slash",false))
 		else:
 			var blocked:bool=false
@@ -2093,17 +2088,24 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			guard_rng.seed=int(layout["seed"])+4251
 			_spawn_boss_reinforcements(room["enemies"],6,true,guard_rng)
 		if room["type"] in ["merchant","start"] and lab_mode!="tutorial":
-			for i in (2 if room["type"]=="start" else 1):
-				var dummy_rng:=RandomNumberGenerator.new();dummy_rng.seed=int(layout["seed"])+i
-				var dummy:Dictionary=Arms.enemy("walk",dummy_rng,false,true)
-				var anchor:=_furniture_offset()+Vector2(870 if i==0 and room["type"]=="start" else (1110 if i==1 else 1360),1050-(35 if i==1 else 0))
-				dummy.merge({"training":true,"spawn_surface":"flight" if i==1 else "ground","floating":i==1,"anchor":anchor,"training_age":0.0,"contact_damage":0.0,"uid":id*100+98+i,"pos":anchor,"vel":Vector2.ZERO,"face":-1.0,"hp":999999.0,"max_hp":999999.0,"body_size":Vector2(84,120),"hurt":0.0,"stun":0.0,"cooldown":1000.0,"attack":Attack.new(),"training_total":0.0},true)
-				room["enemies"].append(dummy)
+			var dummy:Dictionary=MonsterRoster.regular(str(biome["id"]),0)
+			var anchor:=_furniture_offset()+Vector2(870 if room["type"]=="start" else 1360,1050)
+			dummy.merge({"training":true,"passive":true,"contact_damage":0.0,"uid":id*100+98,
+				"pos":anchor,"vel":Vector2.ZERO,"face":-1.0,"hurt":0.0,"stun":0.0,
+				"cooldown":0.0,"max_hp":dummy["hp"],"attack":Attack.new(),"training_total":0.0},true)
+			room["enemies"].append(dummy)
 
 	if not room.has("props"):
 		room["props"]=_make_props()
 		for rect:Rect2 in layout.get("spike_rects",[]):
 			room["props"].append({"kind":"spikes","pos":rect.get_center(),"rect":rect,"hurt":0.0})
+		if room["type"] in ["combat","elite"] and not room.get("spring",false):
+			var avoid:Array=layout["spawn_positions"].values()
+			for door:Dictionary in doors:avoid.append(door["pos"])
+			for prop:Dictionary in room["props"]:
+				if prop["kind"] in ["launcher","chest","fountain"]:avoid.append(prop["pos"])
+			for spike:Rect2 in layout.get("spike_rects",[]):avoid.append(spike.get_center())
+			room["props"].append_array(Stones.spawn(layout,platforms+solids,solids,avoid))
 	props.assign(room["props"])
 	var loaded_enemies:Array[Dictionary]=[]
 	loaded_enemies.assign(room["enemies"])
@@ -2654,7 +2656,7 @@ func _draw_profiled_body() -> void:
 		if view_rect.has_point(drops[i]["pos"]): _draw_drop(drops[i],i==drop_label_target)
 	for en in enemies:
 		if float(en["hp"])<=0 or not view_rect.has_point(en["pos"]):continue
-		if en.get("training",false):SanctuaryArt.dummy(self,en["pos"]+Vector2(0,5),clock,preload("res://scripts/world_placement_v27.gd").prop_base(world_transform));continue
+		if en.get("training",false):SanctuaryArt.dummy(self,en["pos"],clock,world_transform,MonsterMotion.body_size(en),float(en.get("flash_left",0))>0);continue
 		var atk=en["attack"]
 
 		MonsterDesign.draw_charge(self,en,clock,world_transform)
@@ -2710,7 +2712,7 @@ func _draw_profiled_body() -> void:
 		elif e.has("boss_fx"):BossVisual.impact(self,e,world_transform)
 		elif e.has("combat_fx"):
 			var extent:float=float(e.get("fx_extent",65))
-			var alpha:float=.10 if str(e["combat_fx"]).begins_with("explosion_") else 1.0
+			var alpha:float=Explosion.OPACITY if str(e["combat_fx"]).begins_with("explosion_") else 1.0
 			FX.fitted(self,e["combat_fx"],1-float(e["life"])/float(e["max"]),Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,alpha))
 		elif bool(e["ring"]):
 			var radius:float=float(e["radius"])
@@ -3161,7 +3163,7 @@ func _draw_enemy_release(at:Vector2,atk:Variant,face:float) -> void:
 			extent=Vector2(clampf(float(def.get("range",65)),42,155),clampf(float(def.get("size",32))*2,40,108))
 			at_fx.x=at.x+face*extent.x*.5
 	var tint:Color=Color.WHITE.lerp(def.get("color",Color.WHITE),.35)
-	tint.a=.10 if def.get("library_kind","")=="explosion" else 1.0
+	tint.a=Explosion.OPACITY if def.get("library_kind","")=="explosion" else 1.0
 	draw_set_transform_matrix(world_transform*Transform2D(0,Vector2(face,1),0,at_fx))
 	SkillArt.draw(self,row,progress,Rect2(-extent*.5,extent),tint)
 	draw_set_transform_matrix(world_transform)
@@ -3204,7 +3206,7 @@ func _text_on(canvas:CanvasItem,at:Vector2,message:String,size:int,color:Color) 
 
 # v0.5 expedition, props and lifecycle orchestration.
 func _in_aggro(en:Dictionary) -> bool:
-	if int(en.get("model",0))==4 and en.get("combat_engaged",false):return true
+	if int(en.get("model",0))==4 and en.get("combat_engaged",false) and not Motion.airborne(en):return true
 	var zoom:float=_view_zoom()
 	var visible:=Rect2(camera_pos,Vector2(1280,720)/zoom)
 	if display_safe.has_area():visible=Rect2(camera_pos+display_safe.position/zoom,display_safe.size/zoom)
@@ -3421,6 +3423,9 @@ func _update_props_profiled_body(delta:float) -> void:
 		prop["hurt"]=maxf(0,float(prop["hurt"])-delta)
 		for timer in ["break_left","event_left","launch_left","launch_cooldown","launch_hit_cooldown"]:prop[timer]=maxf(0,float(prop.get(timer,0))-delta)
 		if prop.has("open_left"):prop["open_left"]=maxf(0,float(prop["open_left"])-delta)
+		if prop["kind"]=="stone":
+			if not prop["asleep"] and not prop.get("used",false):_step_stone(prop,delta*world_speed)
+			continue
 		if prop["kind"]=="spikes":
 			if _body_box(p["pos"]).intersects(prop["rect"]):_hurt_player(1,prop["pos"])
 			continue
@@ -3435,9 +3440,49 @@ func _update_props_profiled_body(delta:float) -> void:
 			_restore_vital("hp",delta)
 			_restore_vital("energy",delta*2)
 
-func _hit_props(box:Rect2,damage:float,attack_id:int=-1) -> void:
+func _step_stone(stone:Dictionary,delta:float) -> void:
+	var old:Vector2=Stones.body(stone).get_center()
+	var speed:Vector2=stone["vel"]
+	Stones.step(stone,delta,solids+platforms)
+	var next:Vector2=Stones.body(stone).get_center()
+	if next.y>_room_size().y+96 or next.x< -96 or next.x>_room_size().x+96:
+		stone["used"]=true
+		return
+	if speed.length_squared()<130.0*130.0 or float(stone["damage"])<=0:return
+	var extent:Vector2=Stones.size(stone)*.5
+	var hits:Dictionary=stone["hits"]
+	for enemy:Dictionary in enemies:
+		if enemy["hp"]<=0 or hits.has(enemy["uid"]):continue
+		var target:Rect2=_enemy_body_box(enemy)
+		var expanded:=Rect2(target.position-extent,target.size+extent*2)
+		if Coll.segment(old,next,expanded)==INF:continue
+		hits[enemy["uid"]]=true
+		_hit_enemy(enemy,float(stone["damage"]),Color("e1c5a0"),90.0 if stone["large"] else 55.0,old,speed.normalized())
+
+func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.INF,projectile_hits:Variant=null) -> void:
 	for i in props.size():
 		var prop:Dictionary=props[i]
+		if prop["kind"]=="stone":
+			if damage<=0 or prop.get("used",false):continue
+			var target:Rect2=Stones.body(prop)
+			var struck:bool=box.intersects(target)
+			if projectile_hits!=null:
+				struck=Coll.segment(source,box.get_center(),target.grow(box.size.x*.5))<INF
+			if not struck:continue
+			var key:int=-10000-i
+			if attack_id<0 and p_attack.is_active() and not p_attack.mark_hit(key):continue
+			if projectile_hits!=null and projectile_hits.has(key):continue
+			if projectile_hits!=null:projectile_hits[key]=true
+			var center:Vector2=Stones.body(prop).get_center()
+			var direction:=Vector2(float(p["face"]),0)
+			if attack_id<0:direction=_attack_direction(p_attack.attack)
+			elif source.is_finite():direction=(center-source).normalized()
+			if direction.is_zero_approx():direction=Vector2(float(p["face"]),0)
+			Stones.launch(prop,direction,damage)
+			_hit_flash(center,damage,Color("e1c5a0"))
+			_particles(center,Color("bca58d"),6,100)
+			_sound("metal_hit")
+			continue
 		if prop["kind"]=="home_projector":
 			if not prop["used"] and damage>0:
 				var center:Vector2=HomeArt.lamp_center(prop,clock)
@@ -3631,7 +3676,7 @@ func _explode(at:Vector2,radius:float,damage:float,knockback:float,from_player:b
 	if from_player:
 		for en in enemies:
 			if en["hp"]>0 and not exclude.has(en["uid"]) and _enemy_body_box(en).get_center().distance_to(at)<=radius:_hit_enemy(en,damage,Color("ffe0aa"),knockback)
-		_hit_props(Rect2(at-Vector2.ONE*radius,Vector2.ONE*radius*2),damage,1)
+		_hit_props(Rect2(at-Vector2.ONE*radius,Vector2.ONE*radius*2),damage,1,at)
 		_damage_traps(Rect2(at-Vector2.ONE*radius,Vector2.ONE*radius*2),damage)
 	elif not exclude.has(-1) and _body_box(p["pos"]).get_center().distance_to(at)<=radius:
 		if _hurt_player(damage,at):p["recoil_left"]=.18;p["recoil_velocity"]=Vector2(signf(p["pos"].x-at.x)*knockback/.18,0);p["knockback_t"]=0
@@ -3702,6 +3747,9 @@ func _draw_props(focus:Dictionary={}) -> void:
 		if prop.get("used",false) and prop["kind"]!="chest" and float(prop.get("break_left",0))<=0:continue
 		var at:Vector2=prop["pos"];var kind:String=prop["kind"]
 		if not view_rect.grow(140).has_point(at):continue
+		if kind=="stone":
+			Stones.draw(self,prop,biome)
+			continue
 		if kind=="fountain":
 			if at.distance_to(p["pos"])<160:_text(at-Vector2(75,90),"泉水 · 回復生命與能量",14,accent)
 			continue

@@ -36,8 +36,9 @@ static func market(c:CanvasItem,stock:Array,player:Vector2,time:float,base:Trans
 		Items.draw_icon(c,Items.stock_icon(item),Rect2(at-Vector2(26,26)+Vector2(0,sin(time*1.4+i)*2),Vector2(52,52)),base)
 		if focused==i:c.draw_arc(at,32,0,TAU,32,Color(color,.8),1.5,true)
 		c.draw_string(font,at+Vector2(-17,41),str(item["price"])+"金",HORIZONTAL_ALIGNMENT_LEFT,-1,13,color)
-static func dummy(c:CanvasItem,at:Vector2,_time:float,base:Transform2D) -> void:
-	c.draw_set_transform_matrix(base);part(c,"dummy",Rect2(at-Vector2(42,120),Vector2(84,120)))
+static func dummy(c:CanvasItem,at:Vector2,_time:float,base:Transform2D,size:Vector2=Vector2(84,120),flash:bool=false) -> void:
+	c.draw_set_transform_matrix(base)
+	part(c,"dummy",Rect2(at-Vector2(size.x*.5,size.y),size),Color(1.8,1.8,1.8) if flash else Color.WHITE)
 static func pool_back(c:CanvasItem,pool:Rect2,time:float,base:Transform2D) -> void:
 	if pool.size.x<=0:return
 	c.draw_set_transform_matrix(base)

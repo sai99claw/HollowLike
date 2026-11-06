@@ -77,7 +77,7 @@ func run() -> void:
 		else:
 			for step in 240:scene._update_projectiles(.01);scene._update_hazards(.01)
 		check(dummy["training_total"]>total,"Trial target can measure the actual secondary: "+str(i))
-	check(dummy["hp"]==999999.0,"Training target takes measurable hits without dying")
+	check(dummy["hp"]==dummy["max_hp"],"Training target takes measurable hits without dying")
 	scene._start_trial(2);scene._enter_room(spring_room);check(scene.merchant_trial.is_empty(),"Crossing a passage returns all unsold trial goods")
 	# Springs now remain inside hostile rooms and do not cut a room-sized bath.
 	scene._close_panel();scene._clear_keys();var fountain:Dictionary={}
