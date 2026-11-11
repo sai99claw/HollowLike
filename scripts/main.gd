@@ -16,6 +16,9 @@ const WeaponArt=preload("res://scripts/weapon_art_v24.gd")
 const ProjectileReadability=preload("res://scripts/projectile_readability_v25.gd")
 const LaunchArt=preload("res://scripts/launch_object_v23.gd")
 const NewBiome=preload("res://scripts/biome_art_v21.gd")
+const PigeonPose=preload("res://scripts/pigeon_motion_v22.gd")
+const AdventurePose=preload("res://scripts/adventure_visual.gd")
+const HIT_WHITE_SECONDS:float=2.0/60.0
 const CorpseField=preload("res://scripts/corpse_field_v21.gd")
 const Tuning=preload("res://scripts/rd_tuning_v19.gd")
 const TuningPanel=preload("res://scripts/rd_tuning_panel_v19.gd")
@@ -319,7 +322,7 @@ func _ready() -> void:
 		new_run("rogue",12345)
 
 func _reset_player(at: Vector2) -> void:
-	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"gust_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
+	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"gust_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
 	p_attack.cancel()
 	if walker!=null:walker.reset_turn(float(p["face"]))
 	drop_through_timer=0.0
@@ -636,6 +639,7 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if screen=="hub":
 		_update_home(delta);return
 	if screen!="game":return
+	_update_hit_white(delta)
 	_update_dream(delta)
 	room_cooldown=maxf(0,room_cooldown-delta);freeze_timer=maxf(0,freeze_timer-delta)
 	for key in ["invul","hurt","wall_lock","shield","impact_root","flash_left","heavy_land_left","power_item_left","shield_item_left"]:p[key]=maxf(0,float(p.get(key,0))-delta)
@@ -826,13 +830,19 @@ func _step_player(delta: float) -> void:
 	p["gust_left"]=maxf(0,float(p.get("gust_left",0))-delta)
 	p["landing_left"]=maxf(0,float(p.get("landing_left",0))-delta)
 	p["wall_kick_left"]=maxf(0,float(p.get("wall_kick_left",0))-delta)
-	p["wall_hold_left"]=maxf(0,float(p.get("wall_hold_left",0))-delta)
+	var wall_hold_left:float=float(p["wall_hold_left"])
+	p["wall_hold_left"]=maxf(0,wall_hold_left-delta)
+	if was_attached:p["wall_slide_age"]+=maxf(0,delta-wall_hold_left)
+	if float(p["jump_rise_age"])>=0:p["jump_rise_age"]+=delta
+	p["slam_land_left"]=maxf(0,float(p["slam_land_left"])-delta)
 	drop_through_timer=maxf(0,drop_through_timer-delta)
 	var axis: float=0.0 if _movement_locked() else float(int(_key("right"))-int(_key("left")))
 	var speed_factor:float=_movement_factor()
 	if _movement_locked():vel.x=0
 	if axis!=0 and not _release_locked(): p["face"]=signf(axis)
-	if bool(p["slam"]):p["slam_speed"]=minf(1480.0,float(p.get("slam_speed",520))+2100.0*delta)
+	if bool(p["slam"]):
+		p["slam_age"]+=delta
+		p["slam_speed"]=minf(1480.0,float(p["slam_speed"])+2100.0*delta)
 	var knocked: bool = float(p.get("knockback_t",0))>0
 	if knocked:
 		var step: float=minf(delta,float(p["knockback_t"]))
@@ -848,13 +858,13 @@ func _step_player(delta: float) -> void:
 	elif float(p["dash_t"])>0.0 or _wind_form_active():
 		p["dash_t"]=maxf(0,float(p["dash_t"])-delta)
 		vel=p["dash_dir"]*(940.0 if p_attack.is_active() and p_attack.attack.get("kind","") in ["pierce","slam"] else 650.0)*1.2
-		if bool(p["slam"]): vel=Vector2(0,float(p["slam_speed"]))
+		if bool(p["slam"]): vel=Vector2(0,float(p["slam_speed"])*PlayerMotion.SLAM_SPEED_FACTOR)
 		# A single retained wind texture replaces per-substep particle allocation.
 	else:
 		vel.x=axis*MOVE_SPEED*speed_factor
 		if axis==0 and float(p.get("wall_kick_left",0))>0:vel.x=float(p["wall_kick_velocity"])
 		vel.y=minf(vel.y+PlayerMotion.RISE_GRAVITY*(Tuning.value("fall_gravity") if vel.y>=0 else 1.0)*delta,PlayerMotion.MAX_FALL_SPEED)
-		if bool(p["slam"]): vel=Vector2(0,float(p["slam_speed"]))
+		if bool(p["slam"]): vel=Vector2(0,float(p["slam_speed"])*PlayerMotion.SLAM_SPEED_FACTOR)
 	if float(p.get("jump_buffer_left",0))>0 and not knocked and not _movement_locked() and float(p.get("hurt",0))<=0:
 		var jumped:bool=false
 		if int(p["wall"])!=0:
@@ -870,6 +880,7 @@ func _step_player(delta: float) -> void:
 				drop_through_y=pos.y;drop_through_timer=.22
 				pos.y+=3;vel.y=130;p["grounded"]=false;_sound("drop_through")
 			else:
+				p["jump_rise_age"]=0.0
 				vel.y=-JUMP_SPEED*(1.0+_rune_effect("wing"))*Tuning.value("jump_speed");p["grounded"]=false;p["jumps"]=1;_sound("jump")
 		elif _skill("doublejump") and int(p["jumps"])<2:
 			jumped=true
@@ -887,14 +898,14 @@ func _step_player(delta: float) -> void:
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
 	var approach_x:float=vel.x
-	var player_solids:Array=solids
+	var nearby_stones:Array[Vector3]=[]
 	if screen=="game":
 		for prop:Dictionary in props:
 			if prop["kind"]!="stone" or not prop["asleep"] or prop.get("used",false):continue
 			if Vector2(prop["pos"]).distance_squared_to(pos)>180.0*180.0:continue
-			if is_same(player_solids,solids):player_solids=solids.duplicate()
-			player_solids.append(Stones.body(prop))
-	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),player_solids,4)
+			var center:Vector2=Stones.center(prop)
+			nearby_stones.append(Vector3(center.x,center.y,Stones.radius(prop)))
+	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),solids,4,false,nearby_stones)
 	if _in_bath() and absf(vel.x)>1 and absf(resolved["vel"].x)<1:
 		for lift in [8.0,18.0,30.0]:
 			var raised:Vector2=pos-Vector2(0,lift)
@@ -926,10 +937,11 @@ func _step_player(delta: float) -> void:
 	if int(p["wall"])!=0:
 		# Clamp the real physics velocity, never shift the rendered sprite toward
 		# a wall. Both sides use the same feet anchor and the same AABB solver.
-		if not was_attached:p["wall_hold_left"]=1.0;_sound("wall_attach")
+		if not was_attached:p["wall_hold_left"]=PlayerMotion.WALL_HOLD_SECONDS;p["wall_slide_age"]=0.0;_sound("wall_attach")
 		vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED;_restore_ground_movement()
 		if dashed_into:p["dash_t"]=0;vel.y=0;p["wall_lock"]=0
-	if int(p["wall"])==0:p["wall_hold_left"]=0.0
+	if int(p["wall"])==0:p["wall_hold_left"]=0.0;p["wall_slide_age"]=0.0
+	if vel.y>=0:p["jump_rise_age"]=-1.0
 	if bool(p["grounded"]) and bool(p["slam"]):_slam_impact(pos)
 	var ceiling:float=HomeArt.CEILING_Y if screen=="hub" and not trophy_room else 0.0
 	if pos.y<ceiling:pos.y=ceiling;vel.y=maxf(0,vel.y)
@@ -1103,10 +1115,9 @@ func _player_active_started() -> void:
 			elif def.get("weapon_kind","")=="sword":_sound("attack_whoosh")
 			else: _emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),def,true)
 		"pierce","slam":
-			p["slam_speed"]=520.0;_sound("slam_wind" if def["kind"]=="slam" else "double_dash_wind")
+			p["slam_speed"]=520.0;p["slam_age"]=0.0;p["slam_land_left"]=0.0;_sound("slam_wind" if def["kind"]=="slam" else "double_dash_wind")
 			p["dash_dir"]=def["dir"];p["dash_t"]=float(def["active"]);p["air_dash"]=true
 			p["slam"]=def["kind"]=="slam"
-			# The eight-frame wind-form body replaces the pigeon while this skill is active.
 		"item_bomb":
 			_sound("explosion")
 			_contact_fx("explosion_artificial",p["pos"]-Vector2(0,25))
@@ -1175,7 +1186,7 @@ func _slam_contacts(old:Vector2,next:Vector2) -> void:
 	_damage_traps(box,float(p_attack.attack.get("damage",2)))
 
 func _slam_impact(at: Vector2) -> void:
-	p["slam"]=false;p["dash_t"]=0.0
+	p["slam"]=false;p["dash_t"]=0.0;p["slam_land_left"]=.125
 	p["invul"]=maxf(float(p["invul"]),.5)
 	if p_attack.is_active() and p_attack.attack.get("kind","")=="slam":
 		p_attack.elapsed=maxf(0,float(p_attack.attack["active"])-.001)
@@ -1214,11 +1225,18 @@ func _update_heal_profiled_body(delta: float) -> void:
 			heal_timer=0;p["energy"]-=3;_restore_vital("hp",1);_float(p["pos"]-Vector2(0,55),"+1",Color("9df3b4"));_sound("heal_finish")
 	else: heal_timer=0
 
+func _update_hit_white(delta:float) -> void:
+	for en:Dictionary in enemies:
+		var remaining:float=float(en.get("flash_left",0))
+		if remaining<=0:continue
+		en["flash_left"]=maxf(0,remaining-delta)
+		if float(en["hp"])<=0 and en["flash_left"]<=0 and corpse_layer!=null:corpse_layer.invalidate()
+
 func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true) -> void:
 	if float(en["hp"])<=0:return
 	if mode=="musou":damage*=dream.damage_factor()
 	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
-	en["flash_left"]=2.0/60.0;en["_impact_time"]=clock
+	en["flash_left"]=HIT_WHITE_SECONDS;en["_impact_time"]=clock
 	if int(en.get("model",0))!=4 or float(en.get("boss_impact_guard",0))<=0:
 		en["impact_freeze_left"]=.125;en["impact_pose_clock"]=draw_clock
 		if int(en.get("model",0))==4:en["boss_impact_guard"]=.45
@@ -1251,7 +1269,7 @@ func _hurt_player(amount:float,source:Vector2) -> bool:
 	amount=maxi(1,roundi(amount)) if amount>0 else 0
 	charge_timer=0;keys["attack"]=false;idle_time=0
 	p["mantle_left"]=0
-	p["hp"]=maxi(0,int(p["hp"])-int(amount));p["flash_left"]=1.0/60;p["hurt"]=.25;p["invul"]=2.0 if mode=="musou" else (.55+_rune_effect("guard"))*1.5
+	p["hp"]=maxi(0,int(p["hp"])-int(amount));p["flash_left"]=HIT_WHITE_SECONDS;p["hurt"]=.25;p["invul"]=2.0 if mode=="musou" else (.55+_rune_effect("guard"))*1.5
 	_hit_flash(p["pos"]-Vector2(0,22),amount,Color("ffad9b"))
 	if not (mode=="musou" and not revive_used and int(p["hp"])<=0) and not (_release_locked() or (p_attack.is_active() and bool(p_attack.attack.get("super_armor",false)))):
 		var away:float=signf(p["pos"].x-source.x)
@@ -1354,7 +1372,6 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			continue
 		if float(en["hp"])>0 and float(en.get("impact_freeze_left",0))>0:
 			en["impact_freeze_left"]=maxf(0.0,float(en["impact_freeze_left"])-delta)
-			en["flash_left"]=maxf(0.0,float(en.get("flash_left",0))-delta)
 			continue
 		if en.has("tutorial_respawn"):
 			if float(en["hp"])<=0:
@@ -1364,7 +1381,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 					for key in ["hurt","stun","flash_left","push_left","impact_freeze_left"]:en[key]=0.0
 					en["tutorial_patrol_age"]=0.0
 			else:
-				for key in ["hurt","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
+				for key in ["hurt"]:en[key]=maxf(0,float(en.get(key,0))-delta)
 				var age:float=float(en.get("tutorial_patrol_age",0))+movement_delta
 				en["tutorial_patrol_age"]=age
 				var previous:Vector2=en["pos"]
@@ -1382,7 +1399,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			if mode=="musou" and room.get("type","")=="boss":
 				if not frozen and _boss_summoning(en,delta):continue
 				if float(en.get("summon_cast_left",0))>0.0:continue
-		for key in ["hurt","stun","cooldown","flash_left"]:en[key]=maxf(0,float(en.get(key,0))-delta)
+		for key in ["hurt","stun","cooldown"]:en[key]=maxf(0,float(en.get(key,0))-delta)
 		var atk=en["attack"]
 		var toward:Vector2=p["pos"]-en["pos"]
 		var engaged:bool=not en.get("training",false) and _in_aggro(en)
@@ -1841,7 +1858,10 @@ func _enemy_defeated(en: Dictionary) -> void:
 		return
 	if en.get("corpse_created",false):return
 	_sound("boss_defeat" if int(en.get("model",0))==4 else "enemy_defeat")
-	en["corpse_created"]=true;corpses.append(CorpseField.create(en));room["corpses"]=corpses
+	en["corpse_created"]=true
+	var body:Dictionary=CorpseField.create(en)
+	body["hit_actor"]=en
+	corpses.append(body);room["corpses"]=corpses
 	if corpse_layer!=null:corpse_layer.invalidate()
 	if lab_mode=="tutorial":return
 	kills+=1
@@ -2656,7 +2676,7 @@ func _draw_profiled_body() -> void:
 		if view_rect.has_point(drops[i]["pos"]): _draw_drop(drops[i],i==drop_label_target)
 	for en in enemies:
 		if float(en["hp"])<=0 or not view_rect.has_point(en["pos"]):continue
-		if en.get("training",false):SanctuaryArt.dummy(self,en["pos"],clock,world_transform,MonsterMotion.body_size(en),float(en.get("flash_left",0))>0);continue
+		if en.get("training",false):continue
 		var atk=en["attack"]
 
 		MonsterDesign.draw_charge(self,en,clock,world_transform)
@@ -2772,7 +2792,7 @@ func _draw_enemy_warning(en:Dictionary) -> void:
 func _draw_player_body() -> void:
 	var anim:String="limp" if injured else ("rest" if idle_time>=5 else "idle")
 	if absf(p["vel"].x)>30:anim="limp" if injured else "run"
-	if not bool(p["grounded"]):anim="jump_up" if p["vel"].y < -70 else ("jump_down" if p["vel"].y>70 else "jump_apex")
+	if not bool(p["grounded"]):anim="jump_up" if p["vel"].y < 0 else ("jump_down" if p["vel"].y>70 else "jump_apex")
 	elif float(p.get("landing_left",0))>0 and not injured:anim="land"
 	if float(p["dash_t"])>0:anim="dash"
 	if int(p["wall"])!=0:anim="wall"
@@ -2791,12 +2811,18 @@ func _draw_player_body() -> void:
 		var squash:float=sin(float(p["landing_left"])/.09*PI)*.08
 		player_base=world_transform*Transform2D(0,Vector2(1+squash,1-squash),0,p["pos"])*Transform2D(0,-Vector2(p["pos"]))
 	if float(p.get("gust_left",0))>0:preload("res://scripts/adventure_art_v29.gd").jump_gust(self,p["pos"],.20-float(p["gust_left"]),world_transform)
-	if not _wind_form_active():
+	if float(p["slam_land_left"])>0:
+		AdventurePose.draw_action(self,3,3,p["pos"],p["face"],player_base,tint)
+	elif bool(p["slam"]):
+		AdventurePose.draw_action(self,3,AdventurePose.slam_frame(p["slam_age"]),p["pos"],p["face"],player_base,tint)
+	elif _wind_form_active():
+		AdventurePose.draw_action(self,2,1,p["pos"],p_attack.attack["dir"].x,player_base,tint)
+	else:
 		if anim=="mantle":preload("res://scripts/mantle_art_v37.gd").draw(self,p,player_base,tint)
 		elif anim=="heavy_land":preload("res://scripts/heavy_landing_v28.gd").draw(self,p["pos"],float(p["face"]),.5-float(p["heavy_land_left"]),player_base,tint)
 		elif float(p.get("dash_t",0))>0 and not p_attack.is_busy():preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),(.16-float(p["dash_t"]))*2,player_base,tint)
 		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash","charge"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
-		elif dream_progress>=0 and anim not in ["hurt","heal","wall"]:FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
+		elif dream_progress>=0 and anim not in ["hurt","heal","wall","jump_up"]:FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
 		elif anim=="charge":
 			var feet:Vector2=p["pos"]
 			if walker.moving and bool(p["grounded"]) and absf(p["vel"].x)>30:
@@ -2816,9 +2842,11 @@ func _draw_player_body() -> void:
 				draw_set_transform_matrix(player_base*Transform2D(0,Vector2(float(p["face"])*shape.x,shape.y),0,feet))
 				draw_texture_rect(pose,Rect2(Vector2(-size.x*.5,-size.y),size),false,tint)
 			draw_set_transform_matrix(world_transform)
+		elif anim=="wall":PigeonPose.draw_pose(self,"wall",PigeonPose.wall_frame(float(p["wall_hold_left"])>0,float(p["wall_slide_age"])),p["pos"],float(p["wall"]),player_base,tint)
+		elif anim=="jump_up" and float(p["jump_rise_age"])>=0:AdventurePose.draw_jump(self,p["jump_rise_age"],p["pos"],p["face"],player_base,tint)
 		elif anim in ["idle","rest"]:IdleArt.draw(self,p["pos"],float(p["face"]),idle_time,player_base,tint)
 		else:Art.draw_pigeon(self,p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim,tint,1.0,(1-float(p["hurt"])/.25) if anim=="hurt" else p_attack.progress(),player_base,str(p_attack.attack.get("style","quick")),p_attack.attack)
-	if not _wind_form_active():preload("res://scripts/cloak_art_v29.gd").draw(self,int(meta.get("skin",0)),p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim not in ["idle","rest","heavy_land"],player_base,anim,tint.a)
+	if not _wind_form_active() and float(p["slam_land_left"])<=0:preload("res://scripts/cloak_art_v29.gd").draw(self,int(meta.get("skin",0)),p["pos"],float(p["wall"]) if anim=="wall" else float(p["face"]),clock,anim not in ["idle","rest","heavy_land"],player_base,anim,tint.a)
 	if p_attack.is_busy() and p_attack.attack.get("kind","")=="secondary":WorldItems.secondary(self,p_attack.attack,p["pos"],float(p["face"]),world_transform)
 
 func _draw_hub() -> void:
@@ -3103,7 +3131,9 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 			if show_hitboxes:draw_rect(_attack_box(at-Vector2(0,5),atk.attack,face),Color("ffe3a0"),false,1)
 		return
 	if is_player and atk.attack.get("kind","") in ["pierce","slam"]:
-		if atk.is_active() or bool(p.get("slam",false)):Wind.wind_form(self,at-Vector2(0,22),atk.attack["dir"],atk.elapsed,float(atk.attack["active"]),world_transform,atk.attack["kind"]=="slam")
+		if bool(p.get("slam",false)) or (atk.is_active() and atk.attack["kind"]=="pierce"):
+			var down:bool=atk.attack["kind"]=="slam"
+			Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,atk.attack["dir"],float(p["slam_age"]) if down else atk.elapsed,float(atk.attack["active"]),world_transform,down)
 		return
 	if is_player and atk.attack.get("primary",false) and (not atk.attack.get("charged",false) or atk.attack.get("great_spin_release",false)):
 		if show_hitboxes and atk.is_active():draw_rect(_attack_box(at,atk.attack,face),Color("ffe3a0"),false,1)
@@ -3441,39 +3471,42 @@ func _update_props_profiled_body(delta:float) -> void:
 			_restore_vital("energy",delta*2)
 
 func _step_stone(stone:Dictionary,delta:float) -> void:
-	var old:Vector2=Stones.body(stone).get_center()
 	var speed:Vector2=stone["vel"]
-	Stones.step(stone,delta,solids+platforms)
-	var next:Vector2=Stones.body(stone).get_center()
+	var damage:float=stone["damage"]
+	var path:PackedVector2Array=Stones.step(stone,delta,solids+platforms)
+	var next:Vector2=Stones.center(stone)
 	if next.y>_room_size().y+96 or next.x< -96 or next.x>_room_size().x+96:
 		stone["used"]=true
 		return
-	if speed.length_squared()<130.0*130.0 or float(stone["damage"])<=0:return
-	var extent:Vector2=Stones.size(stone)*.5
+	if speed.length_squared()<130.0*130.0 or damage<=0:return
+	var radius:float=Stones.radius(stone)
 	var hits:Dictionary=stone["hits"]
 	for enemy:Dictionary in enemies:
 		if enemy["hp"]<=0 or hits.has(enemy["uid"]):continue
 		var target:Rect2=_enemy_body_box(enemy)
-		var expanded:=Rect2(target.position-extent,target.size+extent*2)
-		if Coll.segment(old,next,expanded)==INF:continue
-		hits[enemy["uid"]]=true
-		_hit_enemy(enemy,float(stone["damage"]),Color("e1c5a0"),90.0 if stone["large"] else 55.0,old,speed.normalized())
+		for i:int in range(1,path.size()):
+			var from:Vector2=path[i-1]
+			var to:Vector2=path[i]
+			if Coll.swept_circle_rect(from,to,radius,target)==INF:continue
+			hits[enemy["uid"]]=true
+			_hit_enemy(enemy,damage,Color("e1c5a0"),90.0 if stone["large"] else 55.0,from,from.direction_to(to))
+			break
 
 func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.INF,projectile_hits:Variant=null) -> void:
 	for i in props.size():
 		var prop:Dictionary=props[i]
 		if prop["kind"]=="stone":
 			if damage<=0 or prop.get("used",false):continue
-			var target:Rect2=Stones.body(prop)
-			var struck:bool=box.intersects(target)
+			var center:Vector2=Stones.center(prop)
+			var radius:float=Stones.radius(prop)
+			var struck:bool=Coll.circle_overlaps_rect(center,radius,box)
 			if projectile_hits!=null:
-				struck=Coll.segment(source,box.get_center(),target.grow(box.size.x*.5))<INF
+				struck=Coll.segment_circle(source,box.get_center(),center,radius+box.size.x*.5)<INF
 			if not struck:continue
 			var key:int=-10000-i
 			if attack_id<0 and p_attack.is_active() and not p_attack.mark_hit(key):continue
 			if projectile_hits!=null and projectile_hits.has(key):continue
 			if projectile_hits!=null:projectile_hits[key]=true
-			var center:Vector2=Stones.body(prop).get_center()
 			var direction:=Vector2(float(p["face"]),0)
 			if attack_id<0:direction=_attack_direction(p_attack.attack)
 			elif source.is_finite():direction=(center-source).normalized()
@@ -3749,6 +3782,7 @@ func _draw_props(focus:Dictionary={}) -> void:
 		if not view_rect.grow(140).has_point(at):continue
 		if kind=="stone":
 			Stones.draw(self,prop,biome)
+			if show_hitboxes:draw_arc(Stones.center(prop),Stones.radius(prop),0,TAU,32,Color("ffdf94"),1,true)
 			continue
 		if kind=="fountain":
 			if at.distance_to(p["pos"])<160:_text(at-Vector2(75,90),"泉水 · 回復生命與能量",14,accent)
@@ -4302,6 +4336,9 @@ func _enemy_pose_clock(en:Dictionary) -> float:
 	return float(en["frost_pose_clock"]) if float(en.get("frost_left",0))>0 else (float(en["impact_pose_clock"]) if float(en.get("impact_freeze_left",0))>0 else draw_clock)
 
 func _paint_enemy_body(canvas:CanvasItem,en:Dictionary) -> void:
+	if en.get("training",false):
+		SanctuaryArt.dummy(canvas,en["pos"],clock,Transform2D.IDENTITY,MonsterMotion.body_size(en))
+		return
 	_paint_enemy_actor(canvas,en)
 	var melt:float=clampf(float(en.get("frost_left",0))/2.0,0.0,1.0)
 	if melt<=0:return
@@ -4342,7 +4379,7 @@ func _sync_enemy_canvases() -> void:
 func _sync_enemy_canvases_profiled_body() -> void:
 	var alive:Dictionary={}
 	for en:Dictionary in enemies:
-		if en.get("training",false) or float(en["hp"])<=0:continue
+		if float(en["hp"])<=0 and float(en.get("flash_left",0))<=0:continue
 		var id:int=int(en["uid"]);alive[id]=true
 		var enabled:bool=screen=="game" and view_rect.intersects(_enemy_body_box(en).grow(24))
 		if not enemy_canvases.has(id):
@@ -4352,11 +4389,12 @@ func _sync_enemy_canvases_profiled_body() -> void:
 		var attack=en["attack"]
 		var pose_clock:float=_enemy_pose_clock(en)
 		var signature:Array=[int(pose_clock*30),en.get("face",1),attack.phase,int(attack.progress()*60),int(float(en.get("hurt",0))*60),en.get("scale",1),int(float(en.get("turn_left",0))*60)]
-		if en.has("roster_id"):
+		if en.has("roster_id") and not en.get("training",false):
 			var sample:Dictionary=NewMonsterArt.actor_sample(en,pose_clock) if en.has("v55_row") else preload("res://scripts/monster_art_v36.gd").actor_sample(en,pose_clock)
 			signature=[sample["sheet"],sample["row"],sample["column"],en.get("face",1),float(en.get("hurt",0))>0,en.get("scale",1)]
 		signature.append(ceili(float(en.get("frost_left",0))*15))
-		sprite.refresh(world_transform.translated_local(Vector2(0,5)),enabled,signature)
+		var base:Transform2D=world_transform if en.get("training",false) else world_transform.translated_local(Vector2(0,5))
+		sprite.refresh(base,enabled,signature)
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
@@ -4423,7 +4461,8 @@ func _update_corpses_profiled_body(delta:float) -> void:
 
 func _paint_corpses(canvas:CanvasItem) -> void:
 	if screen!="game":return
-	for body:Dictionary in corpses:CorpseField.draw(canvas,body)
+	for body:Dictionary in corpses:
+		if float(body.get("hit_actor",{}).get("flash_left",0))<=0:CorpseField.draw(canvas,body)
 
 func _paint_edge_background(canvas:CanvasItem) -> void:
 	if screen=="game":NewBiome.draw_details(canvas,str(_ecology()["id"]),layout,-1,terrain_region)

@@ -2,12 +2,16 @@ class_name ArtCatalogV16
 extends RefCounted
 ## RD asset metadata is cheap. Texture decoding happens only for selected frames.
 ## No call into the gameplay art helpers' unbounded texture caches is needed.
+const GROUPS:Array[String]=["主角","小怪","Boss","地圖","物件"]
+const ACTOR_MOTION=preload("res://scripts/adventure_visual.gd")
+const WALL_MOTION=preload("res://scripts/pigeon_motion_v22.gd")
+const WIND_MOTION=preload("res://scripts/wind_art.gd")
 const CACHE_LIMIT:int=24
 const ROOT:String="res://assets/"
 const BIOME_NAMES:Dictionary={"sky":"天空","trunk":"樹幹","underground":"地底","canopy":"樹梢（舊區）","branches":"樹枝（舊區）","grass":"草地（舊區）"}
 const OBJECT_NAMES:Dictionary={"sky":["藍風草","白絨雲花","青晶蘆","藍羽薊","藍釉天甕","浮空浮石"],"trunk":["翡翠蕨","三葉幼苗","樹皮層菇","苔種莢","捲藤芽","橡果燈"],"underground":["琥珀晶簇","象牙洞菇","捲根叢","赤陶甕","發光根球","頁岩石堆"]}
 const HOME_SLEEP:Array[Array]=[[43,339,500,238],[543,301,531,274],[1122,132,495,458],[1657,178,477,406]]
-const ACTION_REGIONS:Array[Array]=[[[20,105,259,211],[346,87,251,230],[656,63,258,254],[969,69,240,248]],[[25,423,266,220],[335,417,274,218],[648,426,289,212],[967,421,279,217]],[[19,715,297,178],[312,714,317,144],[625,736,317,118],[938,713,303,168]],[[69,922,196,250],[408,921,143,279],[720,914,222,302],[938,1026,299,165]]]
+const ACTION_REGIONS=ACTOR_MOTION.ACTION_REGIONS
 const IMPACT_BASELINES:Array[int]=[300,300,300,300,647,647,647,647,972,972,972,972]
 static var _entries:Array[Dictionary]=[]
 static var _by_id:Dictionary={}
@@ -23,11 +27,18 @@ static func all_entries() -> Array[Dictionary]:
 	# PCK directories expose remapped source names. Discover future image assets
 	# as well, so a newly generated v16 effect is never invisible in the RD room.
 	_monsters_v36();_art_v37();_art_v38();_art_v39()
+	_recent_art()
 	_remaining_images(ROOT)
 	var audit:Dictionary=_json(ROOT+("v24/asset-audit.json" if FileAccess.file_exists(ROOT+"v24/asset-audit.json") else "v23/asset-audit.json" if FileAccess.file_exists(ROOT+"v23/asset-audit.json") else "v22/asset-audit.json")).get("entries",{})
 	for item:Dictionary in _entries:
-		if str(item["id"]).begins_with("v36:") or str(item["id"]).begins_with("v37:") or str(item["id"]).begins_with("v38:") or str(item["id"]).begins_with("v39:"):item.merge({"runtime_usage":"used","usage_note":"目前生態怪物、攻擊前搖或投射物。"},true)
-		else:item.merge(audit.get(item["id"],{"runtime_usage":"un-used","usage_note":"保留於素材庫，未接入目前遊戲畫面。"}),true)
+		item["group"]=_group_for(item)
+		item.merge(audit.get(item["id"],{}))
+		var usage:Dictionary=_current_usage(item)
+		item.merge(usage,true)
+		var context:String=str(item.get("notes","")).get_slice("。",0)
+		if not item.has("runtime_usage"):item["runtime_usage"]="un-used"
+		if not item.has("usage_note"):
+			item["usage_note"]=str(item["label"])+" · "+(context+"。" if not context.is_empty() else "")+"素材庫原圖，未查到遊戲呼叫。"
 	_entries.sort_custom(func(a:Dictionary,b:Dictionary)->bool:return str(a["category"])+str(a["label"])<str(b["category"])+str(b["label"]))
 	return _entries
 
@@ -76,18 +87,19 @@ static func _monsters_v36() -> void:
 			var spec:Dictionary=data["sheets"]["projectiles"];var row:int=int(data["projectiles"][id]["row"]);var frames:Array=[]
 			for index:int in 8:frames.append(_descriptor(ROOT+"v36/monsters/"+spec["path"],spec["frames"][row*8+index]["rect"]))
 			_add("v36:"+biome+":"+id,BIOME_NAMES[biome]+" · "+id,"怪物投射物",frames,14,"八幀獨立旋轉貼圖與繪製拖尾。")
-static func categories() -> Array[String]:
+static func categories(group:String="") -> Array[String]:
 	var result:Array[String]=[]
 	for item:Dictionary in all_entries():
-		if not result.has(item["category"]):result.append(item["category"])
+		if (group.is_empty() or item["group"]==group) and not result.has(item["category"]):result.append(item["category"])
 	return result
-static func search(query:String="",category:String="",kind:String="all") -> Array[Dictionary]:
+static func search(query:String="",category:String="",kind:String="all",group:String="") -> Array[Dictionary]:
 	var result:Array[Dictionary]=[];var terms:PackedStringArray=_search_text(query).split(" ",false)
 	for item:Dictionary in all_entries():
+		if not group.is_empty() and item["group"]!=group:continue
 		if not category.is_empty() and item["category"]!=category:continue
 		if kind=="animated" and int(item["frame_count"])<=1:continue
 		if kind=="still" and int(item["frame_count"])!=1:continue
-		var text:String=_search_text(str(item["id"])+" "+str(item["label"])+" "+str(item.get("notes",""))+" "+str(item["category"])+" "+str(item.get("runtime_usage","")))
+		var text:String=_search_text(str(item["id"])+" "+str(item["label"])+" "+str(item.get("notes",""))+" "+str(item["category"])+" "+str(item.get("runtime_usage",""))+" "+str(item.get("usage_note",""))+" "+str(item["group"]))
 		var matches:bool=true
 		for term in terms:
 			if not text.contains(term):matches=false;break
@@ -167,19 +179,24 @@ static func _curated_sheets() -> void:
 	_sheet("explosion:surface","爆炸 · 貼面受限擴散","衝刺與爆炸特效",ROOT+"v16/explosion_surface.png",4,2,8,16,{"baseline":.875,"effect_plane":"surface"})
 	_sheet("explosion:air","爆炸 · 空中全向擴散","衝刺與爆炸特效",ROOT+"v16/explosion_air.png",4,2,8,16,{"effect_plane":"air"})
 	_sheet("wind:jet","單C · 小噴射","衝刺與爆炸特效",ROOT+"motion_v14/dash-jet.png",3,2,6,37.5)
-	_sheet("wind:form","雙C · 化身為風","衝刺與爆炸特效",ROOT+"motion_v14/wind-form.png",4,2,8,24)
+	_sheet("wind:form","雙C · 化身為風","衝刺與爆炸特效",ROOT+"motion_v14/wind-form.png",4,2,8,WIND_MOTION.FORM_FPS,{"hidden_frames":[2,4]})
 	_sheet("wind:impact","下衝 · 接地衝擊","衝刺與爆炸特效",ROOT+"motion_v14/ground-impact.png",4,3,12,24,{"clip_baselines":IMPACT_BASELINES})
 	_sheet("merchant:owl","貓頭鷹商人 · 待機","角色與NPC",ROOT+"adventure_v08/owl_merchant.png",2,2,4,1.5)
 	for row in ACTION_REGIONS.size():
 		var frames:Array=[]
 		for region_data:Array in ACTION_REGIONS[row]:frames.append(_descriptor(ROOT+"adventure_v08/pigeon_actions.png",region_data))
-		_add("pigeon_action:"+str(row),["鴿子 · 回血","鴿子 · 重傷跛行","舊衝刺姿態","舊下衝姿態"][row],"主角姿態",frames,5)
+		if row==1:
+			_add("pigeon_action:1:legacy","鴿子 · 舊四格跛行","主角姿態",frames,5)
+			continue
+		var extra:Dictionary={}
+		if row==2:extra={"phases":{"橫向穿刺":[1]},"hidden_frames":[0,2,3]}
+		if row==3:extra={"sequence":ACTOR_MOTION.SLAM_FRAMES+[3],"phases":{"下衝":ACTOR_MOTION.SLAM_FRAMES,"落地":[3]}}
+		_add("pigeon_action:"+str(row),["鴿子 · 回血","","鴿子 · 橫向雙C","鴿子 · 下衝與落地"][row],"主角姿態",frames,5 if row==0 else ACTOR_MOTION.SLAM_FPS,"",extra)
 	var sleeping:Array=[]
 	for region_data:Array in HOME_SLEEP:sleeping.append(_descriptor(ROOT+"home_v13/sleep.png",region_data))
 	_add("home:sleep","鳥巢 · 睡眠與起身","主角姿態",sleeping,6)
 	for id:String in ["background","musou","rogue","nest"]:
 		_add("home:"+id,"鳥巢 · "+{"background":"樹梢背景","musou":"無雙夢境大門","rogue":"冒險大門","nest":"鳥巢"}[id],"首頁與大門",[_descriptor(ROOT+"v33/home/background.png") if id=="background" else _descriptor(ROOT+"v33/home/props.png",[],[2,2],[0 if id=="musou" else 1,0]) if id in ["musou","rogue"] else _descriptor(ROOT+"v34/home/nest.png")],1)
-	for id:String in ["background","musou","rogue","nest"]:_covered[ROOT+"home_v13/"+id+".png"]=true
 	_sheet("ambient:bird","遠景飛鳥 · 四格","環境生物",ROOT+"atmosphere_v09/bird.png",4,1,4,7)
 	_sheet("ambient:dragonfly","近景蜻蜓 · 四格","環境生物",ROOT+"atmosphere_v09/dragonfly.png",4,1,4,22)
 	_sheet("spring:legacy","舊溫泉 · 四格水氣","場景互動物件",ROOT+"atmosphere_v10/spring.png",2,2,4,3)
@@ -196,8 +213,13 @@ static func _remaining_images(directory:String) -> void:
 		var path:String=directory+original
 		if _covered.has(path) or not ResourceLoader.exists(path):continue
 		var category:String="原圖與其他素材"
-		if directory.contains("ecology"):category="地形與背景"
-		elif directory.contains("explosion") or directory.contains("motion"):category="衝刺與爆炸特效"
+		if directory.contains("/bosses/"):category="首領圖集"
+		elif directory.contains("/monsters/"):category="小怪圖集"
+		elif directory.contains("/midground/") or directory.contains("ecology") or original.contains("background"):category="地形與背景"
+		elif directory.contains("/cloaks/") or directory.contains("/player/") or original.begins_with("pigeon"):category="主角姿態"
+		elif directory.contains("/projectiles/"):category="投射物"
+		elif directory.contains("explosion") or directory.contains("motion") or directory.contains("/effects/"):category="特效原圖"
+		elif directory.contains("/stations/") or directory.contains("/chests/"):category="場景互動物件"
 		_add("raw:"+path.trim_prefix(ROOT),original.get_basename(),category,[_descriptor(path)],1,"原始圖檔；若為新圖集且尚未登記切片，會先顯示完整圖集。")
 
 static func _category(id:String,library:String) -> String:
@@ -336,7 +358,10 @@ static func _v23() -> void:
 			for f:Dictionary in clip["frames"]:
 				var descriptor:Dictionary=_descriptor(ROOT+"v23/"+str(clip["path"]),f["source_rect"]);descriptor["pivot"]=f["pivot"];frames.append(descriptor)
 			var label:String="鴿子 · "+("統一比例空中動作" if id=="air" else "雙腳平貼牆面") if library=="pigeon-motion" else BIOME_NAMES[id]+" · 彈射風菇"
-			_add("v23:"+library+":"+id,label,"主角姿態" if library=="pigeon-motion" else "彈射互動物件",frames,8,"身體固定比例、獨立接觸點。彈射物件碰觸一倍跳高、砍中三倍跳高。")
+			var extra:Dictionary={}
+			if library=="pigeon-motion" and id=="wall":
+				extra={"sequence":WALL_MOTION.WALL_SLIDE_FRAMES,"phases":{"貼牆靜止":[0],"貼牆下滑":WALL_MOTION.WALL_SLIDE_FRAMES,"原始四格":[0,1,2,3]}}
+			_add("v23:"+library+":"+id,label,"主角姿態" if library=="pigeon-motion" else "彈射互動物件",frames,8,"固定比例，使用實際接觸點。",extra)
 	var decor:Dictionary=_json(ROOT+"v23/edge-decor-manifest.json")
 	for biome:String in decor.get("biomes",{}):
 		for item:Dictionary in decor["biomes"][biome]:
@@ -369,3 +394,122 @@ static func _v24() -> void:
 	for biome:String in corners.get("biomes",{}):
 		for kind:String in ["convex","concave"]:
 			_add("v24:corner:"+biome+":"+kind,BIOME_NAMES[biome]+" · "+("外凸" if kind=="convex" else "內凹")+"自然轉角","地形連接模組",[_descriptor(ROOT+"v24/terrain/"+corners["biomes"][biome][kind]["path"])],1,"僅真實地形轉角放置，固定2來源像素／世界像素；局部羽化銜接。")
+
+static func _group_for(item:Dictionary) -> String:
+	var id:String=item["id"]
+	var category:String=item["category"]
+	var path:String=item["frames"][0].get("path","")
+	if category in ["首領圖集","Boss動作與特效"] or path.begins_with(ROOT+"v59/monsters/") or path.begins_with(ROOT+"v59/effects/") or id.begins_with("v22:boss-actions:") or id in ["v22:death:underground","v22:death:trunk","v22:death:sky"]:return "Boss"
+	if category.begins_with("怪物") or category in ["小怪動作","小怪圖集","高解析怪物動作","死亡與屍體","陷阱安置動畫","環境生物"]:return "小怪"
+	if category in ["主角","主角姿態","衝刺與爆炸特效"] and (not id.begins_with("explosion:")):return "主角"
+	if category.contains("地形") or category.contains("中景") or category.contains("裝飾") or category=="首頁與大門" or path.contains("/maps/") or id.begins_with("procedural:door_"):return "地圖"
+	return "物件"
+
+static func _recent_art() -> void:
+	var motion:String=ROOT+"v68/pigeon_motion.webp"
+	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS)
+	var limp:Array=[]
+	for i in 8:limp.append(_descriptor(motion,[],[4,3],[i%4,1+i/4]))
+	_add("pigeon_action:1","鴿子 · 重傷跛行","主角姿態",limp,8,"近腳與遠腳依步態交替；遊戲依走過的距離換幀。")
+	for biome:String in ["underground","trunk","sky"]:
+		for size_id:String in ["large","small"]:
+			var label:String=BIOME_NAMES[biome]+" · "+("大圓石" if size_id=="large" else "小圓石")
+			_add("v67:stone:"+biome+":"+size_id,label,"場景互動物件",[_descriptor(ROOT+"v67/stones/"+biome+"_"+size_id+".webp")],1)
+		_sheet("v59:chest:"+biome,BIOME_NAMES[biome]+" · 寶箱開啟","場景互動物件",ROOT+"v59/chests/"+biome+".webp",4,2,8,12.5)
+	_sheet("v48:pigeon:quickdraw_walk","鴿子 · 蓄氣步行","主角姿態",ROOT+"v48/pigeon_quickdraw_walk.webp",3,2,6,8)
+
+static func _current_usage(item:Dictionary) -> Dictionary:
+	var id:String=item["id"]
+	var label:String=item["label"]
+	var path:String=item["frames"][0].get("path","").trim_prefix(ROOT)
+	var used:bool=true
+	var note:String=""
+	match id:
+		"pigeon_action:0":note="按住回血時的四張角色姿態。"
+		"pigeon_action:1":note="重傷後地面跛行，八幀依步行距離取樣。"
+		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由八幀交替步態取代。"
+		"pigeon_action:2":note="橫向雙 C 穿刺全程使用第 2 張，其他三張留在 RD。"
+		"pigeon_action:3":note="向下雙 C 用第 1、2、3 張接續，第 3 張持續到觸地，第 4 張落地。"
+		"v68:pigeon:jump_rise":note="地面起跳上升，前三張各 1/30 秒，第 4 張維持到上升結束。"
+		"v23:pigeon-motion:wall":note="貼牆靜止用第 1 張；下滑以 8 FPS 播 1→3→4→3→1→3→4→3→1。"
+		"v23:pigeon-motion:air":note="牆跳等其他上升、跳躍頂點、下降和普通落地姿勢。"
+		"v48:pigeon:quickdraw_walk":note="按住集氣且在地面移動時，按步態切換六張拔刀預備姿勢。"
+		"wind:form":note="雙 C 疊在鴿子中心，20% 不透明度；第 3、5 張停用，橫向播一次，垂直循環這六張。"
+		"wind:impact":note="向下雙 C 觸地後的地面風壓，20% 不透明度。"
+		"wind:jet":used=false;note="舊單 C 噴射；目前採用二段跳式拍翅與風尾。"
+		"combat_v05:pigeon_featherblade_up":note="朝上普攻，亦為目前副武器朝上施放時的角色姿勢。"
+		"combat_v05:pigeon_featherblade_down":note="朝下普攻、下劈反彈，亦可在副武器朝下施放時出現。"
+		"combat_v05:pigeon_greatblade_up":note="單 C 衝刺期間朝上攻擊，使用重刀上斬姿勢。"
+		"combat_v05:pigeon_greatblade_down":note="單 C 衝刺期間朝下攻擊，使用重刀下斬姿勢。"
+		"combat_v05:pigeon_feather_left":note="橫向羽毛刀三連普攻的第 1 刀，左右方向共用鏡像。"
+		"combat_v05:pigeon_feather_right":note="橫向羽毛刀三連普攻的第 2 刀，左右方向共用鏡像。"
+		"combat_v05:pigeon_feather_thrust":note="橫向羽毛刀三連普攻的第 3 刀，左右方向共用鏡像。"
+		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
+		"v37:feathers":note="攻擊命中後從怪物中心向攻擊方向噴出的兩格碎羽。"
+		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
+		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
+		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"
+		"v39:crescent":note="打中敵人時，細長月牙對準受擊者中央。"
+	if id.begins_with("v67:stone:"):note=label+"，隨機生成，受玩家攻擊擊飛後可撞傷怪物。"
+	elif id.begins_with("v59:chest:"):note=label+"，戰鬥房或獎勵房互動後播放。"
+	elif id.begins_with("v36:"):note=label+"，三生態戰鬥房的怪物姿勢或投射物。"
+	elif id.begins_with("v39:") and ":death:" in id:note=label+"，敵人血量歸零時的倒地姿勢。"
+	if note.is_empty() and id.begins_with("raw:"):
+		var file:Dictionary=_raw_usage(path)
+		if not file.is_empty():return file
+	if not note.is_empty():return {"runtime_usage":"used" if used else "un-used","usage_note":note}
+	if item.get("runtime_usage","")=="used":
+		var detail:String=str(item.get("notes",""))
+		if detail.begins_with("透明圖集"):detail=""
+		return {"usage_note":label+" · "+(detail if not detail.is_empty() else str(item.get("usage_note","遊戲內繪製。")))}
+	return {}
+
+static func _raw_usage(path:String) -> Dictionary:
+	var role:String=""
+	var used:bool=true
+	if path.begins_with("v63/monsters/"):
+		role="怪物高解析原稿，供切圖與審圖。"
+		used=false
+	elif path.begins_with("v55/bosses/"):
+		role="首領舊圖集；已由 v57 首領與 v59 移動圖取代。"
+		used=false
+	elif path.begins_with("v57/bosses/"):
+		role="各生態首領的出招、移動或倒地貼圖。"
+	elif path.begins_with("v59/monsters/"):
+		role="樹幹與天空首領移動時使用的高解析重繪。"
+	elif path.begins_with("v55/monsters/"):
+		role="三生態新增怪物的移動、攻擊與倒地圖集。"
+	elif path.begins_with("v51/midground/"):
+		role="依房間種子選擇的生態視差中景。"
+	elif path.begins_with("v30/cloaks/"):
+		role="選用該外觀後，依主角當前姿勢疊在身上的斗篷。"
+	elif path.begins_with("v31/projectiles/"):
+		role="副武器發射後的飛行、命中或爆炸動畫。"
+	elif path.begins_with("v33/safehouses/"):
+		role="三生態整備房的背景、供應台或工作站。"
+	elif path.begins_with("v33/springs/"):
+		role="溫泉房水面與池岸，入水時和角色互動。"
+	elif path.begins_with("v54/items_"):
+		role="消耗品在背包、快捷欄和掉落物上的圖示。"
+	else:
+		role={
+			"v65/home/projection_bottom.png":"首頁鳥巢投影幕下緣。",
+			"v63/home/stations.webp":"鳥巢的投影燈、門框、紀錄與戰利品站。",
+			"v62/tutorial/stations.webp":"新手教學的附武器、符文與動作示範站。",
+			"v59/effects/release.webp":"首領技能釋放序列。",
+			"v59/effects/ring.webp":"首領技能命中的環狀特效。",
+			"v57/maps/paper.svg":"章節與全塔地圖面板的紙張底圖。",
+			"v47/pigeon_quickdraw.webp":"主角站定蓄氣時的拔刀準備姿勢。",
+			"v55/effects/aura.svg":"重傷強化或護盾啟動時的環形特效。",
+			"v55/effects/frost.svg":"敵人被凍結時覆在本體上的冰層。",
+			"v55/effects/spark.svg":"投射物拖尾與場景火花粒子。",
+			"v55/ui/etched_slot.svg":"裝備卡片與鳥巢展示欄的雕紋底框。",
+			"v30/effects/wing-puff.png":"起跳或拍翅時的風團。",
+			"v29/effects/refined-feather.png":"死亡地點或取回物品的發光羽毛。",
+			"v29/stations/cloak-wardrobe.png":"整備房試穿外觀的衣櫃。",
+			"v29/stations/free-weapon-pedestal.png":"免費副武器領取台。",
+			"v28/player/heavy-landing.png":"主角從高處跌落時的重落地姿勢。",
+			"v27/player/double-jump-flap.png":"二段跳及單 C 短衝時的拍翅姿勢。",
+			"v27/fire/ground-flame.png":"火系攻擊留在地面上的火焰。",
+		}.get(path,"")
+	return {} if role.is_empty() else {"runtime_usage":"used" if used else "un-used","usage_note":role}

@@ -1,7 +1,7 @@
 class_name WorldCollision
 extends RefCounted
 ## Solid AABB solver; all actor anchors are at their feet.
-static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0,_full_scan:bool=false) -> Dictionary:
+static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0,_full_scan:bool=false,circles:Array[Vector3]=[]) -> Dictionary:
 	var pos:Vector2=depenetrate(at,size,solids);var vel:Vector2=velocity
 	var grounded:bool=false;var wall:int=0;var corrected:bool=false
 	var near:Array=solids if _full_scan else motion_candidates(pos,velocity,delta,size,solids,corner_margin)
@@ -17,7 +17,15 @@ static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solid
 			if vel.x>0:pos.x=solid.position.x-size.x*.5;wall=1
 			elif vel.x<0:pos.x=solid.end.x+size.x*.5;wall=-1
 			vel.x=0
-			if not _full_scan and not anchor_sweep.has_point(pos):return move_body(at,velocity,delta,size,solids,corner_margin,true)
+			if not _full_scan and not anchor_sweep.has_point(pos):return move_body(at,velocity,delta,size,solids,corner_margin,true,circles)
+		for circle:Vector3 in circles:
+			var center:=Vector2(circle.x,circle.y)
+			var dy:float=center.y-clampf(center.y,pos.y-size.y,pos.y)
+			if absf(dy)>=circle.z:continue
+			var extent:float=sqrt(circle.z*circle.z-dy*dy)+size.x*.5
+			if absf(pos.x-center.x)>=extent:continue
+			if vel.x>0:pos.x=center.x-extent;vel.x=0
+			elif vel.x<0:pos.x=center.x+extent;vel.x=0
 		pos.y+=vel.y*dt
 		for solid:Rect2 in near:
 			var box:Rect2=Rect2(pos-Vector2(size.x*.5,size.y),size)
@@ -36,7 +44,16 @@ static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solid
 			if vel.y>=0:pos.y=solid.position.y;grounded=true
 			else:pos.y=solid.end.y+size.y+.01
 			vel.y=0
-			if not _full_scan and not anchor_sweep.has_point(pos):return move_body(at,velocity,delta,size,solids,corner_margin,true)
+			if not _full_scan and not anchor_sweep.has_point(pos):return move_body(at,velocity,delta,size,solids,corner_margin,true,circles)
+		for circle:Vector3 in circles:
+			var center:=Vector2(circle.x,circle.y)
+			var dx:float=maxf(0,absf(center.x-pos.x)-size.x*.5)
+			if dx>=circle.z:continue
+			var extent:float=sqrt(circle.z*circle.z-dx*dx)
+			if pos.y<=center.y-extent or pos.y-size.y>=center.y+extent:continue
+			if vel.y>=0:pos.y=center.y-extent;grounded=true
+			else:pos.y=center.y+extent+size.y
+			vel.y=0
 	var final:Rect2=Rect2(pos-Vector2(size.x*.5,size.y),size)
 	for solid:Rect2 in near:
 		if final.end.y>solid.position.y+.1 and final.position.y<solid.end.y-.1:
@@ -83,3 +100,32 @@ static func motion_candidates(at:Vector2,velocity:Vector2,delta:float,size:Vecto
 	for solid:Rect2 in solids:
 		if solid.intersects(sweep,true):result.append(solid)
 	return result
+
+
+static func segment_circle(a:Vector2,b:Vector2,center:Vector2,radius:float) -> float:
+	var relative:Vector2=a-center
+	var offset:float=relative.length_squared()-radius*radius
+	if offset<=0:return 0.0
+	var delta:Vector2=b-a
+	var length_sq:float=delta.length_squared()
+	if length_sq<=.000001:return INF
+	var projection:float=relative.dot(delta)
+	var discriminant:float=projection*projection-length_sq*offset
+	if discriminant<0:return INF
+	var t:float=(-projection-sqrt(discriminant))/length_sq
+	return t if t>=0 and t<=1 else INF
+
+static func circle_overlaps_rect(center:Vector2,radius:float,rect:Rect2) -> bool:
+	var closest:Vector2=center.clamp(rect.position,rect.end)
+	return center.distance_squared_to(closest)<=radius*radius
+
+static func swept_circle_rect(a:Vector2,b:Vector2,radius:float,rect:Rect2) -> float:
+	# A rectangle expanded by a disk has four circular corners.
+	var sweep:=Rect2(a.min(b),a.max(b)-a.min(b)).grow(radius+.001)
+	if not sweep.intersects(rect,true):return INF
+	var t:float=minf(
+		segment(a,b,rect.grow_side(SIDE_LEFT,radius).grow_side(SIDE_RIGHT,radius)),
+		segment(a,b,rect.grow_side(SIDE_TOP,radius).grow_side(SIDE_BOTTOM,radius)))
+	for corner:Vector2 in [rect.position,rect.end,Vector2(rect.position.x,rect.end.y),Vector2(rect.end.x,rect.position.y)]:
+		t=minf(t,segment_circle(a,b,corner,radius))
+	return t

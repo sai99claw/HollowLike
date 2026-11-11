@@ -93,7 +93,7 @@ const ITEMS: Array[Dictionary] = [
 ## Root owns evaluation and persistence; attempts are alternate low-barrier paths.
 const SKILLS: Array[Dictionary] = [
 	{"id": "doublejump", "name": "二段跳", "desc": "空中再次按跳躍", "description": "空中再次按跳躍", "rooms": 0, "attempts": 1},
-	{"id": "wall", "name": "貼牆與牆跳", "desc": "貼牆不滑，視同落地，按跳躍離牆", "description": "貼牆不滑，視同落地，按跳躍離牆", "rooms": 0, "attempts": 1},
+	{"id": "wall", "name": "貼牆與牆跳", "desc": "貼牆靜止 0.5 秒後下滑，按跳躍離牆", "description": "貼牆靜止 0.5 秒後下滑，按跳躍離牆", "rooms": 0, "attempts": 1},
 	{"id": "dash_horizontal", "name": "穿刺雙衝", "desc": "0.5 秒內連按兩下 C", "description": "0.5 秒內連按兩下 C", "rooms": 1, "attempts": 2},
 	{"id": "charge_horizontal", "name": "橫向集氣斬", "desc": "長按主攻擊，左右方向放開", "description": "長按主攻擊，左右方向放開", "rooms": 1, "attempts": 2},
 	{"id": "dash_vertical", "name": "下砸穿刺", "desc": "下方向連按 C，下衝落地造成震波；上衝已移除", "description": "下方向連按 C，下衝落地造成震波；上衝已移除", "rooms": 2, "attempts": 2},

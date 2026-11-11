@@ -41,7 +41,7 @@ func run() -> void:
 	clear_combat(scene,Vector2(700,200));scene.platforms.assign([Rect2(0,1050,1500,70)]);scene.clock=10;scene._dash_pressed()
 	check(scene.p["dash_t"]>0 and not scene._wind_form_active() and not scene.p_attack.is_busy(),"Single C keeps the pigeon and plays only a small rear jet")
 	scene.clock=10.2;scene._dash_pressed();scene.p_attack.tick(.04)
-	check(scene._wind_form_active() and scene.p_attack.attack["kind"]=="pierce","Double C replaces the normal body with the wind form")
+	check(scene._wind_form_active() and scene.p_attack.attack["kind"]=="pierce","Double C starts the dedicated piercing action")
 	for speed in [.4,1.0,1.5]:
 		clear_combat(scene,Vector2(700,200));scene.world_speed=speed;scene.clock=10;scene._dash_pressed();scene.clock=10.2;scene._dash_pressed();scene.p_attack.tick(.04)
 		for step in 15:scene._physics_process(1.0/60)
@@ -79,11 +79,13 @@ func run() -> void:
 	check(not scene._hurt_player(1,Vector2(700,600)),"Landing protection still blocks damage at 0.49 seconds")
 	scene._physics_process(.011);check(scene._hurt_player(1,Vector2(700,600)),"Incoming damage resumes after the half-second landing window")
 	# World slow motion cannot expire the attack before the player reaches the floor.
-	clear_combat(scene,Vector2(700,60));scene.platforms.assign([Rect2(0,1050,1500,70)]);scene.world_speed=.4;down_dash(scene);var long_dive:bool=false
+	clear_combat(scene,Vector2(700,60));scene.platforms.assign([Rect2(0,1050,1500,70)]);scene.world_speed=.4;down_dash(scene);var ended_on_floor:bool=false
 	for step in 240:
 		scene.p["invul"]=0;scene._physics_process(1.0/60)
-		if step>110 and scene.p["slam"]:long_dive=true;check(scene.p_attack.is_active() and scene._slam_invulnerable(),"Slow-motion dive retains damage, wind body and invulnerability past the old timeout")
-		if step>5 and not scene.p["slam"]:break
-	check(long_dive and not scene.p["slam"] and is_equal_approx(scene.p["pos"].y,1050),"Extended slow-motion dive still ends on actual ground")
+		if scene.p["slam"]:check(scene.p_attack.is_active() and scene._slam_invulnerable(),"Slow-motion dive retains its attack and invulnerability")
+		elif step>5:
+			ended_on_floor=is_equal_approx(scene.p["pos"].y,1050)
+			break
+	check(ended_on_floor,"Faster slow-motion dive still ends on actual ground")
 	scene.meta=saved;scene._save_meta();scene.combat_feedback.clear();scene.queue_free();await process_frame
 	print("v0.14: ","passed" if failures.is_empty() else failures);quit(0 if failures.is_empty() else 1)

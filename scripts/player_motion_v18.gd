@@ -6,7 +6,9 @@ const FALL_MULTIPLIER:float=2.0
 const MAX_FALL_SPEED:float=1000.0
 const RELEASE_SPEED:float=140.0
 const POGO_SPEED:float=530.0
-const WALL_SLIDE_SPEED:float=120.0*1.5*.2
+const WALL_HOLD_SECONDS:float=.5
+const WALL_SLIDE_SPEED:float=36.0*1.2
+const SLAM_SPEED_FACTOR:float=1.5
 const WALL_APEX_SPEED:float=70.0
 static func can_attach(vertical_speed:float,dashing_into_wall:bool,was_attached:bool) -> bool:
 	# A normal jump is free through its ascent and apex. A deliberate dash

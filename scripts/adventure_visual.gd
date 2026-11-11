@@ -6,6 +6,13 @@ static var actions:Texture2D
 static var portal_dot:GradientTexture2D
 const FEATHER_SIZE:=Vector2(120,80)
 const FEATHER_BOB:float=6.0
+const NEW_MOTION=preload("res://assets/v68/pigeon_motion.webp")
+const MOTION_CELL:=Vector2(288,288)
+const MOTION_PIVOT:=Vector2(155,237)
+const JUMP_FPS:float=30.0
+const WIND_BODY_CENTER:=Vector2(0,22)
+const SLAM_FRAMES=[0,1,2,2,2,2,2,2,2]
+const SLAM_FPS:float=24.0
 const ACTION_REGIONS=[[[20,105,259,211],[346,87,251,230],[656,63,258,254],[969,69,240,248]],[[25,423,266,220],[335,417,274,218],[648,426,289,212],[967,421,279,217]],[[19,715,297,178],[312,714,317,144],[625,736,317,118],[938,713,303,168]],[[69,922,196,250],[408,921,143,279],[720,914,222,302],[938,1026,299,165]]]
 static func portal_mote(at:Vector2,time:float,index:int) -> Dictionary:
 	var t:float=fposmod(time/8.0+index*.6180339,1)
@@ -57,22 +64,47 @@ static func player_action(c:CanvasItem,anim:String,attack:Dictionary,progress:fl
 	var kind:String=str(attack.get("kind",""))
 	var special:bool=anim in ["windup","active","recovery"] and kind in ["pierce","slam"]
 	if anim not in ["heal","limp","dash"] and not special:return false
-	if actions==null:actions=load("res://assets/adventure_v08/pigeon_actions.png")
-	var row:int=0 if anim=="heal" else (1 if anim=="limp" else (3 if special and kind=="slam" else 2))
+	if anim=="limp":
+		_draw_new_motion(c,4+clampi(walk_frame,0,7),at,face,base,tint,scale_value)
+		return true
+	var row:int=0 if anim=="heal" else (3 if special and kind=="slam" else 2)
 	var index:int=int(time*5)%4
-	if row==1:index=clampi(walk_frame/3,0,3)
-	elif row>=2:index=0 if anim=="windup" else (3 if anim=="recovery" else 1+mini(1,int(progress*2)))
+	if row==2:index=1
+	elif row==3:index=3 if anim=="recovery" else mini(2,int(progress*3))
+	draw_action(c,row,index,at,face,base,tint,scale_value)
+	return true
+
+static func draw_action(c:CanvasItem,row:int,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
+	if actions==null:actions=load("res://assets/adventure_v08/pigeon_actions.png")
 	var raw:Array=ACTION_REGIONS[row][index]
 	var region:=Rect2(raw[0],raw[1],raw[2],raw[3])
 	var factor:float=sqrt(4.0/95.0)*scale_value
 	var pivot:=Vector2(region.size.x*.65,region.size.y)
 	var anchor:Vector2=at
-	if row==2:pivot=region.size*.5;anchor-=Vector2(0,24)
-	if row==3:pivot.x=region.size.x*.6
+	if row==2:pivot=region.size*.5;anchor-=WIND_BODY_CENTER
+	if row==3 and index<3:
+		pivot=region.size*.5
+		anchor-=WIND_BODY_CENTER
+	elif row==3:pivot.x=region.size.x*.6
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,anchor))
 	c.draw_texture_rect_region(actions,Rect2(-pivot,region.size),region,tint)
 	c.draw_set_transform_matrix(base)
-	return true
+
+static func jump_frame(elapsed:float) -> int:
+	return clampi(int(elapsed*JUMP_FPS),0,3)
+
+static func slam_frame(elapsed:float) -> int:
+	return SLAM_FRAMES[clampi(int(elapsed*SLAM_FPS),0,SLAM_FRAMES.size()-1)]
+
+static func draw_jump(c:CanvasItem,elapsed:float,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
+	_draw_new_motion(c,jump_frame(elapsed),at,face,base,tint)
+
+static func _draw_new_motion(c:CanvasItem,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
+	var source:=Rect2(Vector2(index%4,index/4)*MOTION_CELL,MOTION_CELL)
+	var factor:float=.224*scale_value
+	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,at))
+	c.draw_texture_rect_region(NEW_MOTION,Rect2(-MOTION_PIVOT,MOTION_CELL),source,tint)
+	c.draw_set_transform_matrix(base)
 
 static func door_color(target:Dictionary,locked:bool=false) -> Color:
 	if locked:return Color("ad9790")

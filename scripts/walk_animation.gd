@@ -50,7 +50,7 @@ func advance(distance:float,enabled:bool,ground:String,audible:bool) -> void:
 	var current:int=int(floor(phase))
 	for boundary in range(previous+1,current+1):
 		if boundary%(6 if limping else 5)==0:_footstep(ground,audible)
-	frame_index=[0,1,2,3,4,4,5,5,6,7,8,9][current%12] if limping else current%10
+	frame_index=[0,1,2,3,3,3,4,5,6,7,7,7][current%12] if limping else current%10
 	if phase>12000:phase=fmod(phase,60)
 func _footstep(ground:String,audible:bool) -> void:
 	emitted_events+=1

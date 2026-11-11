@@ -1,14 +1,18 @@
 class_name PigeonMotionV22
 extends RefCounted
 const Pose=preload("res://scripts/atlas_v23.gd")
+const WALL_SLIDE_FRAMES=[0,2,3,2,0,2,3,2,0]
+const WALL_FPS:float=8.0
 const Atlas=preload("res://scripts/atlas_v22.gd")
 static func drowsy_index(idle_seconds:float) -> int:return posmod(int(maxf(0,idle_seconds-6)*8),8)
 static func draw_drowsy(c:CanvasItem,at:Vector2,face:float,idle_seconds:float,base:Transform2D,tint:Color) -> bool:
 	return draw(c,"drowsy",drowsy_index(idle_seconds),at,face,base,tint)
 static func draw_air(c:CanvasItem,anim:String,at:Vector2,face:float,time:float,base:Transform2D,tint:Color,scale_value:float=1) -> bool:
-	if anim=="wall":return draw_pose(c,"wall",int(time*8)%4,at,face,base,tint,scale_value)
+	if anim in ["wall","wall_slide"]:return draw_pose(c,"wall",wall_frame(anim=="wall",time),at,face,base,tint,scale_value)
 	if anim in ["jump","jump_up","jump_apex","jump_down","land"]:return draw_pose(c,"air",{"jump":0,"jump_up":0,"jump_apex":1,"jump_down":2,"land":3}[anim],at,face,base,tint,scale_value)
 	return false
+static func wall_frame(holding:bool,elapsed:float) -> int:
+	return 0 if holding else WALL_SLIDE_FRAMES[int(maxf(elapsed,0.0)*WALL_FPS)%WALL_SLIDE_FRAMES.size()]
 static func draw(c:CanvasItem,id:String,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1) -> bool:
 	var clip:Dictionary=Atlas.clip("pigeon-motion",id)
 	if clip.is_empty():return false

@@ -6,7 +6,10 @@ const JET_SCALE:float=.10
 const FORM_SCALE:float=.25
 const IMPACT_SCALE:float=.90
 const JET_ANCHORS=[Vector2(438,270),Vector2(392,270),Vector2(390,270),Vector2(438,258),Vector2(392,258),Vector2(390,258)]
-const FORM_ANCHORS=[Vector2(375,290),Vector2(371,290),Vector2(370,290),Vector2(361,290),Vector2(374,260),Vector2(370,260),Vector2(370,260),Vector2(361,260)]
+const FORM_ANCHORS=[Vector2(204.5,284.5),Vector2(195.5,281),Vector2(189,282.5),Vector2(194.5,283.5),Vector2(203.5,242.5),Vector2(200.5,240),Vector2(195,248),Vector2(191,251)]
+const FORM_SEQUENCE=[0,1,3,5,6,7]
+const FORM_FPS:float=24.0
+const OVERLAY_TINT:=Color(1,1,1,.2)
 const GROUND_BASELINES=[300,300,300,300,647,647,647,647,972,972,972,972]
 static var textures:Dictionary={}
 static func texture(kind:String) -> Texture2D:
@@ -33,13 +36,12 @@ static func small_jet(c:CanvasItem,at:Vector2,dir:Vector2,elapsed:float,base:Tra
 	c.draw_texture_rect_region(texture("jet"),Rect2(-JET_ANCHORS[index],source.size),source)
 	c.draw_set_transform_matrix(base)
 static func form_index(elapsed:float,duration:float,down:bool) -> int:
-	if down and elapsed>=.06:return 2+int((elapsed-.06)*24)%4
-	return frame_index("form",elapsed/(.24 if down else maxf(.001,duration)))
+	var slot:int=int(maxf(0,elapsed)*FORM_FPS)%FORM_SEQUENCE.size() if down else mini(FORM_SEQUENCE.size()-1,int(clampf(elapsed/maxf(.001,duration),0,1)*FORM_SEQUENCE.size()))
+	return FORM_SEQUENCE[slot]
 static func wind_form(c:CanvasItem,at:Vector2,dir:Vector2,elapsed:float,duration:float,base:Transform2D,down:bool=false) -> void:
 	var index:int=form_index(elapsed,duration,down);var source:Rect2=region("form",index)
-	var anchor:Vector2=at+dir*(20 if down else 35)
-	c.draw_set_transform_matrix(base*Transform2D(dir.angle(),Vector2.ONE*FORM_SCALE,0,anchor))
-	c.draw_texture_rect_region(texture("form"),Rect2(-FORM_ANCHORS[index],source.size),source)
+	c.draw_set_transform_matrix(base*Transform2D(dir.angle(),Vector2.ONE*FORM_SCALE,0,at))
+	c.draw_texture_rect_region(texture("form"),Rect2(-FORM_ANCHORS[index],source.size),source,OVERLAY_TINT)
 	c.draw_set_transform_matrix(base)
 static func impact_rect(at:Vector2,_progress:float) -> Rect2:
 	# Conservative, fixed-size bounds for all twelve frames, entirely above ground.
@@ -49,5 +51,5 @@ static func impact(c:CanvasItem,at:Vector2,progress:float,base:Transform2D) -> v
 	var index:int=frame_index("impact",progress);var source:Rect2=region("impact",index)
 	var pivot:=Vector2(source.size.x*.5,source.size.y)
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2.ONE*IMPACT_SCALE,0,at))
-	c.draw_texture_rect_region(texture("impact"),Rect2(-pivot,source.size),source)
+	c.draw_texture_rect_region(texture("impact"),Rect2(-pivot,source.size),source,OVERLAY_TINT)
 	c.draw_set_transform_matrix(base)

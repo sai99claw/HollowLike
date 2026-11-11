@@ -4,6 +4,7 @@ const Art=preload("res://scripts/art.gd")
 const Slash=preload("res://scripts/slash_art_v18.gd")
 const Flap=preload("res://scripts/double_jump_v27.gd")
 const DashGust=preload("res://scripts/dash_flap_v39.gd")
+const AdventurePose=preload("res://scripts/adventure_visual.gd")
 const Wind=preload("res://scripts/wind_art.gd")
 const Weapon=preload("res://scripts/weapon_art_v24.gd")
 const READY_TIME:float=.55
@@ -66,6 +67,10 @@ func _draw() -> void:
 					Flap.draw(self,at,1.0,t-.30,Transform2D.IDENTITY,Color.WHITE)
 					_draw_timeline()
 					return
+				if anim=="jump_up":
+					AdventurePose.draw_jump(self,t,at,1,Transform2D.IDENTITY,Color.WHITE)
+					_draw_timeline()
+					return
 			"dash","pierce":
 				at.x+=minf(t/.16,1)*size.x*.14
 				if t<.16:
@@ -76,17 +81,24 @@ func _draw() -> void:
 				if action=="pierce" and t>=.24:
 					at.x+=clampf((t-.24)/.46,0,1)*size.x*.29
 					if t<.70:
-						Wind.wind_form(self,at-Vector2(0,22),direction,t-.24,.46,Transform2D.IDENTITY)
+						AdventurePose.draw_action(self,2,1,at,direction.x,Transform2D.IDENTITY,Color.WHITE)
+						Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,direction,t-.24,.46,Transform2D.IDENTITY)
 						_draw_timeline()
 						return
 			"slam":
 				at.y-=96*clampf(1-pow(maxf(0,t-.24)/.39,2),0,1)
 				anim="jump_down" if at.y<floor_y else "land"
 				if t>=.24 and t<.63:
-					Wind.wind_form(self,at-Vector2(0,22),Vector2.DOWN,t-.24,.39,Transform2D.IDENTITY,true)
+					AdventurePose.draw_action(self,3,AdventurePose.slam_frame(t-.24),at,1,Transform2D.IDENTITY,Color.WHITE)
+					Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,Vector2.DOWN,t-.24,.39,Transform2D.IDENTITY,true)
 					_draw_timeline()
 					return
-				if t>=.63 and t<.91:Wind.impact(self,at,(t-.63)/.28,Transform2D.IDENTITY)
+				if t>=.63 and t<.91:
+					Wind.impact(self,at,(t-.63)/.28,Transform2D.IDENTITY)
+					if t<.755:
+						AdventurePose.draw_action(self,3,3,at,1,Transform2D.IDENTITY,Color.WHITE)
+						_draw_timeline()
+						return
 			"attack","down_attack","charged":
 				var release:float=lesson.get("hold",0.0)
 				var elapsed:float=t-release

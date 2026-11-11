@@ -1,8 +1,8 @@
 extends RefCounted
 
 const Collision=preload("res://scripts/world_collision.gd")
-const LARGE:=Vector2(54,48)
-const SMALL:=Vector2(22,14)
+const LARGE:=Vector2(50,50)
+const SMALL:=Vector2(20,20)
 const PILE_OFFSETS:Array[float]=[-64,-38,-12,14,40,66]
 const LARGE_ART={
 	"underground":preload("res://assets/v67/stones/underground_large.webp"),
@@ -21,6 +21,12 @@ static func size(stone:Dictionary) -> Vector2:
 static func body(stone:Dictionary) -> Rect2:
 	var extent:Vector2=size(stone)
 	return Rect2(Vector2(stone["pos"])-Vector2(extent.x*.5,extent.y),extent)
+
+static func radius(stone:Dictionary) -> float:
+	return size(stone).x*.5
+
+static func center(stone:Dictionary) -> Vector2:
+	return Vector2(stone["pos"])-Vector2(0,radius(stone))
 
 static func draw(canvas:CanvasItem,stone:Dictionary,biome:String) -> void:
 	var art:Dictionary=LARGE_ART if stone["large"] else SMALL_ART
@@ -68,18 +74,44 @@ static func launch(stone:Dictionary,direction:Vector2,attack_damage:float) -> vo
 	stone["hits"]={}
 	stone["damage"]=clampf(attack_damage*.55,1.0,4.0)*(1.5 if stone["large"] else 1.0)
 
-static func step(stone:Dictionary,delta:float,world:Array) -> void:
+static func step(stone:Dictionary,delta:float,world:Array) -> PackedVector2Array:
 	var vel:Vector2=stone["vel"]
 	vel.y=minf(850.0,vel.y+850.0*delta)
-	var moved:Dictionary=Collision.move_body(stone["pos"],vel,delta,size(stone),world)
-	stone["pos"]=moved["pos"]
-	var after:Vector2=moved["vel"]
-	if moved["wall"]!=0 and is_zero_approx(after.x):after.x=-vel.x*.26
-	if moved["grounded"]:
-		after.x=move_toward(after.x,0,760.0*delta)
-		if vel.y>100:after.y=-vel.y*.29
-		if after.length_squared()<49:
-			after=Vector2.ZERO
-			stone["asleep"]=true
-			stone["damage"]=0.0
-	stone["vel"]=after
+	var at:Vector2=center(stone)
+	var path:=PackedVector2Array([at])
+	var r:float=radius(stone)
+	var remaining:float=delta
+	var grounded:bool=false
+	for iteration:int in 4:
+		var target:Vector2=at+vel*remaining
+		var earliest:float=INF
+		var normal:=Vector2.ZERO
+		for tile:Rect2 in world:
+			var t:float=Collision.swept_circle_rect(at,target,r,tile)
+			if t>=earliest:continue
+			var contact:Vector2=at.lerp(target,t)
+			var outward:Vector2=(contact-contact.clamp(tile.position,tile.end)).normalized()
+			if outward.is_zero_approx() or vel.dot(outward)>=0:continue
+			earliest=t
+			normal=outward
+		if earliest==INF:
+			at=target
+			path.append(at)
+			break
+		at=at.lerp(target,earliest)+normal*.001
+		path.append(at)
+		remaining*=1.0-earliest
+		var impact:float=-vel.dot(normal)
+		var floor_contact:bool=normal.y<-.6
+		var restitution:float=(.29 if impact>100 else 0.0) if floor_contact else .26
+		vel+=normal*impact*(1+restitution)
+		if floor_contact:
+			grounded=true
+			vel.x=move_toward(vel.x,0,760.0*delta)
+	if grounded and vel.length_squared()<49:
+		vel=Vector2.ZERO
+		stone["asleep"]=true
+		stone["damage"]=0.0
+	stone["pos"]=at+Vector2(0,r)
+	stone["vel"]=vel
+	return path

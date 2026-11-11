@@ -16,6 +16,20 @@ class Checker:
 		for y in range(0,int(size.y)+edge,edge):
 			for x in range(0,int(size.x)+edge,edge):draw_rect(Rect2(x,y,edge,edge),Color("243331") if (x/edge+y/edge)%2==0 else Color("1b2928"))
 
+class FrameButton:
+	extends Button
+	var timeline_index:int
+	var reorder:Callable
+	func _get_drag_data(_at:Vector2) -> Variant:
+		var badge:=Label.new()
+		badge.text="第 %d 格"%(timeline_index+1)
+		set_drag_preview(badge)
+		return {"timeline":reorder,"index":timeline_index}
+	func _can_drop_data(_at:Vector2,data:Variant) -> bool:
+		return data is Dictionary and data.get("timeline") == reorder and data.get("index") != timeline_index
+	func _drop_data(at:Vector2,data:Variant) -> void:
+		reorder.call(int(data["index"]),timeline_index+int(at.x>=size.x*.5))
+
 var current_entry:Dictionary={}
 var frame_index:int=0
 var fps:float=12
@@ -25,6 +39,9 @@ var filtered_entries:Array[Dictionary]=[]
 var thumbnail_page:int=0
 var _timeline:Array[Dictionary]=[]
 var _phase_edits:Dictionary={}
+var _playable:Array[int]=[]
+var _copied_frame:Dictionary={}
+var _copied_asset:String=""
 var _phase_id:String="all"
 var _elapsed:float=0
 var _built:bool=false
@@ -35,6 +52,7 @@ var _thumb_buttons:Array[Button]=[]
 var _thumb_indices:Array[int]=[]
 var _search:LineEdit
 var _kind:OptionButton
+var _group:OptionButton
 var _category:OptionButton
 var _list:ItemList
 var _filtered_count:Label
@@ -69,6 +87,8 @@ var _asset_id:LineEdit
 var gallery_page:int=0
 var gallery_cards:Array[Dictionary]=[]
 var _cache_label:Label
+var _active_frame_style:StyleBoxFlat
+var _inactive_frame_style:StyleBoxFlat
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -93,14 +113,16 @@ func _style(color:Color,border:Color=Color.TRANSPARENT) -> StyleBoxFlat:
 	return box
 func _label(text:String,point:int=16,color:Color=INK) -> Label:
 	var value:=Label.new();value.text=text;value.add_theme_font_size_override("font_size",point);value.add_theme_color_override("font_color",color);return value
-func _button(text:String,callback:Callable,width:float=0) -> Button:
-	var value:=Button.new();value.text=text;value.custom_minimum_size=Vector2(width,34)
+func _button(text:String,callback:Callable,width:float=0,provided:Button=null) -> Button:
+	var value:Button=provided if provided!=null else Button.new();value.text=text;value.custom_minimum_size=Vector2(width,34)
 	value.add_theme_color_override("font_color",INK);value.add_theme_stylebox_override("normal",_style(Color("294a3e"),Color("416553")))
 	value.add_theme_stylebox_override("hover",_style(Color("37614d"),GOLD));value.add_theme_stylebox_override("pressed",_style(Color("1c352d"),GOLD))
 	value.pressed.connect(callback);return value
 func _panel() -> PanelContainer:
 	var panel:=PanelContainer.new();panel.add_theme_stylebox_override("panel",_style(Color("152a23"),Color("365143")));return panel
 func _build() -> void:
+	_active_frame_style=_style(Color("49634a"),GOLD)
+	_inactive_frame_style=_style(Color("294a3e"),Color("416553"))
 	var backing:=ColorRect.new();backing.color=Color("0c1b17");backing.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);backing.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(backing)
 	var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side:String in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,14)
@@ -117,6 +139,9 @@ func _build() -> void:
 	left.add_child(_label("關鍵字（名稱、說明或 ID）",12,MUTED))
 	_search=LineEdit.new();_search.name="AssetSearch";_search.placeholder_text="搜尋角色、武器、符文或 ID";_search.custom_minimum_size.y=36;_search.clear_button_enabled=true;_search.text_changed.connect(func(_value:String)->void:_filter());left.add_child(_search)
 	left.add_child(_label("素材分類",12,MUTED))
+	_group=OptionButton.new();_group.name="AssetGroup";_group.custom_minimum_size.y=32;left.add_child(_group)
+	_group.get_popup().theme=theme
+	_group.item_selected.connect(func(_index:int)->void:_fill_subcategories();_filter())
 	_category=OptionButton.new();_category.name="AssetCategory";_category.custom_minimum_size.y=32;_category.item_selected.connect(func(_index:int)->void:_filter());left.add_child(_category)
 	_kind=OptionButton.new();_kind.name="AssetKindFilter";_kind.custom_minimum_size.y=34;left.add_child(_kind)
 	for pair in [["全部：動畫與靜態","all"],["只看動畫／逐幀特效","animated"],["只看靜態插圖／圖示","still"]]:_kind.add_item(pair[0]);_kind.set_item_metadata(_kind.item_count-1,pair[1])
@@ -150,7 +175,7 @@ func _build() -> void:
 	_reset_preview=_button("還原試播",reset_preview);edit_controls.add_child(_reset_preview)
 	edit_controls.add_child(_label("只影響試播",12,MUTED))
 	var strip_header:=HBoxContainer.new();right.add_child(strip_header)
-	strip_header.add_child(_label("影格順序 · 點選任一格定位",13,MUTED));var spacer:=Control.new();spacer.size_flags_horizontal=Control.SIZE_EXPAND_FILL;strip_header.add_child(spacer)
+	strip_header.add_child(_label("影格順序 · 可拖曳 · Ctrl+C／Ctrl+V",13,MUTED));var spacer:=Control.new();spacer.size_flags_horizontal=Control.SIZE_EXPAND_FILL;strip_header.add_child(spacer)
 	_previous_page=_button("上一頁",func()->void:_change_page(-1),70);strip_header.add_child(_previous_page)
 	_page_label=_label("1 / 1",12,MUTED);_page_label.custom_minimum_size.x=45;_page_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;strip_header.add_child(_page_label)
 	_next_page=_button("下一頁",func()->void:_change_page(1),70);strip_header.add_child(_next_page)
@@ -170,13 +195,19 @@ func _build() -> void:
 	_gallery_page_label=_label("",14,MUTED);_gallery_page_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_gallery_page_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;pages.add_child(_gallery_page_label)
 	_gallery_next=_button("下一頁",func()->void:change_gallery_page(1),110);pages.add_child(_gallery_next)
 func _fill_categories() -> void:
-	_category.clear();_category.get_popup().theme=theme;_category.add_item("全部分類")
-	for category:String in Catalog.categories():_category.add_item(category)
+	_group.clear();_group.add_item("全部大類")
+	for group:String in Catalog.GROUPS:_group.add_item(group)
+	_fill_subcategories()
+func _selected_group() -> String:
+	return "" if _group.selected<=0 else _group.get_item_text(_group.selected)
+func _fill_subcategories() -> void:
+	_category.clear();_category.get_popup().theme=theme;_category.add_item("全部子類")
+	for category:String in Catalog.categories(_selected_group()):_category.add_item(category)
 func _filter() -> void:
 	if _list==null:return
 	var selected_category:String="" if _category.selected<=0 else _category.get_item_text(_category.selected)
 	var kind:String=str(_kind.get_item_metadata(_kind.selected)) if _kind!=null else "all"
-	filtered_entries=Catalog.search(_search.text,selected_category,kind)
+	filtered_entries=Catalog.search(_search.text,selected_category,kind,_selected_group())
 	var usage:String=str(_usage.get_item_metadata(_usage.selected)) if _usage!=null else "all"
 	if usage!="all":filtered_entries=filtered_entries.filter(func(item:Dictionary)->bool:return item.get("runtime_usage","un-used")==usage)
 	_list.clear();gallery_page=0
@@ -189,7 +220,7 @@ func _filter() -> void:
 		if filtered_entries[i]["id"]==current_entry.get("id",""):_list.select(i);return
 	select_entry(filtered_entries[0])
 func clear_filters() -> void:
-	_search.text="";_category.select(0);_kind.select(0);_usage.select(0);_filter()
+	_search.text="";_group.select(0);_fill_subcategories();_kind.select(0);_usage.select(0);_filter()
 func _clear_selection() -> void:
 	pause();current_entry={};_phase_edits.clear();_timeline=[];frame_index=0;_preview_frame=-1;_preview_id=""
 	if _preview==null:return
@@ -236,13 +267,31 @@ func _phase_selected(index:int) -> void:
 func _original_timeline() -> Array[Dictionary]:
 	var slots:Array[Dictionary]=[]
 	for source:int in Catalog.sequence(current_entry,_phase_id):
-		slots.append({"source":source,"hidden":false})
+		slots.append({"source":source,"hidden":source in current_entry.get("hidden_frames",[])})
 	return slots
 
 func insert_blank_frame() -> void:
 	if _timeline.is_empty():return
 	_timeline.insert(frame_index+1,{"source":-1,"hidden":false})
 	frame_index+=1
+	_finish_timeline_edit()
+
+func copy_frame() -> void:
+	if _timeline.is_empty():return
+	_copied_frame=_timeline[frame_index].duplicate()
+	_copied_asset=str(current_entry["id"])
+
+func paste_frame() -> void:
+	if _timeline.is_empty() or _copied_frame.is_empty() or current_entry["id"]!=_copied_asset:return
+	frame_index+=1
+	_timeline.insert(frame_index,_copied_frame.duplicate())
+	_finish_timeline_edit()
+
+func move_frame(from_index:int,insertion_index:int) -> void:
+	if from_index<0 or from_index>=_timeline.size():return
+	var slot:Dictionary=_timeline.pop_at(from_index)
+	frame_index=clampi(insertion_index-int(from_index<insertion_index),0,_timeline.size())
+	_timeline.insert(frame_index,slot)
 	_finish_timeline_edit()
 
 func toggle_frame_visibility() -> void:
@@ -276,7 +325,10 @@ func _refresh_timeline() -> void:
 	_changing=true
 	_scrubber.max_value=maxi(0,_timeline.size()-1)
 	_changing=false
-	_play_button.disabled=_timeline.size()<=1
+	_playable.clear()
+	for index:int in _timeline.size():
+		if not _timeline[index]["hidden"]:_playable.append(index)
+	_play_button.disabled=_playable.size()<=1
 	if _play_button.disabled:pause()
 	thumbnail_page=frame_index/PAGE_SIZE
 	_preview_frame=-1
@@ -306,19 +358,22 @@ func pause() -> void:
 	playing=false
 	if _play_button!=null:_play_button.text="播放"
 func play() -> void:
-	if _timeline.size()<=1:return
+	if _playable.size()<=1:return
+	if not _playable.has(frame_index):
+		var next:int=_playable.bsearch(frame_index)
+		seek_frame(_playable[next%_playable.size()])
 	playing=true;_elapsed=0
 	if _play_button!=null:_play_button.text="暫停"
 func _toggle_play() -> void:
 	if playing:pause()
 	else:play()
 func _process(delta:float) -> void:
-	if not visible or (_gallery!=null and _gallery.visible) or not playing or _timeline.size()<=1:return
+	if not visible or (_gallery!=null and _gallery.visible) or not playing or _playable.size()<=1:return
 	_elapsed+=delta
 	var interval:float=1.0/fps
 	if _elapsed<interval:return
 	var advance:int=maxi(1,int(_elapsed/interval));_elapsed=fmod(_elapsed,interval)
-	frame_index=(frame_index+advance)%_timeline.size()
+	frame_index=_playable[(_playable.bsearch(frame_index)+advance)%_playable.size()]
 	var desired_page:int=frame_index/PAGE_SIZE
 	if desired_page!=thumbnail_page:thumbnail_page=desired_page;_rebuild_thumbnails()
 	_refresh_preview()
@@ -338,7 +393,14 @@ func _refresh_preview() -> void:
 	_highlight_thumbnails()
 	_cache_label.text="按需載入 · 快取 %d / 24 筆"%Catalog.cache_size()
 func _highlight_thumbnails() -> void:
-	for i in _thumb_buttons.size():_thumb_buttons[i].modulate=Color.WHITE if _thumb_indices[i]==frame_index else Color(.67,.75,.69,1)
+	for i in _thumb_buttons.size():
+		var selected:bool=_thumb_indices[i]==frame_index
+		var button:Button=_thumb_buttons[i]
+		button.modulate=Color.WHITE if selected else Color(.67,.75,.69,1)
+		button.add_theme_stylebox_override("normal",_active_frame_style if selected else _inactive_frame_style)
+		if selected:_scroll_to_frame.call_deferred(button)
+func _scroll_to_frame(button:Button) -> void:
+	if is_instance_valid(button) and button.is_inside_tree():_thumbnail_scroll.ensure_control_visible(button)
 func _rebuild_thumbnails() -> void:
 	if _strip==null or current_entry.is_empty():return
 	for child in _strip.get_children():_strip.remove_child(child);child.queue_free()
@@ -348,8 +410,15 @@ func _rebuild_thumbnails() -> void:
 		var frame_number:int=index
 		var source:int=_timeline[index]["source"]
 		var hidden:bool=_timeline[index]["hidden"]
-		var status:String="空白" if source<0 else ("隱藏" if hidden else "")
-		var button:=_button("",func()->void:pause();seek_frame(frame_number));button.name="Frame_%d"%index;button.custom_minimum_size=Vector2(72,76);button.tooltip_text="第 %d 格"%(index+1);_strip.add_child(button)
+		var status:String="空白" if source<0 else ("隱藏" if hidden else "%d"%(source+1))
+		var draggable:=FrameButton.new()
+		draggable.timeline_index=index
+		draggable.reorder=move_frame
+		var button:=_button("",func()->void:pause();seek_frame(frame_number),72,draggable)
+		button.name="Frame_%d"%index
+		button.custom_minimum_size=Vector2(72,76)
+		button.tooltip_text="第 %d 格 · 拖到左半部插入前方，右半部插入後方"%(index+1)
+		_strip.add_child(button)
 		var box:=VBoxContainer.new();box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);box.offset_left=4;box.offset_right=-4;box.offset_top=3;box.offset_bottom=-3;box.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(box)
 		var image:=TextureRect.new();image.texture=Catalog.frame(current_entry,source) if source>=0 and not hidden else null;image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;image.size_flags_vertical=Control.SIZE_EXPAND_FILL;image.custom_minimum_size=Vector2(64,48);image.mouse_filter=Control.MOUSE_FILTER_IGNORE;box.add_child(image)
 		if source>=0 and not hidden and current_entry.get("kind","")=="procedural":
@@ -368,6 +437,17 @@ func _close() -> void:
 			for child in box.get_children():
 				if child is TextureRect:child.texture=null
 	Catalog.clear_cache();closed.emit()
+func _input(event:InputEvent) -> void:
+	if not visible or not _built or not _inspector.visible or not event is InputEventKey:return
+	if not event.pressed or event.echo or not event.is_command_or_control_pressed():return
+	var focused:Control=get_viewport().gui_get_focus_owner()
+	if focused is LineEdit or focused is TextEdit:return
+	match event.keycode:
+		KEY_C:copy_frame()
+		KEY_V:paste_frame()
+		_:return
+	get_viewport().set_input_as_handled()
+
 func _unhandled_key_input(event:InputEvent) -> void:
 	if visible and event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:_close();get_viewport().set_input_as_handled()
 func _exit_tree() -> void:Catalog.clear_cache()

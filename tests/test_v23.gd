@@ -66,7 +66,7 @@ func run() -> void:
 		check(contact==Vector2(700+17*side,600),"Wall visual is rooted at the true side and bottom of the34x42collider")
 		for frame:Dictionary in Atlas.clip("pigeon-motion","wall")["frames"]:
 			check(frame["pivot"]==frame["wall_contact"],"Wall clip pivot is the authored flatsole contact")
-	check(is_equal_approx(PlayerMotion.WALL_SLIDE_SPEED,36),"Wallslide is exactly onefifth ofv22speed")
+	check(is_equal_approx(PlayerMotion.WALL_SLIDE_SPEED,43.2),"Wall slide is 20 percent faster than v0.67")
 	var tower:Dictionary=Tower.generate(3322);var chapters:Array=Map.full_tower_layout(tower,Rect2(180,155,915,422));var points:Dictionary={}
 	for chapter:Dictionary in chapters:points.merge(chapter["graph"]["points"])
 	check(points.size()==tower["rooms"].size(),"One full tower includes every room")
