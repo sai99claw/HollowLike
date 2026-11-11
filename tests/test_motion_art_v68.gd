@@ -144,12 +144,17 @@ func test_game() -> void:
 		game._begin_primary({"dir":direction,"charged":false})
 		game.p_attack.tick(float(game.p_attack.attack["windup"])+.001)
 		check(game.p_attack.is_active(),"Ordinary attack is in its visible strike phase")
-		Slash.texture=null
+		Slash.straight_texture=null
 		slash_canvas.queue_redraw()
 		await process_frame
 		await process_frame
-		check(Slash.texture!=null,"Ordinary "+direction+" attack draws its slash texture over the body pose")
+		check(Slash.straight_texture!=null,"Ordinary "+direction+" attack draws the straight flash over the body pose")
 		game.p_attack.cancel()
+	for zoom:float in [.65,1.0,2.0]:
+		var base:=Transform2D(0,Vector2.ONE*zoom,0,Vector2.ZERO)
+		check(is_equal_approx(Slash.straight_length(920,base)*zoom,460),"Flash is half the visible screen width at any camera zoom")
+	check(Catalog.entry("v72:straight_slash").get("frame_count",0)==4,"RD shows the four straight flash frames")
+	check(Catalog.entry("v72:wing_impulse").get("frame_count",0)==4 and Catalog.entry("v72:impact_feathers").get("frame_count",0)==4,"RD shows both four-frame feather effects")
 	slash_canvas.queue_free()
 	game._leave_lab()
 	if game.screen!="hub":game._ui_action("hub",null)

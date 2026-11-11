@@ -1,4 +1,5 @@
 extends SceneTree
+const Burst=preload("res://scripts/pigeon_burst_v72.gd")
 const Hit=preload("res://scripts/hit_art_v37.gd")
 const Mantle=preload("res://scripts/mantle_art_v37.gd")
 const Feedback=preload("res://scripts/combat_feedback.gd")
@@ -9,14 +10,11 @@ func _initialize() -> void:call_deferred("run")
 func check(ok:bool,message:String) -> void:
 	if not ok:failures.append(message);push_error(message)
 func run() -> void:
-	var d:Dictionary=Hit.info();check(Hit.texture()!=null,"Hit atlas loads from actual packed resources")
-	for kind:String in ["feathers"]:
-		check(d["animations"][kind].size()==3,"Hit effect has exactly three authored frames")
-		var distinct:Dictionary={}
-		for f:Dictionary in d["animations"][kind]:distinct[str(f["source_rect"])]=true
-		check(distinct.size()==3,"Each hit pose selects its own cell")
+	check(Burst.IMPACT.get_size()==Burst.CELL*2,"Four feather frames ship in the packed atlas")
 	check(Mantle.info()["frames"].size()==4 and ResourceLoader.exists(Mantle.ROOT+Mantle.info()["path"]),"Four-pose mantle artwork is exported")
-	check(Hit.feather_frame(62499)==0 and Hit.feather_frame(62500)==1 and Hit.feather_frame(125000)==-1,"Two feather frames last 1/16 second each")
+	for i in 4:
+		check(Burst.frame_at((i+.5)*.05,Burst.IMPACT_DURATION)==i,"Feathers visit all four authored spray poses")
+	check(Burst.frame_at(.20,Burst.IMPACT_DURATION)==-1,"The feather spray expires after 200 ms")
 	var crescent=preload("res://scripts/clean_crescent_v39.gd")
 	var scale:Vector2=crescent.pose(Vector2.ZERO,0,1475).get_scale().abs()
 	check(scale.is_equal_approx(Vector2(.85,1.20)) and Hit.CRESCENT_DURATION_USEC==125000,"Crescent is narrower, longer and lasts 1/8 second")
@@ -43,12 +41,17 @@ func run() -> void:
 	game.effects.clear();game.combat_feedback.clear();game._hit_enemy({"hp":100.0,"training":true,"pos":Vector2(500,500)},1,Color.WHITE)
 	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Training targets use the same new impact with no old body-centered animation")
 	game.effects.clear();game.combat_feedback.clear();game.props.assign([{"kind":"dummy","pos":Vector2(500,500),"used":false,"hurt":0.0}]);game._hit_props(Rect2(450,420,100,100),1,99)
-	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Station dummies also show the two-frame feather impact")
+	check(game.effects.is_empty() and game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["feathers"],"Station dummies also show the feather impact")
 	game._enter_practice(true)
 	game._begin_primary({"dir":"right","charged":false})
-	check(game.p_attack.is_active() and game.p_attack.attack["windup"]==0.0,"Primary attack starts active")
+	game.p_attack.tick(float(game.p_attack.attack["windup"])+.001)
+	check(game.p_attack.is_active(),"Primary attack reaches the active strike")
 	var target:Dictionary=game.enemies[0]
-	game._hit_enemy(target,.01,Color.WHITE)
+	var hitbox:Rect2=game._attack_box(game.p["pos"],game.p_attack.attack,1)
+	target["pos"]+=hitbox.get_center()-game._enemy_body_box(target).get_center()
+	game.combat_feedback.clear()
+	game._process_player_attack()
+	check(game.combat_feedback.flashes.size()==1 and not game.combat_feedback.flashes[0]["crescent"],"An ordinary strike ejects feathers without layering the old crescent")
 	var frozen_pose:float=game._enemy_pose_clock(target)
 	game.draw_clock+=.1
 	game._update_enemies_profiled_body(.1)

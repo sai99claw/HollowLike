@@ -3,7 +3,7 @@ extends Control
 const Art=preload("res://scripts/art.gd")
 const Slash=preload("res://scripts/slash_art_v18.gd")
 const Flap=preload("res://scripts/double_jump_v27.gd")
-const DashGust=preload("res://scripts/dash_flap_v39.gd")
+const PigeonBurst=preload("res://scripts/pigeon_burst_v72.gd")
 const AdventurePose=preload("res://scripts/adventure_visual.gd")
 const Wind=preload("res://scripts/wind_art.gd")
 const Weapon=preload("res://scripts/weapon_art_v24.gd")
@@ -63,6 +63,9 @@ func _draw() -> void:
 				else:at.y-=sin(clampf(ascent,0,1)*PI)*74
 				anim="jump_up" if (t<.31 or (twice and t>=.30 and t<.60)) else "jump_down"
 				if at.y>=floor_y-1:anim="idle"
+				if twice and t>=.30:
+					var origin:=Vector2(at.x,floor_y-sin(.30/.68*PI)*74-18)
+					PigeonBurst.draw(self,PigeonBurst.IMPULSE,origin,Vector2.DOWN,t-.30,PigeonBurst.IMPULSE_DURATION,110.0,Transform2D.IDENTITY)
 				if twice and t>=.30 and t<.58:
 					Flap.draw(self,at,1.0,t-.30,Transform2D.IDENTITY,Color.WHITE)
 					_draw_timeline()
@@ -72,9 +75,9 @@ func _draw() -> void:
 					_draw_timeline()
 					return
 			"dash","pierce":
+				PigeonBurst.draw(self,PigeonBurst.IMPULSE,at-Vector2(12,24),Vector2.LEFT,t,PigeonBurst.IMPULSE_DURATION,110.0,Transform2D.IDENTITY)
 				at.x+=minf(t/.16,1)*size.x*.14
 				if t<.16:
-					DashGust.gust(self,at,direction,t,Transform2D.IDENTITY)
 					Flap.draw(self,at,1.0,t*2.0,Transform2D.IDENTITY,Color.WHITE)
 					_draw_timeline()
 					return
@@ -119,7 +122,9 @@ func _draw() -> void:
 					var tip:Vector2=origin+direction*size.x*.43*(t/.85)
 					Weapon.draw(self,weapon_id,tip,direction,14,true,Transform2D.IDENTITY,t)
 	Art.draw_pigeon(self,at,1,clock,anim,Color.WHITE,1.0,progress,Transform2D.IDENTITY,"quick",attack)
-	if slash_box.has_area():Slash.draw(self,slash_box,attack,progress,Transform2D.IDENTITY)
+	if slash_box.has_area():
+		if attack.has("wing_pose"):Slash.draw_straight(self,slash_box.get_center(),attack["direction"],progress,size.x,Transform2D.IDENTITY)
+		else:Slash.draw(self,slash_box,attack,progress,Transform2D.IDENTITY)
 	_draw_timeline()
 
 func _draw_timeline() -> void:

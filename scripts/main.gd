@@ -325,7 +325,7 @@ func _ready() -> void:
 
 func _reset_player(at: Vector2) -> void:
 	combo_index=0
-	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"gust_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
+	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
 	p_attack.cancel()
 	if walker!=null:walker.reset_turn(float(p["face"]))
 	drop_through_timer=0.0
@@ -858,7 +858,6 @@ func _step_player(delta: float) -> void:
 	if jump_request:p["jump_buffer_left"]=.12;jump_request=false
 	else:p["jump_buffer_left"]=maxf(0,float(p.get("jump_buffer_left",0))-delta)
 	p["flap_left"]=maxf(0,float(p.get("flap_left",0))-delta)
-	p["gust_left"]=maxf(0,float(p.get("gust_left",0))-delta)
 	p["landing_left"]=maxf(0,float(p.get("landing_left",0))-delta)
 	p["wall_kick_left"]=maxf(0,float(p.get("wall_kick_left",0))-delta)
 	var wall_hold_left:float=float(p["wall_hold_left"])
@@ -915,7 +914,7 @@ func _step_player(delta: float) -> void:
 				vel.y=-JUMP_SPEED*(1.0+_rune_effect("wing"))*Tuning.value("jump_speed");p["grounded"]=false;p["jumps"]=1;_sound("jump")
 		elif _skill("doublejump") and int(p["jumps"])<2:
 			jumped=true
-			vel.y=-JUMP_SPEED*.92*Tuning.value("jump_speed");p["jumps"]=2;p["flap_left"]=.32;p["gust_left"]=.20;combat_feedback.double_jump(pos-Vector2(0,10));_sound("double_jump")
+			vel.y=-JUMP_SPEED*.92*Tuning.value("jump_speed");p["jumps"]=2;p["flap_left"]=.32;combat_feedback.double_jump(pos-Vector2(0,18));_sound("double_jump")
 		if jumped:
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
@@ -1194,7 +1193,7 @@ func _process_player_attack_profiled_body() -> void:
 		if bool(def.get("primary",false)) and ea.is_active() and bool(ea.attack.get("primary",false)) and hitbox.intersects(_attack_box(en["pos"],ea.attack,float(en["face"]))):
 			_parry(en)
 		if hitbox.intersects(_enemy_body_box(en)) and (p_attack.mark_timed_hit(int(en["uid"]),.5,3) if def.get("charged",false) else p_attack.mark_hit(int(en["uid"]))):
-			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def))
+			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def),true,not def.has("wing_pose"))
 			if float(def.get("recoil",0))>0:_recoil(float(def["recoil"]),en["pos"],-_attack_direction(def))
 			_restore_vital("energy",float(def.get("energy_gain",0))*(1.0+_rune_effect("energy")))
 			p["air_dash"]=false
@@ -1259,7 +1258,7 @@ func _update_hit_white(delta:float) -> void:
 		en["flash_left"]=maxf(0,remaining-delta)
 		if float(en["hp"])<=0 and en["flash_left"]<=0 and corpse_layer!=null:corpse_layer.invalidate()
 
-func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true) -> void:
+func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true,show_crescent:bool=true) -> void:
 	if float(en["hp"])<=0:return
 	if mode=="musou":damage*=dream.damage_factor()
 	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
@@ -1284,7 +1283,7 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 		en["push_left"]=.18;en["push_velocity"]=impulse*knockback/.18;en["push_base_y"]=en.get("vel",Vector2.ZERO).y;en["stun"]=maxf(float(en.get("stun",0)),.12)
 	en["death_direction"]=impulse;en["death_knockback"]=knockback
 	var contact:Vector2=en["pos"]-Vector2(0,_enemy_body_box(en).size.y*.5)
-	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse,str(Data.PRIMARY[weapon_index]["style"]),float(en["hp"])<=0)
+	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse,str(Data.PRIMARY[weapon_index]["style"]),float(en["hp"])<=0,show_crescent)
 
 	if not training and rng.randf()<clampf(_rune_effect("lifesteal"),0,1):_restore_vital("hp",1);_contact_fx("lifesteal",p["pos"]-Vector2(0,25))
 	_float(en["pos"]-Vector2(0,55),"%.1f"%damage,color);shake=maxf(shake,2.2)
@@ -2723,7 +2722,6 @@ func _draw_profiled_body() -> void:
 		bath.draw(self,_active_pool(),world_transform,draw_clock)
 		SanctuaryArt.pool_front(self,_active_pool(),draw_clock,world_transform)
 	if _is_healing():FX.fitted(self,"heal_guard",0,Rect2(p["pos"]-Vector2(35,65),Vector2(70,75)),world_transform,"right","idle",Color(.7,1,.8,.65),clock)
-	if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
 	_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	if charge_timer>.15 and show_hitboxes:
 		var threshold:float=_charge_threshold()
@@ -2841,7 +2839,6 @@ func _draw_player_body() -> void:
 	if float(p.get("landing_left",0))>0 and anim in ["idle","run","limp"]:
 		var squash:float=sin(float(p["landing_left"])/.09*PI)*.08
 		player_base=world_transform*Transform2D(0,Vector2(1+squash,1-squash),0,p["pos"])*Transform2D(0,-Vector2(p["pos"]))
-	if float(p.get("gust_left",0))>0:preload("res://scripts/adventure_art_v29.gd").jump_gust(self,p["pos"],.20-float(p["gust_left"]),world_transform)
 	if float(p["slam_land_left"])>0:
 		AdventurePose.draw_action(self,3,3,p["pos"],p["face"],player_base,tint)
 	elif bool(p["slam"]):
@@ -2897,7 +2894,6 @@ func _draw_hub() -> void:
 	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1,world_transform)
 	else:
 		_draw_player_body()
-		if float(p["dash_t"])>0 and not _wind_form_active():preload("res://scripts/dash_flap_v39.gd").gust(self,p["pos"],p["dash_dir"],.16-float(p["dash_t"]),world_transform)
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	draw_set_transform_matrix(world_transform)
 	_draw_home_keys()
@@ -3593,7 +3589,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 			combat_feedback.grass_hit(prop["pos"]-Vector2(0,18),Vector2(float(p["face"]),0),str(p_attack.attack.get("style","quick")))
 			_particles(prop["pos"]-Vector2(0,15),Color("a9c6a0"),7,80);continue
 		prop["hurt"]=.3
-		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false)
+		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false,attack_id>=0 or not p_attack.attack.has("wing_pose"))
 		else:_hit_flash(prop["pos"]-Vector2(0,35),damage,Color("aee8dc"))
 		if prop["kind"]=="health":p["hp"]=p["max_hp"];prop["used"]=true;prop["break_left"]=.5;p["hp_recovery"]=0.0;_toast("生命已回滿")
 		elif prop["kind"] in ["energy","energy_infinite"]:_restore_vital("energy",2);prop["used"]=prop["kind"]=="energy";prop["break_left"]=.5 if prop["used"] else 0
@@ -4439,7 +4435,12 @@ func _sync_enemy_canvases_profiled_body() -> void:
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
 	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
-	SlashArt.draw(canvas,_attack_box(p["pos"],p_attack.attack,float(p["face"])),p_attack.attack,p_attack.progress(),world_transform)
+	var def:Dictionary=p_attack.attack
+	var box:Rect2=_attack_box(p["pos"],def,float(p["face"]))
+	if def.has("wing_pose"):
+		SlashArt.draw_straight(canvas,box.get_center(),str(def.get("direction","right")),p_attack.progress(),display_safe.size.x,world_transform)
+	else:
+		SlashArt.draw(canvas,box,def,p_attack.progress(),world_transform)
 
 func _pogo() -> void:
 	p["jump_cut_allowed"]=false;p["recoil_left"]=0;p["wall_kick_left"]=0

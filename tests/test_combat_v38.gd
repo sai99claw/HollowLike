@@ -1,4 +1,5 @@
 extends SceneTree
+const Burst=preload("res://scripts/pigeon_burst_v72.gd")
 const Roster=preload("res://scripts/monster_roster_v36.gd")
 const Attack=preload("res://scripts/attack_state.gd")
 const Feedback=preload("res://scripts/combat_feedback.gd")
@@ -28,13 +29,15 @@ func run() -> void:
 	reset(g);g.enemies.assign([enemy(g,"underground",0)]);g.p_attack.begin({"kind":"pierce","windup":.1,"active":.3,"recovery":.2});g._update_enemies(.001,0);check(g.p["hp"]==5,"CC contact is protected during windup")
 	reset(g);var harmless:Dictionary=enemy(g,"underground",0);harmless.merge({"training":true,"contact_damage":0.0},true);g.enemies.assign([harmless]);g._update_enemies(.001,0);check(g.p["hp"]==5,"Training target stays harmless")
 	reset(g);g.p["grounded"]=true;g.p["jump_buffer_left"]=.1;g._step_player(.001)
-	check(g.combat_feedback.bursts.is_empty(),"First jump does not emit the second-jump burst")
+	check(g.combat_feedback.impulses.is_empty(),"First jump does not emit the second-jump burst")
 	g.p["coyote_left"]=0;g.p["jump_buffer_left"]=.1;g._step_player(.001)
-	check(g.p["jumps"]==2 and g.combat_feedback.bursts.size()==1,"Actual double jump emits feathers")
-	if not g.combat_feedback.bursts.is_empty():
-		var burst:CPUParticles2D=g.combat_feedback.bursts[0]
-		check(burst.texture!=null and burst.direction==Vector2.DOWN and burst.initial_velocity_min>=145 and burst.amount>=18,"Double jump uses visible textured downward feathers")
-		g.combat_feedback.set_frozen(true);check(burst.speed_scale==0,"Feathers respect hitstop")
+	check(g.p["jumps"]==2 and g.combat_feedback.impulses.size()==1,"Actual double jump emits a four-frame impulse")
+	if not g.combat_feedback.impulses.is_empty():
+		var impulse:Dictionary=g.combat_feedback.impulses[0]
+		check(Burst.IMPULSE!=null and impulse["direction"]==Vector2.DOWN,"Double jump draws a visible downward texture sequence")
+		g.hitstop=.1;g._physics_process(.016)
+		check(impulse["age"]==0,"Animated sprite respects hitstop")
+		g.hitstop=0
 	for biome:String in Roster.BIOMES:
 		for row in 5:
 			for face:float in [-1,1]:

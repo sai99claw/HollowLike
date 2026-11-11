@@ -409,11 +409,14 @@ static func _group_for(item:Dictionary) -> String:
 	var path:String=item["frames"][0].get("path","")
 	if category in ["首領圖集","Boss動作與特效"] or path.begins_with(ROOT+"v59/monsters/") or path.begins_with(ROOT+"v59/effects/") or id.begins_with("v22:boss-actions:") or id in ["v22:death:underground","v22:death:trunk","v22:death:sky"]:return "Boss"
 	if category.begins_with("怪物") or category in ["小怪動作","小怪圖集","高解析怪物動作","死亡與屍體","陷阱安置動畫","環境生物"]:return "小怪"
-	if category in ["主角","主角姿態","衝刺與爆炸特效"] and (not id.begins_with("explosion:")):return "主角"
+	if id in ["v72:wing_impulse","v72:straight_slash"] or (category in ["主角","主角姿態","衝刺與爆炸特效"] and not id.begins_with("explosion:")):return "主角"
 	if category.contains("地形") or category.contains("中景") or category.contains("裝飾") or category=="首頁與大門" or path.contains("/maps/") or id.begins_with("procedural:door_"):return "地圖"
 	return "物件"
 
 static func _recent_art() -> void:
+	_sheet("v72:wing_impulse","單 C／二段跳 · 拍翅噴流","動作與特效",ROOT+"v72/wing-impulse.webp",2,2,4,4.0/.24)
+	_sheet("v72:impact_feathers","命中 · 身體向外噴出碎羽","攻擊與命中特效",ROOT+"v72/impact-feathers.webp",2,2,4,20)
+	_sheet("v72:straight_slash","普攻 · 直線閃光","攻擊與命中特效",ROOT+"v72/straight-slash.png",2,2,4,24)
 	var motion:String=ROOT+"v68/pigeon_motion.webp"
 	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS,
 		{"sequence":ACTOR_MOTION.JUMP_SEQUENCE,"hidden_frames":[0,3],"phases":{"原始圖集":[0,1,2,3]}})
@@ -458,7 +461,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"idle:v19:idle":note="待機 5 FPS，依指定順序往返播放，第 4、8 張停用。"
 		"idle:v19:rest":note="閒置五秒後從第 2 張進入趴地休息。"
 		"walk_v2:pigeon_walk_master":note="正常走路依距離播第 7、3、8、9、10 張。"
-		"slash:v18":note="普攻、上下斬與手動集氣釋放的羽刃月牙，依判定範圍與揮擊方向播放。"
+		"slash:v18":note="手動集氣釋放使用舊羽刃月牙。普通揮擊使用直線閃光。"
 		"combat_v05:pigeon_featherblade_up":note="副武器朝上施放時的舊角色姿勢。"
 		"combat_v05:pigeon_featherblade_down":note="副武器朝下施放時的舊角色姿勢。"
 		"combat_v05:pigeon_greatblade_up":used=false;note="舊衝刺上斬姿勢，已由右翅上揮取代。"
@@ -469,13 +472,16 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
 		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
 		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
-		"v37:feathers":note="攻擊命中後從怪物中心向攻擊方向噴出的兩格碎羽。"
+		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
+		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
+		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，四幀由集中至飛散。"
+		"v72:straight_slash":note="普攻有效期間從判定中心畫出半個可見畫面寬的直線，方向隨橫斬、上斬或下斬。傷害沿用原判定。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
 		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"
-		"v39:crescent":note="打中敵人時，細長月牙對準受擊者中央。"
+		"v39:crescent":note="集氣等其他攻擊命中時，細長月牙對準受擊者中央。"
 	if id.begins_with("v70:pigeon:attack:"):note=label+"；普攻以預備姿勢接動態模糊。角色造型取自走路第 10 幀。"
-	elif id.begins_with("v67:stone:"):note=label+"，隨機生成，主角可穿過，擊飛後可撞傷怪物。六顆小石排成 1／2／3 層，近戰擊中其中一顆會打散整堆。"
+	elif id.begins_with("v67:stone:"):note=label+"，隨機生成，主角可穿過，擊飛後可撞傷怪物。"+("六顆小石排成 1／2／3 層，近戰擊中其中一顆會打散整堆。" if id.ends_with(":small") else "")
 	elif id.begins_with("v59:chest:"):note=label+"，戰鬥房或獎勵房互動後播放。"
 	elif id.begins_with("v36:"):note=label+"，三生態戰鬥房的怪物姿勢或投射物。"
 	elif id.begins_with("v39:") and ":death:" in id:note=label+"，敵人血量歸零時的倒地姿勢。"
