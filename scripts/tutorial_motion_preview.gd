@@ -111,8 +111,8 @@ func _draw() -> void:
 				elif elapsed<.44:
 					anim="active";progress=elapsed/.44
 					attack={"direction":"down" if action=="down_attack" else "right","great_spin_release":action=="charged"}
-					if action=="charged":slash_box=Rect2(at+Vector2(7,-58),Vector2(103,57))
-					else:attack["wing_pose"]=3 if action=="down_attack" else 0
+					slash_box=Rect2(at+Vector2(-29,-8),Vector2(58,82)) if action=="down_attack" else Rect2(at+Vector2(7,-58),Vector2(103,57))
+					if action!="charged":attack["wing_pose"]=3 if action=="down_attack" else 0
 			"sub":
 				if t<.85:
 					var origin:Vector2=at-Vector2(0,26)

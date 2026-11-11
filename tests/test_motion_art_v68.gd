@@ -1,5 +1,6 @@
 extends SceneTree
 
+const Slash=preload("res://scripts/slash_art_v18.gd")
 const Pose=preload("res://scripts/adventure_visual.gd")
 const Wall=preload("res://scripts/pigeon_motion_v22.gd")
 const Wind=preload("res://scripts/wind_art.gd")
@@ -136,6 +137,20 @@ func test_game() -> void:
 		game._begin_primary({"dir":"right","charged":false})
 		check(game.p_attack.attack["wing_pose"]==i%2,"Live controller alternates wing poses")
 		game.p_attack.cancel()
+	var slash_canvas:=Node2D.new()
+	root.add_child(slash_canvas)
+	slash_canvas.draw.connect(game._paint_player_slash.bind(slash_canvas))
+	for direction in ["right","up","down"]:
+		game._begin_primary({"dir":direction,"charged":false})
+		game.p_attack.tick(float(game.p_attack.attack["windup"])+.001)
+		check(game.p_attack.is_active(),"Ordinary attack is in its visible strike phase")
+		Slash.texture=null
+		slash_canvas.queue_redraw()
+		await process_frame
+		await process_frame
+		check(Slash.texture!=null,"Ordinary "+direction+" attack draws its slash texture over the body pose")
+		game.p_attack.cancel()
+	slash_canvas.queue_free()
 	game._leave_lab()
 	if game.screen!="hub":game._ui_action("hub",null)
 	game._enter_practice(true)

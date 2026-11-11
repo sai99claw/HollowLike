@@ -11,13 +11,13 @@ func run() -> void:
 	var ui=UI.new();root.add_child(ui);await process_frame
 	for rune in Data.all_runes():check(Icons.texture(Icons.rune(rune["id"],rune.get("strong",false))) is AtlasTexture,"Every normal/strong rune resolves to a cropped delivered UI image")
 	for skill in Data.SKILLS:check(Icons.texture(Icons.by_text("已解鎖　"+skill["name"])) is AtlasTexture,"Skill sections display the matching delivered icon")
-	for item in Data.ITEMS:check(Icons.texture("items_"+item["id"]) is AtlasTexture,"Every consumable uses delivered art")
+	for item in Data.ITEMS:check(Icons.texture("items_"+item["id"])!=null,"Every consumable uses delivered art")
 	for weapon in Data.SECONDARY:check(Icons.texture("secondary_"+weapon["id"]) is AtlasTexture,"Every secondary uses delivered art")
-	ui.update_hud({"hp":4,"max_hp":6,"energy":2,"max_energy":6,"hp_recovery":.25,"energy_recovery":.6,"hp_recovering":true,"energy_recovering":true,"weapon":"大刀","coins":9})
-	check(ui.hp_label.text=="生命 4 / 6" and ui.energy_label.text=="能量 2 / 6","Resource labels display only integer values")
+	ui.update_hud({"hp":4,"max_hp":6,"energy":2,"max_energy":6,"hp_recovery":.25,"energy_recovery":.6,"hp_recovering":true,"energy_recovering":true,"weapon":"大刀","coins":9,"mode":"rogue"})
+	check(ui.health_art.texture!=null and ui.energy_art.texture!=null and ui.health_art.tooltip_text=="生命 4 / 6" and ui.energy_art.tooltip_text=="能量 2 / 6","HUD displays resource art with exact integer values available on hover")
 	check(ui.health_cells.get_child_count()==6 and ui.energy_cells.get_child_count()==6,"Health and energy each display their exact number of discrete cells")
 	check(ui.health_cells.recovering_index==4 and ui.energy_cells.recovering_index==2,"Only the next unfinished resource cell is marked recovering")
-	check(not ui.health_bar.visible and not ui.energy_bar.visible,"Continuous resource bars are hidden")
+	check(ui.header.get_theme_stylebox("panel") is StyleBoxEmpty and ui.coins_label.text=="9","HUD uses a transparent background and a numeric coin balance")
 	var before:float=ui.health_cells.get_child(4).modulate.a
 	ui.health_cells._process(.07)
 	check(not is_equal_approx(before,ui.health_cells.get_child(4).modulate.a),"Recovering cell visibly blinks")

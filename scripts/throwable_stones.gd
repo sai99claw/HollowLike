@@ -3,7 +3,16 @@ extends RefCounted
 const Collision=preload("res://scripts/world_collision.gd")
 const LARGE:=Vector2(50,50)
 const SMALL:=Vector2(20,20)
-const PILE_OFFSETS:Array[float]=[-64,-38,-12,14,40,66]
+const ROW_HEIGHT:=17.320508
+const PILE_OFFSETS:Array[Vector2]=[
+	Vector2(0,-2*ROW_HEIGHT),
+	Vector2(-10,-ROW_HEIGHT),Vector2(10,-ROW_HEIGHT),
+	Vector2(-20,0),Vector2(0,0),Vector2(20,0),
+]
+const SCATTER_DIRECTIONS:Array[Vector2]=[
+	Vector2(.24,-1),Vector2(-.76,-.76),Vector2(.83,-.72),
+	Vector2(-1,-.18),Vector2(-.31,-.92),Vector2(1,-.26),
+]
 const LARGE_ART={
 	"underground":preload("res://assets/v67/stones/underground_large.webp"),
 	"trunk":preload("res://assets/v67/stones/trunk_large.webp"),
@@ -43,19 +52,22 @@ static func spawn(layout:Dictionary,surfaces:Array,solids:Array,avoid:Array) -> 
 			if x>=132 and x<=bounds.x-132 and surface.position.y>100 and surface.position.y<=float(layout["floor_y"]):
 				candidates.append(Vector2(x,surface.position.y))
 	for large:bool in [false,true]:
-		var offsets:Array=[0.0] if large else PILE_OFFSETS
+		var offsets:Array=[Vector2.ZERO] if large else PILE_OFFSETS
 		var extent:Vector2=LARGE if large else SMALL
 		var options:Array[Vector2]=candidates.duplicate()
 		while not options.is_empty():
 			var at:Vector2=options.pop_at(random.randi_range(0,options.size()-1))
 			if avoid.any(func(point:Vector2)->bool:return point.distance_to(at)<(135.0 if large else 170.0)):continue
-			if not large and not offsets.all(func(dx:float)->bool:return _supported(at+Vector2(dx,0),extent.x*.5,surfaces)):continue
 			if large and not _supported(at,extent.x*.5,surfaces):continue
-			var spread:float=extent.x*.5+(0.0 if large else 68.0)
-			var clearance:=Rect2(at-Vector2(spread,extent.y+5),Vector2(spread*2,extent.y+4.9))
+			if not large and not PILE_OFFSETS.slice(3).all(func(offset:Vector2)->bool:return _supported(at+offset,extent.x*.5,surfaces)):continue
+			var half_width:float=extent.x*.5 if large else 30.0
+			var height:float=extent.y if large else extent.y+2*ROW_HEIGHT
+			var clearance:=Rect2(at-Vector2(half_width,height+5),Vector2(half_width*2,height+4.9))
 			if solids.any(func(tile:Rect2)->bool:return tile.intersects(clearance)):continue
-			for dx:float in offsets:
-				result.append({"kind":"stone","pos":at+Vector2(dx,0),"large":large,"vel":Vector2.ZERO,"hurt":0.0,"asleep":true,"hits":{},"damage":0.0})
+			for slot in offsets.size():
+				var stone:Dictionary={"kind":"stone","pos":at+offsets[slot],"large":large,"vel":Vector2.ZERO,"hurt":0.0,"asleep":true,"hits":{},"damage":0.0}
+				if not large:stone["pile_slot"]=slot
+				result.append(stone)
 			avoid.append(at)
 			break
 	return result
@@ -65,7 +77,12 @@ static func _supported(at:Vector2,half:float,surfaces:Array) -> bool:
 		if not surfaces.any(func(s:Rect2)->bool:return absf(s.position.y-at.y)<.1 and x>=s.position.x and x<=s.end.x):return false
 	return true
 
+static func scatter(stone:Dictionary,direction:Vector2,attack_damage:float) -> void:
+	var spread:Vector2=SCATTER_DIRECTIONS[int(stone["pile_slot"])]+direction*.22
+	launch(stone,spread.normalized(),attack_damage)
+
 static func launch(stone:Dictionary,direction:Vector2,attack_damage:float) -> void:
+	stone.erase("pile_slot")
 	var speed:float=520.0 if stone["large"] else 690.0
 	var lift:float=205.0 if absf(direction.y)<.5 else 0.0
 	stone["vel"]=direction.normalized()*speed-Vector2(0,lift)

@@ -930,14 +930,7 @@ func _step_player(delta: float) -> void:
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
 	var approach_x:float=vel.x
-	var nearby_stones:Array[Vector3]=[]
-	if screen=="game":
-		for prop:Dictionary in props:
-			if prop["kind"]!="stone" or not prop["asleep"] or prop.get("used",false):continue
-			if Vector2(prop["pos"]).distance_squared_to(pos)>180.0*180.0:continue
-			var center:Vector2=Stones.center(prop)
-			nearby_stones.append(Vector3(center.x,center.y,Stones.radius(prop)))
-	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),solids,4,false,nearby_stones)
+	var resolved:Dictionary=Coll.move_body(pos,vel,delta,Vector2(34,42),solids,4)
 	if _in_bath() and absf(vel.x)>1 and absf(resolved["vel"].x)<1:
 		for lift in [8.0,18.0,30.0]:
 			var raised:Vector2=pos-Vector2(0,lift)
@@ -2633,7 +2626,7 @@ func _update_hud() -> void:
 func _update_hud_profiled_body() -> void:
 	if ui==null:return
 	var phase_name:String=p_attack.phase
-	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"map":int(room.get("map_index",-1))+1,"room":current_room+1,"biome":_biome_name(),"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"revive":not revive_used,"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"seed":tower.get("seed",0),"fps":fps_smoothed,"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
+	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
 	ui.update_quickbar(bag_items,Data.ITEMS)
 	ui.quickbar.visible=screen=="game" and not ui.is_panel_open() and not minimap_open
@@ -3550,7 +3543,14 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 			if attack_id<0:direction=_attack_direction(p_attack.attack)
 			elif source.is_finite():direction=(center-source).normalized()
 			if direction.is_zero_approx():direction=Vector2(float(p["face"]),0)
-			Stones.launch(prop,direction,damage)
+			if attack_id<0 and prop.has("pile_slot"):
+				for member_index in props.size():
+					var member:Dictionary=props[member_index]
+					if member["kind"]!="stone" or not member.has("pile_slot") or member.get("used",false):continue
+					if p_attack.is_active():p_attack.mark_hit(-10000-member_index)
+					Stones.scatter(member,direction,damage)
+			else:
+				Stones.launch(prop,direction,damage)
 			_hit_flash(center,damage,Color("e1c5a0"))
 			_particles(center,Color("bca58d"),6,100)
 			_sound("metal_hit")
@@ -4438,7 +4438,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
-	if p_attack.attack.has("wing_pose") or screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
+	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
 	SlashArt.draw(canvas,_attack_box(p["pos"],p_attack.attack,float(p["face"])),p_attack.attack,p_attack.progress(),world_transform)
 
 func _pogo() -> void:

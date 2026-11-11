@@ -32,7 +32,7 @@ func run() -> void:
 	scene.ui.mute_button.pressed.emit();check(scene.audio_enabled and not scene.ui.is_panel_open(),"Top mute button toggles sound without opening settings")
 	scene.ui.mute_button.pressed.emit();check(not scene.audio_enabled and not scene.meta["settings"]["audio_enabled"] and AudioServer.is_bus_mute(0),"Mute setting is saved and immediately mutes all sound")
 	scene.bag_weapons.assign([Data.secondary_attack(0),Data.secondary_attack(10)]);scene.secondary_index=0;scene._unhandled_input(key(KEY_Q,true))
-	check(scene.secondary_index==1 and scene.ui.secondary_label.text.contains("連鎖雷擊法杖") and scene.ui.secondary_label.text.contains("Q"),"Q changes equipped secondary and visible HUD immediately")
+	check(scene.secondary_index==1 and scene.ui.secondary_art.tooltip_text.contains("連鎖雷擊法杖") and scene.ui.secondary_art.tooltip_text.contains("Q"),"Q changes equipped secondary and visible HUD immediately")
 	check(scene.ui.secondary_art.texture==Icons.texture("secondary_chain_staff"),"HUD shows equipped secondary's illustration")
 	# Every aerial weapon starts active synchronously on the input event.
 	for i in Data.SECONDARY.size():

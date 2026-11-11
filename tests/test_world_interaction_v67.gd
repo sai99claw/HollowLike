@@ -28,6 +28,14 @@ func run() -> void:
 	var floor:=Rect2(0,600,1600,100)
 	var rocks:Array[Dictionary]=Stones.spawn({"size":Vector2(1600,700),"floor_y":600,"seed":67},[floor],[floor],[])
 	check(rocks.size()==7 and rocks.filter(func(rock:Dictionary)->bool:return rock["large"]).size()==1,"One large stone and a six-stone pile")
+	var rows:Dictionary={}
+	for rock in rocks:
+		if rock["large"]:continue
+		var height:int=roundi(Vector2(rock["pos"]).y)
+		rows[height]=int(rows.get(height,0))+1
+	var heights:Array=rows.keys()
+	heights.sort()
+	check(heights.size()==3 and [rows[heights[0]],rows[heights[1]],rows[heights[2]]]==[1,2,3],"Small stones form a triangular 1/2/3 tower")
 	var random:=RandomNumberGenerator.new()
 	random.seed=67
 	for variant:int in [0,Roster.REGULAR_COUNT-1]:
@@ -48,7 +56,31 @@ func run() -> void:
 	check(game._enemy_body_box(dummy).size==Roster.regular("underground",0)["body_size"],"Dummy collision uses the regular monster body")
 	game._hit_enemy(dummy,2,Color.WHITE,76,Vector2.INF,Vector2.RIGHT)
 	check(dummy["training_total"]==2 and dummy["hp"]==dummy["max_hp"] and dummy["push_left"]>0,"Dummy receives normal knockback and records damage without dying")
+	game.props.assign(rocks)
+	game.solids.assign([floor])
+	game.platforms.assign([floor])
+	game.enemies.clear()
 	var stone:Dictionary=rocks.back()
+	stone["pos"]=Vector2(500,600)
+	var tower_x:float=Vector2(rocks[0]["pos"]).x
+	var left_x:float=minf(500,tower_x)-55
+	var right_x:float=maxf(500,tower_x)+55
+	game._reset_player(Vector2(left_x,600))
+	game.keys["right"]=true
+	for i in ceili((right_x-left_x)/2.0):game._step_player(1.0/120.0)
+	game.keys["right"]=false
+	check(Vector2(game.p["pos"]).x>right_x,"The player crosses both sleeping stones and the small tower")
+	game.p_attack.cancel()
+	game.p["face"]=1
+	var tip:Vector2=Stones.center(rocks[0])
+	game._hit_props(Rect2(tip-Vector2.ONE,Vector2(2,2)),3)
+	var velocities:Dictionary={}
+	for rock in rocks.slice(0,6):
+		check(not rock["asleep"] and not rock.has("pile_slot"),"Hitting the top member scatters every small stone")
+		velocities[Vector2(rock["vel"]).normalized()]=true
+	var headings:Array=velocities.keys()
+	check(headings.size()==6 and headings.any(func(v:Vector2)->bool:return v.x<0) and headings.any(func(v:Vector2)->bool:return v.x>0),"The six stones leave on distinct paths on both sides")
+	game.enemies.assign([dummy])
 	stone["pos"]=Vector2(500,600)
 	game.props.assign([stone])
 	game.solids.assign([floor])

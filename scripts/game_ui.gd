@@ -16,19 +16,15 @@ const Cells=preload("res://scripts/vital_cells.gd")
 
 var ui_root: Control
 var header: PanelContainer
-var title_label: Label
-var location_label: Label
-var hp_label: Label
-var energy_label: Label
 var coins_label: Label
-var weapon_label: Label
-var phase_label: Label
+var health_art:TextureRect
+var energy_art:TextureRect
+var injury_art:TextureRect
+var phase_art:TextureRect
 var phase_bar: ProgressBar
-var dream_row:VBoxContainer
+var dream_row:HBoxContainer
 var dream_label:Label
 var dream_cells:Array[ColorRect]=[]
-var health_bar: ProgressBar
-var energy_bar: ProgressBar
 var health_cells:HBoxContainer
 var energy_cells:HBoxContainer
 var message_label: Label
@@ -113,63 +109,94 @@ func set_safe_rect(safe:Rect2) -> void:
 	quickbar.position=Vector2(20,642+extra.y)
 
 func _build_header() -> void:
-	# Compact floating vitals; no full-width bar obscures the room.
 	header = PanelContainer.new()
 	header.name = "CompactVitals"
 	header.position = Vector2(20,16)
-	header.custom_minimum_size = Vector2(440,100)
 	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	header.add_theme_stylebox_override("panel", _box(Color(0.035,0.09,0.09,0.78),Color.TRANSPARENT,12,12))
+	header.add_theme_stylebox_override("panel",StyleBoxEmpty.new())
 	ui_root.add_child(header)
 	var main := VBoxContainer.new()
 	main.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	main.add_theme_constant_override("separation",5)
+	main.add_theme_constant_override("separation",4)
 	header.add_child(main)
-	title_label = _label("枝間鴿行",16,INK)
-	title_label.visible = false
-	main.add_child(title_label)
-	location_label = _label("鳥巢 · 選擇冒險",12,MINT)
-	main.add_child(location_label)
+
 	var vitals := HBoxContainer.new()
 	vitals.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vitals.add_theme_constant_override("separation",8)
+	vitals.add_theme_constant_override("separation",6)
 	main.add_child(vitals)
-	hp_label = _label("生命 5 / 5",13,INK)
-	vitals.add_child(hp_label)
-	health_bar = _bar(Color("e8a18c"),Vector2(70,6))
-	health_bar.visible=false;vitals.add_child(health_bar)
-	health_cells=Cells.new();health_cells.name="HealthCells";health_cells.filled_color=Color("e8a18c");vitals.add_child(health_cells)
-	energy_label = _label("能量 3 / 6",13,INK)
-	vitals.add_child(energy_label)
-	energy_bar = _bar(MINT,Vector2(62,6))
-	energy_bar.visible=false;vitals.add_child(energy_bar)
-	energy_cells=Cells.new();energy_cells.name="EnergyCells";energy_cells.filled_color=MINT;vitals.add_child(energy_cells)
+	health_art=_icon("strong_heartplus",20)
+	health_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	vitals.add_child(health_art)
+	health_cells=Cells.new()
+	health_cells.name="HealthCells"
+	health_cells.filled_color=Color("e8a18c")
+	vitals.add_child(health_cells)
+	energy_art=_icon("items_energy",20)
+	energy_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	vitals.add_child(energy_art)
+	energy_cells=Cells.new()
+	energy_cells.name="EnergyCells"
+	energy_cells.filled_color=MINT
+	vitals.add_child(energy_cells)
 	coin_art=_icon("coin",20)
+	coin_art.mouse_filter=Control.MOUSE_FILTER_PASS
 	vitals.add_child(coin_art)
-	coins_label = _label("金幣 0",13,GOLD)
+	coins_label=_label("0",13,GOLD)
 	vitals.add_child(coins_label)
+
 	var equipment_row:=HBoxContainer.new()
 	equipment_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	equipment_row.add_theme_constant_override("separation",6)
 	main.add_child(equipment_row)
 	primary_art=_icon("weapon_feather",24)
+	primary_art.mouse_filter=Control.MOUSE_FILTER_PASS
 	equipment_row.add_child(primary_art)
-	weapon_label = _label("",11,MUTED)
-	equipment_row.add_child(weapon_label)
-	var secondary_row:=HBoxContainer.new();secondary_row.add_theme_constant_override("separation",7);secondary_row.mouse_filter=Control.MOUSE_FILTER_IGNORE;main.add_child(secondary_row)
-	secondary_art=_icon("",28);secondary_row.add_child(secondary_art)
-	secondary_label=_label("副武器 尚未裝備 · Q 切換",13,MINT);secondary_label.custom_minimum_size.x=300;secondary_row.add_child(secondary_label)
-	var phase_row:=HBoxContainer.new();phase_row.name="AttackReadiness";phase_row.add_theme_constant_override("separation",10);main.add_child(phase_row)
-	phase_label = _label("可出擊",12,MINT)
-	phase_label.custom_minimum_size.x=218
-	phase_row.add_child(phase_label)
-	phase_bar = _bar(MINT,Vector2(108,4));phase_bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+	var secondary_row:=HBoxContainer.new()
+	secondary_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	equipment_row.add_child(secondary_row)
+	secondary_art=_icon("",24)
+	secondary_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	secondary_row.add_child(secondary_art)
+	secondary_label=_label("",13,MINT)
+	secondary_row.add_child(secondary_label)
+	injury_art=_icon("items_heal",20)
+	injury_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	injury_art.tooltip_text="重傷 · 回安全屋急救"
+	injury_art.modulate=Color("ffb482")
+	equipment_row.add_child(injury_art)
+	var phase_row:=HBoxContainer.new()
+	phase_row.name="AttackReadiness"
+	phase_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	equipment_row.add_child(phase_row)
+	phase_art=_icon("strong_swiftblade",18)
+	phase_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	phase_row.add_child(phase_art)
+	phase_bar=_bar(MINT,Vector2(44,4))
+	phase_bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 	phase_row.add_child(phase_bar)
-	dream_row=VBoxContainer.new();dream_row.name="DreamEnergy";dream_row.visible=false;main.add_child(dream_row)
-	dream_label=_label("無雙能量 0 / 20",12,GOLD);dream_row.add_child(dream_label)
-	var cells:=HBoxContainer.new();cells.add_theme_constant_override("separation",3);dream_row.add_child(cells)
+
+	dream_row=HBoxContainer.new()
+	dream_row.name="DreamEnergy"
+	dream_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	dream_row.visible=false
+	main.add_child(dream_row)
+	var dream_art:=_icon("strong_motion_energy",18)
+	dream_art.mouse_filter=Control.MOUSE_FILTER_PASS
+	dream_art.tooltip_text="無雙能量"
+	dream_row.add_child(dream_art)
+	var cells:=HBoxContainer.new()
+	cells.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	cells.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+	cells.add_theme_constant_override("separation",3)
+	dream_row.add_child(cells)
 	for i in 20:
-		var cell:=ColorRect.new();cell.custom_minimum_size=Vector2(9,7);cell.mouse_filter=Control.MOUSE_FILTER_IGNORE;cells.add_child(cell);dream_cells.append(cell)
+		var cell:=ColorRect.new()
+		cell.custom_minimum_size=Vector2(7,6)
+		cell.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		cells.add_child(cell)
+		dream_cells.append(cell)
+	dream_label=_label("",12,GOLD)
+	dream_row.add_child(dream_label)
 	var tools := HBoxContainer.new()
 	edge_tools=tools
 	tools.position = Vector2(944,18)
@@ -281,62 +308,56 @@ func update_hud(info: Dictionary) -> void:
 	var max_hp:int=maxi(1,int(info.get("max_hp",5)))
 	var energy:int=maxi(0,int(info.get("energy",3)))
 	var max_energy:int=maxi(1,int(info.get("max_energy",6)))
-	hp_label.text = "生命 %d / %d" % [hp,max_hp]
-	energy_label.text = "能量 %d / %d" % [energy,max_energy]
+	health_art.tooltip_text="生命 %d / %d" % [hp,max_hp]
+	energy_art.tooltip_text="能量 %d / %d" % [energy,max_energy]
 	health_cells.set_state(hp,max_hp,float(info.get("hp_recovery",0)),bool(info.get("hp_recovering",false)))
 	energy_cells.set_state(energy,max_energy,float(info.get("energy_recovery",0)),bool(info.get("energy_recovering",false)))
-	health_bar.value = float(hp) / max_hp * 100.0
-	energy_bar.value = float(energy) / max_energy * 100.0
-	coins_label.text = "金幣 %s" % str(info.get("coins", 0))
-	if coin_art.texture==null:coin_art.texture=Icons.texture("coin")
+	coins_label.text=str(info.get("coins",0))
+	coin_art.tooltip_text="金幣"
+	primary_art.tooltip_text=str(info.get("weapon",""))
 	for weapon in Icons.Data.PRIMARY:
-		if str(weapon["name"])==str(info.get("weapon","")):primary_art.texture=Icons.texture(Icons.primary(weapon));break
-	var mode_value: String = str(info.get("mode", ""))
-	var mode_name: String = "無雙夢境" if mode_value in ["musou", "無雙", "無雙夢境"] else "Roguelike"
-	if mode_value in ["", "hub", "鳥巢"]:
-		mode_name = "鳥巢"
-	var map_value: String = str(info.get("map", "—"))
-	var room_value: String = str(info.get("room", ""))
-	var biome_value: String = str(info.get("biome", "樹枝"))
-	location_label.text = "%s · 圖 %s · %s %s  ·  %d FPS" % [mode_name, map_value, biome_value, room_value, int(info.get("fps",60))]
-	var home:bool=mode_name=="鳥巢"
-	if home:location_label.text="鳥巢 · 選擇左右大門開始冒險"
-	elif bool(info.get("in_start",false)):location_label.text="安全屋 · "+biome_value
-	dream_row.visible=mode_name=="無雙夢境" and not home
+		if str(weapon["name"])==primary_art.tooltip_text:
+			primary_art.texture=Icons.texture(Icons.primary(weapon))
+			break
+	var mode_value:String=str(info.get("mode",""))
+	var home:bool=mode_value in ["","hub","鳥巢"]
+	dream_row.visible=mode_value in ["musou","無雙","無雙夢境"]
 	if dream_row.visible:
 		var amount:int=clampi(int(info.get("dream_energy",0)),0,20)
 		var rage_left:float=float(info.get("dream_rage",0))
-		dream_label.text="無雙能量 %d / 20"%amount+(" · 攻擊 ×2　%d秒"%ceili(rage_left) if rage_left>0 else "")
+		dream_label.visible=rage_left>0
+		dream_label.text="×2  %ds"%ceili(rage_left) if rage_left>0 else ""
 		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
-	for control:Control in [hp_label,energy_label,health_cells,energy_cells]:control.visible=not home
+	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
 	primary_art.get_parent().visible=not home
-	secondary_art.get_parent().visible=not home
-	header.custom_minimum_size=Vector2(330,0) if home else Vector2(440,100)
-	if home:header.reset_size()
-	var revive_value:String="重傷 · 回安全屋急救" if info.get("injured",false) else "健全"
-	weapon_label.text = "主武器 %s  ·  %s" % [str(info.get("weapon", "—")), str(revive_value)]
-	secondary_label.text="附武器 %s ×%d  ·  %s 切換"%[str(info.get("sub","尚未裝備")),int(info.get("sub_count",0)),str(info.get("cycle_key","Q"))]
+	injury_art.visible=not home and bool(info.get("injured",false))
+	var sub_count:int=int(info.get("sub_count",0))
 	secondary_art.texture=Icons.texture(str(info.get("sub_icon","")))
+	secondary_art.tooltip_text="%s · %s 切換"%[str(info.get("sub","")),str(info.get("cycle_key","Q"))]
+	secondary_art.get_parent().visible=not home and secondary_art.texture!=null
+	secondary_label.text="×%d"%sub_count
 	mute_button.text="聲音：開" if info.get("audio_enabled",true) else "聲音：靜音"
-	var phase: String = str(info.get("phase", "idle"))
+	var phase:String=str(info.get("phase","idle"))
 	var remaining:float=float(info.get("phase_remaining",0))
 	var ready:bool=phase=="idle"
 	if ready and attack_feedback_reason in ["busy","locked"]:clear_attack_feedback()
-	phase_label.get_parent().visible=bool(info.get("show_attack",false))
-	var phases:Dictionary={"idle":"可出擊", "windup":"前搖", "active":"攻擊中", "recovery":"後搖"}
-	phase_label.text=str(phases.get(phase,phase))
-	if not ready:phase_label.text+=" %.1f 秒"%remaining
-	if phase=="recovery":phase_label.text+=" · %s 可取消"%str(info.get("dash_key","C"))
+	phase_art.get_parent().visible=bool(info.get("show_attack",false))
+	var phases:Dictionary={"idle":"可出擊","windup":"前搖","active":"攻擊中","recovery":"後搖"}
+	var phase_tip:String=str(phases.get(phase,phase))
+	if not ready:phase_tip+=" %.1f 秒"%remaining
+	if phase=="recovery":phase_tip+=" · %s 可取消"%str(info.get("dash_key","C"))
 	if attack_feedback_timer>0:
 		match attack_feedback_reason:
-			"energy":phase_label.text="能量不足 · 近戰命中回能"
-			"no_weapon":phase_label.text="尚未裝備副武器"
-			"hurt":phase_label.text="受傷硬直中"
-			"busy","locked":phase_label.text="尚未就緒 · "+phase_label.text if not ready else "技能施放中"
+			"energy":phase_tip="能量不足 · 近戰命中回能"
+			"no_weapon":phase_tip="尚未裝備副武器"
+			"hurt":phase_tip="受傷硬直中"
+			"busy","locked":phase_tip="尚未就緒 · "+phase_tip if not ready else "技能施放中"
+	phase_art.tooltip_text=phase_tip
 	phase_bar.value=100 if ready else clampf(float(info.get("phase_progress",0)),0,1)*100
 	var phase_color:Color=MINT if ready or phase=="active" else GOLD
 	phase_bar.modulate=Color("ffb482") if attack_feedback_timer>0 else phase_color
-	phase_label.modulate=Color("ffc296") if attack_feedback_timer>0 else Color.WHITE
+	phase_art.modulate=phase_bar.modulate
+	header.reset_size()
 	prep_button.visible = bool(info.get("in_start", false))
 	var message: String = str(info.get("message", ""))
 	if not message.is_empty() and message != _last_message:
@@ -588,7 +609,7 @@ func _process(delta: float) -> void:
 	attack_feedback_timer=maxf(0,attack_feedback_timer-delta)
 	var pulse:bool=attack_feedback_timer>0 and attack_feedback_reason=="energy"
 	var tint:Color=Color("ffb482") if pulse and fmod(.8-attack_feedback_timer,.24)<.14 else Color.WHITE
-	energy_label.modulate=tint;energy_cells.modulate=tint
+	energy_art.modulate=tint;energy_cells.modulate=tint
 	if _message_timer > 0.0:
 		_message_timer = maxf(0.0, _message_timer - delta)
 		message_label.modulate.a = minf(1.0, _message_timer / 0.4)

@@ -14,9 +14,9 @@ const JUMP_SEQUENCE=[1,2]
 const LIMPS=preload("res://assets/v70/pigeon_limp.webp")
 const WING_ATTACKS=preload("res://assets/v70/pigeon_attack.webp")
 const GLIDE=preload("res://assets/v70/pigeon_glide.webp")
-const LIMP_CELL:=Vector2(288,256)
+const LIMP_CELL:=Vector2(330,256)
 const ATTACK_CELL:=Vector2(416,320)
-const ATTACK_PIVOT:=Vector2(192,245)
+const ATTACK_PIVOT:=Vector2(210,245)
 const WIND_BODY_CENTER:=Vector2(0,22)
 const SLAM_FRAMES=[0,1,2,2,2,2,2,2,2]
 const SLAM_FPS:float=24.0
@@ -76,7 +76,7 @@ static func player_action(c:CanvasItem,anim:String,attack:Dictionary,progress:fl
 	if anim not in ["heal","limp","dash"] and not special:return false
 	if anim=="limp":
 		var region:=Rect2(Vector2(walk_frame%5,walk_frame/5)*LIMP_CELL,LIMP_CELL)
-		_draw_sprite(c,LIMPS,region,Vector2(144,221),at,face,base,tint,.224*scale_value)
+		_draw_sprite(c,LIMPS,region,Vector2(221,221),at,face,base,tint,.224*scale_value)
 		return true
 	var row:int=0 if anim=="heal" else (3 if special and kind=="slam" else 2)
 	var index:int=int(time*5)%4
@@ -120,7 +120,7 @@ static func draw_wing_attack(c:CanvasItem,row:int,frame:int,at:Vector2,face:floa
 	_draw_sprite(c,WING_ATTACKS,region,ATTACK_PIVOT,at,face,base,tint,.224*scale_value)
 
 static func draw_glide(c:CanvasItem,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
-	_draw_sprite(c,GLIDE,Rect2(Vector2.ZERO,GLIDE.get_size()),Vector2(230,206),at,face,base,tint,.224)
+	_draw_sprite(c,GLIDE,Rect2(Vector2.ZERO,GLIDE.get_size()),Vector2(280,241),at,face,base,tint,.224)
 
 static func _draw_sprite(c:CanvasItem,texture:Texture2D,source:Rect2,pivot:Vector2,at:Vector2,face:float,base:Transform2D,tint:Color,factor:float) -> void:
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,at))
