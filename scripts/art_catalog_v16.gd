@@ -3,6 +3,8 @@ extends RefCounted
 ## RD asset metadata is cheap. Texture decoding happens only for selected frames.
 ## No call into the gameplay art helpers' unbounded texture caches is needed.
 const GROUPS:Array[String]=["主角","小怪","Boss","地圖","物件"]
+const IDLE_MOTION=preload("res://scripts/pigeon_idle_v19.gd")
+const WALK_MOTION=preload("res://scripts/walk_animation.gd")
 const ACTOR_MOTION=preload("res://scripts/adventure_visual.gd")
 const WALL_MOTION=preload("res://scripts/pigeon_motion_v22.gd")
 const WIND_MOTION=preload("res://scripts/wind_art.gd")
@@ -143,6 +145,9 @@ static func _animation_manifest(library:String) -> void:
 			frames.append(frame_data)
 		var extra:Dictionary={"library":library,"clip":id,"phases":clip.get("phases",{}).duplicate(true),"complete_release":clip.get("complete_release",false)}
 		if clip.has("loop_start"):extra["loop"]=[int(clip["loop_start"]),int(clip["loop_end"])]
+		if library=="walk_v2" and id=="pigeon_walk_master":
+			extra["sequence"]=WALK_MOTION.WALK_SEQUENCE
+			extra["phases"]={"原始圖集":range(frames.size())}
 		_add(library+":"+id,_label(id),_category(id,library),frames,float(clip.get("fps",12)),str(clip.get("description","")),extra)
 	for raw_id in data.get("modules",{}):
 		var module:Dictionary=data["modules"][raw_id]
@@ -304,7 +309,10 @@ static func _idle_v19() -> void:
 	for id:String in data.get("animations",{}):
 		var clip:Dictionary=data["animations"][id];var frames:Array=[]
 		for f:Dictionary in clip["frames"]:frames.append(_descriptor(root+clip["path"],f["source_rect"]))
-		_add("idle:v19:"+id,"鴿子 · "+("待機呼吸" if id=="idle" else "趴地休息"),"主角姿態",frames,8,"8 fps；閒置五秒開始趴地，移動時立即起身。")
+		var idle:bool=id=="idle"
+		var sequence:Array=IDLE_MOTION.IDLE_SEQUENCE if idle else IDLE_MOTION.REST_SEQUENCE
+		_add("idle:v19:"+id,"鴿子 · "+("待機呼吸" if idle else "趴地休息"),"主角姿態",frames,IDLE_MOTION.IDLE_FPS if idle else IDLE_MOTION.REST_FPS,
+			"閒置五秒開始趴地，移動時立即起身。",{"sequence":sequence,"hidden_frames":[3,7] if idle else [0],"phases":{"原始圖集":range(frames.size())}})
 
 static func _biomes_v21() -> void:
 	var atlas:Dictionary=_json(ROOT+"v21/atlas-metadata.json")
@@ -407,10 +415,18 @@ static func _group_for(item:Dictionary) -> String:
 
 static func _recent_art() -> void:
 	var motion:String=ROOT+"v68/pigeon_motion.webp"
-	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS)
-	var limp:Array=[]
-	for i in 8:limp.append(_descriptor(motion,[],[4,3],[i%4,1+i/4]))
-	_add("pigeon_action:1","鴿子 · 重傷跛行","主角姿態",limp,8,"近腳與遠腳依步態交替；遊戲依走過的距離換幀。")
+	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS,
+		{"sequence":ACTOR_MOTION.JUMP_SEQUENCE,"hidden_frames":[0,3],"phases":{"原始圖集":[0,1,2,3]}})
+	var old_limp:Array=[]
+	for i in 8:old_limp.append(_descriptor(motion,[],[4,3],[i%4,1+i/4]))
+	_add("pigeon_action:1:v68","鴿子 · 舊八格跛行","主角姿態",old_limp,8)
+	_sheet("pigeon_action:1","鴿子 · 重傷跛行","主角姿態",ROOT+"v70/pigeon_limp.webp",5,2,10,8)
+	for row:int in 4:
+		var labels:Array=["右翅由右往左","左翅由左往右","右翅上揮","右腳向後抓踢"]
+		var frames:Array=[]
+		for col:int in 2:frames.append(_descriptor(ROOT+"v70/pigeon_attack.webp",[],[2,4],[col,row]))
+		_add("v70:pigeon:attack:"+str(row),labels[row],"主角姿態",frames,12,"預備、打擊動態模糊。")
+	_add("v70:pigeon:glide","鴿子 · 展翅滑翔","主角姿態",[_descriptor(ROOT+"v70/pigeon_glide.webp")],1)
 	for biome:String in ["underground","trunk","sky"]:
 		for size_id:String in ["large","small"]:
 			var label:String=BIOME_NAMES[biome]+" · "+("大圓石" if size_id=="large" else "小圓石")
@@ -426,31 +442,40 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var note:String=""
 	match id:
 		"pigeon_action:0":note="按住回血時的四張角色姿態。"
-		"pigeon_action:1":note="重傷後地面跛行，八幀依步行距離取樣。"
-		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由八幀交替步態取代。"
+		"pigeon_action:1":note="重傷後地面跛行。右腳和左腳輪流支撐，各五幀，依步行距離取樣。"
+		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由新十幀步態取代。"
 		"pigeon_action:2":note="橫向雙 C 穿刺全程使用第 2 張，其他三張留在 RD。"
 		"pigeon_action:3":note="向下雙 C 用第 1、2、3 張接續，第 3 張持續到觸地，第 4 張落地。"
-		"v68:pigeon:jump_rise":note="地面起跳上升，前三張各 1/30 秒，第 4 張維持到上升結束。"
+		"v68:pigeon:jump_rise":note="地面起跳上升，只播原第 2、3 張，第 3 張維持至上升結束。"
 		"v23:pigeon-motion:wall":note="貼牆靜止用第 1 張；下滑以 8 FPS 播 1→3→4→3→1→3→4→3→1。"
 		"v23:pigeon-motion:air":note="牆跳等其他上升、跳躍頂點、下降和普通落地姿勢。"
 		"v48:pigeon:quickdraw_walk":note="按住集氣且在地面移動時，按步態切換六張拔刀預備姿勢。"
-		"wind:form":note="雙 C 疊在鴿子中心，20% 不透明度；第 3、5 張停用，橫向播一次，垂直循環這六張。"
-		"wind:impact":note="向下雙 C 觸地後的地面風壓，20% 不透明度。"
+		"wind:form":note="雙 C 疊在鴿子中心，90% 不透明度；第 3、5 張停用，橫向播一次，垂直循環這六張。"
+		"wind:impact":note="向下雙 C 觸地後的地面風壓，90% 不透明度。"
 		"wind:jet":used=false;note="舊單 C 噴射；目前採用二段跳式拍翅與風尾。"
-		"combat_v05:pigeon_featherblade_up":note="朝上普攻，亦為目前副武器朝上施放時的角色姿勢。"
-		"combat_v05:pigeon_featherblade_down":note="朝下普攻、下劈反彈，亦可在副武器朝下施放時出現。"
-		"combat_v05:pigeon_greatblade_up":note="單 C 衝刺期間朝上攻擊，使用重刀上斬姿勢。"
-		"combat_v05:pigeon_greatblade_down":note="單 C 衝刺期間朝下攻擊，使用重刀下斬姿勢。"
-		"combat_v05:pigeon_feather_left":note="橫向羽毛刀三連普攻的第 1 刀，左右方向共用鏡像。"
-		"combat_v05:pigeon_feather_right":note="橫向羽毛刀三連普攻的第 2 刀，左右方向共用鏡像。"
-		"combat_v05:pigeon_feather_thrust":note="橫向羽毛刀三連普攻的第 3 刀，左右方向共用鏡像。"
+		"pigeon_action:1:v68":used=false;note="v0.68 舊八幀跛行，已由十幀步態取代。"
+		"v70:pigeon:glide":note="空中長按跳躍鍵滑翔，或由浮翼符文提供持續升力時展開雙翅。"
+		"idle:v19:idle":note="待機 5 FPS，依指定順序往返播放，第 4、8 張停用。"
+		"idle:v19:rest":note="閒置五秒後從第 2 張進入趴地休息。"
+		"walk_v2:pigeon_walk_master":note="正常走路依距離播第 7、3、8、9、10 張。"
+		"slash:v18":note="舊月牙只在集氣斬或其他仍使用此特效的攻擊顯示。"
+		"combat_v05:pigeon_featherblade_up":note="副武器朝上施放時的舊角色姿勢。"
+		"combat_v05:pigeon_featherblade_down":note="副武器朝下施放時的舊角色姿勢。"
+		"combat_v05:pigeon_greatblade_up":used=false;note="舊衝刺上斬姿勢，已由右翅上揮取代。"
+		"combat_v05:pigeon_greatblade_down":used=false;note="舊衝刺下斬姿勢，已由右腳抓踢取代。"
+		"combat_v05:pigeon_feather_left":used=false;note="舊橫向普攻第 1 刀，已由右翅取代。"
+		"combat_v05:pigeon_feather_right":used=false;note="舊橫向普攻第 2 刀，已由左翅取代。"
+		"combat_v05:pigeon_feather_thrust":used=false;note="停用的第三下普攻。"
+		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
+		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
 		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
 		"v37:feathers":note="攻擊命中後從怪物中心向攻擊方向噴出的兩格碎羽。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
 		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"
 		"v39:crescent":note="打中敵人時，細長月牙對準受擊者中央。"
-	if id.begins_with("v67:stone:"):note=label+"，隨機生成，受玩家攻擊擊飛後可撞傷怪物。"
+	if id.begins_with("v70:pigeon:attack:"):note=label+"；普攻以預備姿勢接動態模糊。"
+	elif id.begins_with("v67:stone:"):note=label+"，隨機生成，受玩家攻擊擊飛後可撞傷怪物。"
 	elif id.begins_with("v59:chest:"):note=label+"，戰鬥房或獎勵房互動後播放。"
 	elif id.begins_with("v36:"):note=label+"，三生態戰鬥房的怪物姿勢或投射物。"
 	elif id.begins_with("v39:") and ":death:" in id:note=label+"，敵人血量歸零時的倒地姿勢。"

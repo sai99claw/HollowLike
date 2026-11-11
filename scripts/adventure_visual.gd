@@ -10,6 +10,13 @@ const NEW_MOTION=preload("res://assets/v68/pigeon_motion.webp")
 const MOTION_CELL:=Vector2(288,288)
 const MOTION_PIVOT:=Vector2(155,237)
 const JUMP_FPS:float=30.0
+const JUMP_SEQUENCE=[1,2]
+const LIMPS=preload("res://assets/v70/pigeon_limp.webp")
+const WING_ATTACKS=preload("res://assets/v70/pigeon_attack.webp")
+const GLIDE=preload("res://assets/v70/pigeon_glide.webp")
+const LIMP_CELL:=Vector2(288,256)
+const ATTACK_CELL:=Vector2(416,320)
+const ATTACK_PIVOT:=Vector2(192,245)
 const WIND_BODY_CENTER:=Vector2(0,22)
 const SLAM_FRAMES=[0,1,2,2,2,2,2,2,2]
 const SLAM_FPS:float=24.0
@@ -61,11 +68,15 @@ static func feather(c:CanvasItem,at:Vector2,time:float,base:Transform2D) -> void
 	preload("res://scripts/adventure_art_v29.gd").death_feather(c,at,time,base)
 
 static func player_action(c:CanvasItem,anim:String,attack:Dictionary,progress:float,at:Vector2,face:float,time:float,base:Transform2D,tint:Color,scale_value:float,walk_frame:int) -> bool:
+	if attack.has("wing_pose") and anim in ["windup","active","recovery"]:
+		draw_wing_attack(c,int(attack["wing_pose"]),attack_frame(anim,progress),at,float(attack.get("face",face)),base,tint,scale_value)
+		return true
 	var kind:String=str(attack.get("kind",""))
 	var special:bool=anim in ["windup","active","recovery"] and kind in ["pierce","slam"]
 	if anim not in ["heal","limp","dash"] and not special:return false
 	if anim=="limp":
-		_draw_new_motion(c,4+clampi(walk_frame,0,7),at,face,base,tint,scale_value)
+		var region:=Rect2(Vector2(walk_frame%5,walk_frame/5)*LIMP_CELL,LIMP_CELL)
+		_draw_sprite(c,LIMPS,region,Vector2(144,221),at,face,base,tint,.224*scale_value)
 		return true
 	var row:int=0 if anim=="heal" else (3 if special and kind=="slam" else 2)
 	var index:int=int(time*5)%4
@@ -91,19 +102,29 @@ static func draw_action(c:CanvasItem,row:int,index:int,at:Vector2,face:float,bas
 	c.draw_set_transform_matrix(base)
 
 static func jump_frame(elapsed:float) -> int:
-	return clampi(int(elapsed*JUMP_FPS),0,3)
+	return JUMP_SEQUENCE[clampi(int(elapsed*JUMP_FPS),0,JUMP_SEQUENCE.size()-1)]
 
 static func slam_frame(elapsed:float) -> int:
 	return SLAM_FRAMES[clampi(int(elapsed*SLAM_FPS),0,SLAM_FRAMES.size()-1)]
 
 static func draw_jump(c:CanvasItem,elapsed:float,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
-	_draw_new_motion(c,jump_frame(elapsed),at,face,base,tint)
+	var region:=Rect2(Vector2(jump_frame(elapsed),0)*MOTION_CELL,MOTION_CELL)
+	_draw_sprite(c,NEW_MOTION,region,MOTION_PIVOT,at,face,base,tint,.224)
 
-static func _draw_new_motion(c:CanvasItem,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
-	var source:=Rect2(Vector2(index%4,index/4)*MOTION_CELL,MOTION_CELL)
-	var factor:float=.224*scale_value
+static func attack_frame(phase:String,progress:float) -> int:
+	# Two visual poses without delaying the existing active hit window.
+	return 0 if phase=="windup" or (phase=="active" and progress<.30) else 1
+
+static func draw_wing_attack(c:CanvasItem,row:int,frame:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
+	var region:=Rect2(Vector2(frame,row)*ATTACK_CELL,ATTACK_CELL)
+	_draw_sprite(c,WING_ATTACKS,region,ATTACK_PIVOT,at,face,base,tint,.224*scale_value)
+
+static func draw_glide(c:CanvasItem,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
+	_draw_sprite(c,GLIDE,Rect2(Vector2.ZERO,GLIDE.get_size()),Vector2(230,206),at,face,base,tint,.224)
+
+static func _draw_sprite(c:CanvasItem,texture:Texture2D,source:Rect2,pivot:Vector2,at:Vector2,face:float,base:Transform2D,tint:Color,factor:float) -> void:
 	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,at))
-	c.draw_texture_rect_region(NEW_MOTION,Rect2(-MOTION_PIVOT,MOTION_CELL),source,tint)
+	c.draw_texture_rect_region(texture,Rect2(-pivot,source.size),source,tint)
 	c.draw_set_transform_matrix(base)
 
 static func door_color(target:Dictionary,locked:bool=false) -> Color:

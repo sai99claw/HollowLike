@@ -49,11 +49,11 @@ func run() -> void:
 	clear(game);for i in 300:game._update_idle(1.0/60)
 	check(game.idle_time>4.99,"Five seconds standing accumulates the resting timer")
 	game.keys["right"]=true;game._update_player(.01);game._update_idle(.01);check(game.idle_time==0,"Movement instantly wakes the loaf pose")
-	Idle.ensure();check(Idle.FPS==8 and Idle.frame_index(4.99)<8 and Idle.frame_index(5)==0 and Idle.frame_index(5.875)==7,"Idle and settle use eight frames per second")
+	Idle.ensure();check(Idle.IDLE_FPS==5 and Idle.REST_FPS==8 and Idle.frame_index(4.99)<8 and Idle.frame_index(5)==1 and Idle.frame_index(5.875)==7,"Idle plays at five FPS and rest starts at its second frame")
 	for id in ["idle","rest"]:
 		var hashes:Dictionary={}
 		for frame:Dictionary in Idle.manifest["animations"][id]["frames"]:hashes[frame["sha256"]]=true
-		check(hashes.size()==8 and Catalog.entry("idle:v19:"+id)["fps"]==8,"Both authored idle sheets have eight unique poses and RD playback")
+		check(hashes.size()==8 and Catalog.entry("idle:v19:"+id)["fps"]==(5 if id=="idle" else 8),"RD plays the authored sheets at the current idle and rest rates")
 	game.atmosphere.configure("sky",123,true);check(not game.atmosphere.far_birds.enabled and not game.atmosphere.far_birds.visible,"Background birds are disabled")
 	# Exercise every sidearm through real selection and input, including third+ slots.
 	game.bag_weapons.clear();for i in Data.SECONDARY.size():game.bag_weapons.append(Data.SECONDARY[i].duplicate(true))

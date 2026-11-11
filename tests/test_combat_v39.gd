@@ -14,8 +14,8 @@ func check(ok:bool,message:String) -> void:
 func run() -> void:
 	for direction:String in ["left","right","up","down"]:
 		for combo in 3:
-			var dash:Dictionary=Data.action_attack(direction,false,true,combo);var original:Dictionary=Data.primary_attack(2,direction,false,false,combo)
-			for field:String in ["range","width","shape","fx_clip","style"]:check(dash[field]==original[field],"Dash attack retains original heavy ordinary attack "+field)
+			var dash:Dictionary=Data.action_attack(direction,false,true,combo);var original:Dictionary=Data.primary_attack(2,direction,false,false,combo%2)
+			for field:String in ["range","width","shape","fx_clip","style"]:check(dash[field]==original[field],"Dash attack retains the selected one of the two heavy profiles for "+field)
 			check(Data.action_attack(direction,false,false,combo)["style"]=="quick","Ordinary attacks always use the knife")
 		var charged:Dictionary=Data.action_attack(direction,true,false);var spin:Dictionary=Data.primary_attack(2,direction,false,false,2)
 		for field:String in ["range","width","shape","fx_clip"]:check(charged[field]==spin[field],"Charge matches the third heavy ordinary attack "+field)

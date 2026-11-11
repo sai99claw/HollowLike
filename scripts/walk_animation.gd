@@ -2,6 +2,8 @@ class_name WalkAnimation
 extends Node
 const ROOT="res://assets/walk_v2/"
 const DISTANCE_PER_FRAME:float=16.5
+const WALK_SEQUENCE=[6,2,7,8,9]
+const LIMP_FRAME_COUNT:int=10
 static var manifest:Dictionary={}
 static var textures:Dictionary={}
 static var frame_index:int=0
@@ -32,7 +34,7 @@ static func clip() -> Dictionary:
 static func draw_frame(c:CanvasItem,at:Vector2,face:float,tint:Color,scale_value:float,base:Transform2D) -> bool:
 	var def:Dictionary=clip()
 	if def.is_empty():return false
-	var frame:Dictionary=def["frames"][frame_index%def["frames"].size()]
+	var frame:Dictionary=def["frames"][WALK_SEQUENCE[frame_index%WALK_SEQUENCE.size()]]
 	var path:String=ROOT+frame["path"]
 	if not textures.has(path):textures[path]=load(path)
 	var pixel_scale:float=80.0/256.0
@@ -49,8 +51,8 @@ func advance(distance:float,enabled:bool,ground:String,audible:bool) -> void:
 	phase+=distance/DISTANCE_PER_FRAME
 	var current:int=int(floor(phase))
 	for boundary in range(previous+1,current+1):
-		if boundary%(6 if limping else 5)==0:_footstep(ground,audible)
-	frame_index=[0,1,2,3,3,3,4,5,6,7,7,7][current%12] if limping else current%10
+		if boundary%5==0:_footstep(ground,audible)
+	frame_index=current%(LIMP_FRAME_COUNT if limping else WALK_SEQUENCE.size())
 	if phase>12000:phase=fmod(phase,60)
 func _footstep(ground:String,audible:bool) -> void:
 	emitted_events+=1

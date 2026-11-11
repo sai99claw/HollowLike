@@ -101,6 +101,7 @@ static func actor_factor(id:String) -> float:
 
 static func player_clip(weapon:String,attack:Dictionary,anim:String) -> String:
 	if anim=="hurt":return "pigeon_hurt"
+	if attack.has("wing_pose"):return ""
 	if anim in ["windup","active","recovery"] and attack.get("kind","") in ["slam","pierce"]:return ""
 	if anim not in ["charge","windup","active","recovery"]:return ""
 	if attack.get("great_spin_release",false) and anim!="charge":return "pigeon_great_spin"

@@ -1,6 +1,6 @@
 class_name ExplosionV16
 extends RefCounted
-const OPACITY:float=.70
+const OPACITY:float=.90
 static var frames:Dictionary={}
 static func texture(surface:bool,index:int) -> Texture2D:
 	var key:String=("surface" if surface else "air")+str(clampi(index,0,7))

@@ -134,10 +134,12 @@ static func primary_attack(index:int,direction:String,charged:bool,dash_charge:b
 
 ## Old profiles remain available to the animation library, not as selectable weapons.
 static func action_attack(direction:String,charged:bool,during_dash:bool,combo:int=0) -> Dictionary:
-	var def:Dictionary=primary_attack(2 if charged or during_dash else 1,direction,false,false,2 if charged else combo)
+	var def:Dictionary=primary_attack(2 if charged or during_dash else 1,direction,false,false,2 if charged else posmod(combo,2))
 	def["dash_attack"]=during_dash
 	if during_dash:def["recovery"]=0.0
-	if charged:
+	if not charged:
+		def["wing_pose"]={"up":2,"down":3}.get(direction,posmod(combo,2))
+	else:
 		def.merge({"kind":"charge","charged":true,"great_spin_release":true,"windup":0.0,"active":1.0,"recovery":0.0,"recoil":0.0,"energy_gain":2.0,"super_armor":true,"complete_release":true},true)
 	return def
 

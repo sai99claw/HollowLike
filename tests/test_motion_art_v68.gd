@@ -20,8 +20,13 @@ func check(ok:bool,message:String) -> void:
 	push_error(message)
 
 func test_motion() -> void:
-	for i in 4:check(Pose.jump_frame((i+.5)/Pose.JUMP_FPS)==i,"Every takeoff pose is sampled in order")
-	check(Pose.jump_frame(2.0)==3,"Fourth takeoff pose holds through ascent")
+	check(Pose.jump_frame(0)==1 and Pose.jump_frame(2.0)==2,"Takeoff uses original frames two and three")
+	check(is_equal_approx(Wind.OVERLAY_TINT.a,.9),"Both double C overlays use ninety percent opacity")
+	check(is_equal_approx(preload("res://scripts/explosion_v16.gd").OPACITY,.9),"Explosion art uses ninety percent opacity")
+	var idle=preload("res://scripts/pigeon_idle_v19.gd")
+	for i in 20:
+		check(idle.frame_index((i+.5)/5.0)==int("12356765321235676532"[i])-1,"Idle follows the authored sequence at 5 FPS")
+	check(idle.frame_index(5.0)==1,"Rest skips its first frame")
 	for i in 9:
 		check(Pose.slam_frame((i+.5)/24.0)==mini(i,2),"Dive advances through poses one and two, then holds three")
 	var expected:Array=[0,1,3,5,6,7]
@@ -31,14 +36,15 @@ func test_motion() -> void:
 	for i in 9:
 		check(Wall.wall_frame(false,(i+.5)/8.0)==[0,2,3,2,0,2,3,2,0][i],"Sliding uses the specified 8 FPS sequence")
 	check(Wall.wall_frame(true,5.0)==0,"Holding uses the first wall frame")
-	for i in 3:
+	for i in 6:
 		var attack:Dictionary=Data.action_attack("right",false,false,i)
-		check(FX.player_clip(attack["style"],attack,"active")==["pigeon_feather_left","pigeon_feather_right","pigeon_feather_thrust"][i],"Legacy feather sprites are the current horizontal combo")
+		check(attack["combo"]==i%2 and attack["wing_pose"]==i%2,"Horizontal primary attacks alternate two regular strikes")
+		check(FX.player_clip(attack["style"],attack,"active").is_empty(),"Ordinary strikes bypass old featherblade art")
 	for direction:String in ["up","down"]:
-		for during_dash:bool in [false,true]:
-			var attack:Dictionary=Data.action_attack(direction,false,during_dash)
-			var family:String="greatblade" if during_dash else "featherblade"
-			check(FX.player_clip(attack["style"],attack,"active")=="pigeon_"+family+"_"+direction,"Directional attack uses the appropriate feather or greatblade clip")
+		var attack:Dictionary=Data.action_attack(direction,false,true)
+		check(attack["wing_pose"]==(2 if direction=="up" else 3),"Vertical strikes use the requested wing or foot")
+	var charged:Dictionary=Data.action_attack("right",true,false,0)
+	check(charged["great_spin_release"] and not charged.has("wing_pose"),"Charged releases keep their separate pose")
 
 func test_collision() -> void:
 	var target:=Rect2(100,100,20,20)
@@ -61,8 +67,12 @@ func test_viewer() -> void:
 		check(not Catalog.categories(group).is_empty(),"Each of the five groups has child categories")
 	for item:Dictionary in Catalog.all_entries():
 		check(item["group"] in Catalog.GROUPS and not str(item["usage_note"]).is_empty(),"Every item has a group and usage note")
-	check(Catalog.entry("pigeon_action:1")["frame_count"]==8,"Limping atlas exposes all eight frames")
-	check(Catalog.entry("v68:pigeon:jump_rise")["frame_count"]==4,"Jump atlas exposes all four frames")
+	check(Catalog.entry("pigeon_action:1")["frame_count"]==10,"Limping atlas exposes ten frames")
+	check(Catalog.sequence(Catalog.entry("v68:pigeon:jump_rise"))==[1,2],"RD takeoff skips the first and fourth frames")
+	check(Catalog.sequence(Catalog.entry("walk_v2:pigeon_walk_master"))==[6,2,7,8,9],"RD walk order matches gameplay")
+	for i in 4:
+		var clip:Dictionary=Catalog.entry("v70:pigeon:attack:"+str(i))
+		check(clip["frame_count"]==2 and Catalog.frame(clip,0)!=null and Catalog.frame(clip,1)!=null,"Each of the four attacks exposes two exported sprites")
 	viewer.select_entry("wind:form")
 	viewer.pause();viewer.set_fps(10);viewer.seek_frame(1);viewer.play()
 	viewer._process(.101)
@@ -112,6 +122,20 @@ func test_game() -> void:
 	game.jump_request=true
 	game._step_player(1.0/120)
 	check(game.p["jump_rise_age"]==0.0 and game.p["vel"].y<0,"Ground jump starts the rising animation immediately")
+	game._reset_player(Vector2(700,430))
+	game.p["grounded"]=false
+	game.p["vel"]=Vector2(0,240)
+	game.keys["jump"]=true
+	game._step_player(1.0/120)
+	check(game.p["gliding"] and is_equal_approx(game.p["vel"].y,120),"Holding Space while falling starts ordinary glide")
+	game.keys["jump"]=false
+	game._step_player(1.0/120)
+	check(not game.p["gliding"] and game.p["vel"].y>120,"Releasing Space resumes falling")
+	game._reset_player(Vector2(700,430))
+	for i in 6:
+		game._begin_primary({"dir":"right","charged":false})
+		check(game.p_attack.attack["wing_pose"]==i%2,"Live controller alternates wing poses")
+		game.p_attack.cancel()
 	game._leave_lab()
 	if game.screen!="hub":game._ui_action("hub",null)
 	game._enter_practice(true)

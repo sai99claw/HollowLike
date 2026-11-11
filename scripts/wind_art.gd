@@ -9,7 +9,7 @@ const JET_ANCHORS=[Vector2(438,270),Vector2(392,270),Vector2(390,270),Vector2(43
 const FORM_ANCHORS=[Vector2(204.5,284.5),Vector2(195.5,281),Vector2(189,282.5),Vector2(194.5,283.5),Vector2(203.5,242.5),Vector2(200.5,240),Vector2(195,248),Vector2(191,251)]
 const FORM_SEQUENCE=[0,1,3,5,6,7]
 const FORM_FPS:float=24.0
-const OVERLAY_TINT:=Color(1,1,1,.2)
+const OVERLAY_TINT:=Color(1,1,1,.9)
 const GROUND_BASELINES=[300,300,300,300,647,647,647,647,972,972,972,972]
 static var textures:Dictionary={}
 static func texture(kind:String) -> Texture2D:

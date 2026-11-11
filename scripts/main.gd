@@ -221,7 +221,6 @@ var empty_energy_time:float=0
 var move_energy_distance:float=0
 var bee_timer:float=0
 var combo_index:int=0
-var combo_deadline:float=-1
 var last_motion_pos:Vector2=Vector2.ZERO
 var spawn_serial:int=0
 var prep_station:String="forge"
@@ -325,6 +324,7 @@ func _ready() -> void:
 		new_run("rogue",12345)
 
 func _reset_player(at: Vector2) -> void:
+	combo_index=0
 	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"gust_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
 	p_attack.cancel()
 	if walker!=null:walker.reset_turn(float(p["face"]))
@@ -919,12 +919,13 @@ func _step_player(delta: float) -> void:
 		if jumped:
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
-	var floating:bool=_rune_effect("held_flight")>0 and _key("jump") and not p["grounded"] and not _wind_form_active() and not knocked
-	if floating and vel.y>-230.0:
-		if not p.get("flight_boosting",false):_sound("flight_boost")
-		p["flight_boosting"]=true
-		vel.y=-230.0
-	elif not floating:p["flight_boosting"]=false
+	var can_glide:bool=_key("jump") and not p["grounded"] and int(p["wall"])==0 and not _wind_form_active() and float(p["dash_t"])<=0 and not knocked and float(p["hurt"])<=0 and not _in_bath()
+	var floating:bool=can_glide and _rune_effect("held_flight")>0 and vel.y>-230.0
+	var gliding:bool=can_glide and vel.y>=0.0
+	if floating and not p.get("flight_boosting",false):_sound("flight_boost")
+	p["flight_boosting"]=floating
+	if floating:vel.y=-230.0
+	elif gliding:vel.y=minf(vel.y,PlayerMotion.GLIDE_FALL_SPEED)
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
@@ -985,9 +986,11 @@ func _step_player(delta: float) -> void:
 		elif not p.has("launch_pending_velocity"):_sound("land")
 		p["fall_distance"]=0.0
 	if p.has("launch_pending_velocity"):
+		floating=false;gliding=false
 		vel=p["launch_pending_velocity"];p.erase("launch_pending_velocity")
 		p["grounded"]=false;p["wall"]=0;p["landing_left"]=0
 	p["_motion_step"]=false
+	p["gliding"]=(floating or gliding) and not p["grounded"] and int(p["wall"])==0
 	p["pos"]=pos;p["vel"]=vel
 
 func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0) -> float:
@@ -1067,11 +1070,11 @@ func _normal_damage() -> float:
 
 func _begin_primary(request:Dictionary) -> void:
 	if _action_locked():_reject_attack("locked");return
-	if clock>combo_deadline:combo_index=0
 	var def:Dictionary=_primary_definition(request)
 	if def.get("charged",false):p["recoil_left"]=0;p["impact_root"]=0
 	if p_attack.begin(def):
-		combo_index=(combo_index+1)%3;combo_deadline=clock+float(def["windup"])+float(def["active"])+float(def["recovery"])+.65;charge_timer=0
+		if not def["charged"] and def["direction"] in ["left","right"]:combo_index=1-int(def["combo"])
+		charge_timer=0
 		ui.clear_attack_feedback();_update_hud()
 
 func _secondary_at(index:int) -> Dictionary:
@@ -2574,7 +2577,7 @@ func _buy_skin(index:int) -> void:
 
 func _show_help() -> void:
 	_panel("從鳥巢開始",[
-		{"text":"預設方向鍵移動；空白鍵短按小跳、長按大跳與二段跳。上牆吸附1秒後緩滑，視同落地，按跳躍可離牆。"},
+		{"text":"預設方向鍵移動；空白鍵短按小跳、長按大跳，空中再次按可二段跳，下降時持續按住可展翅滑翔。上牆吸附1秒後緩滑，視同落地，按跳躍可離牆。"},
 		{"text":"C 單按小噴射，沒有無敵；0.5 秒內雙按化身為風，前搖與攻擊時無敵。↓＋雙 C 下砸全程無敵，落地後保護0.5秒；向上衝刺已移除。"},
 		{"text":"X 按下即出刀；繼續按住1.4秒集氣，放開後完整施放1秒，期間可移動及跳躍。左右與上下集氣是獨立技能。"},
 		{"text":"Z 施放附武器（－1能量）。Roguelike用Q切換，同武器重複取得投射物+1，最多+8；無雙夢境一次發動最多16把。A長按回血（－3能量）。"},
@@ -2828,6 +2831,7 @@ func _draw_player_body() -> void:
 	if absf(p["vel"].x)>30:anim="limp" if injured else "run"
 	if not bool(p["grounded"]):anim="jump_up" if p["vel"].y < 0 else ("jump_down" if p["vel"].y>70 else "jump_apex")
 	elif float(p.get("landing_left",0))>0 and not injured:anim="land"
+	if not p["grounded"] and p.get("gliding",false) and _key("jump"):anim="glide"
 	if float(p["dash_t"])>0:anim="dash"
 	if int(p["wall"])!=0:anim="wall"
 	if charge_timer>.15:anim="charge"
@@ -2855,8 +2859,9 @@ func _draw_player_body() -> void:
 		if anim=="mantle":preload("res://scripts/mantle_art_v37.gd").draw(self,p,player_base,tint)
 		elif anim=="heavy_land":preload("res://scripts/heavy_landing_v28.gd").draw(self,p["pos"],float(p["face"]),.5-float(p["heavy_land_left"]),player_base,tint)
 		elif float(p.get("dash_t",0))>0 and not p_attack.is_busy():preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),(.16-float(p["dash_t"]))*2,player_base,tint)
+		elif anim=="glide":AdventurePose.draw_glide(self,p["pos"],p["face"],player_base,tint)
 		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash","charge"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
-		elif dream_progress>=0 and anim not in ["hurt","heal","wall","jump_up"]:FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
+		elif dream_progress>=0 and anim not in ["hurt","heal","wall","jump_up"] and not (p_attack.attack.has("wing_pose") and anim in ["windup","active","recovery"]):FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
 		elif anim=="charge":
 			var feet:Vector2=p["pos"]
 			if walker.moving and bool(p["grounded"]) and absf(p["vel"].x)>30:
@@ -4433,7 +4438,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
-	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
+	if p_attack.attack.has("wing_pose") or screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
 	SlashArt.draw(canvas,_attack_box(p["pos"],p_attack.attack,float(p["face"])),p_attack.attack,p_attack.progress(),world_transform)
 
 func _pogo() -> void:
