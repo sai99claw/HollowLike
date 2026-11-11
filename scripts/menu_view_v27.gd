@@ -25,6 +25,7 @@ static func build(ui,game,category:String) -> void:
 			Station._text(ui,right,"畫面與聲音",22,ui.GOLD)
 			Station._button(ui,right,"放大填滿"+(" ✓" if game.display_fit=="cover" else ""),"display_fit","cover","settings:cover")
 			Station._button(ui,right,"縮小完整"+(" ✓" if game.display_fit=="contain" else ""),"display_fit","contain","settings:contain")
+			if game.display_fit=="cover":_display_zoom(ui,right,game.display_zoom,game.DISPLAY_ZOOM_MAX)
 			Station._button(ui,right,"特效量："+("精簡" if game.low_effects else "標準"),"effects",null,"settings:effects")
 			Station._button(ui,right,"音樂與音效："+("開" if game.audio_enabled else "關"),"audio",null,"settings:audio")
 			Station._text(ui,right,"精簡模式保留投射物軌跡、命中回饋與地面燃燒。",15)
@@ -54,3 +55,34 @@ static func _slider(ui,parent:Node,title:String,action:String,min_value:float,ma
 	var caption:Label=Station._text(ui,parent,title+" %.2f×"%value,17,ui.INK)
 	var slider:=HSlider.new();slider.min_value=min_value;slider.max_value=max_value;slider.step=step;slider.value=value;slider.custom_minimum_size.y=35;slider.set_meta("station_key","settings:"+action);parent.add_child(slider)
 	slider.value_changed.connect(func(next:float)->void:caption.text=title+" %.2f×"%next;ui.action_requested.emit(action,next))
+
+
+static func _display_zoom(ui,parent:Node,value:float,max_value:float) -> void:
+	var row:=HBoxContainer.new()
+	row.add_theme_constant_override("separation",10)
+	parent.add_child(row)
+	Station._text(ui,row,"填滿縮放 Zoom",17,ui.INK)
+	var input:=LineEdit.new()
+	input.name="DisplayZoomInput"
+	input.custom_minimum_size=Vector2(94,38)
+	input.alignment=HORIZONTAL_ALIGNMENT_CENTER
+	input.virtual_keyboard_type=LineEdit.KEYBOARD_TYPE_NUMBER_DECIMAL
+	input.set_meta("station_key","settings:display_zoom_input")
+	input.text="%.2f"%value
+	row.add_child(input)
+	Station._text(ui,row,"×",17,ui.INK)
+	var apply:Button=Station._button(ui,row,"套用","","","settings:display_zoom_apply")
+	var hint:Label=Station._text(ui,parent,"等比例置中裁切，可輸入 1.00～%.2f。"%max_value,14)
+	var submit:Callable=func(raw:String)->void:
+		var number:String=raw.strip_edges()
+		var zoom:float=number.to_float()
+		if not number.is_valid_float() or not is_finite(zoom) or zoom<1.0 or zoom>max_value:
+			hint.text="請輸入 1.00～%.2f 的數字。"%max_value
+			return
+		var next:float=snappedf(zoom,.01)
+		input.text="%.2f"%next
+		hint.text="已套用 %.2f×"%next
+		ui.action_requested.emit("display_zoom",next)
+		apply.grab_focus()
+	input.text_submitted.connect(submit)
+	apply.pressed.connect(func()->void:submit.call(input.text))

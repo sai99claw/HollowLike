@@ -711,7 +711,7 @@ func _number(value: float) -> String:
 func _navigable(node:Node,out:Array[Control]) -> void:
 	for child in node.get_children():
 		if child is Button and child.is_visible_in_tree() and not child.disabled:out.append(child)
-		elif child is HSlider and child.is_visible_in_tree():out.append(child)
+		elif (child is HSlider or (child is LineEdit and child.has_meta("station_key"))) and child.is_visible_in_tree():out.append(child)
 		_navigable(child,out)
 
 func focus_first() -> void:

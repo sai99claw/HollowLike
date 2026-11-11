@@ -137,7 +137,10 @@ var hazards: Array[Dictionary] = []
 var effects: Array[Dictionary] = []
 var floaters: Array[Dictionary] = []
 var camera_zoom:float=1.3
+const DISPLAY_SIZE:=Vector2(1280,720)
+const DISPLAY_ZOOM_MAX:float=2.0
 var display_fit:String="contain"
+var display_zoom:float=1.0
 var trophy_room:bool=false
 var key_bindings:Dictionary=Bindings.DEFAULTS.duplicate()
 var capturing_key:String=""
@@ -346,6 +349,8 @@ func _input(event:InputEvent) -> void:
 	if capturing_key.is_empty():
 		if event is InputEventKey:
 			var code:int=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+			var focused:Control=get_viewport().gui_get_focus_owner()
+			if focused is LineEdit and focused.name=="DisplayZoomInput" and code!=KEY_ESCAPE:return
 			if code==KEY_ESCAPE and minimap_open and event.pressed:
 				map_pinned=false;_set_map_held(false)
 				get_viewport().set_input_as_handled();return
@@ -705,30 +710,56 @@ func _load_settings() -> void:
 	if not settings is Dictionary:settings={}
 	camera_zoom=clampf(float(settings.get("zoom",1.3)),.8,2.0)
 	display_fit="cover" if settings.get("display_fit","contain")=="cover" else "contain"
+	display_zoom=_normalize_display_zoom(settings.get("display_zoom",1.0))
 	_apply_display_fit()
 	world_speed=clampf(float(settings.get("speed",.8)),.4,1.5)
 	audio_enabled=bool(settings.get("audio_enabled",audio_enabled))
 	key_bindings=Bindings.load_bindings(settings.get("keys",{}))
 	if int(settings.get("bindings_version",0))<2 and int(key_bindings.get("sub",0))==KEY_U and Bindings.action_for(key_bindings,KEY_Z)=="":Bindings.assign(key_bindings,"sub",KEY_Z)
 
+func _normalize_display_zoom(value:Variant) -> float:
+	if not (value is float or value is int) or not is_finite(float(value)):return 1.0
+	return clampf(snappedf(float(value),.01),1.0,DISPLAY_ZOOM_MAX)
+
 func _apply_display_fit() -> void:
+	var cover:bool=display_fit=="cover"
 	if OS.has_feature("web"):
-		JavaScriptBridge.eval("document.documentElement.dataset.gameFit="+JSON.stringify(display_fit))
+		JavaScriptBridge.eval("document.documentElement.dataset.gameFit="+JSON.stringify(display_fit)
+			+";document.documentElement.style.setProperty('--game-zoom',"+JSON.stringify(display_zoom)+")")
 	else:
 		var window:Window=get_window()
-		var dimensions:Vector2=Vector2(window.size)
-		var ratio:float=dimensions.x/maxf(1.0,dimensions.y)
-		window.content_scale_factor=maxf(ratio/(16.0/9.0),(16.0/9.0)/maxf(.01,ratio)) if display_fit=="cover" else 1.0
+		if window.size.x<=0 or window.size.y<=0:return
+		if cover:
+			# EXPAND keeps one scale for both axes and removes letterboxing.
+			# Translate the logical canvas so the extra crop is centered.
+			var scale_by_axis:Vector2=Vector2(window.size)/DISPLAY_SIZE
+			window.content_scale_aspect=Window.CONTENT_SCALE_ASPECT_EXPAND
+			window.content_scale_factor=maxf(scale_by_axis.x,scale_by_axis.y)/minf(scale_by_axis.x,scale_by_axis.y)*display_zoom
+			var visible:Vector2=window.get_visible_rect().size
+			window.global_canvas_transform=Transform2D(0,(visible-DISPLAY_SIZE)*.5)
+		else:
+			window.content_scale_aspect=Window.CONTENT_SCALE_ASPECT_KEEP
+			window.content_scale_factor=1.0
+			window.global_canvas_transform=Transform2D.IDENTITY
 	display_probe=0.0
 
 func _update_safe_interface() -> void:
 	if ui==null or ui.ui_root==null:return
-	var logical:=Vector2(1280,720)
-	var visible:Vector2=logical
+	var visible:Vector2=DISPLAY_SIZE
 	if display_fit=="cover":
-		var ratio:float=float(JavaScriptBridge.eval("window.innerWidth/Math.max(1,window.innerHeight)")) if OS.has_feature("web") else float(get_window().size.x)/maxf(1,get_window().size.y)
-		if ratio>0:visible=Vector2(minf(logical.x,logical.y*ratio),minf(logical.y,logical.x/ratio))
-	var safe:=Rect2((logical-visible)*.5,visible)
+		if OS.has_feature("web"):
+			var fraction:Variant=JSON.parse_string(str(JavaScriptBridge.eval("""
+				(() => {
+					const canvas = document.getElementById('canvas').getBoundingClientRect();
+					const view = document.documentElement;
+					return JSON.stringify([view.clientWidth / canvas.width, view.clientHeight / canvas.height]);
+				})()
+			""")))
+			if fraction is Array and fraction.size()==2 and float(fraction[0])>0 and float(fraction[1])>0:
+				visible=DISPLAY_SIZE*Vector2(minf(1.0,float(fraction[0])),minf(1.0,float(fraction[1])))
+		else:
+			visible=get_window().get_visible_rect().size
+	var safe:=Rect2((DISPLAY_SIZE-visible)*.5,visible)
 	if safe==display_safe:return
 	display_safe=safe
 	ui.set_safe_rect(safe)
@@ -746,7 +777,7 @@ func _safe_canvas_transform() -> Transform2D:
 	return Transform2D(0,Vector2.ONE*factor,0,display_safe.get_center()-logical*factor*.5)
 
 func _save_settings() -> void:
-	meta["settings"]={"zoom":camera_zoom,"speed":world_speed,"keys":key_bindings.duplicate(),"bindings_version":2,"audio_enabled":audio_enabled,"touch_enabled":touch_enabled,"display_fit":display_fit}
+	meta["settings"]={"zoom":camera_zoom,"speed":world_speed,"keys":key_bindings.duplicate(),"bindings_version":2,"audio_enabled":audio_enabled,"touch_enabled":touch_enabled,"display_fit":display_fit,"display_zoom":display_zoom}
 	_save_meta()
 	_update_shortcuts()
 
@@ -2374,6 +2405,9 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"display_fit":
 			display_fit="cover" if str(payload)=="cover" else "contain"
 			_apply_display_fit();_save_settings();_show_settings()
+		"display_zoom":
+			display_zoom=_normalize_display_zoom(payload)
+			_apply_display_fit();_update_safe_interface();_save_settings()
 		"zoom":
 			camera_zoom=clampf(float(payload),.8,2.0);camera_pos=_camera_target(p["pos"]) if screen=="game" else Vector2.ZERO;_save_settings()
 		"feedback":
