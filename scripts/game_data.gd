@@ -138,7 +138,8 @@ static func action_attack(direction:String,charged:bool,during_dash:bool,combo:i
 	def["dash_attack"]=during_dash
 	if during_dash:def["recovery"]=0.0
 	if not charged:
-		def["wing_pose"]={"up":2,"down":3}.get(direction,posmod(combo,2))
+		if not during_dash:
+			def["body_clip"]={"up":"pigeon_featherblade_up","down":"pigeon_featherblade_down"}.get(direction,["pigeon_feather_left","pigeon_feather_right"][posmod(combo,2)])
 	else:
 		def.merge({"kind":"charge","charged":true,"great_spin_release":true,"windup":0.0,"active":1.0,"recovery":0.0,"recoil":0.0,"energy_gain":2.0,"super_armor":true,"complete_release":true},true)
 	return def

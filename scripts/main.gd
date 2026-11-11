@@ -118,6 +118,7 @@ var tuning_view:Control
 var real_clock:float=0.0
 var enemy_canvases:Dictionary={}
 var slash_canvas:Node2D
+var player_slashes:Array[Dictionary]=[]
 var home_sleeping:bool=true
 var home_wake_left:float=0
 var screen: String = "hub"
@@ -293,6 +294,7 @@ func _ready() -> void:
 	spring_particles=preload("res://scripts/spring_particles_v33.gd").new();spring_particles.z_index=2;add_child(spring_particles)
 	home_atmosphere=preload("res://scripts/home_atmosphere_v33.gd").new();add_child(home_atmosphere)
 	slash_canvas=Cache.new();slash_canvas.z_index=1;slash_canvas.paint=_paint_player_slash;add_child(slash_canvas)
+	p_attack.active_started.connect(_start_player_slash)
 	player_flash_layer=EnemyCanvas.new();player_flash_layer.z_index=1;player_flash_layer.paint=_paint_player_flash;add_child(player_flash_layer)
 	ui = UI.new()
 	add_child(ui)
@@ -324,6 +326,7 @@ func _ready() -> void:
 		new_run("rogue",12345)
 
 func _reset_player(at: Vector2) -> void:
+	player_slashes.clear()
 	combo_index=0
 	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
 	p_attack.cancel()
@@ -1193,7 +1196,7 @@ func _process_player_attack_profiled_body() -> void:
 		if bool(def.get("primary",false)) and ea.is_active() and bool(ea.attack.get("primary",false)) and hitbox.intersects(_attack_box(en["pos"],ea.attack,float(en["face"]))):
 			_parry(en)
 		if hitbox.intersects(_enemy_body_box(en)) and (p_attack.mark_timed_hit(int(en["uid"]),.5,3) if def.get("charged",false) else p_attack.mark_hit(int(en["uid"]))):
-			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def),true,not def.has("wing_pose"))
+			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def),true,def.get("kind","")!="primary")
 			if float(def.get("recoil",0))>0:_recoil(float(def["recoil"]),en["pos"],-_attack_direction(def))
 			_restore_vital("energy",float(def.get("energy_gain",0))*(1.0+_rune_effect("energy")))
 			p["air_dash"]=false
@@ -2045,6 +2048,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 	_save_meta()
 
 func _enter_room(id: int, from_dir: String="center") -> void:
+	player_slashes.clear()
 	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
 	_return_trial(false);bath.reset();spring_particles.clear();poison_clouds.clear()
 	if dream_visual!=null:dream_visual.clear_waves()
@@ -2851,7 +2855,7 @@ func _draw_player_body() -> void:
 		elif float(p.get("dash_t",0))>0 and not p_attack.is_busy():preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),(.16-float(p["dash_t"]))*2,player_base,tint)
 		elif anim=="glide":AdventurePose.draw_glide(self,p["pos"],p["face"],player_base,tint)
 		elif float(p.get("flap_left",0))>0 and not bool(p["grounded"]) and not p_attack.is_busy() and anim not in ["hurt","heal","wall","dash","charge"]:preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),.32-float(p["flap_left"]),player_base,tint)
-		elif dream_progress>=0 and anim not in ["hurt","heal","wall","jump_up"] and not (p_attack.attack.has("wing_pose") and anim in ["windup","active","recovery"]):FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
+		elif dream_progress>=0 and anim not in ["hurt","heal","wall","jump_up"] and not (p_attack.attack.get("kind","")=="primary" and anim in ["windup","active","recovery"]):FX.actor(self,"pigeon_feather_charge",dream_progress,p["pos"],player_base,float(p["face"]),1.0,tint,"active")
 		elif anim=="charge":
 			var feet:Vector2=p["pos"]
 			if walker.moving and bool(p["grounded"]) and absf(p["vel"].x)>30:
@@ -3589,7 +3593,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 			combat_feedback.grass_hit(prop["pos"]-Vector2(0,18),Vector2(float(p["face"]),0),str(p_attack.attack.get("style","quick")))
 			_particles(prop["pos"]-Vector2(0,15),Color("a9c6a0"),7,80);continue
 		prop["hurt"]=.3
-		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false,attack_id>=0 or not p_attack.attack.has("wing_pose"))
+		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false,attack_id>=0 or p_attack.attack.get("kind","")!="primary")
 		else:_hit_flash(prop["pos"]-Vector2(0,35),damage,Color("aee8dc"))
 		if prop["kind"]=="health":p["hp"]=p["max_hp"];prop["used"]=true;prop["break_left"]=.5;p["hp_recovery"]=0.0;_toast("生命已回滿")
 		elif prop["kind"] in ["energy","energy_infinite"]:_restore_vital("energy",2);prop["used"]=prop["kind"]=="energy";prop["break_left"]=.5 if prop["used"] else 0
@@ -4433,14 +4437,18 @@ func _sync_enemy_canvases_profiled_body() -> void:
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
-func _paint_player_slash(canvas:CanvasItem) -> void:
-	if screen not in ["game","hub"] or not p_attack.is_active() or not p_attack.attack.get("primary",false) or (p_attack.attack.get("charged",false) and not p_attack.attack.get("great_spin_release",false)):return
+func _start_player_slash() -> void:
 	var def:Dictionary=p_attack.attack
-	var box:Rect2=_attack_box(p["pos"],def,float(p["face"]))
-	if def.has("wing_pose"):
-		SlashArt.draw_straight(canvas,box.get_center(),str(def.get("direction","right")),p_attack.progress(),display_safe.size.x,world_transform)
-	else:
-		SlashArt.draw(canvas,box,def,p_attack.progress(),world_transform)
+	if not def.get("primary",false) or (def.get("charged",false) and not def.get("great_spin_release",false)):return
+	while not player_slashes.is_empty() and draw_clock-float(player_slashes[0]["start"])>=SlashArt.DURATION:
+		player_slashes.pop_front()
+	if player_slashes.size()>=8:player_slashes.pop_front()
+	player_slashes.append({"box":_attack_box(p["pos"],def,float(p["face"])),"definition":def.duplicate(),"start":draw_clock})
+
+func _paint_player_slash(canvas:CanvasItem) -> void:
+	if screen not in ["game","hub"]:return
+	for slash:Dictionary in player_slashes:
+		SlashArt.draw(canvas,slash["box"],slash["definition"],draw_clock-float(slash["start"]),world_transform)
 
 func _pogo() -> void:
 	p["jump_cut_allowed"]=false;p["recoil_left"]=0;p["wall_kick_left"]=0

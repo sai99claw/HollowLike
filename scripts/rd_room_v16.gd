@@ -3,6 +3,9 @@ extends Control
 ## Full-screen, mouse-first atlas/animation inspection. No gameplay state is owned.
 signal closed
 const Procedural=preload("res://scripts/rd_procedural_v16.gd")
+const Burst=preload("res://scripts/pigeon_burst_v72.gd")
+const TagRules=preload("res://scripts/art_tags_v73.gd")
+const TAG_FILE:String="user://rd_asset_tags.cfg"
 const Catalog=preload("res://scripts/art_catalog_v16.gd")
 const PAGE_SIZE:int=24
 const GALLERY_PAGE_SIZE:int=12
@@ -51,9 +54,15 @@ var _preview_id:String=""
 var _thumb_buttons:Array[Button]=[]
 var _thumb_indices:Array[int]=[]
 var _search:LineEdit
-var _kind:OptionButton
-var _group:OptionButton
-var _category:OptionButton
+var _include_menu:MenuButton
+var _exclude_menu:MenuButton
+var _tag_summary:Label
+var _custom_tag:LineEdit
+var _entry_tags:Label
+var included_tags:Dictionary={}
+var excluded_tags:Dictionary={}
+var custom_tags:Dictionary={}
+var tag_options:PackedStringArray=[]
 var _list:ItemList
 var _filtered_count:Label
 var _procedural:Control
@@ -75,7 +84,6 @@ var _page_label:Label
 var _previous_page:Button
 var _next_page:Button
 var _phase:OptionButton
-var _usage:OptionButton
 var _view:OptionButton
 var _inspector:Control
 var _gallery:Control
@@ -100,8 +108,15 @@ func _ready() -> void:
 		for role:String in ["normal_font","bold_font","italics_font","bold_italics_font","mono_font"]:shared.set_font(role,"RichTextLabel",shared.default_font)
 	for type:String in ["Label","Button","LineEdit","OptionButton","ItemList","PopupMenu"]:shared.set_color("font_color",type,INK)
 	theme=shared
-	_build();entries=Catalog.all_entries();_fill_categories();_filter();_built=true
-	if not entries.is_empty():select_entry(entries[0])
+	_build()
+	entries=Catalog.all_entries()
+	var saved:=ConfigFile.new()
+	if saved.load(TAG_FILE)==OK:
+		var stored:Variant=saved.get_value("art","tags",{})
+		if stored is Dictionary:custom_tags=stored
+	_fill_tag_menus()
+	_built=true
+	_filter()
 	set_process(visible)
 func setup_ready() -> void:
 	# Optional explicit hook for a parent that creates this Control before adding it.
@@ -138,18 +153,16 @@ func _build() -> void:
 	left.add_child(_label("篩選與搜尋",18,GOLD))
 	left.add_child(_label("關鍵字（名稱、說明或 ID）",12,MUTED))
 	_search=LineEdit.new();_search.name="AssetSearch";_search.placeholder_text="搜尋角色、武器、符文或 ID";_search.custom_minimum_size.y=36;_search.clear_button_enabled=true;_search.text_changed.connect(func(_value:String)->void:_filter());left.add_child(_search)
-	left.add_child(_label("素材分類",12,MUTED))
-	_group=OptionButton.new();_group.name="AssetGroup";_group.custom_minimum_size.y=32;left.add_child(_group)
-	_group.get_popup().theme=theme
-	_group.item_selected.connect(func(_index:int)->void:_fill_subcategories();_filter())
-	_category=OptionButton.new();_category.name="AssetCategory";_category.custom_minimum_size.y=32;_category.item_selected.connect(func(_index:int)->void:_filter());left.add_child(_category)
-	_kind=OptionButton.new();_kind.name="AssetKindFilter";_kind.custom_minimum_size.y=34;left.add_child(_kind)
-	for pair in [["全部：動畫與靜態","all"],["只看動畫／逐幀特效","animated"],["只看靜態插圖／圖示","still"]]:_kind.add_item(pair[0]);_kind.set_item_metadata(_kind.item_count-1,pair[1])
-	_kind.get_popup().theme=theme;_kind.item_selected.connect(func(_index:int)->void:_filter())
-	_usage=OptionButton.new();_usage.name="AssetUsageFilter";_usage.custom_minimum_size.y=32;left.add_child(_usage)
-	for pair in [["使用狀態：全部","all"],["遊戲中已使用","used"],["未使用 · un-used","un-used"]]:_usage.add_item(pair[0]);_usage.set_item_metadata(_usage.item_count-1,pair[1])
-	_usage.get_popup().theme=theme;_usage.item_selected.connect(func(_index:int)->void:_filter())
-	left.add_child(_button("清除全部條件",clear_filters))
+	var filters:=HBoxContainer.new()
+	left.add_child(filters)
+	_include_menu=_tag_menu("包含標籤",included_tags,excluded_tags)
+	_exclude_menu=_tag_menu("排除標籤",excluded_tags,included_tags)
+	filters.add_child(_include_menu)
+	filters.add_child(_exclude_menu)
+	filters.add_child(_button("清除",clear_filters))
+	_tag_summary=_label("",12,MUTED)
+	_tag_summary.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	left.add_child(_tag_summary)
 	_filtered_count=_label("",13,MUTED);left.add_child(_filtered_count)
 	_list=ItemList.new();_list.name="AssetList";_list.size_flags_vertical=Control.SIZE_EXPAND_FILL;_list.select_mode=ItemList.SELECT_SINGLE;_list.allow_reselect=true;_list.add_theme_font_size_override("font_size",14);_list.add_theme_constant_override("v_separation",7);_list.item_selected.connect(_item_selected);left.add_child(_list)
 	_cache_label=_label("圖片按需載入 · 最多快取 24 筆",12,MUTED);left.add_child(_cache_label)
@@ -185,6 +198,20 @@ func _build() -> void:
 	var id_row:=HBoxContainer.new();right.add_child(id_row)
 	_asset_id=LineEdit.new();_asset_id.name="CopyableAssetID";_asset_id.editable=false;_asset_id.size_flags_horizontal=Control.SIZE_EXPAND_FILL;id_row.add_child(_asset_id)
 	id_row.add_child(_button("複製 ID",func()->void:if not current_entry.is_empty():copy_asset_id(str(current_entry["id"])),95))
+	_entry_tags=_label("",12,MUTED)
+	_entry_tags.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	right.add_child(_entry_tags)
+	var custom_row:=HBoxContainer.new()
+	right.add_child(custom_row)
+	_custom_tag=LineEdit.new()
+	_custom_tag.name="CustomAssetTag"
+	_custom_tag.placeholder_text="自訂標籤"
+	_custom_tag.max_length=30
+	_custom_tag.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	_custom_tag.text_submitted.connect(func(_value:String)->void:set_custom_tag(_custom_tag.text,true))
+	custom_row.add_child(_custom_tag)
+	custom_row.add_child(_button("加到素材",func()->void:set_custom_tag(_custom_tag.text,true)))
+	custom_row.add_child(_button("從素材移除",func()->void:set_custom_tag(_custom_tag.text,false)))
 	_notes=RichTextLabel.new();_notes.name="AssetNotes";_notes.custom_minimum_size.y=40;_notes.scroll_active=true;_notes.add_theme_font_size_override("normal_font_size",12);_notes.add_theme_color_override("default_color",MUTED);right.add_child(_notes)
 	_gallery=VBoxContainer.new();_gallery.name="AssetGalleryView";_gallery.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(_gallery);_gallery.hide()
 	_gallery.add_child(_label("全部貼圖 · 首幀預覽",20,GOLD));_gallery.add_child(_label("每頁 12 張，按需載入。點圖檢視動畫；ID 可直接複製。",13,MUTED))
@@ -194,22 +221,86 @@ func _build() -> void:
 	_gallery_previous=_button("上一頁",func()->void:change_gallery_page(-1),110);pages.add_child(_gallery_previous)
 	_gallery_page_label=_label("",14,MUTED);_gallery_page_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL;_gallery_page_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;pages.add_child(_gallery_page_label)
 	_gallery_next=_button("下一頁",func()->void:change_gallery_page(1),110);pages.add_child(_gallery_next)
-func _fill_categories() -> void:
-	_group.clear();_group.add_item("全部大類")
-	for group:String in Catalog.GROUPS:_group.add_item(group)
-	_fill_subcategories()
-func _selected_group() -> String:
-	return "" if _group.selected<=0 else _group.get_item_text(_group.selected)
-func _fill_subcategories() -> void:
-	_category.clear();_category.get_popup().theme=theme;_category.add_item("全部子類")
-	for category:String in Catalog.categories(_selected_group()):_category.add_item(category)
+func _tag_menu(title:String,selected:Dictionary,opposite:Dictionary) -> MenuButton:
+	var button:=MenuButton.new()
+	button.text=title
+	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var popup:=button.get_popup()
+	popup.theme=theme
+	popup.max_size=Vector2i(0,440)
+	popup.hide_on_checkable_item_selection=false
+	popup.id_pressed.connect(func(index:int)->void:
+		if index<0 or index>=tag_options.size():return
+		var tag:String=tag_options[index]
+		if selected.has(tag):selected.erase(tag)
+		else:
+			opposite.erase(tag)
+			selected[tag]=true
+		_sync_tag_checks()
+		_filter())
+	return button
+
+func _asset_tags(item:Dictionary) -> PackedStringArray:
+	var tags:PackedStringArray=item["tags"].duplicate()
+	for value:Variant in custom_tags.get(item["id"],[]):
+		tags.append("自訂/"+str(value))
+	return tags
+
+func _fill_tag_menus() -> void:
+	var unique:Dictionary={}
+	for item:Dictionary in entries:
+		for tag:String in _asset_tags(item):unique[tag]=true
+	tag_options.clear()
+	for button:MenuButton in [_include_menu,_exclude_menu]:button.get_popup().clear()
+	for facet:String in TagRules.FACETS:
+		var values:Array=unique.keys().filter(func(tag:String)->bool:return tag.begins_with(facet+"/"))
+		if values.is_empty():continue
+		values.sort_custom(func(left:String,right:String)->bool:return left.naturalnocasecmp_to(right)<0)
+		for button:MenuButton in [_include_menu,_exclude_menu]:button.get_popup().add_separator(facet)
+		for tag:String in values:
+			for button:MenuButton in [_include_menu,_exclude_menu]:button.get_popup().add_check_item(tag.get_slice("/",1),tag_options.size())
+			tag_options.append(tag)
+	for selected:Dictionary in [included_tags,excluded_tags]:
+		for tag:String in selected.keys():
+			if not unique.has(tag):selected.erase(tag)
+	_sync_tag_checks()
+
+func _sync_tag_checks() -> void:
+	for button:MenuButton in [_include_menu,_exclude_menu]:
+		var selected:Dictionary=included_tags if button==_include_menu else excluded_tags
+		var popup:=button.get_popup()
+		for row in popup.item_count:
+			if not popup.is_item_separator(row):popup.set_item_checked(row,selected.has(tag_options[popup.get_item_id(row)]))
+	var terms:=PackedStringArray()
+	for tag:String in included_tags:terms.append("＋"+tag)
+	for tag:String in excluded_tags:terms.append("－"+tag)
+	_tag_summary.text=" · ".join(terms) if not terms.is_empty() else "同類任一符合，跨類須同時符合"
+	_tag_summary.tooltip_text=_tag_summary.text
+
+func set_custom_tag(raw:String,enabled:bool) -> void:
+	if current_entry.is_empty():return
+	var label:String=raw.strip_edges().replace("/","／")
+	if label.is_empty():return
+	var id:String=current_entry["id"]
+	var labels:Array=custom_tags.get(id,[])
+	if enabled and not labels.has(label):labels.append(label)
+	elif not enabled:labels.erase(label)
+	if labels.is_empty():custom_tags.erase(id)
+	else:custom_tags[id]=labels
+	var saved:=ConfigFile.new()
+	saved.set_value("art","tags",custom_tags)
+	if saved.save(TAG_FILE)!=OK:push_warning("無法儲存 RD 自訂標籤")
+	_fill_tag_menus()
+	_update_entry_tags()
+	_filter()
+
+func _update_entry_tags() -> void:
+	_entry_tags.text=" · ".join(_asset_tags(current_entry)) if not current_entry.is_empty() else ""
+	_entry_tags.tooltip_text=_entry_tags.text
+
 func _filter() -> void:
 	if _list==null:return
-	var selected_category:String="" if _category.selected<=0 else _category.get_item_text(_category.selected)
-	var kind:String=str(_kind.get_item_metadata(_kind.selected)) if _kind!=null else "all"
-	filtered_entries=Catalog.search(_search.text,selected_category,kind,_selected_group())
-	var usage:String=str(_usage.get_item_metadata(_usage.selected)) if _usage!=null else "all"
-	if usage!="all":filtered_entries=filtered_entries.filter(func(item:Dictionary)->bool:return item.get("runtime_usage","un-used")==usage)
+	filtered_entries=Catalog.search(_search.text).filter(func(item:Dictionary)->bool:return TagRules.matches(_asset_tags(item),included_tags,excluded_tags))
 	_list.clear();gallery_page=0
 	for item:Dictionary in filtered_entries:
 		_list.add_item(str(item["label"]));_list.set_item_tooltip(_list.item_count-1,str(item["id"])+"\n"+str(item["frame_count"])+" 格 · "+str(item["fps"])+"fps")
@@ -220,10 +311,15 @@ func _filter() -> void:
 		if filtered_entries[i]["id"]==current_entry.get("id",""):_list.select(i);return
 	select_entry(filtered_entries[0])
 func clear_filters() -> void:
-	_search.text="";_group.select(0);_fill_subcategories();_kind.select(0);_usage.select(0);_filter()
+	_search.text=""
+	included_tags.clear()
+	excluded_tags.clear()
+	_sync_tag_checks()
+	_filter()
 func _clear_selection() -> void:
 	pause();current_entry={};_phase_edits.clear();_timeline=[];frame_index=0;_preview_frame=-1;_preview_id=""
 	if _preview==null:return
+	_update_entry_tags()
 	_preview.texture=null;_procedural.hide();_name.text="沒有符合條件的素材";_source.text="";_asset_id.text="";_notes.text="請換個關鍵字，或按「清除全部條件」。";_counter.text="0 / 0";_play_button.disabled=true
 	_update_edit_controls()
 	_changing=true;_scrubber.max_value=0;_scrubber.value=0;_changing=false
@@ -248,9 +344,11 @@ func select_entry(value:Variant) -> void:
 		if item["phases"][raw].is_empty():continue
 		_phase.add_item({"idle":"完整姿態","break":"破壞動畫","windup":"前搖","active":"出擊","recovery":"後搖","flight":"飛行","arming":"陷阱設置"}.get(key,key));_phase.set_item_metadata(_phase.item_count-1,key)
 	_phase.selected=0;_phase.disabled=_phase.item_count<=1
+	_preview.modulate=Burst.IMPACT_TINT if item["id"]=="v72:impact_feathers" else Color.WHITE
 	_name.text=str(item["label"]);_name.tooltip_text=str(item["id"])
 	_source.text=str(item["id"])+"  ·  "+str(item["frames"][0].get("path",""));_source.tooltip_text=_source.text
 	_asset_id.text=str(item["id"])
+	_update_entry_tags()
 	_notes.text=("已使用" if item.get("runtime_usage","")=="used" else "un-used")+" · "+str(item.get("usage_note",""))+"\n"+str(item.get("density_note",""))+"\n"+str(item.get("notes",""));_changing=false
 	playing=_timeline.size()>1;_play_button.text="暫停" if playing else "播放"
 	_refresh_timeline();_filter_selection()

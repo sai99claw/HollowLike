@@ -2,7 +2,9 @@ class_name ArtCatalogV16
 extends RefCounted
 ## RD asset metadata is cheap. Texture decoding happens only for selected frames.
 ## No call into the gameplay art helpers' unbounded texture caches is needed.
-const GROUPS:Array[String]=["主角","小怪","Boss","地圖","物件"]
+const Tags=preload("res://scripts/art_tags_v73.gd")
+const Slash=preload("res://scripts/slash_art_v18.gd")
+const GROUPS:Array[String]=["主角","小怪","Boss","地圖","物件","NPC","戰鬥共用"]
 const IDLE_MOTION=preload("res://scripts/pigeon_idle_v19.gd")
 const WALK_MOTION=preload("res://scripts/walk_animation.gd")
 const ACTOR_MOTION=preload("res://scripts/adventure_visual.gd")
@@ -41,6 +43,7 @@ static func all_entries() -> Array[Dictionary]:
 		if not item.has("runtime_usage"):item["runtime_usage"]="un-used"
 		if not item.has("usage_note"):
 			item["usage_note"]=str(item["label"])+" · "+(context+"。" if not context.is_empty() else "")+"素材庫原圖，未查到遊戲呼叫。"
+		item["tags"]=Tags.for_asset(item)
 	_entries.sort_custom(func(a:Dictionary,b:Dictionary)->bool:return str(a["category"])+str(a["label"])<str(b["category"])+str(b["label"]))
 	return _entries
 
@@ -101,7 +104,7 @@ static func search(query:String="",category:String="",kind:String="all",group:St
 		if not category.is_empty() and item["category"]!=category:continue
 		if kind=="animated" and int(item["frame_count"])<=1:continue
 		if kind=="still" and int(item["frame_count"])!=1:continue
-		var text:String=_search_text(str(item["id"])+" "+str(item["label"])+" "+str(item.get("notes",""))+" "+str(item["category"])+" "+str(item.get("runtime_usage",""))+" "+str(item.get("usage_note",""))+" "+str(item["group"]))
+		var text:String=_search_text(str(item["id"])+" "+str(item["label"])+" "+str(item.get("notes",""))+" "+str(item["category"])+" "+str(item.get("runtime_usage",""))+" "+str(item.get("usage_note",""))+" "+str(item["group"])+" "+" ".join(item["tags"]))
 		var matches:bool=true
 		for term in terms:
 			if not text.contains(term):matches=false;break
@@ -218,11 +221,11 @@ static func _remaining_images(directory:String) -> void:
 		var path:String=directory+original
 		if _covered.has(path) or not ResourceLoader.exists(path):continue
 		var category:String="原圖與其他素材"
-		if directory.contains("/bosses/"):category="首領圖集"
+		if directory.contains("/projectiles/"):category="投射物"
+		elif directory.contains("/bosses/"):category="首領圖集"
 		elif directory.contains("/monsters/"):category="小怪圖集"
 		elif directory.contains("/midground/") or directory.contains("ecology") or original.contains("background"):category="地形與背景"
 		elif directory.contains("/cloaks/") or directory.contains("/player/") or original.begins_with("pigeon"):category="主角姿態"
-		elif directory.contains("/projectiles/"):category="投射物"
 		elif directory.contains("explosion") or directory.contains("motion") or directory.contains("/effects/"):category="特效原圖"
 		elif directory.contains("/stations/") or directory.contains("/chests/"):category="場景互動物件"
 		_add("raw:"+path.trim_prefix(ROOT),original.get_basename(),category,[_descriptor(path)],1,"原始圖檔；若為新圖集且尚未登記切片，會先顯示完整圖集。")
@@ -295,7 +298,7 @@ static func _procedural() -> void:
 		_add("procedural:"+pair[0],pair[1],"即時程式特效",frames,12,"直接執行遊戲的繪圖函式；時間樣本可逐格播放。",{"kind":"procedural"})
 
 static func _motion_v18() -> void:
-	_sheet("slash:v18","普攻 · 白色羽刃月牙","攻擊與命中特效",ROOT+"v18/slash-smear.png",4,2,8,60,{"phases":{"active":[0,1,2,3,4,5,6,7]}})
+	_sheet("slash:v18","普攻 · 白色羽刃月牙","攻擊與命中特效",ROOT+"v18/slash-smear.png",4,2,Slash.FRAME_COUNT,Slash.FPS,{"phases":{"active":[0,1,2,3,4,5,6,7]}})
 	var data:Dictionary=_json(ROOT+"v18/monster-motion-manifest.json")
 	for id:String in data.get("animations",{}):
 		var clip:Dictionary=data["animations"][id];var frames:Array=[]
@@ -408,8 +411,11 @@ static func _group_for(item:Dictionary) -> String:
 	var category:String=item["category"]
 	var path:String=item["frames"][0].get("path","")
 	if category in ["首領圖集","Boss動作與特效"] or path.begins_with(ROOT+"v59/monsters/") or path.begins_with(ROOT+"v59/effects/") or id.begins_with("v22:boss-actions:") or id in ["v22:death:underground","v22:death:trunk","v22:death:sky"]:return "Boss"
-	if category.begins_with("怪物") or category in ["小怪動作","小怪圖集","高解析怪物動作","死亡與屍體","陷阱安置動畫","環境生物"]:return "小怪"
-	if id in ["v72:wing_impulse","v72:straight_slash"] or (category in ["主角","主角姿態","衝刺與爆炸特效"] and not id.begins_with("explosion:")):return "主角"
+	if id.begins_with("monster_projectile:") or category.begins_with("怪物") or category in ["小怪動作","小怪圖集","高解析怪物動作","死亡與屍體","陷阱安置動畫","環境生物"]:return "小怪"
+	if id in ["slash:v18","v72:wing_impulse","v72:straight_slash"] or (category in ["主角","主角姿態","衝刺與爆炸特效"] and not id.begins_with("explosion:")):return "主角"
+	if category=="角色與NPC":return "NPC"
+	if id in ["v72:impact_feathers","v39:crescent"]:return "戰鬥共用"
+	if id.begins_with("v24:projectile:") or id.begins_with("v24:weapon:") or id.begins_with("v31:") or id=="v38:laser" or path.contains("/v31/projectiles/"):return "主角"
 	if category.contains("地形") or category.contains("中景") or category.contains("裝飾") or category=="首頁與大門" or path.contains("/maps/") or id.begins_with("procedural:door_"):return "地圖"
 	return "物件"
 
@@ -461,26 +467,26 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"idle:v19:idle":note="待機 5 FPS，依指定順序往返播放，第 4、8 張停用。"
 		"idle:v19:rest":note="閒置五秒後從第 2 張進入趴地休息。"
 		"walk_v2:pigeon_walk_master":note="正常走路依距離播第 7、3、8、9、10 張。"
-		"slash:v18":note="手動集氣釋放使用舊羽刃月牙。普通揮擊使用直線閃光。"
-		"combat_v05:pigeon_featherblade_up":note="副武器朝上施放時的舊角色姿勢。"
-		"combat_v05:pigeon_featherblade_down":note="副武器朝下施放時的舊角色姿勢。"
+		"slash:v18":note="主角 A1、A2、上斬、下斬及手動集氣釋放的獨立攻擊特效。八幀以 24 FPS 播放。"
+		"combat_v05:pigeon_featherblade_up":note="普通上斬的角色動畫，沿用羽毛刀朝上姿勢。"
+		"combat_v05:pigeon_featherblade_down":note="普通下斬的角色動畫，沿用羽毛刀朝下姿勢。"
 		"combat_v05:pigeon_greatblade_up":used=false;note="舊衝刺上斬姿勢，已由右翅上揮取代。"
 		"combat_v05:pigeon_greatblade_down":used=false;note="舊衝刺下斬姿勢，已由右腳抓踢取代。"
-		"combat_v05:pigeon_feather_left":used=false;note="舊橫向普攻第 1 刀，已由右翅取代。"
-		"combat_v05:pigeon_feather_right":used=false;note="舊橫向普攻第 2 刀，已由左翅取代。"
+		"combat_v05:pigeon_feather_left":note="橫向普攻 A1 的角色動畫。"
+		"combat_v05:pigeon_feather_right":note="橫向普攻 A2 的角色動畫。"
 		"combat_v05:pigeon_feather_thrust":used=false;note="停用的第三下普攻。"
 		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
 		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
 		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
-		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，四幀由集中至飛散。"
-		"v72:straight_slash":note="普攻有效期間從判定中心畫出半個可見畫面寬的直線，方向隨橫斬、上斬或下斬。傷害沿用原判定。"
+		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，四幀由集中至飛散，遊戲內放大 40% 並提高亮度。"
+		"v72:straight_slash":used=false;note="v0.72 普攻直線閃光，現已恢復 slash:v18 羽刃月牙。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
 		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"
 		"v39:crescent":note="集氣等其他攻擊命中時，細長月牙對準受擊者中央。"
-	if id.begins_with("v70:pigeon:attack:"):note=label+"；普攻以預備姿勢接動態模糊。角色造型取自走路第 10 幀。"
+	if id.begins_with("v70:pigeon:attack:"):used=false;note=label+"；舊版翅膀／腳爪普攻角色動畫。"
 	elif id.begins_with("v67:stone:"):note=label+"，隨機生成，主角可穿過，擊飛後可撞傷怪物。"+("六顆小石排成 1／2／3 層，近戰擊中其中一顆會打散整堆。" if id.ends_with(":small") else "")
 	elif id.begins_with("v59:chest:"):note=label+"，戰鬥房或獎勵房互動後播放。"
 	elif id.begins_with("v36:"):note=label+"，三生態戰鬥房的怪物姿勢或投射物。"
@@ -498,7 +504,10 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 static func _raw_usage(path:String) -> Dictionary:
 	var role:String=""
 	var used:bool=true
-	if path.begins_with("v63/monsters/"):
+	if path=="v30/effects/wing-puff.png":
+		role="舊拍翅風團，由 v72:wing_impulse 取代。"
+		used=false
+	elif path.begins_with("v63/monsters/"):
 		role="怪物高解析原稿，供切圖與審圖。"
 		used=false
 	elif path.begins_with("v55/bosses/"):
@@ -535,7 +544,6 @@ static func _raw_usage(path:String) -> Dictionary:
 			"v55/effects/frost.svg":"敵人被凍結時覆在本體上的冰層。",
 			"v55/effects/spark.svg":"投射物拖尾與場景火花粒子。",
 			"v55/ui/etched_slot.svg":"裝備卡片與鳥巢展示欄的雕紋底框。",
-			"v30/effects/wing-puff.png":"起跳或拍翅時的風團。",
 			"v29/effects/refined-feather.png":"死亡地點或取回物品的發光羽毛。",
 			"v29/stations/cloak-wardrobe.png":"整備房試穿外觀的衣櫃。",
 			"v29/stations/free-weapon-pedestal.png":"免費副武器領取台。",

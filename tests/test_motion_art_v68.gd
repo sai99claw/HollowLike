@@ -39,13 +39,13 @@ func test_motion() -> void:
 	check(Wall.wall_frame(true,5.0)==0,"Holding uses the first wall frame")
 	for i in 6:
 		var attack:Dictionary=Data.action_attack("right",false,false,i)
-		check(attack["combo"]==i%2 and attack["wing_pose"]==i%2,"Horizontal primary attacks alternate two regular strikes")
-		check(FX.player_clip(attack["style"],attack,"active").is_empty(),"Ordinary strikes bypass old featherblade art")
+		check(attack["combo"]==i%2,"Horizontal primary attacks alternate two regular strikes")
+		check(FX.player_clip(attack["style"],attack,"active")==["pigeon_feather_left","pigeon_feather_right"][i%2],"Ordinary strikes restore the old A1 and A2 art")
 	for direction:String in ["up","down"]:
-		var attack:Dictionary=Data.action_attack(direction,false,true)
-		check(attack["wing_pose"]==(2 if direction=="up" else 3),"Vertical strikes use the requested wing or foot")
+		var attack:Dictionary=Data.action_attack(direction,false,false)
+		check(FX.player_clip(attack["style"],attack,"active")=="pigeon_featherblade_"+direction,"Vertical strikes restore the old featherblade poses")
 	var charged:Dictionary=Data.action_attack("right",true,false,0)
-	check(charged["great_spin_release"] and not charged.has("wing_pose"),"Charged releases keep their separate pose")
+	check(charged["great_spin_release"] and not charged.has("body_clip"),"Charged releases keep their separate pose")
 
 func test_collision() -> void:
 	var target:=Rect2(100,100,20,20)
@@ -74,6 +74,22 @@ func test_viewer() -> void:
 	for i in 4:
 		var clip:Dictionary=Catalog.entry("v70:pigeon:attack:"+str(i))
 		check(clip["frame_count"]==2 and Catalog.frame(clip,0)!=null and Catalog.frame(clip,1)!=null,"Each of the four attacks exposes two exported sprites")
+	var slash:Dictionary=Catalog.entry("slash:v18")
+	check(slash["fps"]==24 and slash["group"]=="主角" and "用途/特效" in slash["tags"],"RD catalogs the slash under the protagonist as a 24 FPS effect")
+	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("歸屬/主角"))
+	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("用途/特效"))
+	viewer._exclude_menu.get_popup().id_pressed.emit(viewer.tag_options.find("使用狀態/未使用"))
+	check(slash in viewer.filtered_entries and not Catalog.entry("v72:straight_slash") in viewer.filtered_entries,"The menus combine multiple inclusions with an exclusion")
+	viewer.select_entry("slash:v18")
+	viewer.set_custom_tag("動作驗收",true)
+	var custom_index:int=viewer.tag_options.find("自訂/動作驗收")
+	check(custom_index>=0,"Custom tags are available as filters")
+	viewer._include_menu.get_popup().id_pressed.emit(custom_index)
+	check(viewer.filtered_entries==[slash],"A custom tag combines with the existing filters")
+	var saved:=ConfigFile.new()
+	check(saved.load(viewer.TAG_FILE)==OK and "動作驗收" in saved.get_value("art","tags",{}).get("slash:v18",[]),"The custom tag persists on this device")
+	viewer.set_custom_tag("動作驗收",false)
+	viewer.clear_filters()
 	viewer.select_entry("wind:form")
 	viewer.pause();viewer.set_fps(10);viewer.seek_frame(1);viewer.play()
 	viewer._process(.101)
@@ -135,7 +151,7 @@ func test_game() -> void:
 	game._reset_player(Vector2(700,430))
 	for i in 6:
 		game._begin_primary({"dir":"right","charged":false})
-		check(game.p_attack.attack["wing_pose"]==i%2,"Live controller alternates wing poses")
+		check(game.p_attack.attack["body_clip"]==["pigeon_feather_left","pigeon_feather_right"][i%2],"Live controller alternates legacy body poses")
 		game.p_attack.cancel()
 	var slash_canvas:=Node2D.new()
 	root.add_child(slash_canvas)
@@ -144,16 +160,16 @@ func test_game() -> void:
 		game._begin_primary({"dir":direction,"charged":false})
 		game.p_attack.tick(float(game.p_attack.attack["windup"])+.001)
 		check(game.p_attack.is_active(),"Ordinary attack is in its visible strike phase")
-		Slash.straight_texture=null
+		Slash.texture=null
+		game.p_attack.cancel()
 		slash_canvas.queue_redraw()
 		await process_frame
 		await process_frame
-		check(Slash.straight_texture!=null,"Ordinary "+direction+" attack draws the straight flash over the body pose")
+		check(Slash.texture!=null,"Ordinary "+direction+" attack draws the retained slash even after its hit phase ends")
 		game.p_attack.cancel()
-	for zoom:float in [.65,1.0,2.0]:
-		var base:=Transform2D(0,Vector2.ONE*zoom,0,Vector2.ZERO)
-		check(is_equal_approx(Slash.straight_length(920,base)*zoom,460),"Flash is half the visible screen width at any camera zoom")
-	check(Catalog.entry("v72:straight_slash").get("frame_count",0)==4,"RD shows the four straight flash frames")
+	for i in 8:
+		check(Slash.frame_at((i+.5)/24.0)==i,"Slash displays every original frame at 24 FPS")
+	check(Slash.frame_at(8.0/24.0)==-1,"Slash expires after all eight frames")
 	check(Catalog.entry("v72:wing_impulse").get("frame_count",0)==4 and Catalog.entry("v72:impact_feathers").get("frame_count",0)==4,"RD shows both four-frame feather effects")
 	slash_canvas.queue_free()
 	game._leave_lab()

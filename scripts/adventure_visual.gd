@@ -12,11 +12,8 @@ const MOTION_PIVOT:=Vector2(155,237)
 const JUMP_FPS:float=30.0
 const JUMP_SEQUENCE=[1,2]
 const LIMPS=preload("res://assets/v70/pigeon_limp.webp")
-const WING_ATTACKS=preload("res://assets/v70/pigeon_attack.webp")
 const GLIDE=preload("res://assets/v70/pigeon_glide.webp")
 const LIMP_CELL:=Vector2(330,256)
-const ATTACK_CELL:=Vector2(416,320)
-const ATTACK_PIVOT:=Vector2(210,245)
 const WIND_BODY_CENTER:=Vector2(0,22)
 const SLAM_FRAMES=[0,1,2,2,2,2,2,2,2]
 const SLAM_FPS:float=24.0
@@ -68,9 +65,6 @@ static func feather(c:CanvasItem,at:Vector2,time:float,base:Transform2D) -> void
 	preload("res://scripts/adventure_art_v29.gd").death_feather(c,at,time,base)
 
 static func player_action(c:CanvasItem,anim:String,attack:Dictionary,progress:float,at:Vector2,face:float,time:float,base:Transform2D,tint:Color,scale_value:float,walk_frame:int) -> bool:
-	if attack.has("wing_pose") and anim in ["windup","active","recovery"]:
-		draw_wing_attack(c,int(attack["wing_pose"]),attack_frame(anim,progress),at,float(attack.get("face",face)),base,tint,scale_value)
-		return true
 	var kind:String=str(attack.get("kind",""))
 	var special:bool=anim in ["windup","active","recovery"] and kind in ["pierce","slam"]
 	if anim not in ["heal","limp","dash"] and not special:return false
@@ -110,14 +104,6 @@ static func slam_frame(elapsed:float) -> int:
 static func draw_jump(c:CanvasItem,elapsed:float,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
 	var region:=Rect2(Vector2(jump_frame(elapsed),0)*MOTION_CELL,MOTION_CELL)
 	_draw_sprite(c,NEW_MOTION,region,MOTION_PIVOT,at,face,base,tint,.224)
-
-static func attack_frame(phase:String,progress:float) -> int:
-	# Two visual poses without delaying the existing active hit window.
-	return 0 if phase=="windup" or (phase=="active" and progress<.30) else 1
-
-static func draw_wing_attack(c:CanvasItem,row:int,frame:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
-	var region:=Rect2(Vector2(frame,row)*ATTACK_CELL,ATTACK_CELL)
-	_draw_sprite(c,WING_ATTACKS,region,ATTACK_PIVOT,at,face,base,tint,.224*scale_value)
 
 static func draw_glide(c:CanvasItem,at:Vector2,face:float,base:Transform2D,tint:Color) -> void:
 	_draw_sprite(c,GLIDE,Rect2(Vector2.ZERO,GLIDE.get_size()),Vector2(280,241),at,face,base,tint,.224)

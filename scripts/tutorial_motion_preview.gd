@@ -1,6 +1,7 @@
 extends Control
 
 const Art=preload("res://scripts/art.gd")
+const Data=preload("res://scripts/game_data.gd")
 const Slash=preload("res://scripts/slash_art_v18.gd")
 const Flap=preload("res://scripts/double_jump_v27.gd")
 const PigeonBurst=preload("res://scripts/pigeon_burst_v72.gd")
@@ -52,6 +53,7 @@ func _draw() -> void:
 	var direction:=Vector2.RIGHT
 	var attack:Dictionary={}
 	var slash_box:=Rect2()
+	var slash_age:float=0.0
 	if t>=0:
 		match action:
 			"jump","double_jump":
@@ -113,18 +115,16 @@ func _draw() -> void:
 					draw_arc(at-Vector2(0,25),37,0,TAU*clampf(t/release,0,1),32,Color("98e5c6"),2,true)
 				elif elapsed<.44:
 					anim="active";progress=elapsed/.44
-					attack={"direction":"down" if action=="down_attack" else "right","great_spin_release":action=="charged"}
+					attack=Data.action_attack("down" if action=="down_attack" else "right",action=="charged",false)
+					slash_age=elapsed
 					slash_box=Rect2(at+Vector2(-29,-8),Vector2(58,82)) if action=="down_attack" else Rect2(at+Vector2(7,-58),Vector2(103,57))
-					if action!="charged":attack["wing_pose"]=3 if action=="down_attack" else 0
 			"sub":
 				if t<.85:
 					var origin:Vector2=at-Vector2(0,26)
 					var tip:Vector2=origin+direction*size.x*.43*(t/.85)
 					Weapon.draw(self,weapon_id,tip,direction,14,true,Transform2D.IDENTITY,t)
 	Art.draw_pigeon(self,at,1,clock,anim,Color.WHITE,1.0,progress,Transform2D.IDENTITY,"quick",attack)
-	if slash_box.has_area():
-		if attack.has("wing_pose"):Slash.draw_straight(self,slash_box.get_center(),attack["direction"],progress,size.x,Transform2D.IDENTITY)
-		else:Slash.draw(self,slash_box,attack,progress,Transform2D.IDENTITY)
+	if slash_box.has_area():Slash.draw(self,slash_box,attack,slash_age,Transform2D.IDENTITY)
 	_draw_timeline()
 
 func _draw_timeline() -> void:

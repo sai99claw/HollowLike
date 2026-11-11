@@ -13,5 +13,5 @@ static func draw(c:CanvasItem,flash:Dictionary,base:Transform2D) -> void:
 	if bool(flash.get("crescent",true)) and elapsed_usec<CRESCENT_DURATION_USEC:
 		preload("res://scripts/clean_crescent_v39.gd").draw(c,flash["at"],angle,float(flash.get("length",1280.0/3))/zoom,base,1.0)
 	if bool(flash.get("feathers",false)):
-		PigeonBurst.draw(c,PigeonBurst.IMPACT,flash.get("spray_at",flash["at"]),flash["dir"],elapsed,PigeonBurst.IMPACT_DURATION,120.0,base)
+		PigeonBurst.draw(c,PigeonBurst.IMPACT,flash.get("spray_at",flash["at"]),flash["dir"],elapsed,PigeonBurst.IMPACT_DURATION,PigeonBurst.IMPACT_EXTENT,base,PigeonBurst.IMPACT_TINT)
 	c.draw_set_transform_matrix(base)
