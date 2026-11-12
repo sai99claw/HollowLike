@@ -299,7 +299,7 @@ func _ready() -> void:
 	edge_background=Cache.new();edge_background.z_index=-3;edge_background.paint=_paint_edge_background;add_child(edge_background)
 	edge_foreground=Cache.new();edge_foreground.z_index=7;edge_foreground.paint=_paint_edge_foreground;add_child(edge_foreground)
 	corpse_layer=Cache.new();corpse_layer.z_index=-2;corpse_layer.paint=_paint_corpses;add_child(corpse_layer)
-	minimap = Cache.new();minimap.z_index=10;minimap.paint=_paint_minimap;add_child(minimap)
+	minimap = Cache.new();minimap.z_index=20;minimap.paint=_paint_minimap;add_child(minimap)
 	_reset_player(Vector2(640,600))
 	atmosphere=Atmosphere.new();add_child(atmosphere);atmosphere.configure("branches",0,false);atmosphere.set_audio_enabled(audio_enabled)
 	combat_feedback=Feedback.new();combat_feedback.z_index=2;add_child(combat_feedback)
@@ -490,9 +490,7 @@ func _set_action(action: String, pressed: bool) -> void:
 	if _action_locked() and action in (["attack","sub","interact","up"] if _release_locked() else ["jump","attack","sub","interact","up"]):
 		if pressed and action in ["attack","sub"]:_reject_attack("locked")
 		keys[action]=false;charge_timer=0;return
-	if action=="attack" and pressed and screen=="game" and p_attack.phase=="recovery" and _key("down") and not bool(p["grounded"]) and not _release_locked():
-		p_attack.cancel();p["impact_root"]=0
-	if action=="attack" and pressed and screen=="game" and (p_attack.is_busy() or float(p.get("hurt",0))>0):
+	if action=="attack" and pressed and screen in ["game","hub"] and (p_attack.is_busy() or _ordinary_slash_playing() or float(p.get("hurt",0))>0):
 		# Rejected presses never become a delayed swing or charge.
 		_reject_attack("hurt" if float(p.get("hurt",0))>0 else "busy")
 		keys["attack"]=false;charge_timer=0;pending_attack.clear();return
@@ -529,6 +527,7 @@ func _cycle_map() -> void:
 	minimap_page=(minimap_page+1)%4
 	minimap_open=minimap_page<3
 	ui.header.visible=not minimap_open
+	ui.health_background.visible=ui.header.visible and screen=="game"
 	minimap.invalidate()
 
 func _can_open_map() -> bool:
@@ -545,6 +544,7 @@ func _refresh_map_visibility() -> void:
 	if not minimap_open:minimap_page=-1
 	if ui!=null:
 		ui.header.visible=not minimap_open
+		ui.health_background.visible=ui.header.visible and screen=="game"
 		ui.quickbar.visible=_can_open_map() and not minimap_open
 	if minimap!=null:minimap.invalidate()
 
@@ -744,9 +744,9 @@ func _view_zoom() -> float:
 	var requested:float=minf(camera_zoom,1.0) if room.get("type","")=="boss" else camera_zoom
 	return maxf(Scale.MIN_ZOOM,maxf(requested,fit))
 func _camera_target(at:Vector2) -> Vector2:
-	if screen=="hub":return Vector2(0,clampf(at.y-410.0,HomeArt.CEILING_Y,0)) if not trophy_room else Vector2.ZERO
+	if screen=="hub":return Vector2(0,clampf(at.y-720.0*2.0/3.0,HomeArt.CEILING_Y,0)) if not trophy_room else Vector2.ZERO
 	var visible:Vector2=Vector2(1280,720)/_view_zoom();var bounds:Vector2=_room_size()
-	return Vector2(clampf(at.x-visible.x*.5,0,maxf(0,bounds.x-visible.x)),clampf(at.y-visible.y*.57,0,maxf(0,bounds.y-visible.y)))
+	return Vector2(clampf(at.x-visible.x*.5,0,maxf(0,bounds.x-visible.x)),clampf(at.y-visible.y*2.0/3.0,0,maxf(0,bounds.y-visible.y)))
 func _in_bath() -> bool:return Bath.contains(_active_pool(),p.get("pos",Vector2.ZERO))
 
 func _active_pool() -> Rect2:
@@ -1114,7 +1114,13 @@ func _action_locked() -> bool:
 func _normal_damage() -> float:
 	return float(_primary_definition({"dir":"right","charged":false,"dash_charge":false})["damage"])
 
+func _ordinary_slash_playing() -> bool:
+	if player_slashes.is_empty():return false
+	var last:Dictionary=player_slashes.back()
+	return not last["definition"].get("charged",false) and draw_clock-float(last["start"])<SlashArt.DURATION
+
 func _begin_primary(request:Dictionary) -> void:
+	if not request.get("charged",false) and _ordinary_slash_playing():_reject_attack("busy");return
 	if _action_locked():_reject_attack("locked");return
 	var def:Dictionary=_primary_definition(request)
 	if def.get("charged",false):p["recoil_left"]=0;p["impact_root"]=0
@@ -2153,7 +2159,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	if not room.has("layout"):
 		room["layout"]=Layout.generate(room,int(tower["seed"]))
 		var forced_hazard:String=room.get("practice_hazard","")
-		if not forced_hazard.is_empty() or (room["type"]=="combat" and not room.get("spring",false) and not room.get("laboratory",false)):
+		if not forced_hazard.is_empty():
 			HazardRoom.prepare(room["layout"],id,forced_hazard)
 			if room["layout"].has("hazard_room"):room["fountain"]=false
 	layout=room["layout"]

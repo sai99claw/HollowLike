@@ -153,6 +153,7 @@ func test_game() -> void:
 		game._begin_primary({"dir":"right","charged":false})
 		check(game.p_attack.attack["body_clip"]==["pigeon_feather_left","pigeon_feather_right"][i%2],"Live controller alternates legacy body poses")
 		game.p_attack.cancel()
+		game.draw_clock+=Slash.DURATION+.001
 	var slash_canvas:=Node2D.new()
 	root.add_child(slash_canvas)
 	slash_canvas.draw.connect(game._paint_player_slash.bind(slash_canvas))
@@ -167,6 +168,7 @@ func test_game() -> void:
 		await process_frame
 		check(Slash.texture!=null,"Ordinary "+direction+" attack draws the retained slash even after its hit phase ends")
 		game.p_attack.cancel()
+		game.draw_clock+=Slash.DURATION+.001
 	for i in 4:
 		check(Slash.frame_at((i+.5)/20.0)==[0,1,2,4][i],"Slash draws source frames 1, 2, 3, and 5 at 20 FPS")
 	check(Slash.frame_at(.2)==-1,"Slash expires after four frames")

@@ -145,7 +145,7 @@ func _profile_plazas() -> void:
 	var profile:String=config.layout_profile
 	var count:int={"pillars":0,"terraces":1,"twin_halls":2,"cavern":1,"shaft":1,"loops":1}.get(profile,1)
 	for i in count:
-		var h:int=config.height-2 if profile in ["cavern","shaft"] else (3 if rng.randf()<.6 else 5)
+		var h:int=config.height-2 if profile=="shaft" else (mini(7,config.height-2) if profile=="cavern" else (3 if rng.randf()<.6 else 5))
 		if profile not in ["cavern","shaft"]:h=clampi(roundi(h*config.plaza_scale)|1,3,config.height-2)
 		var w:int=3 if profile=="shaft" else (h if profile=="cavern" else rng.randi_range(2,3)*2+1)
 		w=mini(w,config.width-6)

@@ -1,15 +1,18 @@
 extends RefCounted
 const EdgeSource=preload("res://scripts/biome_art_v21.gd")
-const ROCK=preload("res://assets/v76/near-stone.webp")
-const ROOT=preload("res://assets/v76/near-roots.webp")
-const THORNS=preload("res://assets/v76/near-thorns.webp")
+const ART:Dictionary={
+	"trunk":[preload("res://assets/v76/near-thorns.webp"),preload("res://assets/v76/near-stone.webp"),preload("res://assets/v76/near-roots.webp"),preload("res://assets/v76/near-vine.webp")],
+	"underground":[preload("res://assets/v77/underground-near-thorns.webp"),preload("res://assets/v77/underground-near-stone.webp"),preload("res://assets/v77/underground-near-roots.webp"),preload("res://assets/v77/underground-near-vine.webp")],
+	"sky":[preload("res://assets/v77/sky-near-thorns.webp"),preload("res://assets/v77/sky-near-stone.webp"),preload("res://assets/v77/sky-near-roots.webp"),preload("res://assets/v77/sky-near-vine.webp")],
+}
 
 static func shade_fallback(canvas:CanvasItem,blocks:Array,visible:Rect2) -> void:
 	for r:Rect2 in blocks:
 		if r.size.y>20 and (not visible.has_area() or visible.intersects(r)):
 			canvas.draw_rect(Rect2(r.position+Vector2(0,20),r.size-Vector2(0,20)),Color("16111c",.65))
 
-static func plan(layout:Dictionary,solids:Array) -> Array[Dictionary]:
+static func plan(layout:Dictionary,solids:Array,biome:String="trunk") -> Array[Dictionary]:
+	var art:Array=ART.get(biome,ART["trunk"])
 	var result:Array[Dictionary]=[]
 	var random:=RandomNumberGenerator.new()
 	random.seed=int(layout.get("seed",0))+7419
@@ -33,7 +36,7 @@ static func plan(layout:Dictionary,solids:Array) -> Array[Dictionary]:
 			corners[at]=true
 			var extent:float=random.randf_range(23,43)
 			var rect:=Rect2(at-Vector2(extent*.5,extent*(.65 if top else .25)),Vector2(extent,extent))
-			result.append({"at":at,"rect":rect,"art":ROCK if top else ROOT,"sway":false})
+			result.append({"at":at,"rect":rect,"art":art[1] if top else art[2],"sway":false,"top":top})
 		var x:float=span.x+random.randf_range(18,37)
 		while x<span.y-13:
 			var at:=Vector2(x,edge["at"])
@@ -41,8 +44,23 @@ static func plan(layout:Dictionary,solids:Array) -> Array[Dictionary]:
 				var extent:float=random.randf_range(5,14) if top else random.randf_range(25,60)
 				at.y+=random.randf_range(-3,2) if top else 0.0
 				var rect:=Rect2(at-Vector2(extent*.62,extent if top else 0.0),Vector2(extent*1.24,extent))
-				result.append({"at":at,"rect":rect,"art":THORNS if top else ROOT,"sway":not top})
+				result.append({"at":at,"rect":rect,"art":art[0] if top else art[2+posmod(floori(x/70),2)],"sway":not top,"top":top})
 			x+=random.randf_range(40,90)
+	return result
+
+static func near_plan(shapes:Array[Dictionary]) -> Array[Dictionary]:
+	var result:Array[Dictionary]=[]
+	for index in shapes.size():
+		if index%4!=0:continue
+		var shape:Dictionary=shapes[index]
+		var at:Vector2=shape["at"]
+		if result.any(func(item:Dictionary)->bool:return at.distance_squared_to(item["at"])<76.0*76.0):continue
+		var texture:Texture2D=shape["art"]
+		var limit:=Vector2(46,41)
+		var extent:Vector2=texture.get_size()
+		extent*=minf(limit.x/extent.x,limit.y/extent.y)
+		var pivot:=Vector2(extent.x*.5,extent.y*(.88 if shape["top"] else .12))
+		result.append({"at":at,"local":Rect2(-pivot,extent),"art":texture})
 	return result
 
 static func _allowed(at:Vector2,reserved:Array) -> bool:

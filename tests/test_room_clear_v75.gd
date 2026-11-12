@@ -20,6 +20,7 @@ func run() -> void:
 	game.set_process(false)
 	game.set_physics_process(false)
 	game.new_run("rogue",75075)
+	check(game._room_size().y<=1100,"Safe room stays compact instead of stretching to the combat grid scale")
 	var encounter:Dictionary={}
 	for candidate:Dictionary in game.tower["rooms"]:
 		if candidate["type"]=="combat" and not candidate.get("spring",false):
@@ -27,6 +28,10 @@ func run() -> void:
 			break
 	game._enter_room(encounter["id"])
 	check(is_equal_approx(float(game.layout["tile_height"]),Scale.TILE_HEIGHT),"Live map uses tall cells")
+	check(game.layout.has("maze_grid") and not game.layout.has("hazard_room"),"Adventure keeps the generated maze geometry")
+	var middle:Vector2=game._room_size()*.5
+	var camera_offset:Vector2=game._camera_target(middle)
+	check(is_equal_approx((middle.y-camera_offset.y)*game._view_zoom(),480.0),"Player sits at the start of the bottom third when the camera is away from room edges")
 	check(is_equal_approx(Scale.TILE_HEIGHT,Motion.BASE_JUMP_HEIGHT*2.5),"Cell height is 2.5 times the baseline full jump")
 	game.enemies.assign([{"hp":1.0},{"hp":0.0}])
 	game.room.erase("cleared")

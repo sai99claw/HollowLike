@@ -16,9 +16,9 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	cfg.doors=room.get("doors_config",{}).duplicate();cfg.room_max_size=cfg.height-2;cfg.num_rooms=3;cfg.straight_bias=float(room.get("maze_config",{}).get("straight_bias",.70));cfg.braid_rate=float(room.get("maze_config",{}).get("braid_rate",.80));cfg.corridor_width_mode=str(room.get("maze_config",{}).get("corridor_width_mode","random"))
 	if safe:cfg.width=Scale.SANCTUARY_GRID.x;cfg.height=Scale.SANCTUARY_GRID.y;cfg.doors=cfg.doors.duplicate()
 	if boss:cfg.height=9
-	var cell_y:float=BOSS_ROOM_HEIGHT/cfg.height if boss else CELL_Y
+	var cell_y:float=BOSS_ROOM_HEIGHT/cfg.height if boss else (TILE if safe else CELL_Y)
 	var cell_size:=Vector2(TILE,cell_y)
-	var climb_step:float=90.0 if boss else Scale.CLIMB_STEP
+	var climb_step:float=90.0 if boss else (TILE if safe else Scale.CLIMB_STEP)
 	for direction in cfg.doors:
 		var dim:int=cfg.width if direction in ["top","bottom","up","down"] else cfg.height
 		cfg.doors[direction]=clampi(int(cfg.doors[direction]),3,dim-4)
@@ -83,7 +83,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 				var x:float=TILE if side==0 else size.x-TILE*3
 				var ledge:=Rect2(x,y,TILE*2,9)
 				one_way.append(ledge);navigation.append(ledge)
-		var gallery:=Rect2(TILE,240.0 if boss else cell_y,size.x-TILE*2,9)
+		var gallery:=Rect2(TILE,240.0 if boss else (192.0 if safe else cell_y),size.x-TILE*2,9)
 		one_way.append(gallery);navigation.append(gallery)
 	elif not safe:
 		navigation=Routes.generate(maze,cfg.seed_value)
@@ -142,10 +142,10 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 		# from_dir is the direction travelled, so entry is on its opposite edge.
 		spawn[{"up":"down","down":"up","left":"right","right":"left"}[direction]]=inside
 		if direction=="up":
-			for y:float in ([192.0,240.0] if boss else [192.0,cell_y,cell_y+climb_step,cell_y+climb_step*2]):
+			for y:float in ([192.0,240.0] if boss else ([192.0] if safe else [192.0,cell_y,cell_y+climb_step,cell_y+climb_step*2])):
 				var step:=Rect2(inside.x-TILE,y,TILE*2,9)
 				one_way.append(step);navigation.append(step);platforms.append(step)
-		if direction=="down" and not boss:
+		if direction=="down" and not boss and not safe:
 			var step:=Rect2(inside.x-TILE,floor_y+climb_step,TILE*2,9)
 			one_way.append(step);navigation.append(step);platforms.append(step)
 		var ledge:Rect2

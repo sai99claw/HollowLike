@@ -54,10 +54,10 @@ func run() -> void:
 	game._process(.016)
 	check(world.spores.amount==32 and not world.grade.glow_enabled and not world.fogs[1].visible,"Reduced mode lowers effects while retaining the lantern")
 	check(game.ui.edge_tools.get_child_count()==2 and game.ui.mute_button.visible and game.ui.mute_button.icon!=null,"Menu and mute have visible texture icons")
-	var initial:Vector2=world.canopy_window.position
 	game.camera_pos+=Vector2(100,70)
 	game._process(.016)
-	check(world.canopy_window.position.is_equal_approx(initial+Vector2(100,70)*world.FOREGROUND_FACTOR),"Both camera axes translate the closest artwork faster than terrain")
+	check(world.canopy_base.origin+world.safe.position==game.world_transform.origin,"Near scenery shares the terrain anchor on both camera axes")
+	check(is_equal_approx(game.ui.health_background.size.x,game.ui.energy_cells.get_combined_minimum_size().x),"Health backdrop is only as wide as the energy cells")
 	check(game.ui.health_background.texture.resource_path.ends_with("canopy-left.webp"),"The old left canopy now belongs to the health HUD")
 	game.room_music.stream=null
 	var mute_icon:Texture2D=game.ui.mute_button.icon
@@ -65,7 +65,10 @@ func run() -> void:
 	game.ui.mute_button.pressed.emit()
 	check(game.audio_enabled!=audio_on and game.ui.mute_button.icon!=mute_icon,"Clicking the mute icon changes the audio and icon")
 	game.ui.mute_button.pressed.emit()
-	check(not world.root_sprites.is_empty() and world.CANOPY_ART.size()==2,"Both foreground depths use painted textures")
+	check(not world.root_sprites.is_empty() and Edge.ART.size()==3,"Both foreground depths use painted textures")
+	for sprite:Dictionary in world.root_sprites:
+		var local:Rect2=sprite["local"]
+		check(local.has_point(Vector2.ZERO) and local.size.x<=46.01 and local.size.y<=41.01,"Opaque near sprite remains small and attached at its edge anchor")
 	game.queue_free()
 	await process_frame
 	print("v74 visual checks: ",failures)

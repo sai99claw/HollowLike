@@ -115,8 +115,8 @@ func _build_header() -> void:
 	health_background=TextureRect.new()
 	health_background.name="HealthBackdrop"
 	health_background.texture=preload("res://assets/v75/canopy-left.webp")
-	health_background.position=Vector2(0,0)
-	health_background.size=Vector2(270,92)
+	health_background.position=Vector2(20,13)
+	health_background.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	health_background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	health_background.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	ui_root.add_child(health_background)
@@ -331,6 +331,9 @@ func update_hud(info: Dictionary) -> void:
 	energy_art.tooltip_text="能量 %d / %d" % [energy,max_energy]
 	health_cells.set_state(hp,max_hp,float(info.get("hp_recovery",0)),bool(info.get("hp_recovering",false)))
 	energy_cells.set_state(energy,max_energy,float(info.get("energy_recovery",0)),bool(info.get("energy_recovering",false)))
+	var width:float=energy_cells.get_combined_minimum_size().x
+	var texture_size:Vector2=health_background.texture.get_size()
+	health_background.size=Vector2(width,width*texture_size.y/texture_size.x)
 	coins_label.text=str(info.get("coins",0))
 	coin_art.tooltip_text="金幣"
 	primary_art.tooltip_text=str(info.get("weapon",""))
@@ -347,7 +350,8 @@ func update_hud(info: Dictionary) -> void:
 		dream_label.visible=rage_left>0
 		dream_label.text="×2  %ds"%ceili(rage_left) if rage_left>0 else ""
 		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
-	for control:Control in [health_background,health_art,energy_art,health_cells,energy_cells]:control.visible=not home
+	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
+	health_background.visible=not home and header.visible
 	primary_art.get_parent().visible=not home
 	injury_art.visible=not home and bool(info.get("injured",false))
 	var sub_count:int=int(info.get("sub_count",0))

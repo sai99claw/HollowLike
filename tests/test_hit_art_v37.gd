@@ -72,4 +72,29 @@ func run() -> void:
 	check(is_equal_approx(target["impact_freeze_left"],.02) and game._enemy_pose_clock(target)==frozen_pose and game.hitstop==0,"Only the struck enemy pose freezes")
 	game._update_enemies_profiled_body(.021)
 	check(is_zero_approx(target["impact_freeze_left"]),"Enemy resumes after roughly 70 ms of local hitstop")
+	game.enemies.clear()
+	game.props.clear()
+	for direction:String in ["left","right","up","down"]:
+		game._reset_player(Vector2(700,600))
+		game.keys.clear()
+		game.keys["up"]=direction=="up"
+		game.keys["down"]=direction=="down"
+		game.p["face"]=-1 if direction=="left" else 1
+		game.p["grounded"]=false
+		game._set_action("attack",true)
+		game._set_action("attack",false)
+		var strike_id:int=game.p_attack.attack_id
+		check(game.p_attack.attack.get("direction")==direction,"Normal press starts a strike in "+direction)
+		game.p_attack.tick(float(game.p_attack.attack["active"])+.001)
+		game._set_action("attack",true)
+		game._set_action("attack",false)
+		check(game.p_attack.attack_id==strike_id,"Recovery cannot be cancelled by another press in "+direction)
+		game.p_attack.tick(1.0)
+		game._set_action("attack",true)
+		game._set_action("attack",false)
+		check(game.p_attack.attack_id==strike_id and game.pending_attack.is_empty(),"Unfinished visual blocks early presses without buffering in "+direction)
+		game.draw_clock+=game.SlashArt.DURATION+.001
+		game._set_action("attack",true)
+		game._set_action("attack",false)
+		check(game.p_attack.attack_id==strike_id+1,"A fresh press starts after the animation in "+direction)
 	game.queue_free();feedback.queue_free();await process_frame;print("v37 hit and animation checks: ",failures);quit(0 if failures.is_empty() else 1)

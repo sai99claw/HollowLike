@@ -419,8 +419,11 @@ static func _group_for(item:Dictionary) -> String:
 
 static func _recent_art() -> void:
 	_add("v75:canopy-left","血量列 · 垂枝底圖","介面",[_descriptor(ROOT+"v75/canopy-left.webp")],1)
-	for art:Array in [["near-roots","超前景垂根"],["near-vine","超前景垂藤"],["near-stone","平台角石"],["near-thorns","平台荊枝"]]:
-		_add("v76:"+str(art[0]),str(art[1]),"地形與背景",[_descriptor(ROOT+"v76/"+str(art[0])+".webp")],1)
+	for art:Array in [["near-roots","垂根"],["near-vine","垂藤"],["near-stone","角石"],["near-thorns","荊枝"]]:
+		_add("v76:"+str(art[0]),"樹幹 · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v76/"+str(art[0])+".webp")],1)
+		for biome:String in ["underground","sky"]:
+			var id:String=biome+"-"+str(art[0])
+			_add("v77:"+id,BIOME_NAMES[biome]+" · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v77/"+id+".webp")],1)
 	for art:Array in [["root-cluster","盤根草叢"],["thorn-branch","荊刺枝葉"]]:
 		var category:String="前景"
 		_add("v75:"+str(art[0]),category+" · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v75/"+str(art[0])+".webp")],1)
@@ -456,9 +459,9 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var note:String=""
 	match id:
 		"v75:canopy-left":note="左上血量列的垂枝底圖，固定於介面。"
-		"v76:near-roots","v76:near-vine":note="超前景，以快於地形的速度跟隨鏡頭。"
-		"v76:near-stone","v76:near-thorns":note="平台的角石與荊枝貼圖，沒有碰撞。"
-		"v75:root-cluster","v75:thorn-branch":note="實心地形邊緣的前景根系與葉片，沒有碰撞。"
+		"v76:near-roots","v76:near-vine","v77:underground-near-roots","v77:underground-near-vine","v77:sky-near-roots","v77:sky-near-vine":note="附著在地形下緣，部分繪在主角前方。"
+		"v76:near-stone","v76:near-thorns","v77:underground-near-stone","v77:underground-near-thorns","v77:sky-near-stone","v77:sky-near-thorns":note="平台的角石與荊枝，部分繪在主角前方。"
+		"v75:root-cluster","v75:thorn-branch":used=false;note="舊版前景根系與葉片。"
 		"pigeon_action:0":note="按住回血時的四張角色姿態。"
 		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由新十幀步態取代。"
 		"pigeon_action:2":note="橫向雙 C 穿刺全程使用第 2 張，其他三張留在 RD。"
