@@ -4,13 +4,11 @@ const Roster=preload("res://scripts/monster_roster_v36.gd")
 const CAPACITY:int=20
 const RAGE_SECONDS:float=120.0
 var energy:int=0
-var pending:int=0
 var rage_left:float=0
 func clear() -> void:
-	energy=0;pending=0;rage_left=0
+	energy=0;rage_left=0
 func hit() -> void:
-	energy+=1
-	if energy>=CAPACITY:energy-=CAPACITY;pending+=1
+	energy=mini(CAPACITY,energy+1)
 func step(delta:float) -> void:rage_left=maxf(0,rage_left-maxf(0,delta))
 func damage_factor() -> float:return 2.0 if rage_left>0 else 1.0
 func injure() -> void:rage_left=RAGE_SECONDS

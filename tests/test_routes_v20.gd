@@ -1,57 +1,105 @@
-extends "res://tests/test_platformer_v15.gd"
-func reach(start_indices:Array[int],edges:Array) -> Dictionary:
-	var result:Dictionary={};var pending:Array[int]=start_indices.duplicate();var cursor:int=0
-	for index:int in pending:result[index]=true
-	while cursor<pending.size():
-		var from:int=pending[cursor];cursor+=1
-		for to:int in edges[from]:
-			if not result.has(to):result[to]=true;pending.append(to)
-	return result
+extends SceneTree
+
+const Tower=preload("res://scripts/tower.gd")
+const Layout=preload("res://scripts/room_layout.gd")
+const Scale=preload("res://scripts/world_scale_v17.gd")
+const Motion=preload("res://scripts/player_motion_v18.gd")
+var failures:Array[String]=[]
+
+func _initialize() -> void:
+	call_deferred("run")
+
+func check(condition:bool,message:String) -> void:
+	if not condition:
+		failures.append(message)
+		if failures.size()<=12:push_error(message)
+
+func is_open(grid:Array,cell:Vector2i) -> bool:
+	return cell.y>=0 and cell.y<grid.size() and cell.x>=0 and cell.x<grid[cell.y].size() and grid[cell.y][cell.x]==1
+
 func run() -> void:
-	var room_count:int=0;var exit_count:int=0;var ratios:Array[float]=[];var baseline_ratios:Array[float]=[];var routes:Dictionary={};var nav_count:int=0;var old_count:int=0;var nav_length:float=0;var old_length:float=0
-	for seed_value in range(10):
+	var walls:int=0
+	var mushrooms:int=0
+	var rooms:int=0
+	for seed_value in 10:
 		var tower:Dictionary=Tower.generate(seed_value)
 		for room:Dictionary in tower["rooms"]:
-			if not room.has("layout_profile"):continue
-			var layout:Dictionary=Layout.generate(room,seed_value);var ps:Array=layout["platforms"];var nav:Array=layout["navigation_one_way"]
-			check(Layout.generate(room,seed_value)["navigation_one_way"]==nav,"Seed reproduces the same traversal supports")
-			ratios.append(float(nav.size())/ps.size());nav_count+=nav.size();routes[str(nav)]=true
-			for rect:Rect2 in nav:nav_length+=rect.size.x
-			var levels:int=roundi((layout["floor_y"]-192)/96)
-			var legacy_count:int=levels*2+1+layout["doors"].size()
-			baseline_ratios.append(float(legacy_count)/(ps.size()-nav.size()+legacy_count))
-			old_count+=legacy_count;old_length+=levels*2*144+layout["size"].x-192
-			for direction:String in layout["doors"]:old_length+=144 if direction in ["up","down"] else 240
-			# Build actual controller jump/drop edges once; verify both directions,
-			# including returning from every entrance, not only reaching an exit.
-			var edges:Array=[];var reverse:Array=[]
-			for i in ps.size():edges.append([]);reverse.append([])
-			for i in ps.size():
-				for j in ps.size():
-					if i==j:continue
-					if jump(ps[i],ps[j],layout):edges[i].append(j);reverse[j].append(i)
-			var starts:Array[int]=[];var center:Vector2=layout["spawn_positions"]["center"]
-			for i in ps.size():
-				if absf(ps[i].position.y-center.y)<2 and center.x>=ps[i].position.x+15 and center.x<=ps[i].end.x-15:starts.append(i)
-			var forward:Dictionary=reach(starts,edges);var backward:Dictionary=reach(starts,reverse)
-			for direction:String in layout["doors"]:
-				var door:Vector2=layout["doors"][direction];var outbound:bool=false;var inbound:bool=false
-				for i in ps.size():
-					var surface:Rect2=ps[i];var at_door:bool=false
-					if direction=="up":at_door=surface.position.y<=128 and surface.position.x+18<door.x and surface.end.x-18>door.x
-					elif direction=="down":at_door=surface.position.y>=layout["size"].y-170 and surface.position.x<=door.x+100 and surface.end.x>=door.x-100
-					else:at_door=absf(surface.position.y-door.y)<1 and surface.position.x<=door.x+80 and surface.end.x>=door.x-80
-					if at_door:outbound=outbound or forward.has(i);inbound=inbound or backward.has(i)
-				check(outbound and inbound,"Bidirectional ordinary jump route "+str([seed_value,room["id"],direction,outbound,inbound]))
-				exit_count+=1
-			room_count+=1
-	ratios.sort();var median:float=ratios[ratios.size()/2]
-	# v21 has ten-room chapters and physically stitched17x11 functional rows.
-	# Compare the same generated geometry against its former dual-ladder layout,
-	# rather than a fixed absolute ratio taken from v20's different room sample.
-	baseline_ratios.sort();var baseline_median:float=baseline_ratios[baseline_ratios.size()/2]
-	check(baseline_median-median>.12 and nav_count<float(old_count)*.75,"Navigation density and count fall materially below the same-room dual-ladder baseline")
-	check(nav_length<old_length*.8,"Less suspended bridge length, not merely merged rectangles")
-	check(routes.size()>room_count*.85,"Distinct navigation routes across seeded geometry")
-	print("v20 traversal: rooms=",room_count," exits=",exit_count," nav median=",median," nav counts=",nav_count,"/",old_count," length=",nav_length,"/",old_length," unique=",routes.size(),"; ",failures)
+			var layout:Dictionary=Layout.generate(room,seed_value)
+			var plan:Dictionary=layout.get("navigation_plan",{})
+			if plan.is_empty():continue
+			rooms+=1
+			var grid:Array=layout["maze_grid"]
+			var connected:Dictionary={}
+			for link:Dictionary in plan["climbs"]:
+				var lower:Vector2i=link["from"]
+				var upper:Vector2i=link["to"]
+				connected[lower]=true
+				var feet:Vector2=link["feet"]
+				if link["method"]=="wall":
+					walls+=1
+					var left:bool=not is_open(grid,lower+Vector2i.LEFT) and not is_open(grid,upper+Vector2i.LEFT)
+					var right:bool=not is_open(grid,lower+Vector2i.RIGHT) and not is_open(grid,upper+Vector2i.RIGHT)
+					check(left or right,"Climbing uses a continuous rock face")
+					check(not plan["launchers"].has(feet),"Climbable walls get no redundant mushroom")
+				else:
+					mushrooms+=1
+					check(plan["launchers"].has(feet),"An open vertical link gets a launch mushroom")
+					check(Scale.TILE_HEIGHT<Motion.BASE_JUMP_HEIGHT*3.0,"A mushroom covers a full tall cell")
+					var approach:=Rect2(feet-Vector2(17,42),Vector2(34,41.9))
+					check(not layout["solids"].any(func(rock:Rect2)->bool:return approach.intersects(rock)),"Mushroom has room for the player at launch")
+			var cells:Dictionary={}
+			for cell:Vector2i in plan["cells"]:cells[cell]=true
+			var start:Vector2i=plan["start"]
+			var reached:Dictionary={start:true}
+			var queue:Array[Vector2i]=[start]
+			while not queue.is_empty():
+				var cell:Vector2i=queue.pop_front()
+				for step:Vector2i in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
+					var next:Vector2i=cell+step
+					if not cells.has(next) or reached.has(next):continue
+					if step.y!=0 and not connected.has(cell if step.y<0 else next):continue
+					reached[next]=true
+					queue.append(next)
+			for target:Vector2i in plan["targets"]:
+				check(reached.has(target),"Door or reward has a route with available movement")
+			for bridge:Rect2 in plan["bridges"]:
+				check(bridge.size.x>Scale.TILE*2.0,"Short gaps and vertical links get no filler ledges")
+	check(rooms>80 and walls>0 and mushrooms>0,"Seeded rooms exercise walls and mushrooms")
+	var game=load("res://main.tscn").instantiate()
+	game.audio_enabled=false
+	root.add_child(game)
+	await process_frame
+	game.set_process(false)
+	game.set_physics_process(false)
+	game.new_run("rogue",81081)
+	game.enemies.clear()
+	game.props.clear()
+	game.layout={"size":Vector2(1600,1200),"floor_y":900.0}
+	game.solids.assign([Rect2(450,0,50,1200)])
+	game.platforms.clear()
+	game._reset_player(Vector2(517,850))
+	game.p["grounded"]=false
+	game.p["wall"]=-1
+	game.keys["left"]=true
+	game.room_cooldown=999.0
+	for jump in 3:
+		game._set_action("jump",true)
+		for tick in 85:
+			game._physics_process(1.0/120.0)
+			if tick>22 and game.p["wall"]==-1:break
+		game._set_action("jump",false)
+	check(game.p["pos"].y<850.0-Scale.TILE_HEIGHT,"Live wall jumps climb a full tall cell without a ledge")
+	game._clear_keys()
+	game.solids.clear()
+	game._reset_player(Vector2(700,850))
+	var mushroom:Dictionary={"pos":Vector2(700,850),"navigation":true}
+	game._launch_from_object(mushroom,false)
+	var highest:float=850.0
+	for tick in 80:
+		game._step_player(1.0/120.0)
+		highest=minf(highest,game.p["pos"].y)
+	check(highest<850.0-Scale.TILE_HEIGHT,"A navigation mushroom bounces the live controller through a tall cell")
+	game.queue_free()
+	await process_frame
+	print("Traversal rooms: ",rooms,"  wall links: ",walls,"  mushroom links: ",mushrooms,"  failures: ",failures.size())
 	quit(0 if failures.is_empty() else 1)

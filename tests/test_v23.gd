@@ -28,19 +28,8 @@ func run() -> void:
 		for at:Vector2 in layout["launcher_spawns"]:
 			check(ps.any(func(surface:Rect2)->bool:return is_equal_approx(surface.position.y,at.y) and at.x-46>=surface.position.x and at.x+46<=surface.end.x),"Launcher feet have full real terrain support")
 			check(not layout["solids"].any(func(rock:Rect2)->bool:return rock.intersects(Rect2(at-Vector2(46,400),Vector2(92,399.9)))),"Launcher leaves air for its full triple-height arc")
-		var reachable:Dictionary={};var pending:Array[int]=[];var center:Vector2=layout["spawn_positions"]["center"]
-		for index in ps.size():
-			if absf(center.y-ps[index].position.y)<1 and center.x>=ps[index].position.x and center.x<=ps[index].end.x:reachable[index]=true;pending.append(index)
-		var cursor:int=0
-		while cursor<pending.size():
-			var from:int=pending[cursor];cursor+=1
-			for index in ps.size():
-				if not reachable.has(index) and jump(ps[from],ps[index],layout):reachable[index]=true;pending.append(index)
 		for reward:Dictionary in layout["dead_end_rewards"]:
-			var at:=Vector2((reward["cell"].x+.5)*96,(reward["cell"].y+1)*96);var accessible:bool=false
-			for index in reachable:
-				if absf(ps[index].position.y-at.y)<1 and at.x>=ps[index].position.x+17 and at.x<=ps[index].end.x-17:accessible=true
-			check(accessible,"Ordinary jumps can physically reach the chest at the sealed end")
+			check(layout["navigation_plan"]["cells"].has(reward["cell"]),"The wall and mushroom route includes the dead-end reward")
 		NewBiome.prepare(layout,seed_value)
 		var details:Array=layout["edge_details_v23"];check(not details.is_empty(),"New forefront decorations are instantiated")
 		check(details.any(func(item:Dictionary)->bool:return item["size_class"]=="small") and details.any(func(item:Dictionary)->bool:return item["size_class"]=="large"),"Foreground includes fixed small and large authored pieces")
@@ -78,7 +67,10 @@ func run() -> void:
 	print("v23 stage2 geometry/art complete")
 	var game=load("res://main.tscn").instantiate();game.audio_enabled=false;root.add_child(game);await process_frame;game.set_process(false);game.set_physics_process(false);game.practice_mode=true;game.new_run("rogue",3322)
 	game._clear_keys();game.p_attack.cancel();game.props.clear();game.enemies.clear();game.hazards.clear();game.solids.clear();game.platforms.clear();game.doors.clear();game.layout={"size":Vector2(2000,1800),"floor_y":1700.0};game._reset_player(Vector2(700,1000))
-	var launcher:Dictionary={"kind":"launcher","pos":Vector2(700,1050),"hurt":0.0,"used":false};game.props.assign([launcher]);game._update_props(.01)
+	var launcher:Dictionary={"kind":"launcher","pos":Vector2(700,1050),"hurt":0.0,"used":false}
+	game.props.assign([launcher])
+	game.p["pos"]=game.LaunchArt.body_box(launcher,str(game._ecology()["id"])).get_center()
+	game._update_props(.01)
 	check(is_equal_approx(game.p["vel"].y,-530) and not game.p["grounded"],"Touching the launcher fires immediately at normal jump velocity")
 	var touch_velocity:float=game.p["vel"].y;game._hit_props(Rect2(650,960,100,100),1,1)
 	check(game.p["vel"].y==touch_velocity,"A remote projectile cannot launch its owner from across the room")

@@ -13,6 +13,7 @@ const GOLD := Color("e8c381")
 const Icons=preload("res://scripts/ui_asset_art.gd")
 const Inventory=preload("res://scripts/inventory_view.gd")
 const Cells=preload("res://scripts/vital_cells.gd")
+const UltimateBar=preload("res://scripts/ultimate_bar.gd")
 const HEART_EMPTY=preload("res://assets/v80/heart-empty.webp")
 const HEART_FULL=preload("res://assets/v80/heart-full.webp")
 const SHIELD_EMPTY=preload("res://assets/v80/shield-empty.webp")
@@ -30,8 +31,6 @@ var energy_art:TextureRect
 var injury_art:TextureRect
 var phase_art:TextureRect
 var phase_bar: ProgressBar
-var dream_row:HBoxContainer
-var dream_cells:Array[TextureRect]=[]
 var health_cells:HBoxContainer
 var energy_cells:HBoxContainer
 var shield_cells:HBoxContainer
@@ -39,7 +38,7 @@ var shield_row:HBoxContainer
 var timed_effects_label:Label
 var feather_collection:=FeatherCollection.new()
 var ultimate_hint:Label
-var _ultimate_breath:float=0.0
+var ultimate_bar:Control
 var lift_hint:Label
 var message_label: Label
 var legend_label: Label
@@ -173,9 +172,16 @@ func _build_header() -> void:
 	vitals.add_child(coin_art)
 	coins_label=_label("0",13,GOLD)
 	vitals.add_child(coins_label)
+	var ultimate_row:=HBoxContainer.new()
+	ultimate_row.add_theme_constant_override("separation",8)
+	ultimate_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	main.add_child(ultimate_row)
+	ultimate_bar=UltimateBar.new()
+	ultimate_bar.name="UltimateEnergy"
+	ultimate_row.add_child(ultimate_bar)
 	ultimate_hint=_label("",12,GOLD)
 	ultimate_hint.visible=false
-	vitals.add_child(ultimate_hint)
+	ultimate_row.add_child(ultimate_hint)
 	shield_row=HBoxContainer.new()
 	shield_row.name="Shield"
 	shield_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -229,29 +235,6 @@ func _build_header() -> void:
 	phase_bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 	phase_row.add_child(phase_bar)
 
-	dream_row=HBoxContainer.new()
-	dream_row.name="DreamEnergy"
-	dream_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	dream_row.visible=false
-	main.add_child(dream_row)
-	var dream_art:=_icon("strong_motion_energy",18)
-	dream_art.mouse_filter=Control.MOUSE_FILTER_PASS
-	dream_art.tooltip_text="無雙能量"
-	dream_row.add_child(dream_art)
-	var cells:=HBoxContainer.new()
-	cells.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	cells.size_flags_vertical=Control.SIZE_SHRINK_CENTER
-	cells.add_theme_constant_override("separation",3)
-	dream_row.add_child(cells)
-	for i in 20:
-		var cell:=TextureRect.new()
-		cell.texture=ENERGY_EMPTY
-		cell.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-		cell.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		cell.custom_minimum_size=Vector2(9,11)*ENERGY_ICON_SCALE
-		cell.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		cells.add_child(cell)
-		dream_cells.append(cell)
 	var tools := HBoxContainer.new()
 	edge_tools=tools
 	tools.position = Vector2(1186,13)
@@ -373,7 +356,12 @@ func update_shield_hud(amount:int,capacity:int,timed:PackedStringArray,show_comb
 	feather_collection.visible=show_combat
 
 func energy_collection_target() -> Vector2:
-	return energy_cells.target_center()
+	return ultimate_bar.target_center()
+
+func update_ultimate_hud(progress:float,visible_in_game:bool) -> void:
+	ultimate_bar.visible=visible_in_game
+	ultimate_bar.set_fill(progress)
+	ultimate_hint.visible=visible_in_game and progress>=1.0
 
 func update_hud(info: Dictionary) -> void:
 	setup()
@@ -397,13 +385,8 @@ func update_hud(info: Dictionary) -> void:
 			break
 	var mode_value:String=str(info.get("mode",""))
 	var home:bool=mode_value in ["","hub","鳥巢"]
-	dream_row.visible=mode_value in ["musou","無雙","無雙夢境"]
-	if dream_row.visible:
-		var amount:int=clampi(int(info.get("dream_energy",0)),0,20)
-		for i in dream_cells.size():dream_cells[i].texture=ENERGY_FULL if i<amount else ENERGY_EMPTY
 	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
 	health_background.visible=not home and header.visible
-	ultimate_hint.visible=not home and energy>=max_energy
 	ultimate_hint.text="大招 %s"%str(info.get("ultimate_key","S"))
 	var lift:float=float(info.get("lift_progress",-1.0))
 	lift_hint.visible=not home and lift>=0.0
@@ -688,18 +671,9 @@ func _process(delta: float) -> void:
 	_feedback_cooldown=maxf(0,_feedback_cooldown-delta)
 	attack_feedback_timer=maxf(0,attack_feedback_timer-delta)
 	var warning:bool=attack_feedback_timer>0 and attack_feedback_reason=="energy"
-	var tint:=Color.WHITE
-	if ultimate_hint.visible:
-		_ultimate_breath=fposmod(_ultimate_breath+delta/1.35,1.0)
-		var breath:float=.5-.5*cos(TAU*_ultimate_breath)
-		tint=Color(.96,.72,.45,.77).lerp(Color(1.35,1.31,1.17,1.0),breath)
-	elif warning and fmod(.8-attack_feedback_timer,.24)<.14:
-		tint=Color("ffb482")
-	else:
-		_ultimate_breath=0.0
+	var tint:Color=Color("ffb482") if warning and fmod(.8-attack_feedback_timer,.24)<.14 else Color.WHITE
 	energy_art.modulate=tint
 	energy_cells.modulate=tint
-	ultimate_hint.modulate=tint
 	if _message_timer > 0.0:
 		_message_timer = maxf(0.0, _message_timer - delta)
 		message_label.modulate.a = minf(1.0, _message_timer / 0.4)

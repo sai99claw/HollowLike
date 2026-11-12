@@ -32,11 +32,12 @@ func run() -> void:
 	var near:Dictionary={"pos":Vector2(660,700),"hp":100.0,"vel":Vector2.ZERO}
 	var far:Dictionary={"pos":Vector2(1100,700),"hp":100.0,"vel":Vector2.ZERO}
 	game.enemies.assign([near,far])
-	game.p["energy"]=game.p["max_energy"]
+	game._restore_vital("energy",6)
+	game.p["energy"]=2
 	game._set_action("ultimate",true)
 	game._set_action("ultimate",false)
-	check(game.p["energy"]==0 and near["hp"]==88.0 and far["hp"]==100.0,"Full energy buys one radial hit on enemies in range")
-	check(near["push_velocity"].x>1000 and game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="feather_charge"),"Ultimate hits outward and uses the dedicated atlas")
+	check(game.p["energy"]==2 and game._ultimate_progress()==0.0 and near["hp"]==88.0 and far["hp"]==100.0,"Full energy buys one radial hit on enemies in range")
+	check(near["push_velocity"].x>1000 and not game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="feather_charge"),"Ultimate hits outward and no longer uses the retired atlas")
 	game.p_attack.cancel()
 	game.enemies.clear()
 	game.p["pos"]=Vector2(550,500)
@@ -79,6 +80,25 @@ func run() -> void:
 		if action=="attack":check(game.p_attack.is_active(),"The cancel press immediately executes the attack")
 		if action=="dash":check(game.p["dash_t"]>0,"The cancel press immediately starts the dash")
 		game._set_action(action,false)
+	game._clear_keys()
+	game._reset_player(Vector2(550,700))
+	game.keys["up"]=true
+	game.p["lift_charge"]=game._lift_threshold()
+	var first_target:Dictionary={"pos":Vector2(550,590),"hp":20.0}
+	var second_target:Dictionary={"pos":Vector2(550,470),"hp":20.0}
+	game.enemies.assign([second_target,first_target])
+	game._release_lift()
+	game._step_lift(.25)
+	check(not game.p.get("lift_flying",false) and game.p["vel"]==Vector2.ZERO and first_target["hp"]==18.0 and second_target["hp"]==20.0,"Lift sweeps into the nearest enemy and only hits once")
+	check(game.p.get("lift_invul_left",0)==.5 and not game._hurt_player(1,Vector2.ZERO),"Enemy contact grants half a second of protection")
+	game.enemies.clear()
+	game._clear_keys()
+	game._reset_player(Vector2(550,530))
+	game.strong_slots.assign(["held_flight"])
+	game.keys["jump"]=true
+	game.p["grounded"]=false
+	for i in 20:game._step_player(1.0/120.0)
+	check(game.p["pos"].y>530 and game.p["vel"].y>=0,"Holding Space and the glide rune cannot climb")
 	var speed:float=game._movement_factor()
 	var charge:float=game._charge_threshold()
 	var attack:Dictionary=game._primary_definition({"dir":"right","charged":false})

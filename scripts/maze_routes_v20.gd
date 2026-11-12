@@ -2,11 +2,11 @@ class_name MazeRoutesV20
 extends RefCounted
 ## A small seeded connector tree follows the actual carved air cells. Existing
 ## rock tops cost less than suspended bridges; the outer frame costs more.
-## Only cells on a route to a portal receive supports, at ordinary jump height.
+## Vertical links favor rock faces that support wall-jumping.
 const Scale=preload("res://scripts/world_scale_v17.gd")
 const TILE:float=Scale.TILE
 const DIRS:Array[Vector2i]=[Vector2i.UP,Vector2i.RIGHT,Vector2i.LEFT,Vector2i.DOWN]
-static func generate(maze,seed_value:int) -> Array[Rect2]:
+static func generate(maze,seed_value:int) -> Dictionary:
 	var width:int=maze.config.width;var height:int=maze.config.height
 	var start:=Vector2i(1,height-2)
 	for x in range(1,width-1):
@@ -46,25 +46,35 @@ static func generate(maze,seed_value:int) -> Array[Rect2]:
 				var to:Vector2i=at+step
 				if not costs.has(to):continue
 				var cost:float=float(distances[at])+float(costs[to])
+				if step.y!=0 and vertical_method(maze,at if step.y<0 else to)=="mushroom":cost+=1.8
 				if cost>=float(distances.get(to,INF)):continue
 				distances[to]=cost;previous[to]=at
 				if not pending.has(to):pending.append(to)
 		var cursor:Vector2i=target
 		while not network.has(cursor) and previous.has(cursor):
 			network[cursor]=true;cursor=previous[cursor]
-	# Adjacent air-cell supports are one bridge. Solid tops already support the
-	# player and receive no duplicate one-way collision or extra draw object.
-	var result:Array[Rect2]=[]
+	var bridges:Array[Rect2]=[]
+	var launchers:Array[Vector2]=[]
+	var climbs:Array[Dictionary]=[]
+	for cell:Vector2i in network:
+		if not network.has(cell+Vector2i.UP):continue
+		var method:String=vertical_method(maze,cell)
+		var feet:Vector2=(Vector2(cell)+Vector2(.5,1.0))*Scale.CELL_SIZE
+		climbs.append({"from":cell,"to":cell+Vector2i.UP,"method":method,"feet":feet})
+		if method=="mushroom":launchers.append(feet)
+	# Only long horizontal gaps need a bridge. Vertical tiers use the
+	# rock face or the mushroom assigned above.
 	for y in range(1,height-1):
 		var x:int=1
 		while x<width-1:
 			if not network.has(Vector2i(x,y)) or not maze.is_floor(Vector2i(x,y+1)):x+=1;continue
 			var first:int=x
 			while x<width-1 and network.has(Vector2i(x,y)) and maze.is_floor(Vector2i(x,y+1)):x+=1
-			result.append(Rect2(first*TILE,(y+1)*Scale.TILE_HEIGHT,(x-first)*TILE,9))
-	# A tall vertical cell needs two pass-through footholds to bridge adjacent rows.
-	for cell:Vector2i in network:
-		if not network.has(cell+Vector2i.UP):continue
-		for tier in [1,2]:
-			result.append(Rect2(cell.x*TILE,(cell.y+1)*Scale.TILE_HEIGHT-tier*Scale.CLIMB_STEP,TILE,9))
-	return result
+			if x-first>2:bridges.append(Rect2(first*TILE,(y+1)*Scale.TILE_HEIGHT,(x-first)*TILE,9))
+	return {"bridges":bridges,"launchers":launchers,"climbs":climbs,"cells":network.keys(),"start":start,"targets":targets}
+
+static func vertical_method(maze,lower:Vector2i) -> String:
+	var upper:=lower+Vector2i.UP
+	for side:Vector2i in [Vector2i.LEFT,Vector2i.RIGHT]:
+		if not maze.is_floor(lower+side) and not maze.is_floor(upper+side):return "wall"
+	return "mushroom"

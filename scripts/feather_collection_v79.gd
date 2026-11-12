@@ -3,7 +3,7 @@ extends Node2D
 const FX=preload("res://scripts/combat_visual.gd")
 const LIMIT:int=64
 const BURST_TIME:float=.13
-const SHARD_SCALE:float=2.0
+const SHARD_SCALE:float=4.0
 var shards:Array[Dictionary]=[]
 var rng:=RandomNumberGenerator.new()
 var texture:Texture2D

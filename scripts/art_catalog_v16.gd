@@ -462,7 +462,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var used:bool=true
 	var note:String=""
 	match id:
-		"v79:energy-feather-empty","v79:energy-feather-full":note="左上普通能量與無雙能量的空格和滿格。畫布 52 × 60 px。"
+		"v79:energy-feather-empty","v79:energy-feather-full":note="左上普通能量的空格和滿格。滿格羽毛也用於角色周圍的旋轉護盾。畫布 52 × 60 px。"
 		"v75:canopy-left":note="左上血量列的垂枝底圖，固定於介面。"
 		"v76:near-roots","v76:near-vine","v77:underground-near-roots","v77:underground-near-vine","v77:sky-near-roots","v77:sky-near-vine":note="附著在地形下緣，部分繪在主角前方。"
 		"v76:near-stone","v76:near-thorns","v77:underground-near-stone","v77:underground-near-thorns","v77:sky-near-stone","v77:sky-near-thorns":note="平台的角石與荊枝，部分繪在主角前方。"
@@ -494,11 +494,11 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"combat_v05:pigeon_feather_thrust":used=false;note="停用的第三下普攻。"
 		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
 		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
-		"combat_v05:feather_charge":note="滿能量大招，消耗整條能量，以羽刃對周圍造成傷害及強擊退。"
+		"combat_v05:feather_charge":used=false;note="舊版大招特效，已停用。"
 		"combat_v05:vertical_launch":note="集氣時從雙翅向下向外吹，起飛時朝下噴出的羽毛氣流。"
 		"combat_v05:motion_energy":used=false;note="已停用移動回能的光效。"
 		"combat_v05:dream_feather_charge":note="無雙夢境原有的擴散斬特效。"
-		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
+		"combat_v05:pigeon_feather_charge":note="無雙夢境滿能量後按大招鍵施放擴散斬；手動集氣釋放使用大刀第三刀。"
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
 		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，象牙白與淡紫碎羽由集中至飛散，共四幀。"

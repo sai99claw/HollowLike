@@ -1,7 +1,7 @@
 class_name RoomLayout
 extends RefCounted
 ## Seeded room geometry. All positions are feet / platform top anchors.
-## Connectivity uses ordinary jumps; neither wall climbing nor air dash is required.
+## The maze layout uses rock climbing and mushroom launches for tall links.
 
 const MazeLayout=preload("res://scripts/maze_room_layout.gd")
 const Sanctuary=preload("res://scripts/sanctuary_room.gd")

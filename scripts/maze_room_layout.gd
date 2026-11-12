@@ -71,22 +71,14 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 				if one_way.any(func(other:Rect2)->bool:return absf(other.position.y-at.y)<96):continue
 				one_way.append(ledge);platform_voids.append(area)
 	var random_ledges:Array[Rect2]=one_way.duplicate()
+	var route_plan:Dictionary={}
 	if cfg.arena and (not safe or not maze.doors.is_empty()):
-		# Traversal ledges can be jumped through and dropped through. No thin solid
-		# treads, floating solid perches or solid gallery remain anywhere in the room.
-		for side in 2:
-			var direction:String="left" if side==0 else "right"
-			var anchor:float=(float(maze.doors[direction].y)+2)*cell_y if maze.doors.has(direction) else floor_y
-			for level in range(-ceili(size.y/climb_step),ceili(size.y/climb_step)):
-				var y:float=anchor+level*climb_step
-				if y<192 or y>=floor_y-.01:continue
-				var x:float=TILE if side==0 else size.x-TILE*3
-				var ledge:=Rect2(x,y,TILE*2,9)
-				one_way.append(ledge);navigation.append(ledge)
+		# Arena walls support climbing between the gallery and door landings.
 		var gallery:=Rect2(TILE,240.0 if boss else (192.0 if safe else cell_y),size.x-TILE*2,9)
 		one_way.append(gallery);navigation.append(gallery)
 	elif not safe:
-		navigation=Routes.generate(maze,cfg.seed_value)
+		route_plan=Routes.generate(maze,cfg.seed_value)
+		navigation.assign(route_plan["bridges"])
 		one_way.append_array(navigation)
 	platforms.append_array(one_way)
 	var offset:=Vector2((size.x-1500)*.5,floor_y-1050)
@@ -142,7 +134,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 		# from_dir is the direction travelled, so entry is on its opposite edge.
 		spawn[{"up":"down","down":"up","left":"right","right":"left"}[direction]]=inside
 		if direction=="up":
-			for y:float in ([192.0,240.0] if boss else ([192.0] if safe else [192.0,cell_y,cell_y+climb_step,cell_y+climb_step*2])):
+			for y:float in ([192.0,240.0] if boss else [192.0]):
 				var step:=Rect2(inside.x-TILE,y,TILE*2,9)
 				one_way.append(step);navigation.append(step);platforms.append(step)
 		if direction=="down" and not boss and not safe:
@@ -194,7 +186,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 			if reserved.any(func(rect:Rect2)->bool:return rect.has_point(at)):continue
 			if enemy_spawns.any(func(other:Vector2)->bool:return other.distance_to(at)<80):continue
 			enemy_spawns.append(at)
-	return {"size":size,"floor_y":floor_y,"ceiling_y":0.0,"single_screen":safe,"furniture_offset":offset if safe else Vector2.ZERO,"pool":pool,"platforms":platforms,"one_way":one_way,"platform_art_runs":runs,"random_one_way":random_ledges,"navigation_one_way":navigation,"platform_voids":platform_voids,"door_width":3,"solids":walls,"walls":walls,"blocks":[],"trunks":[],"shapes":[],"doors":doors,"spawn_positions":spawn,"enemy_spawns":enemy_spawns,"ground_spawns":enemy_spawns.filter(func(at:Vector2)->bool:return not one_way.any(func(ledge:Rect2)->bool:return absf(ledge.position.y-at.y)<1 and at.x>=ledge.position.x and at.x<=ledge.end.x)),"reserved_regions":reserved,"decorations":[],"route_indices":[],"archetype":"stitched_arena" if cfg.arena else (cfg.layout_profile if not cfg.layout_profile.is_empty() else "braided_prim"),"seed":cfg.seed_value,"launcher_spawns":_launcher_spawns(maze.rooms,platforms,walls,reserved) if not safe else [],"dead_end_rewards":maze.dead_end_rewards,"maze_grid":maze.grid,"maze_doors":maze.doors,"maze_plazas":maze.rooms,"tile_size":TILE,"tile_height":cell_y,"generation_order":["topology","stitched_doors","prim","plazas","braiding","pass_through_routes"]}
+	return {"size":size,"floor_y":floor_y,"ceiling_y":0.0,"single_screen":safe,"furniture_offset":offset if safe else Vector2.ZERO,"pool":pool,"platforms":platforms,"one_way":one_way,"platform_art_runs":runs,"random_one_way":random_ledges,"navigation_one_way":navigation,"platform_voids":platform_voids,"door_width":3,"solids":walls,"walls":walls,"blocks":[],"trunks":[],"shapes":[],"doors":doors,"spawn_positions":spawn,"enemy_spawns":enemy_spawns,"ground_spawns":enemy_spawns.filter(func(at:Vector2)->bool:return not one_way.any(func(ledge:Rect2)->bool:return absf(ledge.position.y-at.y)<1 and at.x>=ledge.position.x and at.x<=ledge.end.x)),"reserved_regions":reserved,"decorations":[],"route_indices":[],"archetype":"stitched_arena" if cfg.arena else (cfg.layout_profile if not cfg.layout_profile.is_empty() else "braided_prim"),"seed":cfg.seed_value,"navigation_plan":route_plan,"launcher_spawns":_launcher_spawns(maze.rooms,platforms,walls,reserved) if not safe else [],"dead_end_rewards":maze.dead_end_rewards,"maze_grid":maze.grid,"maze_doors":maze.doors,"maze_plazas":maze.rooms,"tile_size":TILE,"tile_height":cell_y,"generation_order":["topology","stitched_doors","prim","plazas","braiding","pass_through_routes"]}
 static func validate(layout:Dictionary) -> Array[String]:
 	var errors:Array[String]=[];var size:Vector2=layout["size"]
 	for rect:Rect2 in layout["solids"]:

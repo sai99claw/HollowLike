@@ -16,5 +16,5 @@ export default {async fetch(request,env){
  const category=['問題回報','操作與手感','美術與音效','玩法建議','其他'].includes(input.category)?input.category:'其他';
  if(message.length<3||message.length>2000||nickname.length>40)return reply({error:'意見請填3～2000字；暱稱最多40字。'},400);
  const id=typeof input.id==='string'&&/^[a-f0-9-]{36}$/.test(input.id)?input.id:crypto.randomUUID();
- try{await env.DB.prepare('INSERT INTO player_feedback (id,nickname,category,message,version,created_at) VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING').bind(id,nickname||'匿名玩家',category,message,'v0.80',new Date().toISOString()).run();return reply({ok:true,id});}catch{return reply({error:'暫時無法儲存，請稍後再試。'},503);}
+ try{await env.DB.prepare('INSERT INTO player_feedback (id,nickname,category,message,version,created_at) VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING').bind(id,nickname||'匿名玩家',category,message,'v0.81',new Date().toISOString()).run();return reply({ok:true,id});}catch{return reply({error:'暫時無法儲存，請稍後再試。'},503);}
 }};

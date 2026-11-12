@@ -29,6 +29,7 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 		layout["floor_y"]=Vector2(0,expanded.y-cell.y).y
 		bounds=expanded
 	layout.erase("maze_grid")
+	layout.erase("navigation_plan")
 	var interior:=Rect2(cell,bounds-cell*2)
 	var supports:Array[Rect2]=[]
 	var islands:Array[Rect2]=[]
