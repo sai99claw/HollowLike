@@ -26,6 +26,14 @@ func run() -> void:
 			for j:int in range(i+1,points.size()):
 				check(points[i].distance_to(points[j])>Rooms.MUSHROOM_SPACING,"Mushrooms are spaced beyond a full C + CC")
 	var floor:=Rect2(0,600,1600,100)
+	var coin_physics=preload("res://scripts/coin_physics.gd")
+	var coin:Dictionary={"pos":Vector2(400,593),"vel":Vector2(100,0)}
+	coin_physics.step(coin,.1,[floor],Rect2(0,0,1600,700))
+	check(coin["rotation"]>0 and coin["pos"].x>400,"A grounded coin rolls in the direction of motion")
+	for large:bool in [true,false]:
+		var rolling:Dictionary={"pos":Vector2(400,600),"vel":Vector2(150,0),"large":large}
+		for step in 8:Stones.step(rolling,1.0/120.0,[floor])
+		check(rolling["rotation"]>0 and rolling["pos"].x>400,"Both sizes of ground stone rotate around their own radius")
 	var rocks:Array[Dictionary]=Stones.spawn({"size":Vector2(1600,700),"floor_y":600,"seed":67},[floor],[floor],[])
 	check(rocks.size()==7 and rocks.filter(func(rock:Dictionary)->bool:return rock["large"]).size()==1,"One large stone and a six-stone pile")
 	var rows:Dictionary={}

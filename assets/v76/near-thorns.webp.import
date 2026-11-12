@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://56vksgyyt0cm"
-path="res://.godot/imported/fine-crescent.webp-fea0f9e7a2f2afcf31de5c10386c7382.ctex"
+uid="uid://dfv3slmibjb1h"
+path="res://.godot/imported/near-thorns.webp-9324a292b79865c554af722f39fc96d7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/v39/effects/fine-crescent.webp"
-dest_files=["res://.godot/imported/fine-crescent.webp-fea0f9e7a2f2afcf31de5c10386c7382.ctex"]
+source_file="res://assets/v76/near-thorns.webp"
+dest_files=["res://.godot/imported/near-thorns.webp-9324a292b79865c554af722f39fc96d7.ctex"]
 
 [params]
 

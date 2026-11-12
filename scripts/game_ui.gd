@@ -44,6 +44,7 @@ var edge_tools:HBoxContainer
 var quickbar:HBoxContainer
 var _focus_index:int=0
 var mute_button:Button
+var health_background:TextureRect
 var secondary_art:TextureRect
 var secondary_label:Label
 var inspector:PanelContainer
@@ -111,6 +112,14 @@ func set_safe_rect(safe:Rect2) -> void:
 	quickbar.position=Vector2(20,642+extra.y)
 
 func _build_header() -> void:
+	health_background=TextureRect.new()
+	health_background.name="HealthBackdrop"
+	health_background.texture=preload("res://assets/v75/canopy-left.webp")
+	health_background.position=Vector2(0,0)
+	health_background.size=Vector2(270,92)
+	health_background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	health_background.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	ui_root.add_child(health_background)
 	header = PanelContainer.new()
 	header.name = "CompactVitals"
 	header.position = Vector2(20,16)
@@ -338,7 +347,7 @@ func update_hud(info: Dictionary) -> void:
 		dream_label.visible=rage_left>0
 		dream_label.text="×2  %ds"%ceili(rage_left) if rage_left>0 else ""
 		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
-	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
+	for control:Control in [health_background,health_art,energy_art,health_cells,energy_cells]:control.visible=not home
 	primary_art.get_parent().visible=not home
 	injury_art.visible=not home and bool(info.get("injured",false))
 	var sub_count:int=int(info.get("sub_count",0))

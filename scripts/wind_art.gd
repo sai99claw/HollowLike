@@ -13,7 +13,7 @@ const FORM_FPS:float=24.0
 const OVERLAY_TINT:=Color(1,1,1,.9)
 static var textures:Dictionary={}
 static func texture(kind:String) -> Texture2D:
-	var path:String={"jet":ROOT+"dash-jet.png","form":"res://assets/v75/wind-form.webp","impact":"res://assets/v75/wind-impact.webp"}[kind]
+	var path:String={"jet":ROOT+"dash-jet.png","form":"res://assets/v75/wind-form.webp","impact":"res://assets/v76/wind-impact.webp"}[kind]
 	if not textures.has(kind):textures[kind]=load(path)
 	return textures[kind]
 static func frame_count(kind:String) -> int:return {"jet":6,"form":8,"impact":4}[kind]

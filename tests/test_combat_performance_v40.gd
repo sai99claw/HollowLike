@@ -1,7 +1,6 @@
 extends SceneTree
 const Data=preload("res://scripts/game_data.gd")
 const Feedback=preload("res://scripts/combat_feedback.gd")
-const Crescent=preload("res://scripts/clean_crescent_v39.gd")
 const Budget=preload("res://scripts/render_budget_v40.gd")
 const Depth=preload("res://scripts/depth_style_v32.gd")
 const Roster=preload("res://scripts/monster_roster_v36.gd")
@@ -18,9 +17,6 @@ func run() -> void:
 				state.tick(float(def["windup"])+float(def["active"])+.00001)
 				check(not state.is_busy(),"Dash/charge can act immediately after their full hit window")
 	check(Data.action_attack("right",false,false)["recovery"]>0,"Ordinary featherblade cadence is retained")
-	for direction:Vector2 in [Vector2.RIGHT,Vector2.LEFT,Vector2.UP,Vector2.DOWN]:
-		var pose:Transform2D=Crescent.pose(Vector2(200,300),direction.angle(),400)
-		check(pose.origin==Vector2(200,300) and pose.x.dot(direction)<0 and pose.determinant()<0,"Crescent reverses its local horizontal facing around the same impact center")
 	var feedback=Feedback.new();root.add_child(feedback)
 	for i in 10:feedback.update_charge(false,Vector2.ZERO,0,2);feedback.update_cache(false,Vector2.ZERO,0)
 	check(feedback.get_child_count()==0,"Inactive charge/cache allocate no particle emitters")

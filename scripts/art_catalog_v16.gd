@@ -68,8 +68,7 @@ static func _art_v38() -> void:
 	_add("v38:laser","連續雷射","戰鬥特效",frames,24,"八張連續光束貼圖，寬度與命中範圍相同。")
 
 static func _art_v39() -> void:
-	var d:Dictionary=_json(ROOT+"v39/effects/fine-crescent.json")
-	_add("v39:crescent","細長月牙","戰鬥特效",[_descriptor(ROOT+"v39/effects/"+d["path"],d["source_rect"])],8,"月牙中段對準敵人中心。")
+	var d:Dictionary
 	for biome:String in ["underground","trunk","sky"]:
 		d=_json(ROOT+"v39/monsters/"+biome+"-death.json")
 		for i in 7:
@@ -187,7 +186,7 @@ static func _curated_sheets() -> void:
 	_sheet("explosion:air","爆炸 · 空中全向擴散","衝刺與爆炸特效",ROOT+"v16/explosion_air.png",4,2,8,16,{"effect_plane":"air"})
 	_sheet("wind:jet","單C · 小噴射","衝刺與爆炸特效",ROOT+"motion_v14/dash-jet.png",3,2,6,37.5)
 	_sheet("wind:form","雙C · 化身為風","衝刺與爆炸特效",ROOT+"v75/wind-form.webp",4,2,8,WIND_MOTION.FORM_FPS,{"hidden_frames":[2,4]})
-	_sheet("wind:impact","下衝 · 接地衝擊","衝刺與爆炸特效",ROOT+"v75/wind-impact.webp",2,2,4,8,{"baseline":1.0})
+	_sheet("wind:impact","下衝 · 接地衝擊","衝刺與爆炸特效",ROOT+"v76/wind-impact.webp",2,2,4,8,{"baseline":1.0})
 	_sheet("merchant:owl","貓頭鷹商人 · 待機","角色與NPC",ROOT+"adventure_v08/owl_merchant.png",2,2,4,1.5)
 	for row in ACTION_REGIONS.size():
 		var frames:Array=[]
@@ -411,21 +410,24 @@ static func _group_for(item:Dictionary) -> String:
 	var path:String=item["frames"][0].get("path","")
 	if category in ["首領圖集","Boss動作與特效"] or path.begins_with(ROOT+"v59/monsters/") or path.begins_with(ROOT+"v59/effects/") or id.begins_with("v22:boss-actions:") or id in ["v22:death:underground","v22:death:trunk","v22:death:sky"]:return "Boss"
 	if id.begins_with("monster_projectile:") or category.begins_with("怪物") or category in ["小怪動作","小怪圖集","高解析怪物動作","死亡與屍體","陷阱安置動畫","環境生物"]:return "小怪"
-	if id in ["slash:v18","v72:wing_impulse","v72:straight_slash"] or (category in ["主角","主角姿態","衝刺與爆炸特效"] and not id.begins_with("explosion:")):return "主角"
+	if id in ["v72:straight_slash","v72:impact_feathers"]:return "戰鬥共用"
+	if id in ["slash:v18","v72:wing_impulse"] or (category in ["主角","主角姿態","衝刺與爆炸特效"] and not id.begins_with("explosion:")):return "主角"
 	if category=="角色與NPC":return "NPC"
-	if id in ["v72:impact_feathers","v39:crescent"]:return "戰鬥共用"
 	if id.begins_with("v24:projectile:") or id.begins_with("v24:weapon:") or id.begins_with("v31:") or id=="v38:laser" or path.contains("/v31/projectiles/"):return "主角"
 	if category.contains("地形") or category.contains("中景") or category.contains("裝飾") or category=="首頁與大門" or path.contains("/maps/") or id.begins_with("procedural:door_"):return "地圖"
 	return "物件"
 
 static func _recent_art() -> void:
-	for art:Array in [["canopy-left","左側垂枝"],["canopy-right","右側垂藤"],["root-cluster","盤根草叢"],["thorn-branch","荊刺枝葉"]]:
-		var category:String="超前景" if str(art[0]).begins_with("canopy") else "前景"
+	_add("v75:canopy-left","血量列 · 垂枝底圖","介面",[_descriptor(ROOT+"v75/canopy-left.webp")],1)
+	for art:Array in [["near-roots","超前景垂根"],["near-vine","超前景垂藤"],["near-stone","平台角石"],["near-thorns","平台荊枝"]]:
+		_add("v76:"+str(art[0]),str(art[1]),"地形與背景",[_descriptor(ROOT+"v76/"+str(art[0])+".webp")],1)
+	for art:Array in [["root-cluster","盤根草叢"],["thorn-branch","荊刺枝葉"]]:
+		var category:String="前景"
 		_add("v75:"+str(art[0]),category+" · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v75/"+str(art[0])+".webp")],1)
 
-	_sheet("v72:wing_impulse","單 C／二段跳 · 拍翅噴流","動作與特效",ROOT+"v72/wing-impulse.webp",2,2,4,4.0/.24)
+	_sheet("v72:wing_impulse","單 C／二段跳 · 拍翅噴流","動作與特效",ROOT+"v76/wing-impulse.webp",2,2,4,4.0/.24)
 	_sheet("v72:impact_feathers","命中 · 身體向外噴出碎羽","攻擊與命中特效",ROOT+"v75/impact-feathers.webp",2,2,4,20)
-	_sheet("v72:straight_slash","普攻 · 直線閃光","攻擊與命中特效",ROOT+"v75/straight-slash.webp",2,2,4,24)
+	_sheet("v72:straight_slash","命中 · 直線閃光","攻擊與命中特效",ROOT+"v75/straight-slash.webp",2,2,4,24)
 	var motion:String=ROOT+"v68/pigeon_motion.webp"
 	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS,
 		{"sequence":ACTOR_MOTION.JUMP_SEQUENCE,"hidden_frames":[0,3],"phases":{"原始圖集":[0,1,2,3]}})
@@ -453,7 +455,9 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var used:bool=true
 	var note:String=""
 	match id:
-		"v75:canopy-left","v75:canopy-right":note="房間上緣的超前景枝葉，隨鏡頭移動，戰鬥區保持清楚。"
+		"v75:canopy-left":note="左上血量列的垂枝底圖，固定於介面。"
+		"v76:near-roots","v76:near-vine":note="超前景，以快於地形的速度跟隨鏡頭。"
+		"v76:near-stone","v76:near-thorns":note="平台的角石與荊枝貼圖，沒有碰撞。"
 		"v75:root-cluster","v75:thorn-branch":note="實心地形邊緣的前景根系與葉片，沒有碰撞。"
 		"pigeon_action:0":note="按住回血時的四張角色姿態。"
 		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由新十幀步態取代。"
@@ -464,7 +468,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"v23:pigeon-motion:air":note="牆跳等其他上升、跳躍頂點、下降和普通落地姿勢。"
 		"v48:pigeon:quickdraw_walk":note="按住集氣且在地面移動時，按步態切換六張拔刀預備姿勢。"
 		"wind:form":note="雙 C 疊在鴿子中心，90% 不透明度；第 3、5 張停用，橫向播一次，垂直循環這六張。"
-		"wind:impact":note="向下雙 C 觸地後向兩側張開的四幀風壓，90% 不透明度。"
+		"wind:impact":note="向下雙 C 觸地時從羽毛堆向兩側炸出羽毛，共四幀。"
 		"wind:jet":used=false;note="舊單 C 噴射；目前採用二段跳式拍翅與風尾。"
 		"pigeon_action:1":note="重傷移動時循環十幀，每五幀交替支撐腳。角色造型取自走路第 10 幀。"
 		"pigeon_action:1:v68":used=false;note="v0.68 舊八幀跛行，已由十幀步態取代。"
@@ -486,11 +490,10 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
 		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，象牙白與淡紫碎羽由集中至飛散，共四幀。"
-		"v72:straight_slash":note="普攻命中時從受擊者中心繪製，沿攻擊方向隨機偏轉，24 FPS。"
+		"v72:straight_slash":note="各類攻擊命中時從受擊者中心繪製，沿攻擊方向隨機偏轉，長度為一個畫面寬，24 FPS。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
 		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"
-		"v39:crescent":note="集氣等其他攻擊命中時，細長月牙對準受擊者中央。"
 	if id.begins_with("v70:pigeon:attack:"):used=false;note=label+"；舊版翅膀／腳爪普攻角色動畫。"
 	elif id.begins_with("v67:stone:"):note=label+"，隨機生成，主角可穿過，擊飛後可撞傷怪物。"+("六顆小石排成 1／2／3 層，近戰擊中其中一顆會打散整堆。" if id.ends_with(":small") else "")
 	elif id.begins_with("v59:chest:"):note=label+"，戰鬥房或獎勵房互動後播放。"

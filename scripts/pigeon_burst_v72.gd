@@ -1,6 +1,6 @@
 extends RefCounted
 
-const IMPULSE=preload("res://assets/v72/wing-impulse.webp")
+const IMPULSE=preload("res://assets/v76/wing-impulse.webp")
 const IMPACT=preload("res://assets/v75/impact-feathers.webp")
 const CELL:=Vector2(384,192)
 const PIVOT:=Vector2(64,96)

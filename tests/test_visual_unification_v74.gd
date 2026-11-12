@@ -25,8 +25,7 @@ func run() -> void:
 		if at.x in [floor.position.x,floor.end.x]:corners+=1
 		if not item["sway"]:continue
 		hanging+=1
-		var depth:float=0
-		for point:Vector2 in item["points"]:depth=maxf(depth,point.y)
+		var depth:float=Rect2(item["rect"]).size.y
 		check(depth>=25 and depth<=60,"Roots extend outside the platform")
 	check(corners==4 and hanging>=4,"The platform has four overhanging corners and a row of hanging roots")
 	var enemy:Dictionary={"hp":10.0,"max_hp":10.0}
@@ -49,12 +48,17 @@ func run() -> void:
 	var world=game.visual_depth
 	check(world.spores is GPUParticles2D and world.spores.amount==76,"Standard mode enables 76 additive GPU spores")
 	check(world.grade.glow_enabled and world.fogs.size()==2,"Standard mode enables bloom and both fog layers")
-	check(world.foreground.z_index>world.details.z_index and world.FOREGROUND_FACTOR==1.35,"The super-foreground sits above platform decor")
+	check(world.foreground.z_index>world.details.z_index and world.FOREGROUND_FACTOR>1.4,"The super-foreground sits above platform decor")
 	check(world.lantern.position.is_equal_approx(game.world_transform*(game.p["pos"]-Vector2(0,27))) and world.lantern.range_z_min<=game.terrain.z_index,"Lantern follows the pigeon and lights the terrain layer")
 	game.low_effects=true
 	game._process(.016)
 	check(world.spores.amount==32 and not world.grade.glow_enabled and not world.fogs[1].visible,"Reduced mode lowers effects while retaining the lantern")
 	check(game.ui.edge_tools.get_child_count()==2 and game.ui.mute_button.visible and game.ui.mute_button.icon!=null,"Menu and mute have visible texture icons")
+	var initial:Vector2=world.canopy_window.position
+	game.camera_pos+=Vector2(100,70)
+	game._process(.016)
+	check(world.canopy_window.position.is_equal_approx(initial+Vector2(100,70)*world.FOREGROUND_FACTOR),"Both camera axes translate the closest artwork faster than terrain")
+	check(game.ui.health_background.texture.resource_path.ends_with("canopy-left.webp"),"The old left canopy now belongs to the health HUD")
 	game.room_music.stream=null
 	var mute_icon:Texture2D=game.ui.mute_button.icon
 	var audio_on:bool=game.audio_enabled

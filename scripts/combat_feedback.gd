@@ -14,13 +14,12 @@ var reduced:bool=true
 var trail_serial:int=0
 var trail_texture:GradientTexture2D
 var cache_motes:CPUParticles2D
-const FLASH_LENGTH:float=1280.0/3.0*1.2
 var impact_rng:=RandomNumberGenerator.new()
-func hit(en:Dictionary,at:Vector2,direction:Vector2,style:String,_killed:bool,show_crescent:bool=true,straight_slash:bool=false) -> void:
+func hit(en:Dictionary,at:Vector2,direction:Vector2) -> void:
 	if flashes.size()>=12:flashes.pop_front()
 	at=impact_center(en,at)
 	var spray:Vector2=direction.normalized() if direction.length_squared()>.01 else Vector2.RIGHT
-	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.25,"max":.25,"length":1280.0/3.0,"started_usec":Time.get_ticks_usec(),"feathers":true,"crescent":show_crescent,"straight":straight_slash,"straight_angle":spray.angle()+impact_rng.randf_range(-.56,.56) if straight_slash else 0.0})
+	flashes.append({"at":at,"spray_at":at,"dir":spray,"life":.25,"max":.25,"feathers":true,"straight_angle":spray.angle()+impact_rng.randf_range(-.56,.56)})
 	queue_redraw()
 
 static func impact_center(en:Dictionary,fallback:Vector2) -> Vector2:

@@ -39,11 +39,20 @@ func run() -> void:
 	game._drop("heal",at,1)
 	game._check_room_clear()
 	game._update_drops(.016)
-	check(not game.room.get("cleared",false) and game.drops.size()==11,"Drops stay put with a living enemy")
+	check(not game.room.get("cleared",false) and game.room_clear_slow_left==0.0 and game.drops.size()==11,"Drops stay put with a living enemy")
 	game.enemies[0]["hp"]=0
 	game.enemies.append({"hp":100,"training":true})
 	game._check_room_clear()
 	check(game.room.get("cleared",false),"Training targets do not block combat room clear")
+	check(game.room_clear_slow_left==2.0 and game._clear_world_rate()<1.0,"Last enemy starts exactly two seconds of world slowdown")
+	game.enemies.clear()
+	game._close_panel()
+	game.hitstop=.05
+	game._physics_process(.05)
+	check(is_equal_approx(game.room_clear_slow_left,1.95),"Slowdown clock runs at real speed through hitstop")
+	var visual_time:float=game.draw_clock
+	game._physics_process(.05)
+	check(is_equal_approx(game.draw_clock-visual_time,.05*game.world_speed*game.ROOM_CLEAR_WORLD_RATE),"World pose time advances at the slowed rate")
 	var gold:int=game.run_coins
 	var item_count:int=int(game.bag_items.get("0",0))
 	var hp:float=maxf(1,game.p["hp"]-2)
@@ -54,7 +63,14 @@ func run() -> void:
 	for i in 120:game._update_drops(1.0/60.0)
 	check(game.drops.is_empty() and game.room["drops"].is_empty(),"Distant coins and non-coin drops all reach the player")
 	check(game.run_coins==gold+9 and int(game.bag_items.get("0",0))==item_count+1 and game.p["hp"]==hp+1,"Normal reward handlers apply every collected drop once")
+	game.enemies.assign([{"pos":Vector2(1200,480),"hp":5.0},{"pos":Vector2(340,500),"hp":0.0}])
+	check(game._minimap_enemy_markers().size()==1,"Minimap shows living enemies even outside the camera and omits corpses")
 	game.enemies.clear()
+	for candidate:Dictionary in game.tower["rooms"]:
+		if candidate["type"]!="boss":continue
+		game._enter_room(candidate["id"])
+		break
+	check(is_equal_approx(game._room_size().y,1080.0) and game._view_zoom()<=1.0,"Boss arena is at most one and a half visible screens high")
 	game.queue_free()
 	await process_frame
 	print("v75 clear and terrain checks: ",failures)

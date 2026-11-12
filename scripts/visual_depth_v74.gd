@@ -1,8 +1,8 @@
 extends Node2D
-const FOREGROUND_FACTOR:float=1.35
+const FOREGROUND_FACTOR:float=1.48
 const Cache=preload("res://scripts/cached_canvas.gd")
 const Edge=preload("res://scripts/platform_overhang_v74.gd")
-const CANOPY_ART:Array[Texture2D]=[preload("res://assets/v75/canopy-left.webp"),preload("res://assets/v75/canopy-right.webp")]
+const CANOPY_ART:Array[Texture2D]=[preload("res://assets/v76/near-roots.webp"),preload("res://assets/v76/near-vine.webp")]
 const ROOT_ART:Array[Texture2D]=[preload("res://assets/v75/root-cluster.webp"),preload("res://assets/v75/thorn-branch.webp")]
 var ambient:CanvasModulate
 var grade:Environment
@@ -24,6 +24,7 @@ var feather:Texture2D
 var shapes:Array[Dictionary]=[]
 var region:=Rect2()
 var safe:=Rect2(0,0,1280,720)
+var canopy_window:=Rect2()
 var origin:=Vector2.INF
 var drift:=Vector2.ZERO
 var fog_y:float=INF
@@ -180,7 +181,7 @@ func _warm(at:Vector2,radius:float) -> void:
 	pulse.tween_property(light,"energy",.67,1.35+fposmod(at.x,100.0)*.008)
 	pulse.tween_property(light,"energy",.46,1.55)
 
-func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,floor_y:float,now:float,active:bool,low:bool,paused:bool,visible_region:Rect2) -> void:
+func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,floor_y:float,now:float,active:bool,low:bool,paused:bool,visible_region:Rect2,rate:float=1.0) -> void:
 	var dt:float=clampf(now-time,0,.1)
 	time=now
 	safe=viewport
@@ -188,6 +189,7 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	if not origin.is_finite():origin=camera
 	drift=(camera-origin)*FOREGROUND_FACTOR
 	var zoom:float=base.x.length()
+	canopy_window=Rect2(camera*FOREGROUND_FACTOR+safe.position/zoom,safe.size/zoom)
 	ambient.visible=active
 	if grade.glow_enabled!=(active and not low):grade.glow_enabled=active and not low
 	lantern.enabled=active
@@ -217,7 +219,7 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	spores.position=safe.get_center()
 	spores.visible=active
 	if spores.emitting!=active:spores.emitting=active
-	spores.speed_scale=0.0 if paused else 1.0
+	spores.speed_scale=0.0 if paused else rate
 	var amount:int=32 if low else 76
 	if spores.amount!=amount:spores.amount=amount
 	drifting_feathers.visible=active
@@ -253,17 +255,25 @@ func _paint_roots(canvas:CanvasItem) -> void:
 			canvas.draw_texture_rect(sprite["art"],sprite["rect"],false,Color(foliage_tint,.85))
 
 func _paint_canopy(canvas:CanvasItem) -> void:
-	var width:float=safe.size.x
-	var height:float=safe.size.y
-	var horizontal:float=sin(drift.x/maxf(1,width)*2.4)
-	var vertical:float=sin(drift.y/maxf(1,height)*2.4)
-	for side in 2:
-		var texture:Texture2D=CANOPY_ART[side]
-		var size:Vector2=texture.get_size()
-		size*=minf(width*.32/size.x,height*.33/size.y)
-		var x:float=-size.x*.15 if side==0 else width-size.x*.85
-		var at:=Vector2(x-horizontal*width*.045,-size.y*.25-vertical*height*.075)
-		canvas.draw_texture_rect(texture,Rect2(at,size),false,Color(foliage_tint,.9 if not reduced else .85))
+	if not canopy_window.has_area():return
+	var zoom:float=safe.size.x/canopy_window.size.x
+	var period:=Vector2(790,570)
+	var bounds:Rect2=canopy_window.grow(300)
+	var first:=Vector2i((bounds.position/period).floor())
+	var last:=Vector2i((bounds.end/period).ceil())
+	var center:=Rect2(safe.size*.23,safe.size*.54)
+	for row in range(first.y,last.y+1):
+		for column in range(first.x,last.x+1):
+			var variant:int=posmod(row+column,2)
+			var texture:Texture2D=CANOPY_ART[variant]
+			var at:=Vector2(column,row)*period+Vector2(195*posmod(row,2),65)
+			var width:float=278.0 if variant==0 else 72.0
+			var size:Vector2=texture.get_size()*width/texture.get_width()
+			var destination:=Rect2((at-canopy_window.position)*zoom,size*zoom)
+			if not Rect2(Vector2.ZERO,safe.size).intersects(destination):continue
+			var opacity:float=.86
+			if center.intersects(destination):opacity=.42 if variant==0 else .58
+			canvas.draw_texture_rect(texture,destination,false,Color(foliage_tint,opacity))
 
 func _paint_feathers(canvas:CanvasItem) -> void:
 	if feather!=null:

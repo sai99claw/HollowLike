@@ -1,7 +1,8 @@
 extends RefCounted
 const EdgeSource=preload("res://scripts/biome_art_v21.gd")
-const ROOT:=Color("211626")
-const MOSS:=Color("39402f")
+const ROCK=preload("res://assets/v76/near-stone.webp")
+const ROOT=preload("res://assets/v76/near-roots.webp")
+const THORNS=preload("res://assets/v76/near-thorns.webp")
 
 static func shade_fallback(canvas:CanvasItem,blocks:Array,visible:Rect2) -> void:
 	for r:Rect2 in blocks:
@@ -30,20 +31,17 @@ static func plan(layout:Dictionary,solids:Array) -> Array[Dictionary]:
 			var y:float=1.0 if top else -1.0
 			if geometry.any(func(r:Rect2)->bool:return r.has_point(at+Vector2(facing*3,y*3))):continue
 			corners[at]=true
-			var tip:float=random.randf_range(15,35)*facing
-			var points:=PackedVector2Array([Vector2(-11*facing,0),Vector2(4*facing,-10*y),Vector2(tip,-2*y),Vector2(tip*.69,11*y),Vector2(1,19*y),Vector2(-8*facing,9*y)])
-			result.append({"at":at,"points":points,"color":ROOT.lerp(MOSS,.25 if top else 0.0),"sway":false})
+			var extent:float=random.randf_range(23,43)
+			var rect:=Rect2(at-Vector2(extent*.5,extent*(.65 if top else .25)),Vector2(extent,extent))
+			result.append({"at":at,"rect":rect,"art":ROCK if top else ROOT,"sway":false})
 		var x:float=span.x+random.randf_range(18,37)
 		while x<span.y-13:
 			var at:=Vector2(x,edge["at"])
 			if _allowed(at,reserved):
 				var extent:float=random.randf_range(5,14) if top else random.randf_range(25,60)
-				var lean:float=random.randf_range(-10,10)
 				at.y+=random.randf_range(-3,2) if top else 0.0
-				var points:=PackedVector2Array([Vector2(-12,2),Vector2(-6,-4),Vector2(lean,-extent),Vector2(lean+6,-extent*.38),Vector2(12,2)]) if top else PackedVector2Array([Vector2(-8,-5),Vector2(8,-4),Vector2(lean+5,extent*.45),Vector2(lean,extent),Vector2(lean-3,extent*.57),Vector2(-5,extent*.27)])
-				result.append({"at":at,"points":points,"color":MOSS if top else ROOT,"sway":not top})
-				if top and random.randf()<.26:
-					result.append({"at":at+Vector2(3,-3),"points":PackedVector2Array([Vector2(-6,0),Vector2(-3,-4),Vector2(2,-6),Vector2(6,-1),Vector2(1,1)]),"color":Color("d6a05b"),"sway":false})
+				var rect:=Rect2(at-Vector2(extent*.62,extent if top else 0.0),Vector2(extent*1.24,extent))
+				result.append({"at":at,"rect":rect,"art":THORNS if top else ROOT,"sway":not top})
 			x+=random.randf_range(40,90)
 	return result
 
@@ -55,12 +53,4 @@ static func draw(canvas:CanvasItem,shapes:Array,visible:Rect2) -> void:
 	for shape:Dictionary in shapes:
 		var at:Vector2=shape["at"]
 		if visible.has_area() and not active.has_point(at):continue
-		var points:PackedVector2Array=shape["points"].duplicate()
-		if Geometry2D.triangulate_polygon(points).is_empty():
-			points=Geometry2D.convex_hull(points)
-			points.resize(points.size()-1)
-		var colors:=PackedColorArray()
-		for i in points.size():
-			colors.append(Color(shape["color"],clampf(points[i].y/55.0,0.0,1.0) if shape["sway"] else 0.0))
-			points[i]+=at
-		canvas.draw_polygon(points,colors)
+		canvas.draw_texture_rect(shape["art"],shape["rect"],false,Color(1,1,1,1.0 if shape["sway"] else .1))

@@ -37,9 +37,12 @@ static func radius(stone:Dictionary) -> float:
 static func center(stone:Dictionary) -> Vector2:
 	return Vector2(stone["pos"])-Vector2(0,radius(stone))
 
-static func draw(canvas:CanvasItem,stone:Dictionary,biome:String) -> void:
+static func draw(canvas:CanvasItem,stone:Dictionary,biome:String,base:Transform2D=Transform2D.IDENTITY) -> void:
 	var art:Dictionary=LARGE_ART if stone["large"] else SMALL_ART
-	canvas.draw_texture_rect(art[biome],body(stone),false,Color("fff2c5") if float(stone["hurt"])>0 else Color.WHITE)
+	var extent:Vector2=size(stone)
+	canvas.draw_set_transform_matrix(base*Transform2D(float(stone.get("rotation",0)),center(stone)))
+	canvas.draw_texture_rect(art[biome],Rect2(-extent*.5,extent),false,Color("fff2c5") if float(stone["hurt"])>0 else Color.WHITE)
+	canvas.draw_set_transform_matrix(base)
 
 static func spawn(layout:Dictionary,surfaces:Array,solids:Array,avoid:Array) -> Array[Dictionary]:
 	var result:Array[Dictionary]=[]
@@ -91,6 +94,7 @@ static func launch(stone:Dictionary,direction:Vector2,attack_damage:float) -> vo
 	var speed:float=520.0 if stone["large"] else 690.0
 	var lift:float=205.0 if absf(direction.y)<.5 else 0.0
 	stone["vel"]=direction.normalized()*speed-Vector2(0,lift)
+	stone["angular_speed"]=Vector2(stone["vel"]).x/radius(stone)
 	stone["asleep"]=false
 	stone["hurt"]=.16
 	stone["hits"]={}
@@ -101,6 +105,7 @@ static func step(stone:Dictionary,delta:float,world:Array) -> PackedVector2Array
 	vel.y=minf(850.0,vel.y+850.0*delta)
 	var at:Vector2=center(stone)
 	var path:=PackedVector2Array([at])
+	var start_x:float=at.x
 	var r:float=radius(stone)
 	var remaining:float=delta
 	var grounded:bool=false
@@ -134,6 +139,10 @@ static func step(stone:Dictionary,delta:float,world:Array) -> PackedVector2Array
 		vel=Vector2.ZERO
 		stone["asleep"]=true
 		stone["damage"]=0.0
+	var angular:float=vel.x/r if grounded else float(stone.get("angular_speed",0))
+	var roll:float=(at.x-start_x)/r if grounded else angular*delta
+	stone["rotation"]=fposmod(float(stone.get("rotation",0))+roll,TAU)
+	stone["angular_speed"]=angular
 	stone["pos"]=at+Vector2(0,r)
 	stone["vel"]=vel
 	return path

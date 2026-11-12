@@ -15,17 +15,14 @@ func run() -> void:
 	for i in 4:
 		check(Burst.frame_at((i+.5)*.05,Burst.IMPACT_DURATION)==i,"Feathers visit all four authored spray poses")
 	check(Burst.frame_at(.20,Burst.IMPACT_DURATION)==-1,"The feather spray expires after 200 ms")
-	var crescent=preload("res://scripts/clean_crescent_v39.gd")
-	var scale:Vector2=crescent.pose(Vector2.ZERO,0,1475).get_scale().abs()
-	check(scale.is_equal_approx(Vector2(.85,1.20)) and Hit.CRESCENT_DURATION_USEC==125000,"Crescent is narrower, longer and lasts 1/8 second")
+	check(Hit.straight_extent(1280,1.0)==Vector2(1280,24) and Hit.straight_extent(1280,2.0)==Vector2(640,12),"Impact slash is double length at one full screen width")
 	var feedback:=Feedback.new();root.add_child(feedback)
-	for i in 10:feedback.hit({},Vector2(500,300),Vector2.RIGHT,"quick",false)
+	for i in 10:feedback.hit({},Vector2(500,300),Vector2.RIGHT)
 	var angles:Dictionary={}
 	for f:Dictionary in feedback.flashes:
-		angles[snappedf(f["angle"],.001)]=true
+		angles[snappedf(f["straight_angle"],.001)]=true
 		check(Vector2(f["dir"]).is_equal_approx(Vector2.RIGHT),"Feathers spray through the target in the strike direction")
-		check(is_equal_approx(f["length"],1280.0/3),"Crescent long axis is one-third screen width")
-		check(absf(angle_difference(f["angle"],0))<=.241,"Crescent angle jitter stays restrained")
+		check(absf(angle_difference(f["straight_angle"],0))<=.561,"Slash angle jitter stays restrained")
 	check(angles.size()>1 and feedback.bursts.is_empty(),"Hits vary angle without emitting old enemy-body ghost copies")
 	feedback.step(.26);check(feedback.flashes.is_empty(),"Transient VFX expire rather than accumulating")
 	for biome:String in ["underground","trunk","sky"]:
@@ -59,12 +56,12 @@ func run() -> void:
 	target["pos"]+=moved_box.get_center()-game._enemy_body_box(target).get_center()
 	game.combat_feedback.clear()
 	game._process_player_attack()
-	check(game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["straight"] and not game.combat_feedback.flashes[0]["crescent"],"An ordinary strike ejects feathers without layering the old crescent")
+	check(game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0].has("straight_angle"),"An ordinary strike triggers the shared straight slash and feathers")
 	var flash:Dictionary=game.combat_feedback.flashes[0]
 	check(flash["at"].is_equal_approx(Feedback.impact_center(target,Vector2.ZERO)),"Straight strike is centered on the target sprite")
 	var variations:Dictionary={}
 	for i in 12:
-		feedback.hit({},Vector2(90,40),Vector2.RIGHT,"quick",false,false,true)
+		feedback.hit({},Vector2(90,40),Vector2.RIGHT)
 		var angle:float=feedback.flashes.back()["straight_angle"]
 		variations[snappedf(angle,.005)]=true
 		check(absf(angle)<=.561,"Impact rotates around the hit direction within its intended arc")

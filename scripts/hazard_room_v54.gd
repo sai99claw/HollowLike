@@ -127,8 +127,9 @@ static func perimeter(size:Vector2,doors:Dictionary,tile:float,door_width:int,ti
 	return result
 
 static func draw_spikes(canvas:CanvasItem,rect:Rect2) -> void:
-	var count:int=maxi(1,roundi(rect.size.x/16))
+	var art:Texture2D=preload("res://scripts/monster_design.gd").texture_for("moss_thorns")
+	if art==null:return
+	var count:int=maxi(1,roundi(rect.size.x/32.0))
 	var width:float=rect.size.x/count
 	for i in count:
-		var at:=Vector2(rect.position.x+i*width,rect.end.y)
-		canvas.draw_colored_polygon(PackedVector2Array([at,at+Vector2(width*.5,-rect.size.y),at+Vector2(width,0)]),Color("c7d4dc"))
+		canvas.draw_texture_rect(art,Rect2(rect.position+Vector2(width*i,0),Vector2(width,rect.size.y)),false,Color("c8c6da"))
