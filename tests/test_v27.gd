@@ -53,7 +53,7 @@ func run() -> void:
 	reset(game);game._dash_pressed();game._update_player(.08);check(is_equal_approx(game.p["pos"].x-400,650*.08*1.2),"Single C travel distance uses current1.2x base (20% shorter than v27)")
 	reset(game);game.p_attack.begin({"kind":"pierce","dir":Vector2.RIGHT,"windup":0.0,"active":.24,"recovery":.16});game.p_attack.phase="active";game.p["dash_dir"]=Vector2.RIGHT;game.p["dash_t"]=.24;game._update_player(.08);check(is_equal_approx(game.p["pos"].x-400,940*.08*1.2),"Double C horizontal travel distance uses current1.2x base (20% shorter than v27)")
 	for mode:String in ["rogue","musou"]:
-		reset(game);game.mode=mode;game.p["hp"]=5;game._hurt_player(1,Vector2(300,500));check(is_equal_approx(game.p["invul"],.55*1.5 if mode=="rogue" else 2.0),"Damage protection preserves Roguelike and uses two-second dream protection: "+mode)
+		reset(game);game.mode=mode;game.p["hp"]=5;game.p["shield_cells"]=0;game._hurt_player(1,Vector2(300,500));check(is_equal_approx(game.p["invul"],.55*1.5 if mode=="rogue" else 2.0),"Damage protection preserves Roguelike and uses two-second dream protection: "+mode)
 	reset(game);game.p["jumps"]=1;game._set_action("jump",true);game._update_player(.01);check(game.p["jumps"]==2 and game.p["flap_left"]>.25,"Actual double jump starts one wing flap")
 	game._set_action("jump",false);game._update_player(.4);check(game.p["flap_left"]==0,"Wing flap stops after one0.32second cycle")
 	check(preload("res://scripts/double_jump_v27.gd").texture()!=null,"New four-frame pigeon wing animation imports")

@@ -103,7 +103,7 @@ func run() -> void:
 	scene._emit_weapon(Vector2(500,475),Vector2.RIGHT,Combat.attack("linear",{"speed":2500,"range":1000}),true);scene._update_projectiles(.16)
 	check(target["hp"]==99 and scene.projectiles.is_empty(),"Fast nonpiercing shot hits crossed body instead of tunneling")
 	# Locked trap placement, arm delay, effective-hit counting and expiry.
-	scene.p_attack.cancel();scene.platforms.assign([Rect2(0,1050,1500,70)]);scene.hazards.clear();scene.p["pos"]=Vector2(500,1050);scene.p["hp"]=100;scene.p["invul"]=0;scene.p["shield"]=0
+	scene.p_attack.cancel();scene.platforms.assign([Rect2(0,1050,1500,70)]);scene.hazards.clear();scene.p["pos"]=Vector2(500,1050);scene.p["hp"]=100;scene.p["invul"]=0;scene.p["shield"]=0;scene.p["shield_cells"]=0
 	var trap:Dictionary=Combat.attack("trap",{"target":Vector2(500,1050),"size":50,"max_hits":2,"hit_interval":.7,"arming_time":.5,"damage":2,"lifetime":5})
 	scene._emit_traps(target,trap);scene._update_projectiles(.4)
 	var actual_arming:float=float(scene.hazards[0]["arming_time"])

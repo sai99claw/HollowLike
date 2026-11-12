@@ -39,6 +39,17 @@ func run() -> void:
 	check(near["push_velocity"].x>1000 and game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="feather_charge"),"Ultimate hits outward and uses the dedicated atlas")
 	game.p_attack.cancel()
 	game.enemies.clear()
+	game.p["pos"]=Vector2(550,500)
+	game.p["grounded"]=false
+	game.p["jumps"]=1
+	game.practice_mode=true
+	game._set_action("up",true)
+	game._set_action("jump",true)
+	game._step_player(1.0/120.0)
+	check(not game.p.has("lift_charge") and game.p["jumps"]==2,"An airborne chord does not charge and preserves the ordinary double jump")
+	game._set_action("jump",false)
+	game._set_action("up",false)
+	game._reset_player(Vector2(550,700))
 	game._set_action("up",true)
 	game._set_action("jump",true)
 	for i in 30:game._step_player(1.0/120.0)
@@ -48,13 +59,26 @@ func run() -> void:
 	for i in 122:game._step_player(1.0/120.0)
 	check(is_equal_approx(game.p["pos"].y,700.0) and is_equal_approx(game.p["lift_charge"],game._lift_threshold()),"Held chord charges at the floor")
 	game._set_action("jump",false)
-	game.keys["right"]=true
+	game._set_action("up",false)
+	check(game.p.get("lift_flying",false),"Releasing the original Up input does not cancel flight")
 	for i in 60:
 		if not game.p.get("lift_flying",false):break
 		game._step_player(1.0/120.0)
-	check(not game.p.get("lift_flying",false) and is_equal_approx(game.p["pos"].x,550.0),"Lift ignores horizontal steering and stops at the ceiling")
+	check(not game.p.get("lift_flying",false) and is_equal_approx(game.p["pos"].x,550.0),"Uninterrupted lift continues vertically to the ceiling")
 	check(game.p["pos"].y>=352.0,"Swept lift never crosses the ceiling")
 	check(game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="vertical_launch"),"Lift launches the authored exhaust")
+	for action:String in ["left","right","jump","dash","attack"]:
+		game._clear_keys()
+		game._reset_player(Vector2(550,700))
+		game.keys["up"]=true
+		game.p["lift_charge"]=game._lift_threshold()
+		game._release_lift()
+		check(game.p.get("lift_flying",false),"Fixture reaches the launch state")
+		game._set_action(action,true)
+		check(not game.p.get("lift_flying",false) and game.keys[action],"Fresh "+action+" cancels flight and is accepted")
+		if action=="attack":check(game.p_attack.is_active(),"The cancel press immediately executes the attack")
+		if action=="dash":check(game.p["dash_t"]>0,"The cancel press immediately starts the dash")
+		game._set_action(action,false)
 	var speed:float=game._movement_factor()
 	var charge:float=game._charge_threshold()
 	var attack:Dictionary=game._primary_definition({"dir":"right","charged":false})

@@ -127,7 +127,7 @@ func run() -> void:
 	scene.room=saved_room;scene.layout=saved_layout
 	check(healing_props>15 and healing_props<50,"Full-heal destructible appearance stays near one percent")
 	# Runtime armor and downslash parry bounce, preserving an active charge.
-	scene.p_attack.cancel();scene.strong_slots.clear();scene.p["hp"]=5;scene.p["invul"]=0;scene.p["shield"]=0
+	scene.p_attack.cancel();scene.strong_slots.clear();scene.p["hp"]=5;scene.p["invul"]=0;scene.p["shield"]=0;scene.p["shield_cells"]=0
 	scene.weapon_index=2;scene._begin_primary({"dir":"right","charged":true});scene.p_attack.tick(float(scene.p_attack.attack["windup"])+.01)
 	var phase:String=scene.p_attack.phase;scene._hurt_player(2,scene.p["pos"]+Vector2(50,0))
 	check(scene.p["hp"]==3 and scene.p_attack.phase==phase,"Charged super armor takes damage without attack cancellation")
@@ -148,12 +148,12 @@ func run() -> void:
 	var home_gold:int=int(scene.meta["coins"])
 	scene._give_drop("coin",11);scene._give_drop("rune",0);scene._give_drop("item",0)
 	check(int(scene.meta["coins"])==home_gold and scene.run_coins==11,"Ordinary pickup does not bank carried gold")
-	scene.p["hp"]=1;scene.p["invul"]=0;scene._hurt_player(2,Vector2(550,1050));check(scene.life_event["kind"]=="injury","First zero HP starts injury instead of room reset")
+	scene.p["hp"]=1;scene.p["shield_cells"]=0;scene.p["invul"]=0;scene._hurt_player(2,Vector2(550,1050));check(scene.life_event["kind"]=="injury","First zero HP starts injury instead of room reset")
 	for step in 240:
 		if scene.life_event.get("kind","") in ["injury","death"]:scene._update_life_event(1.0/60)
 	check(scene.injured and scene.p["max_hp"]==3 and scene.p["max_energy"]==4 and scene.current_room==start,"Injury keeps player in room with two lowered caps")
 	scene._ui_action("first_aid",null);scene._close_panel();check(not scene.injured and scene.p["max_hp"]==5 and scene.p["max_energy"]==6,"Preparation first aid removes injury")
-	scene.injured=true;scene._sync_vitals();scene.p["hp"]=1;scene.p["invul"]=0;scene._hurt_player(2,Vector2(550,1050))
+	scene.injured=true;scene._sync_vitals();scene.p["hp"]=1;scene.p["shield_cells"]=0;scene.p["invul"]=0;scene._hurt_player(2,Vector2(550,1050))
 	for step in 240:
 		if scene.life_event.get("kind","") in ["injury","death"]:scene._update_life_event(1.0/60)
 	check(scene.life_event["kind"]=="await_choice" and not scene.feather.is_empty(),"Second zero HP leaves cache and asks for one rune")

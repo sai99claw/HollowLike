@@ -12,6 +12,7 @@ func check(ok:bool,message:String) -> void:
 	if not ok:failures.append(message);push_error(message)
 func reset(g) -> void:
 	g._close_panel();g.life_event={};g.hitstop=0;g.shake=0;g._clear_keys();g.p_attack.cancel();g._reset_player(Vector2(700,1000))
+	g.p["shield_cells"]=0
 	g.enemies.clear();g.props.clear();g.doors.clear();g.projectiles.clear();g.hazards.clear();g.effects.clear();g.drops.clear();g.solids.clear();g.platforms.clear();g.combat_feedback.clear()
 	g.layout={"size":Vector2(2000,1500),"floor_y":1200.0,"tile_size":96};g.room_cooldown=999;g.world_speed=1;g.freeze_timer=0;g.camera_pos=g._camera_target(g.p["pos"])
 func enemy(g,biome:String,index:int,elite:bool=false) -> Dictionary:

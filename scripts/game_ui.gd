@@ -13,6 +13,9 @@ const GOLD := Color("e8c381")
 const Icons=preload("res://scripts/ui_asset_art.gd")
 const Inventory=preload("res://scripts/inventory_view.gd")
 const Cells=preload("res://scripts/vital_cells.gd")
+const ENERGY_EMPTY=preload("res://assets/v79/energy-feather-empty.webp")
+const ENERGY_FULL=preload("res://assets/v79/energy-feather-full.webp")
+const FeatherCollection=preload("res://scripts/feather_collection_v79.gd")
 
 var ui_root: Control
 var header: PanelContainer
@@ -23,10 +26,13 @@ var injury_art:TextureRect
 var phase_art:TextureRect
 var phase_bar: ProgressBar
 var dream_row:HBoxContainer
-var dream_label:Label
-var dream_cells:Array[ColorRect]=[]
+var dream_cells:Array[TextureRect]=[]
 var health_cells:HBoxContainer
 var energy_cells:HBoxContainer
+var shield_cells:HBoxContainer
+var shield_row:HBoxContainer
+var timed_effects_label:Label
+var feather_collection:=FeatherCollection.new()
 var ultimate_hint:Label
 var lift_hint:Label
 var message_label: Label
@@ -122,6 +128,7 @@ func _build_header() -> void:
 	health_background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	health_background.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	ui_root.add_child(health_background)
+	add_child(feather_collection)
 	header = PanelContainer.new()
 	header.name = "CompactVitals"
 	header.position = Vector2(20,16)
@@ -149,7 +156,9 @@ func _build_header() -> void:
 	vitals.add_child(energy_art)
 	energy_cells=Cells.new()
 	energy_cells.name="EnergyCells"
-	energy_cells.filled_color=MINT
+	energy_cells.empty_texture=ENERGY_EMPTY
+	energy_cells.full_texture=ENERGY_FULL
+	energy_cells.cell_size=Vector2(15,19)
 	vitals.add_child(energy_cells)
 	coin_art=_icon("coin",20)
 	coin_art.mouse_filter=Control.MOUSE_FILTER_PASS
@@ -159,6 +168,23 @@ func _build_header() -> void:
 	ultimate_hint=_label("",12,GOLD)
 	ultimate_hint.visible=false
 	vitals.add_child(ultimate_hint)
+	shield_row=HBoxContainer.new()
+	shield_row.name="Shield"
+	shield_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	main.add_child(shield_row)
+	var shield_art:=_icon("strong_orbit_shield",18)
+	shield_art.tooltip_text="護盾"
+	shield_row.add_child(shield_art)
+	shield_cells=Cells.new()
+	shield_cells.name="ShieldCells"
+	shield_cells.filled_color=Color("8acbff")
+	shield_cells.cell_size=Vector2(12,10)
+	shield_row.add_child(shield_cells)
+	timed_effects_label=_label("",13,Color("d5e9ff"))
+	timed_effects_label.name="TimedEffects"
+	timed_effects_label.add_theme_color_override("font_outline_color",Color("15101e"))
+	timed_effects_label.add_theme_constant_override("outline_size",5)
+	main.add_child(timed_effects_label)
 	lift_hint=_label("",12,MINT)
 	lift_hint.visible=false
 	main.add_child(lift_hint)
@@ -209,13 +235,14 @@ func _build_header() -> void:
 	cells.add_theme_constant_override("separation",3)
 	dream_row.add_child(cells)
 	for i in 20:
-		var cell:=ColorRect.new()
-		cell.custom_minimum_size=Vector2(7,6)
+		var cell:=TextureRect.new()
+		cell.texture=ENERGY_EMPTY
+		cell.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		cell.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		cell.custom_minimum_size=Vector2(9,11)
 		cell.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		cells.add_child(cell)
 		dream_cells.append(cell)
-	dream_label=_label("",12,GOLD)
-	dream_row.add_child(dream_label)
 	var tools := HBoxContainer.new()
 	edge_tools=tools
 	tools.position = Vector2(1186,13)
@@ -329,6 +356,16 @@ func _build_touch() -> void:
 	touch_controls.action_changed.connect(func(action:String,pressed:bool)->void:touch_action.emit(action,pressed))
 
 
+func update_shield_hud(amount:int,capacity:int,timed:PackedStringArray,show_combat:bool) -> void:
+	shield_row.visible=show_combat
+	shield_cells.set_state(amount,capacity)
+	timed_effects_label.visible=show_combat and not timed.is_empty()
+	timed_effects_label.text="\n".join(timed)
+	feather_collection.visible=show_combat
+
+func energy_collection_target() -> Vector2:
+	return energy_cells.target_center()
+
 func update_hud(info: Dictionary) -> void:
 	setup()
 	var hp:int=maxi(0,int(info.get("hp",5)))
@@ -354,10 +391,7 @@ func update_hud(info: Dictionary) -> void:
 	dream_row.visible=mode_value in ["musou","無雙","無雙夢境"]
 	if dream_row.visible:
 		var amount:int=clampi(int(info.get("dream_energy",0)),0,20)
-		var rage_left:float=float(info.get("dream_rage",0))
-		dream_label.visible=rage_left>0
-		dream_label.text="×2  %ds"%ceili(rage_left) if rage_left>0 else ""
-		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
+		for i in dream_cells.size():dream_cells[i].texture=ENERGY_FULL if i<amount else ENERGY_EMPTY
 	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
 	health_background.visible=not home and header.visible
 	ultimate_hint.visible=not home and energy>=max_energy

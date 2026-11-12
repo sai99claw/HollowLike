@@ -72,10 +72,13 @@ const STRONG_RUNES:Array[Dictionary]=[
 	{"id":"motion_energy","name":"行風","effect":"motion_energy","value":1.0,"desc":"實際移動累積距離回復能量","description":"實際移動累積距離回復能量","icon":"E","color":Color("a3eadc"),"strong":true},
 	{"id":"bloodblade","name":"汲命","effect":"lifesteal","value":.12,"desc":"有效命中時12%機率回復1格生命","description":"有效命中時12%機率回復1格生命","icon":"♥","color":Color("efa6b5"),"strong":true},
 	{"id":"heartplus","name":"豐羽","effect":"max_hp","value":1.0,"desc":"最大生命 +1","description":"最大生命 +1","icon":"♥+","color":Color("f3c9a4"),"strong":true},
-	{"id":"single_pierce","name":"穿風","effect":"single_pierce","value":1.0,"desc":"單按衝刺直接穿刺","description":"單按衝刺直接穿刺","icon":"»","color":Color("c9e9ff"),"strong":true},
+	{"id":"single_pierce","name":"穿風","effect":"single_pierce","value":1.0,"desc":"雙按衝刺可直接使用穿刺技能","description":"雙按衝刺可直接使用穿刺技能","icon":"»","color":Color("c9e9ff"),"strong":true},
 	{"id":"held_flight","name":"浮翼","effect":"held_flight","value":1.0,"desc":"長按跳躍飛行","description":"長按跳躍飛行","icon":"↑","color":Color("d5c5ff"),"strong":true},
 	{"id":"poison_trail","name":"毒羽","effect":"poison_trail","value":1.0,"desc":"移動留下毒氣三秒，每秒扣一血","description":"移動留下毒氣三秒，每秒扣一血","icon":"◇","color":Color("a1d68a"),"strong":true},
-	{"id":"steady_energy","name":"蓄風","effect":"energy_regen","value":.5,"desc":"每兩秒回復一格能量","description":"每兩秒回復一格能量","icon":"E","color":Color("a3eadc"),"strong":true}
+	{"id":"steady_energy","name":"蓄風","effect":"energy_regen","value":.5,"desc":"每兩秒回復一格能量","description":"每兩秒回復一格能量","icon":"E","color":Color("a3eadc"),"strong":true},
+	{"id":"instant_strike","name":"無間刃","effect":"instant_strike","value":1.0,"desc":"每次按下普攻立即斬擊，無間隔","description":"每次按下普攻立即斬擊，無間隔","icon":"»","color":Color("d4fcff"),"strong":true},
+	{"id":"far_feather","name":"天涯羽","effect":"reach_mult","value":1.0,"desc":"攻擊距離 ×2","description":"攻擊距離 ×2","icon":"↔","color":Color("e2ccff"),"strong":true},
+	{"id":"shield_slot","name":"磐羽盾","effect":"max_shield","value":1.0,"desc":"最大護盾 +1 格","description":"最大護盾 +1 格","icon":"◇","color":Color("a9d9ff"),"strong":true}
 ]
 static func all_runes() -> Array:
 	return RUNES+STRONG_RUNES

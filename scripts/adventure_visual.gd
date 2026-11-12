@@ -24,7 +24,7 @@ static func portal_mote(at:Vector2,time:float,index:int) -> Dictionary:
 	var radius:float=(160+fposmod(index*79.0,300))*pow(1-t,.85)
 	var center:Vector2=at-Vector2(0,38)
 	return {"pos":center+Vector2(cos(angle),sin(angle)*.7)*radius,"alpha":sin(t*PI)*.24,"radius":radius,"progress":t}
-static func portal(c:CanvasItem,at:Vector2,color:Color,time:float,base:Transform2D,_biome:String,direction:String="left",opening:float=64,reduced:bool=false) -> void:
+static func portal(c:CanvasItem,at:Vector2,color:Color,time:float,base:Transform2D,_biome:String,direction:String="left",opening:float=64,reduced:bool=false,fit_opening:bool=false) -> void:
 	var center:Vector2=at-Vector2(0,opening*.5) if direction in ["left","right"] else at
 	if portal_dot==null:
 		var fade:=Gradient.new()
@@ -41,7 +41,13 @@ static func portal(c:CanvasItem,at:Vector2,color:Color,time:float,base:Transform
 		var tint:Color=color.lerp(Color.WHITE,.25);tint.a=float(mote["alpha"])
 		var radius:float=1+fposmod(i*.37,1.1)
 		var extent:float=radius+1.8
-		c.draw_texture_rect(portal_dot,Rect2(Vector2(mote["pos"])-Vector2.ONE*extent,Vector2.ONE*(extent*2)),false,tint)
+		var position:Vector2=mote["pos"]
+		if fit_opening:
+			var spread:Vector2=(position-center)/460.0
+			var half_height:float=opening*.5-extent
+			var shape:=Vector2(half_height*.40,half_height/.7) if direction in ["left","right"] else Vector2(half_height,half_height*.40/.7)
+			position=center+spread*shape
+		c.draw_texture_rect(portal_dot,Rect2(position-Vector2.ONE*extent,Vector2.ONE*(extent*2)),false,tint)
 	c.draw_set_transform_matrix(base)
 
 static func dash(c:CanvasItem,at:Vector2,dir:Vector2,time:float,base:Transform2D,slam:bool=false) -> void:
@@ -79,7 +85,7 @@ static func player_action(c:CanvasItem,anim:String,attack:Dictionary,progress:fl
 	draw_action(c,row,index,at,face,base,tint,scale_value)
 	return true
 
-static func draw_action(c:CanvasItem,row:int,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0) -> void:
+static func draw_action(c:CanvasItem,row:int,index:int,at:Vector2,face:float,base:Transform2D,tint:Color,scale_value:float=1.0,flip_y:bool=false) -> void:
 	if actions==null:actions=load("res://assets/adventure_v08/pigeon_actions.png")
 	var raw:Array=ACTION_REGIONS[row][index]
 	var region:=Rect2(raw[0],raw[1],raw[2],raw[3])
@@ -91,7 +97,7 @@ static func draw_action(c:CanvasItem,row:int,index:int,at:Vector2,face:float,bas
 		pivot=region.size*.5
 		anchor-=WIND_BODY_CENTER
 	elif row==3:pivot.x=region.size.x*.6
-	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,anchor))
+	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,-factor if flip_y else factor),0,anchor))
 	c.draw_texture_rect_region(actions,Rect2(-pivot,region.size),region,tint)
 	c.draw_set_transform_matrix(base)
 

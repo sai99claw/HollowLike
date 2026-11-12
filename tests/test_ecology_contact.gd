@@ -40,7 +40,7 @@ func run() -> void:
 	var en:Dictionary=scene.enemies.filter(func(value:Dictionary)->bool:return value.get("contact_damage",0)>0)[0]
 	scene.layout["size"]=Vector2(1500,1120);scene.layout["floor_y"]=1050;scene.solids.clear();scene.platforms.assign([Rect2(0,1050,1500,70)])
 	scene.enemies.assign([en]);en["pos"]=Vector2(510,1050);en["vel"]=Vector2.ZERO;en["attack"].cancel()
-	scene.p["pos"]=Vector2(500,1050);scene.p["vel"]=Vector2.ZERO;scene.p["invul"]=0;scene.p["shield"]=0
+	scene.p["pos"]=Vector2(500,1050);scene.p["vel"]=Vector2.ZERO;scene.p["invul"]=0;scene.p["shield"]=0;scene.p["shield_cells"]=0
 	scene.camera_pos=Vector2(0,566);scene.view_rect=Rect2(0,566,1500,720)
 	scene.p["hp"]=5;scene.freeze_timer=2
 	scene._update_enemies(0)

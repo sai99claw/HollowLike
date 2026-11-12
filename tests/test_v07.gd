@@ -51,7 +51,7 @@ func run() -> void:
 		scene._set_action("right",true);scene._set_action("jump",true);scene._set_action("dash",true);scene._set_action("sub",true)
 		scene.bag_items["2"]=1;scene._use_item(2);scene._select_primary((weapon+1)%3);scene._update_player(.02)
 		check(scene.p_attack.attack_id==id and scene.p_attack.is_active() and scene.p["pos"].x>700,"Active charge permits movement while keeping the original action")
-		scene.p["invul"]=0;scene.p["shield"]=0;scene.p["hp"]=5;scene._hurt_player(2,Vector2(650,1050))
+		scene.p["invul"]=0;scene.p["shield"]=0;scene.p["shield_cells"]=0;scene.p["hp"]=5;scene._hurt_player(2,Vector2(650,1050))
 		check(scene.p_attack.is_active() and scene.p["hp"]==3,"Active armor takes damage without flinching")
 		scene.p_attack.tick(1);check(not scene.p_attack.is_busy(),"The complete release finishes at one second without extra recovery")
 	# Isolate enemy feedback from the newly introduced cuttable room grass.

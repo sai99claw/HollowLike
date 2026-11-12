@@ -56,6 +56,7 @@ func run() -> void:
 	var definition:Dictionary=Combat.attack("trap",{"hazard_visual_id":"pollen_flower","size":60,"damage":1,"max_hits":3,"arming_time":.8,"hit_interval":1.0})
 	game._settle_trap({"pos":Vector2(700,1042),"radius":8,"definition":definition});check(game.hazards.size()==1,"Thrown trap plants on a real support")
 	var trap:Dictionary=game.hazards[0];var planted:Vector2=trap["pos"]
+	game.p["shield_cells"]=0
 	game._update_hazards(.79);check(game.p["hp"]==5 and Trap.frame_index(trap)==4,"Installation completes through five visible poses before any damage")
 	game._update_hazards(.02);check(game.p["hp"]==4 and Trap.armed(trap),"Only fully installed trap deals damage")
 	check(Trap.body_box(trap).end.y<=planted.y+.1 and Trap.body_box(trap).size.x<70,"Trap damage occupies its compact solid artwork, not a diffuse expanding aura")

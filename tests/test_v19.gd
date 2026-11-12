@@ -44,7 +44,7 @@ func run() -> void:
 	game._set_action("attack",true);game.p_attack.tick(.5);game.charge_timer=.7;game.keys["right"]=true;game._update_player(.02);game._set_action("jump",true);game._update_player(.02)
 	check(game.charge_timer==.7,"Moving and jumping do not interrupt charge")
 	game.clock=10;game._dash_pressed();check(game.charge_timer==.7 and game._key("attack"),"Single C preserves charge and held input")
-	game.p["invul"]=0;game._hurt_player(1,Vector2(800,1050));check(game.charge_timer==0 and not game._key("attack"),"Actual damage interrupts charge")
+	game.p["invul"]=0;game.p["shield_cells"]=0;game._hurt_player(1,Vector2(800,1050));check(game.charge_timer==0 and not game._key("attack"),"Actual damage interrupts charge")
 	clear(game);game.charge_timer=.8;game.bag_weapons.assign([Data.secondary_attack(0)]);game._begin_secondary();check(game.charge_timer==0,"Casting a sidearm interrupts charge")
 	clear(game);for i in 300:game._update_idle(1.0/60)
 	check(game.idle_time>4.99,"Five seconds standing accumulates the resting timer")

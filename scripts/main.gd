@@ -173,6 +173,10 @@ var rng = RandomNumberGenerator.new()
 var p_attack = Attack.new()
 var keys: Dictionary = {}
 var jump_request: bool = false
+const SHIELD_BASE_CELLS:int=5
+const SHIELD_QUIET_SECONDS:float=6.0
+const SHIELD_RECHARGE_INTERVAL:float=1.0
+const PORTAL_HEIGHT:float=3.0*96.0
 var last_dash_time: float = -10.0
 var dash_chain_open: bool = false
 var pending_attack: Dictionary = {}
@@ -352,6 +356,11 @@ func _reset_player(at: Vector2) -> void:
 	player_slashes.clear()
 	combo_index=0
 	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
+	p["max_shield"]=SHIELD_BASE_CELLS+int(_rune_effect("max_shield"))
+	p["shield_cells"]=p["max_shield"]
+	p["shield_recharge_left"]=0.0
+	dash_chain_open=false
+	if ui!=null:ui.feather_collection.clear()
 	p_attack.cancel()
 	if walker!=null:walker.reset_turn(float(p["face"]))
 	drop_through_timer=0.0
@@ -488,14 +497,18 @@ func _set_action(action: String, pressed: bool) -> void:
 	if float(p.get("heavy_land_left",0))>0:
 		keys[action]=pressed if action in ["left","right","up","down"] else false
 		return
+	var cancelled_lift:bool=p.get("lift_flying",false) and pressed and not _key(action) and action in ["left","right","up","down","jump","dash","attack","sub","heal","ultimate","interact"]
+	if cancelled_lift:
+		p.erase("lift_flying")
+		p["vel"]=Vector2.ZERO
 	if screen=="hub" and pressed and action in ["jump","dash","attack"]:home_sleeping=false;home_wake_left=0
 	if action=="jump":
-		if pressed and not _key("jump"):p["jump_buffer_left"]=0.0 if screen=="game" and _key("up") else .12;p["jump_released"]=false
+		if pressed and not _key("jump"):p["jump_buffer_left"]=0.0 if _key("up") and _can_start_lift() else .12;p["jump_released"]=false
 		elif not pressed:p["jump_released"]=true
 	if _action_locked() and action in (["attack","sub","interact","up"] if _release_locked() else ["jump","attack","sub","interact","up"]):
 		if pressed and action in ["attack","sub"]:_reject_attack("locked")
 		keys[action]=false;charge_timer=0;return
-	if action=="attack" and pressed and screen in ["game","hub"] and (p_attack.is_busy() or _ordinary_slash_playing() or float(p.get("hurt",0))>0):
+	if action=="attack" and pressed and screen in ["game","hub"] and (float(p.get("hurt",0))>0 or _primary_press_blocked()):
 		# Rejected presses never become a delayed swing or charge.
 		_reject_attack("hurt" if float(p.get("hurt",0))>0 else "busy")
 		keys["attack"]=false;charge_timer=0;pending_attack.clear();return
@@ -503,9 +516,13 @@ func _set_action(action: String, pressed: bool) -> void:
 	keys[action]=pressed
 	if pressed and not was:
 		match action:
-			"jump": jump_request=not (screen=="game" and _key("up"));p["jump_released"]=false
+			"jump":
+				var lift_pressed:bool=_key("up") and _can_start_lift()
+				if lift_pressed:p["lift_charge"]=0.0
+				jump_request=not lift_pressed
+				p["jump_released"]=false
 			"dash":
-				if screen in ["game","hub"]: _dash_pressed()
+				if screen in ["game","hub"]: _dash_pressed(cancelled_lift)
 			"attack":
 				charge_timer=0.0
 				if screen in ["game","hub"]:
@@ -514,7 +531,8 @@ func _set_action(action: String, pressed: bool) -> void:
 				if screen=="game": _begin_secondary()
 			"interact": _show_equipment(0)
 			"up":
-				if not _key("jump"):_interact()
+				if _key("jump") and _can_start_lift():p["lift_charge"]=0.0
+				elif not _key("jump"):_interact()
 			"ultimate":_cast_ultimate()
 	if action=="up" and not pressed:p.erase("lift_charge")
 	if action=="jump" and not pressed and was:
@@ -677,6 +695,8 @@ func _physics_process_profiled_body(delta:float) -> void:
 			var slow_delta:float=minf(delta,room_clear_slow_left)
 			delta-=slow_delta*(1.0-ROOM_CLEAR_WORLD_RATE)
 			room_clear_slow_left-=slow_delta
+			_update_shield(real_delta)
+			ui.feather_collection.step(real_delta,world_transform,ui.energy_collection_target())
 		_update_hit_white(delta)
 	# Physics, pose sampling and VFX share the same frozen game clock.
 	if hitstop>0 and life_event.is_empty():
@@ -903,7 +923,7 @@ func _step_player(delta: float) -> void:
 	if p.get("lift_flying",false):
 		_step_lift(delta)
 		return
-	var preparing_lift:bool=screen=="game" and _key("up") and _key("jump") and not _action_locked() and not _is_healing() and float(p["hurt"])<=0 and float(p.get("dash_t",0))<=0 and not p_attack.is_busy() and not _in_bath()
+	var preparing_lift:bool=p.has("lift_charge") and _key("up") and _key("jump") and _can_start_lift()
 	if preparing_lift:
 		p["lift_charge"]=minf(_lift_threshold(),float(p.get("lift_charge",0))+delta)
 		p["jump_buffer_left"]=0.0
@@ -992,7 +1012,6 @@ func _step_player(delta: float) -> void:
 	p["flight_boosting"]=floating
 	if floating:vel.y=-230.0
 	elif gliding:vel.y=minf(vel.y,PlayerMotion.GLIDE_FALL_SPEED)
-	if preparing_lift and not was_grounded:vel.y=clampf(vel.y,-60.0,48.0)
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
@@ -1058,14 +1077,18 @@ func _step_player(delta: float) -> void:
 	if visual_depth!=null and (dash_contact or (p_attack.is_active() and p_attack.attack.get("kind","")=="pierce")):
 		visual_depth.record_grass_wind(old_pos,pos,draw_clock)
 
+func _can_start_lift() -> bool:
+	return screen=="game" and bool(p["grounded"]) and not _action_locked() and not _is_healing() and float(p["hurt"])<=0 and float(p.get("dash_t",0))<=0 and not p_attack.is_busy() and not _in_bath()
+
 func _lift_threshold() -> float:
 	return LIFT_CHARGE_SECONDS*maxf(.25,1.0-_rune_effect("charge_cut"))
 
 func _release_lift() -> void:
 	var charged:bool=p.has("lift_charge") and float(p["lift_charge"])+.00001>=_lift_threshold()
 	p.erase("lift_charge")
-	if not charged or not _key("up") or _action_locked() or p_attack.is_busy() or float(p["hurt"])>0:return
+	if not charged or not _key("up") or not _can_start_lift():return
 	p["lift_flying"]=true
+	p["lift_age"]=0.0
 	p["recoil_left"]=0.0
 	p["vel"]=Vector2(0,-LIFT_SPEED)
 	p["grounded"]=false
@@ -1078,6 +1101,7 @@ func _release_lift() -> void:
 	_contact_fx("vertical_launch",p["pos"],.48,152.0)
 
 func _step_lift(delta:float) -> void:
+	p["lift_age"]+=delta
 	var motion:Dictionary=Coll.move_body(p["pos"],Vector2(0,-LIFT_SPEED),delta,Vector2(34,42),solids,4)
 	var at:Vector2=motion["pos"]
 	var blocked:bool=float(motion["vel"].y)>=0.0 or at.y<=42.0
@@ -1118,14 +1142,14 @@ func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:floa
 func _restore_ground_movement() -> void:
 	p["jumps"]=0;p["air_dash"]=false
 
-func _dash_pressed() -> void:
+func _dash_pressed(interrupting_lift:bool=false) -> void:
 	if p.get("lift_flying",false):return
 	if float(p.get("heavy_land_left",0))>0 or float(p.get("mantle_left",0))>0:return
 	if float(p.get("knockback_t",0))>0 or not life_event.is_empty():return
-	if _key("up"):return
+	if _key("up") and not interrupting_lift:return
 	if p_attack.is_busy() and p_attack.phase=="active":return
 	var elapsed:float=clock-last_dash_time
-	var second:bool=_rune_effect("single_pierce")>0 or (dash_chain_open and elapsed<=.5 and elapsed>.02)
+	var second:bool=dash_chain_open and elapsed<=.5 and elapsed>=0.0
 	if second:
 		dash_chain_open=false
 		var dir:Vector2=Vector2.DOWN if _key("down") else Vector2(float(p["face"]),0)
@@ -1183,7 +1207,7 @@ func _slam_invulnerable() -> bool:
 	return bool(p.get("slam",false)) or (p_attack.is_busy() and p_attack.attack.get("kind","") in ["pierce","slam"] and p_attack.phase in ["windup","active"])
 
 func _action_locked() -> bool:
-	return p.get("lift_flying",false) or float(p.get("mantle_left",0))>0 or float(p.get("heavy_land_left",0))>0 or _wind_form_active() or _release_locked() or (p_attack.is_active() and p_attack.attack.get("style","")=="heavy") or float(p.get("impact_root",0))>0
+	return p.get("lift_flying",false) or float(p.get("mantle_left",0))>0 or float(p.get("heavy_land_left",0))>0 or _wind_form_active() or _release_locked() or (p_attack.is_active() and p_attack.attack.get("style","")=="heavy" and not p_attack.attack.get("instant_strike",false)) or float(p.get("impact_root",0))>0
 
 func _normal_damage() -> float:
 	return float(_primary_definition({"dir":"right","charged":false,"dash_charge":false})["damage"])
@@ -1193,10 +1217,19 @@ func _ordinary_slash_playing() -> bool:
 	var last:Dictionary=player_slashes.back()
 	return not last["definition"].get("charged",false) and (draw_clock-float(last["start"]))*float(last["definition"].get("animation_rate",1.0))<SlashArt.DURATION
 
+func _primary_press_blocked() -> bool:
+	if _rune_effect("instant_strike")>0:
+		return p_attack.is_busy() and not p_attack.attack.get("instant_strike",false)
+	return p_attack.is_busy() or _ordinary_slash_playing()
+
 func _begin_primary(request:Dictionary) -> void:
-	if not request.get("charged",false) and _ordinary_slash_playing():_reject_attack("busy");return
+	var ordinary:bool=not request.get("charged",false)
+	if ordinary and _primary_press_blocked():_reject_attack("busy");return
 	if _action_locked():_reject_attack("locked");return
 	var def:Dictionary=_primary_definition(request)
+	if ordinary and _rune_effect("instant_strike")>0:
+		p_attack.cancel()
+		def.merge({"instant_strike":true,"active":.001,"recovery":0.0},true)
 	if def.get("charged",false):p["recoil_left"]=0;p["impact_root"]=0
 	if p_attack.begin(def):
 		if not def["charged"] and def["direction"] in ["left","right"]:combo_index=1-int(def["combo"])
@@ -1429,6 +1462,8 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 		visual_juice.flash(contact,impulse,draw_clock)
 		shake=maxf(shake,4.5)
 	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse)
+	if damage>0 and ui!=null and screen=="game":
+		ui.feather_collection.burst(CombatFeedback.impact_center(en,contact),impulse,world_transform,low_effects)
 
 	if not training and rng.randf()<clampf(_rune_effect("lifesteal"),0,1):_restore_vital("hp",1);_contact_fx("lifesteal",p["pos"]-Vector2(0,25))
 	_float(en["pos"]-Vector2(0,55),"%.1f"%damage,color);shake=maxf(shake,2.2)
@@ -1437,8 +1472,26 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 func _hurt_player(amount:float,source:Vector2) -> bool:
 	if lab_mode=="tutorial":return false
 	if _slam_invulnerable() or not life_event.is_empty() or float(p["invul"])>0 or float(p["shield"])>0 or _healing_guard():return false
+	if amount<=0:return false
+	var remaining_damage:int=maxi(1,roundi(amount))
+	var shield_before:int=int(p["shield_cells"])
+	var absorbed:int=mini(shield_before,remaining_damage)
+	remaining_damage-=absorbed
+	p["shield_cells"]=shield_before-absorbed
+	p["shield_recharge_left"]=SHIELD_QUIET_SECONDS
+	var shield_broken:bool=absorbed>0 and int(p["shield_cells"])==0
+	if absorbed>0:
+		var center:Vector2=p["pos"]-Vector2(0,23)
+		p["shield_flash_left"]=.22
+		_effect(center,Color("acddff"),110.0 if shield_broken else 44.0,.45 if shield_broken else .21)
+		shake=maxf(shake,26.0 if shield_broken else 3.0)
+		_sound("parry")
+		if remaining_damage==0:
+			p["invul"]=2.0 if mode=="musou" else .55+_rune_effect("guard")
+			_update_hud()
+			return true
 	p.erase("lift_flying");p.erase("lift_charge")
-	amount=maxi(1,roundi(amount)) if amount>0 else 0
+	amount=remaining_damage
 	charge_timer=0;keys["attack"]=false;idle_time=0
 	p["mantle_left"]=0
 	p["hp"]=maxi(0,int(p["hp"])-int(amount));p["flash_left"]=HIT_WHITE_SECONDS;p["hurt"]=.25;p["invul"]=2.0 if mode=="musou" else (.55+_rune_effect("guard"))*1.5
@@ -1448,7 +1501,7 @@ func _hurt_player(amount:float,source:Vector2) -> bool:
 		if away==0:away=-float(p["face"])
 		p["knockback_t"]=KNOCKBACK_TIME;p["knockback_dir"]=away;p["vel"]=Vector2(away*CONTACT_KNOCKBACK/KNOCKBACK_TIME,-100)
 		p_attack.cancel();pending_attack.clear();jump_request=false;charge_timer=0;heal_timer=0;p["slam"]=false;p["dash_t"]=0
-	hitstop=maxf(hitstop,.045);_float(p["pos"]-Vector2(0,65),"受傷 -%d"%int(amount),Color("ffb0a4"));shake=9;_sound("hurt")
+	hitstop=maxf(hitstop,.045);_float(p["pos"]-Vector2(0,65),"受傷 -%d"%int(amount),Color("ffb0a4"));shake=maxf(shake,9.0);_sound("hurt")
 	if float(p["hp"])<=0:_death()
 	return true
 
@@ -2116,20 +2169,17 @@ func _update_drops_profiled_body(delta:float) -> void:
 		if not drop.has("radius"):drop["radius"]=7.0 if drop["kind"]=="coin" else 18.0
 		Coins.initialize(drop,Vector2(rng.randf_range(-180,180),rng.randf_range(-350,-190)) if not drop.has("vel") else Vector2.ZERO)
 		drop["impact_cd"]=maxf(0,float(drop.get("impact_cd",0))-delta)
+		var collected:bool=false
 		if cleared:
-			# Bypass terrain so distant loot can cross walls on the way back.
-			var speed:float=move_toward(float(drop.get("attract_speed",280.0)),1800.0,4000.0*delta)
-			drop["attract_speed"]=speed
-			drop["pos"]=Vector2(drop["pos"]).move_toward(target,speed*delta)
-			drop["rotation"]=float(drop.get("rotation",0))+delta*8.0
-			drop["age"]=maxf(.36,float(drop["age"])+delta)
-		elif drop["kind"]=="coin" and float(drop["age"])>.35 and Vector2(drop["pos"]).distance_squared_to(target)<magnet_radius*magnet_radius:
-			drop["sleeping"]=false;drop["vel"]=drop["vel"].move_toward((target-drop["pos"]).normalized()*450,delta*1200)
-		if not cleared:
+			collected=_step_clear_loot_vortex(drop,target,delta)
+		else:
+			if drop["kind"]=="coin" and float(drop["age"])>.35 and Vector2(drop["pos"]).distance_squared_to(target)<magnet_radius*magnet_radius:
+				drop["sleeping"]=false;drop["vel"]=drop["vel"].move_toward((target-drop["pos"]).normalized()*450,delta*1200)
 			var nearby:Array=[] if drop.get("sleeping",false) and Vector2(drop["vel"]).length_squared()<.01 else coin_field.query(drop["pos"],drop["vel"],delta,float(drop["radius"])+3)
 			if Coins.step(drop,delta,nearby,bounds) and drop["kind"]=="coin" and float(drop["impact_cd"])<=0:
 				drop["impact_cd"]=.15;_particles(drop["pos"],Color("efdba3"),4,65);_sound("coin")
-		if Vector2(drop["pos"]).distance_squared_to(target)<36*36 and float(drop.get("age",0))>.35:
+			collected=Vector2(drop["pos"]).distance_squared_to(target)<36*36 and float(drop.get("age",0))>.35
+		if collected:
 			drop["taken"]=true
 			if drop["kind"]=="coin":picked_gold+=int(drop["value"])
 			else:_give_drop(str(drop["kind"]),int(drop["value"]))
@@ -2137,6 +2187,31 @@ func _update_drops_profiled_body(delta:float) -> void:
 	if picked_gold>0:run_coins+=picked_gold;_sound("coin")
 	drops=drops.filter(func(drop:Dictionary)->bool:return not bool(drop["taken"]))
 	room["drops"]=drops
+
+func _step_clear_loot_vortex(drop:Dictionary,target:Vector2,delta:float) -> bool:
+	var seed:float=float(drop.get("seed",0.0))
+	var radius:float=52.0+24.0*fposmod(seed*.37,1.0)
+	var duration:float=.57+.13*fposmod(seed*.83,1.0)
+	drop["rotation"]=float(drop.get("rotation",0.0))+delta*8.0
+	if not drop.has("orbit_angle"):
+		# The entry point follows the player and stays on the loot's side.
+		var offset:Vector2=Vector2(drop["pos"])-target
+		var angle:float=offset.angle() if offset.length_squared()>.01 else seed
+		var entry:Vector2=target+Vector2.from_angle(angle)*radius
+		var speed:float=move_toward(float(drop.get("attract_speed",280.0)),1800.0,4000.0*delta)
+		drop["attract_speed"]=speed
+		var arrival_time:float=Vector2(drop["pos"]).distance_to(entry)/speed
+		drop["pos"]=Vector2(drop["pos"]).move_toward(entry,speed*delta)
+		if arrival_time>delta:return false
+		drop["orbit_angle"]=angle
+		delta-=arrival_time
+	var elapsed:float=float(drop.get("orbit_elapsed",0.0))+delta
+	drop["orbit_elapsed"]=elapsed
+	var progress:float=clampf(elapsed/duration,0.0,1.0)
+	var angle:float=float(drop["orbit_angle"])+TAU*pow(progress,1.35)
+	var pull:float=smoothstep(.70,1.0,progress)
+	drop["pos"]=target+Vector2.from_angle(angle)*radius*(1.0-pull)
+	return progress>=1.0
 
 func _give_drop(kind: String, value: int) -> void:
 	_sound("coin")
@@ -2219,6 +2294,8 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	p.erase("lift_charge");p.erase("lift_flying")
 	if visual_juice!=null:visual_juice.clear()
 	player_slashes.clear()
+	dash_chain_open=false
+	if ui!=null:ui.feather_collection.clear()
 	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
 	_return_trial(false);bath.reset();spring_particles.clear();poison_clouds.clear()
 	if dream_visual!=null:dream_visual.clear_waves()
@@ -2803,7 +2880,22 @@ func _update_hud() -> void:
 func _update_hud_profiled_body() -> void:
 	if ui==null:return
 	var phase_name:String=p_attack.phase
-	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","ultimate_key":Bindings.label(int(key_bindings["ultimate"])),"lift_progress":float(p.get("lift_charge",-1.0))/_lift_threshold(),"dash_key":Bindings.label(int(key_bindings["dash"])),"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
+	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","ultimate_key":Bindings.label(int(key_bindings["ultimate"])),"lift_progress":float(p.get("lift_charge",-1.0))/_lift_threshold(),"dash_key":Bindings.label(int(key_bindings["dash"])),"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"dream_energy":dream.energy,"in_start":_is_start()})
+	var timed_effects:=PackedStringArray()
+	var frost_left:float=0.0
+	for enemy:Dictionary in enemies:
+		if float(enemy.get("hp",0.0))>0:frost_left=maxf(frost_left,float(enemy.get("frost_left",0.0)))
+	for effect:Array in [
+		["力量",p.get("power_item_left",0.0)],
+		["羽盾道具",p.get("shield_item_left",0.0)],
+		["防護",p.get("shield",0.0)],
+		["夢境爆發 ×2",dream.rage_left if mode=="musou" else 0.0],
+		["清房慢動作",room_clear_slow_left],
+		["凍結",frost_left],
+		["護盾回復",p.get("shield_recharge_left",0.0)],
+	]:
+		if float(effect[1])>0.0:timed_effects.append("%s  %d 秒"%[effect[0],ceili(float(effect[1]))])
+	ui.update_shield_hud(int(p.get("shield_cells",SHIELD_BASE_CELLS)),int(p.get("max_shield",SHIELD_BASE_CELLS)),timed_effects,screen=="game")
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
 	ui.update_quickbar(bag_items,Data.ITEMS)
 	ui.quickbar.visible=screen=="game" and not ui.is_panel_open() and not minimap_open
@@ -2894,6 +2986,9 @@ func _draw_profiled_body() -> void:
 		bath.draw(self,_active_pool(),world_transform,draw_clock)
 		SanctuaryArt.pool_front(self,_active_pool(),draw_clock,world_transform)
 	if _is_healing():FX.fitted(self,"heal_guard",0,Rect2(p["pos"]-Vector2(35,65),Vector2(70,75)),world_transform,"right","idle",Color(.7,1,.8,.65),clock)
+	if p.has("lift_charge"):_draw_lift_charge()
+	if p.get("lift_flying",false):
+		Wind.wind_form(self,p["pos"]-AdventurePose.WIND_BODY_CENTER,Vector2.UP,float(p["lift_age"]),.24,world_transform,true)
 	_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	if charge_timer>.15 and show_hitboxes:
 		var threshold:float=_charge_threshold()
@@ -2904,6 +2999,13 @@ func _draw_profiled_body() -> void:
 
 	if float(p.get("power_item_left",0))>0:
 		draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(45,67),Vector2(90,90)),false,Color(1,.22,.12,.78))
+	if int(p["shield_cells"])>0:
+		var center:Vector2=p["pos"]-Vector2(0,23)
+		var glow:float=clampf(.78+.1*sin(draw_clock*4)+float(p.get("shield_flash_left",0)),0.0,1.0)
+		draw_circle(center,35.0,Color(.26,.59,1.0,.09),true,-1,true)
+		draw_arc(center,38.0,0.0,TAU,48,Color(.21,.65,1.0,.25),6.0,true)
+		draw_arc(center,36.0,0.0,TAU,48,Color(.68,.91,1.0,glow),2.5,true)
+		draw_arc(center,31.0,draw_clock*1.3,draw_clock*1.3+PI*.65,24,Color(.91,.98,1.0,.88),2.0,true)
 	if float(p["shield"])>0:draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(44,67),Vector2(88,88)),false,Color(.69,.79,1,.8))
 	for hazard in hazards:
 		if hazard.get("fire",false):
@@ -2992,6 +3094,25 @@ func _draw_enemy_warning(en:Dictionary) -> void:
 		var dir:Vector2=def.get("aim",Vector2.RIGHT)
 		draw_line(at,at+dir*minf(350,float(def["range"])),Color(color,.28),2,false)
 
+func _draw_lift_charge() -> void:
+	var feet:Vector2=p["pos"]
+	var center:Vector2=feet-AdventurePose.WIND_BODY_CENTER
+	var progress:float=clampf(float(p["lift_charge"])/_lift_threshold(),0.0,1.0)
+	var charged:bool=progress>=.999
+	var glow:=Color("fff0ac") if charged else Color("f9c988")
+	var phase:float=fposmod(draw_clock,.48)/.48
+	var strength:float=.52+.48*progress
+	for side:float in [-1.0,1.0]:
+		var wing:Vector2=feet+Vector2(side*12,-19)
+		FX.frame(self,"vertical_launch",phase,wing,world_transform,1.0,70.0*strength,-side*.98,Color(1.0,.91,.72,.72*strength))
+	var radius:float=48.0
+	draw_arc(center,radius,0.0,TAU,48,Color(.19,.09,.23,.85),5.0,true)
+	draw_arc(center,radius,0.0,TAU,48,Color(.92,.68,.38,.34),2.0,true)
+	if progress>0.0:
+		draw_arc(center,radius,-PI*.5,-PI*.5+TAU*progress,48,glow,4.0,true)
+	if charged:
+		draw_arc(center,radius+4.0,0.0,TAU,48,Color(1.0,.88,.60,.48+.20*sin(draw_clock*12.0)),2.0,true)
+
 func _draw_player_body() -> void:
 	var anim:String="limp" if injured else ("rest" if idle_time>=5 else "idle")
 	if absf(p["vel"].x)>30:anim="limp" if injured else "run"
@@ -3017,7 +3138,7 @@ func _draw_player_body() -> void:
 	if float(p["slam_land_left"])>0:
 		AdventurePose.draw_action(self,3,3,p["pos"],p["face"],player_base,tint)
 	elif p.get("lift_flying",false):
-		AdventurePose.draw_glide(self,p["pos"],p["face"],player_base,tint)
+		AdventurePose.draw_action(self,3,AdventurePose.slam_frame(float(p["lift_age"])),p["pos"],p["face"],player_base,tint,1.0,true)
 	elif p.has("lift_charge"):
 		preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),fposmod(draw_clock,.70)*.32/.70,player_base,tint)
 	elif p_attack.is_busy() and p_attack.attack.get("kind","")=="ultimate":
@@ -3281,9 +3402,12 @@ func _draw_door(door:Dictionary) -> void:
 	var locked:bool=_door_locked(door)
 	var color:Color=Adventure.door_color(target,locked)
 	var at:Vector2=door["pos"]
-	if not view_rect.grow(180).has_point(at):return
-	Adventure.portal(self,at,color,clock,world_transform,str(room["ecology"]["id"]),str(door["dir"]),_door_opening(str(door["dir"]),64.0),low_effects)
-	if locked:draw_line(at-Vector2(25,52),at+Vector2(25,-19),Color("e1b18b"),5)
+	var direction:String=door["dir"]
+	var side:bool=direction in ["left","right"]
+	var center:Vector2=at-Vector2(0,PORTAL_HEIGHT*.5) if side else at
+	if not view_rect.grow(PORTAL_HEIGHT*.5).has_point(center):return
+	Adventure.portal(self,at,color,clock,world_transform,str(room["ecology"]["id"]),direction,PORTAL_HEIGHT,low_effects,true)
+	if locked:draw_line(center+Vector2(-25,28),center+Vector2(25,-28),Color("e1b18b"),5)
 
 func _draw_exit_indicators() -> void:
 	pass
@@ -3493,7 +3617,24 @@ func _station_event(kind:String,event:String) -> void:
 	for prop in props:
 		if prop["kind"]==kind:prop["event"]=event;prop["event_left"]=.8
 
+func _update_shield(delta:float) -> void:
+	p["shield_flash_left"]=maxf(0.0,float(p.get("shield_flash_left",0))-delta)
+	var cells:int=int(p["shield_cells"])
+	var capacity:int=int(p["max_shield"])
+	if cells>=capacity:return
+	var remaining:float=float(p["shield_recharge_left"])-delta
+	while remaining<=.000001 and cells<capacity:
+		cells+=1
+		remaining+=SHIELD_RECHARGE_INTERVAL
+	p["shield_cells"]=cells
+	p["shield_recharge_left"]=maxf(0.0,remaining) if cells<capacity else 0.0
+
 func _sync_vitals() -> void:
+	var old_shield_max:int=int(p["max_shield"])
+	p["max_shield"]=SHIELD_BASE_CELLS+int(_rune_effect("max_shield"))
+	p["shield_cells"]=mini(int(p["shield_cells"]),int(p["max_shield"]))
+	if int(p["max_shield"])>old_shield_max and float(p["shield_recharge_left"])<=0.0:
+		p["shield_recharge_left"]=SHIELD_RECHARGE_INTERVAL
 	var old_max:float=float(p.get("max_hp",5))
 	p["max_hp"]=5+int(_rune_effect("max_hp"))-(2 if injured else 0)
 	p["max_energy"]=6-(2 if injured else 0)
@@ -3587,18 +3728,13 @@ func _update_passives_profiled_body(delta:float) -> void:
 func _bee_position(index:int) -> Vector2:
 	return p["pos"]-Vector2(0,35)+Vector2.from_angle(draw_clock*3+TAU*index/maxf(1,_rune_effect("orbit_bee")))*(50+int(index/8)*10)
 
-func _door_opening(direction:String,legacy_width:float) -> float:
-	if layout.get("door_width",1)!=3:return legacy_width
-	var width:float=float(layout.get("tile_size",64))
-	return 3.0*float(layout.get("tile_height",width)) if direction in ["left","right"] else 3.0*width
-
 func _check_portals() -> void:
 	if _release_locked():return
 	if room_cooldown>0 or not life_event.is_empty():return
 	var at:Vector2=p["pos"]
 	for door in doors:
 		var direction:String=door["dir"];var anchor:Vector2=door["pos"]
-		var opening:float=_door_opening(direction,96.0)
+		var opening:float=PORTAL_HEIGHT
 		var crossed:bool=false
 		match direction:
 			"left":crossed=at.x<25 and at.y>anchor.y-opening+36 and at.y<anchor.y+24

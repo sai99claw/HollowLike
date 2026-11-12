@@ -418,6 +418,8 @@ static func _group_for(item:Dictionary) -> String:
 	return "物件"
 
 static func _recent_art() -> void:
+	_add("v79:energy-feather-empty","羽毛能量 · 空格","介面",[_descriptor(ROOT+"v79/energy-feather-empty.webp")],1)
+	_add("v79:energy-feather-full","羽毛能量 · 滿格","介面",[_descriptor(ROOT+"v79/energy-feather-full.webp")],1)
 	_add("v75:canopy-left","血量列 · 垂枝底圖","介面",[_descriptor(ROOT+"v75/canopy-left.webp")],1)
 	for art:Array in [["near-roots","垂根"],["near-vine","垂藤"],["near-stone","角石"],["near-thorns","荊枝"]]:
 		_add("v76:"+str(art[0]),"樹幹 · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v76/"+str(art[0])+".webp")],1)
@@ -458,6 +460,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var used:bool=true
 	var note:String=""
 	match id:
+		"v79:energy-feather-empty","v79:energy-feather-full":note="左上普通能量與無雙能量的空格和滿格。畫布 52 × 60 px。"
 		"v75:canopy-left":note="左上血量列的垂枝底圖，固定於介面。"
 		"v76:near-roots","v76:near-vine","v77:underground-near-roots","v77:underground-near-vine","v77:sky-near-roots","v77:sky-near-vine":note="附著在地形下緣，部分繪在主角前方。"
 		"v76:near-stone","v76:near-thorns","v77:underground-near-stone","v77:underground-near-thorns","v77:sky-near-stone","v77:sky-near-thorns":note="平台的角石與荊枝，部分繪在主角前方。"
@@ -490,7 +493,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
 		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
 		"combat_v05:feather_charge":note="滿能量大招，消耗整條能量，以羽刃對周圍造成傷害及強擊退。"
-		"combat_v05:vertical_launch":note="集氣升空起飛時向下噴出的羽毛氣流。"
+		"combat_v05:vertical_launch":note="集氣時從雙翅向下向外吹，起飛時朝下噴出的羽毛氣流。"
 		"combat_v05:motion_energy":used=false;note="已停用移動回能的光效。"
 		"combat_v05:dream_feather_charge":note="無雙夢境原有的擴散斬特效。"
 		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"

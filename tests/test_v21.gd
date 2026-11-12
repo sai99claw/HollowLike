@@ -76,7 +76,7 @@ func run() -> void:
 	var adjacent:int=game.room["neighbors"].values()[0];game._enter_room(adjacent);game._enter_room(original)
 	check(game.corpses.size()==1 and game.corpses[0]["identity"]==body["identity"],"Returning to a room retains its own-species corpse")
 	game._respawn_from_soul();check(game.corpses.size()==1,"Player respawn does not erase retained corpses")
-	reset(game);game._hurt_player(1,Vector2(800,1050));game._process(.001)
+	reset(game);game.p["shield_cells"]=0;game._hurt_player(1,Vector2(800,1050));game._process(.001)
 	check(float(game.p["flash_left"])>0 and game.player_flash_layer.material!=null,"Player now has an isolated whole-body white flash as well as hitstop")
 	game.hitstop=0;game._set_map_held(true);var at:Vector2=game.p["pos"];var time:float=game.clock;game._physics_process(.2)
 	check(game.p["pos"]==at and game.clock==time and not game.ui.header.visible,"Holding Tab pauses gameplay and clears overlapping HUD")

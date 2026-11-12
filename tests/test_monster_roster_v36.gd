@@ -44,6 +44,7 @@ func run() -> void:
 	check(game._lab_monsters().size()==28,"Practice exposes every regular, elite, cute animal and Boss")
 	game.layout={"size":Vector2(1500,1120),"floor_y":1050.0};game.solids.assign([Rect2(0,1050,1500,70)]);game.platforms.assign([Rect2(0,1050,1500,8)]);game.freeze_timer=0
 	var ram:Dictionary=fixture();game.enemies.assign([ram]);game._reset_player(Vector2(705,1050));game.camera_pos=game._camera_target(ram["pos"])
+	game.p["shield_cells"]=0
 	var hp:float=game.p["hp"];game._start_enemy_attack(ram,ram["attacks"][0]);game._update_enemies(.05,.04)
 	check(game.p["hp"]==hp and ram["attack"].phase=="windup","Touching a ram during its tell causes no damage")
 	game.p["pos"]=Vector2(650,1050);game._update_enemies(.05,.04)

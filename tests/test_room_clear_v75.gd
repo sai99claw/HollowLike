@@ -62,6 +62,14 @@ func run() -> void:
 	var item_count:int=int(game.bag_items.get("0",0))
 	var hp:float=maxf(1,game.p["hp"]-2)
 	game.p["hp"]=hp
+	var center:Vector2=game.p["pos"]-Vector2(0,20)
+	var orbit:Dictionary={"pos":center,"seed":0.0}
+	check(not game._step_clear_loot_vortex(orbit,center,.15) and orbit.has("orbit_angle"),"Even loot at the player's feet moves out to the orbit before being collected")
+	var entered:Vector2=orbit["pos"]
+	var moved_center:Vector2=center+Vector2(90,-30)
+	check(not game._step_clear_loot_vortex(orbit,moved_center,.22) and not entered.is_equal_approx(orbit["pos"]),"Orbit advances around the moving player before any reward is granted")
+	check(absf(Vector2(orbit["pos"]).distance_to(moved_center)-52.0)<.01,"Orbit keeps its radius relative to the moved player")
+	check(game._step_clear_loot_vortex(orbit,moved_center,.40) and moved_center.is_equal_approx(orbit["pos"]),"A full revolution ends in a pull into the player's center")
 	game._drop("coin",at,2)
 	game._update_drops(.016)
 	check(not game.drops.is_empty(),"Clear animates loot flying across the room")

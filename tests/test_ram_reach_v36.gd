@@ -28,7 +28,7 @@ func run() -> void:
 						game._reset_player(en["pos"]+Vector2(direction*(reach+1),0));game._try_enemy_attack(en,game.p["pos"]-en["pos"])
 						check(not en["attack"].is_busy() or not en["attack"].attack.get("ram",false),"No unreachable ram starts outside the real stride: "+label)
 						en["attack"].cancel();en["cooldown"]=0;en["attack_cursor"]=0
-						game._reset_player(en["pos"]+Vector2(direction*(reach-1),0));var hp:float=game.p["hp"]
+						game._reset_player(en["pos"]+Vector2(direction*(reach-1),0));game.p["shield_cells"]=0;var hp:float=game.p["hp"]
 						game._update_enemies(1.0/120,speed/120)
 						check(en["attack"].phase=="windup","Actual AI starts at the reachable boundary: "+label)
 						var cycle:float=float(en["attack"].attack["windup"])+float(en["attack"].attack["active"])

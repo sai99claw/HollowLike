@@ -26,7 +26,7 @@ func run() -> void:
 		check(not g._hurt_player(1,Vector2.ZERO),"Double C protects windup: "+dir)
 		g.p_attack.tick(.11);check(not g._hurt_player(1,Vector2.ZERO),"Double C protects active: "+dir)
 		g.p_attack.tick(.3);g.p["slam"]=false;check(g._hurt_player(1,Vector2.ZERO),"Double C recovery is vulnerable: "+dir)
-	reset(g,Vector2(600,1200));g.platforms.assign([Rect2(0,1200,2000,60)]);g.injured=false;g.revive_used=false;g.p["hp"]=1;var seed_value:int=g.tower["seed"]
+	reset(g,Vector2(600,1200));g.platforms.assign([Rect2(0,1200,2000,60)]);g.injured=false;g.revive_used=false;g.p["hp"]=1;g.p["shield_cells"]=0;var seed_value:int=g.tower["seed"]
 	g._hurt_player(1,Vector2.ZERO);check(g.life_event.get("kind")=="injury" and g.revive_used,"First lethal hit reserves the single injured revival")
 	for i in 300:
 		if g.life_event.is_empty():break
