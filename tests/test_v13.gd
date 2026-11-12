@@ -80,8 +80,8 @@ func run() -> void:
 	for i in 100:scene.combat_feedback.projectile_trail({"pos":Vector2(700,400),"vel":Vector2.RIGHT,"radius":8},1)
 	check(scene.combat_feedback.trails.size()==24,"Reduced effects cap trails at 24 emitters under a 100-projectile load")
 	for record in scene.combat_feedback.trails.values():check(record["emitter"].amount==5,"Reduced projectile emitters use five particles")
-	scene._process(.01)
-	for particle in scene.atmosphere.ambient+scene.atmosphere.foreground+scene.atmosphere.mid_particles+scene.atmosphere.rain_layers:check(particle.material==null,"Default ambient particles skip repeated blur texture sampling")
+	scene.low_effects=true;scene._process(.01)
+	for particle in scene.atmosphere.ambient+scene.atmosphere.rain_layers:check(particle.material==null,"Reduced ambient particles skip repeated blur texture sampling")
 	scene._enter_room(merchant);check(scene.atmosphere.merchant_room and not scene.atmosphere.rainy,"Merchant has dedicated indoor scenery without outdoor rain")
 	for character in "樹梢上的家金羽奔流":check(scene.font.has_char(character.unicode_at(0)),"Home font covers new Chinese text")
 	scene.meta=saved;scene._save_meta();scene.combat_feedback.clear();scene.queue_free();await process_frame

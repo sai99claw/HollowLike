@@ -481,7 +481,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
 		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，四幀由集中至飛散，遊戲內放大 40% 並提高亮度。"
-		"v72:straight_slash":used=false;note="v0.72 普攻直線閃光，現已恢復 slash:v18 羽刃月牙。"
+		"v72:straight_slash":note="普攻命中時從受擊者中心繪製，沿攻擊方向隨機偏轉，24 FPS。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"
 		"v38:crescent":used=false;note="舊版命中月牙，由 v39 細長月牙取代。"

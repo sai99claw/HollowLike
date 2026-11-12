@@ -81,8 +81,11 @@ static func actor(c:CanvasItem,id:String,progress:float,at:Vector2,base:Transfor
 	if id.begins_with("enemy_") or id.begins_with("elite_"):pivot.x=float(bounds[0])+float(bounds[2])*.5
 	var factor:float=actor_factor(id)*scale_value
 	var origin:Vector2=at
-	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face*factor,factor),0,origin))
-	c.draw_texture_rect(texture_for(id,index),Rect2(-pivot,size),false,tint);c.draw_set_transform_matrix(base);return true
+	var pose:=base*Transform2D(0,Vector2(face*factor,factor),0,origin)
+	var art:Texture2D=texture_for(id,index)
+	if art!=null and preload("res://scripts/enemy_ink_v74.gd").draw_frame(c,art,pivot,Rect2(Vector2.ZERO,art.get_size()),pose,tint):return true
+	c.draw_set_transform_matrix(pose)
+	c.draw_texture_rect(art,Rect2(-pivot,size),false,tint);c.draw_set_transform_matrix(base);return true
 static func actor_factor(id:String) -> float:
 	var clip:Dictionary=definition(id)
 	if clip.is_empty():return 1.0

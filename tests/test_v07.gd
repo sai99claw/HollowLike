@@ -74,14 +74,12 @@ func run() -> void:
 	var front:Transform2D=Atmosphere.parallax(Vector2(100,80),1.3,1)
 	check(absf(sky.origin.x)<absf(middle.origin.x) and absf(middle.origin.x)<absf(front.origin.x),"Foreground pans faster than middle and far layers")
 	scene.atmosphere.configure("underground",23)
-	check(scene.atmosphere.spores.visible and scene.atmosphere.spores.emitting,"Lower ecologies emit native bioluminescent mushroom particles")
-	check(scene.atmosphere.mid_particles.size()==2 and scene.atmosphere.foreground.size()==4,"Native feathers exist in middle, foreground and out-of-focus near-foreground layers")
-	check(scene.atmosphere.mid_particles[0].modulate.r>.8 and scene.atmosphere.mid_particles[1].modulate.r<.1,"Translucent white and black feathers coexist")
-	check(scene.atmosphere.foreground[-1].material.get_shader_parameter("blur_radius")>scene.atmosphere.middle.material.get_shader_parameter("blur_radius"),"Closest feathers have stronger focus blur than the middle layer")
-	scene.atmosphere.configure("sky",24);check(not scene.atmosphere.spores.emitting,"Upper ecology does not emit underground mushroom spores")
+	scene.low_effects=false
 	scene._process(.016)
-	var focus:Vector2=scene.atmosphere.focus.material.get_shader_parameter("focus")
-	check(focus.distance_to((scene.world_transform*(scene.p["pos"]-Vector2(0,22)))/Vector2(1280,720))<.001,"Light stays centered on the player through the camera transform")
+	check(scene.visual_depth.spores is GPUParticles2D and scene.visual_depth.spores.emitting,"Room depth uses additive GPU spores")
+	check(scene.visual_depth.fogs.size()==2 and scene.visual_depth.foreground.z_index>scene.visual_depth.details.z_index,"Ground fog and super-foreground render on distinct layers")
+	var focus:Vector2=scene.visual_depth.lantern.position
+	check(focus.distance_to(scene.world_transform*(scene.p["pos"]-Vector2(0,27)))<.001,"Point light follows the player through the camera transform")
 	scene.meta=saved;scene._save_meta();scene.combat_feedback.clear();scene.queue_free();await process_frame
 	print("v0.7: ","passed: fifteen batches / 277 clips / 1193 frames, %d hitbox mappings, release armor/action locks, impact souls and kill bursts, native feather/spore particles, three depth layers and player light"%mappings if failures.is_empty() else failures)
 	quit(0 if failures.is_empty() else 1)

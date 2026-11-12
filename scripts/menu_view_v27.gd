@@ -31,6 +31,7 @@ static func build(ui,game,category:String) -> void:
 			Station._text(ui,right,"精簡模式保留投射物軌跡、命中回饋與地面燃燒。",15)
 		"practice":
 			Station._text(ui,right,"練習與檢查",22,ui.GOLD)
+			if OS.has_feature("web"):Station._button(ui,right,"效能紀錄","performance_panel",null,"settings:perf")
 			if game.screen=="hub":
 				Station._button(ui,right,"進入練習房","lab_enter",null,"settings:enter_practice")
 				Station._button(ui,right,"開發工具","developer_tools",null,"settings:developer_tools")
@@ -40,7 +41,7 @@ static func build(ui,game,category:String) -> void:
 		_:
 			Station._text(ui,right,"冒險與進度",22,ui.GOLD)
 			var links:=HBoxContainer.new();links.add_theme_constant_override("separation",8);right.add_child(links)
-			for entry:Array in [["技能樹","skills"],["全塔地圖","map"],["造型工坊","shop"]]:Station._button(ui,links,entry[0],entry[1],null,"settings:"+str(entry[1]))
+			for entry:Array in [["裝備","bag"],["符文","runes"],["技能樹","skills"],["全塔地圖","map"],["造型工坊","shop"]]:Station._button(ui,links,entry[0],entry[1],null,"settings:"+str(entry[1]))
 			if game.lab_mode=="tutorial":
 				Station._button(ui,right,"教學與武器","tutorial_guide",null,"settings:tutorial")
 				Station._button(ui,right,"返回鳥巢","hub",null,"settings:hub")

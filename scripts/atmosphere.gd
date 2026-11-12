@@ -21,10 +21,6 @@ var middle_objects:Node2D
 var middle:Node2D
 var near_layer:Node2D
 var ambient:Array[CPUParticles2D]=[]
-var foreground:Array[CPUParticles2D]=[]
-var mid_particles:Array[CPUParticles2D]=[]
-var spores:CPUParticles2D
-var focus:ColorRect
 var far_birds:Node2D
 var near_dragonflies:Node2D
 var middle_structures:Array[Dictionary]=[]
@@ -57,19 +53,6 @@ func _ready() -> void:
 		motes.gravity=Vector2.ZERO;motes.direction=Vector2.RIGHT;motes.spread=30;motes.initial_velocity_min=4;motes.initial_velocity_max=14
 		motes.scale_amount_min=.04;motes.scale_amount_max=.12;motes.modulate=Color(1,1,1,.26);motes.material=_blur
 		add_child(motes);ambient.append(motes)
-	for depth in [0,1,2]:
-		for dark in [false,true]:
-			var particle:CPUParticles2D=_feathers(depth,dark)
-			add_child(particle)
-			if depth==0:mid_particles.append(particle)
-			else:foreground.append(particle)
-	spores=CPUParticles2D.new();spores.name="BioluminescentSpores";spores.z_index=-11;spores.amount=40;spores.lifetime=9;spores.preprocess=9;spores.local_coords=true
-	spores.emission_shape=CPUParticles2D.EMISSION_SHAPE_RECTANGLE;spores.emission_rect_extents=Vector2(730,430)
-	spores.direction=Vector2.UP;spores.spread=55;spores.gravity=Vector2(0,-3);spores.initial_velocity_min=5;spores.initial_velocity_max=15
-	spores.scale_amount_min=.12;spores.scale_amount_max=.32;spores.color=Color(.36,.75,1,.45)
-	var glow:=GradientTexture2D.new();glow.width=32;glow.height=32;glow.fill=GradientTexture2D.FILL_RADIAL;glow.fill_from=Vector2(.5,.5);glow.fill_to=Vector2(1,.5)
-	var gradient:=Gradient.new();gradient.colors=PackedColorArray([Color(.6,1,1,.9),Color(.2,.45,1,0)]);glow.gradient=gradient;spores.texture=glow
-	add_child(spores)
 	for depth in 2:
 		var rain:=CPUParticles2D.new();rain.name="RainFar" if depth==0 else "RainMiddle";rain.z_index=-17 if depth==0 else -14
 		rain.amount=110 if depth==0 else 75;rain.lifetime=2.8;rain.preprocess=2.8;rain.local_coords=true
@@ -82,21 +65,6 @@ func _ready() -> void:
 	rain_audio=AudioStreamPlayer.new();rain_audio.name="RoomRainAmbience";rain_audio.stream=load("res://assets/atmosphere_v10/rain.wav");rain_audio.volume_db=-18
 	var rain_stream:AudioStreamWAV=rain_audio.stream;rain_stream.loop_mode=AudioStreamWAV.LOOP_FORWARD;rain_stream.loop_begin=0;rain_stream.loop_end=rain_stream.data.size()/2
 	add_child(rain_audio)
-	focus=ColorRect.new();focus.name="PlayerFocusLight";focus.z_index=8;focus.size=Vector2(1280,720);focus.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var mat:=ShaderMaterial.new();mat.shader=load("res://shaders/player_focus.gdshader");mat.set_shader_parameter("darkness",.22);focus.material=mat;add_child(focus)
-func _feathers(depth:int,dark:bool) -> CPUParticles2D:
-	var particle:=CPUParticles2D.new();particle.name="Feathers_%d_%s"%[depth,"Black" if dark else "White"]
-	particle.z_index=[-12,4,6][depth];particle.amount=[34,23,14][depth];particle.lifetime=14;particle.preprocess=14;particle.local_coords=true
-	particle.emission_shape=CPUParticles2D.EMISSION_SHAPE_RECTANGLE;particle.emission_rect_extents=Vector2(680,420)
-	particle.texture=FX.texture_for("death_feather_glow")
-	particle.direction=Vector2(1,.25);particle.spread=24;particle.gravity=Vector2(2,3);particle.initial_velocity_min=10;particle.initial_velocity_max=25
-	particle.angular_velocity_min=-24;particle.angular_velocity_max=30
-	particle.scale_amount_min=[.035,.05,.14][depth];particle.scale_amount_max=[.06,.09,.24][depth]
-	particle.modulate=Color(.03,.035,.05,.22 if depth==2 else .34) if dark else Color(.88,.94,1,.17 if depth==2 else .28)
-	particle.color=Color.WHITE;particle.set_meta("full_amount",particle.amount)
-	var ramp:=Gradient.new();ramp.offsets=PackedFloat32Array([0,.15,.8,1]);ramp.colors=PackedColorArray([Color(1,1,1,0),Color.WHITE,Color.WHITE,Color(1,1,1,0)]);particle.color_ramp=ramp
-	if depth!=1:particle.material=_near_blur if depth==2 else _blur
-	return particle
 func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=false,quiet:bool=false,_layout:Dictionary={},background:Rect2=Rect2()) -> void:
 	merchant_room=merchant;quiet_room=quiet;ambient_frame=-1;depth_origin_ready=false
 	biome=ecology_id;room_seed=seed_value;wind=-1 if seed_value%2 else 1;active=enabled
@@ -119,10 +87,7 @@ func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=
 		if not id.is_empty():particle.texture=FX.texture_for(id)
 		var grounded:bool=id.ends_with("grass") or id.ends_with("mushroom") or id.ends_with("root_glow")
 		particle.emission_rect_extents=Vector2(780,30 if grounded else 500);particle.initial_velocity_min=0 if grounded else 4;particle.initial_velocity_max=1 if grounded else 14
-	if spores!=null:spores.emitting=enabled and biome in ["grass","underground"];spores.visible=spores.emitting
-	for particle in foreground+mid_particles:particle.emitting=enabled;particle.visible=enabled
-	if focus!=null:focus.visible=enabled
-	for particle in ambient+foreground+mid_particles+rain_layers+[spores]:
+	for particle in ambient+rain_layers:
 		particle.process_mode=Node.PROCESS_MODE_DISABLED if quiet_room or not enabled or not particle.emitting else Node.PROCESS_MODE_INHERIT
 func update_view(camera:Vector2,zoom:float,world:Transform2D,player:Vector2,time:float,speed:float,reduced:bool) -> void:
 	if profiler==null or not profiler.active:
@@ -136,18 +101,17 @@ func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,play
 	if not depth_origin_ready:depth_origin=camera;depth_origin_ready=true
 	if reduced:
 		middle.material=null;near_layer.material=null
-		for particle in ambient+foreground+mid_particles+rain_layers:particle.material=null
+		for particle in ambient+rain_layers:particle.material=null
 	near_layer.visible=not quiet_room
-	for particle in foreground+mid_particles:particle.visible=not quiet_room;particle.emitting=not quiet_room;particle.process_mode=Node.PROCESS_MODE_DISABLED if quiet_room else Node.PROCESS_MODE_INHERIT
 	if effects_reduced!=reduced:
 		effects_reduced=reduced
 		middle_objects.material=preload("res://scripts/depth_style_v32.gd").material(biome,"middle",reduced)
-		for particle in ambient+foreground+mid_particles+rain_layers:
-			particle.material=null if reduced else (_near_blur if particle in foreground else _blur)
+		for particle in ambient+rain_layers:
+			particle.material=null if reduced else _blur
 	var quiet:bool=quiet_room or not active
 	if quiet:
-		for particle in ambient+foreground+mid_particles+rain_layers+[spores]:particle.emitting=false;particle.visible=false;particle.process_mode=Node.PROCESS_MODE_DISABLED
-		focus.visible=false;near_layer.visible=false
+		for particle in ambient+rain_layers:particle.emitting=false;particle.visible=false;particle.process_mode=Node.PROCESS_MODE_DISABLED
+		near_layer.visible=false
 		middle_objects.transform=_middle_transform(camera)
 		middle.transform=parallax(camera,zoom,MID_FACTOR)
 		return
@@ -171,30 +135,8 @@ func _update_view_profiled_body(camera:Vector2,zoom:float,world:Transform2D,play
 		if particle.get_meta("frame",-1)!=frame:particle.texture=FX.texture_for(id,frame);particle.set_meta("frame",frame)
 		var grounded:bool=id.ends_with("grass") or id.ends_with("mushroom") or id.ends_with("root_glow")
 		particle.transform=parallax(camera,zoom,.60)*Transform2D(0,Vector2(750,1020 if grounded else 550));particle.direction=Vector2(wind,.2);particle.speed_scale=speed
-	var feather_drift:Vector2=(camera-depth_origin).limit_length(300)*zoom
-	var mid:=Transform2D(0,Vector2.ONE*zoom,0,Vector2(640,360)-feather_drift*.22)
-	for particle in mid_particles:
-		particle.transform=mid;particle.direction=Vector2(wind,.25);particle.gravity=Vector2(wind*3+sin(time*.12)*2,4);particle.speed_scale=speed
-		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.32 if reduced else 1))
-		if particle.amount!=amount:particle.amount=amount
-	for i in foreground.size():
-		var particle:CPUParticles2D=foreground[i]
-		var drift:float=.10 if i<2 else -.18
-		particle.transform=Transform2D(0,Vector2.ONE*zoom,0,Vector2(640,360)-feather_drift*drift);particle.direction=Vector2(wind,.22);particle.gravity=Vector2(wind*4,6);particle.speed_scale=speed
-		var amount:int=maxi(2,int(particle.get_meta("full_amount",15))*(.32 if reduced else 1))
-		if particle.amount!=amount:particle.amount=amount
 	for particle in ambient:
 		particle.emitting=active and not reduced;particle.visible=particle.emitting;particle.process_mode=Node.PROCESS_MODE_INHERIT if particle.emitting else Node.PROCESS_MODE_DISABLED
-	spores.emitting=active;spores.visible=spores.emitting;spores.process_mode=Node.PROCESS_MODE_INHERIT if spores.emitting else Node.PROCESS_MODE_DISABLED
-	focus.visible=active and not reduced
-	var mote_count:int=(28 if reduced else 84) if biome=="underground" else (24 if reduced else 68) if biome in ["trunk","grass","branches","canopy"] else (20 if reduced else 60)
-	if spores.amount!=mote_count:spores.amount=mote_count
-	spores.color=Color(1,.70,.30,.38) if biome=="underground" else Color(.48,1,.59,.42) if biome!="sky" else Color(.57,.88,1,.38)
-	spores.direction=Vector2(wind,-.25) if biome=="sky" else Vector2(wind*.5,-1)
-	spores.gravity=Vector2(wind*4+sin(time*.7)*3,-2)
-	spores.initial_velocity_min=12;spores.initial_velocity_max=32 if biome=="sky" else 23
-	spores.transform=world*Transform2D(0,Vector2(750,680));spores.speed_scale=speed
-	focus.material.set_shader_parameter("focus",(world*(player-Vector2(0,22)))/Vector2(1280,720))
 func depth_transform(camera:Vector2,zoom:float,factor:float) -> Transform2D:
 	# Rebase at entry so complete props stay in view in tall rooms.
 	return Transform2D(0,Vector2.ONE*zoom,0,-(camera*factor+depth_origin*(1-factor))*zoom)

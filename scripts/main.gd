@@ -18,12 +18,19 @@ const LaunchArt=preload("res://scripts/launch_object_v23.gd")
 const NewBiome=preload("res://scripts/biome_art_v21.gd")
 const PigeonPose=preload("res://scripts/pigeon_motion_v22.gd")
 const AdventurePose=preload("res://scripts/adventure_visual.gd")
-const HIT_WHITE_SECONDS:float=2.0/60.0
+const HIT_WHITE_SECONDS:float=.03
 const CorpseField=preload("res://scripts/corpse_field_v21.gd")
 const Tuning=preload("res://scripts/rd_tuning_v19.gd")
 const TuningPanel=preload("res://scripts/rd_tuning_panel_v19.gd")
 const IdleArt=preload("res://scripts/pigeon_idle_v19.gd")
 const PlayerMotion=preload("res://scripts/player_motion_v18.gd")
+const DepthPass=preload("res://scripts/visual_depth_v74.gd")
+const Overhang=preload("res://scripts/platform_overhang_v74.gd")
+const Juice=preload("res://scripts/visual_juice_v74.gd")
+const EnemyVitals=preload("res://scripts/enemy_vitals_v74.gd")
+var visual_depth:Node2D
+var visual_juice:Node2D
+var visual_layout:Dictionary
 const EnemyCanvas=preload("res://scripts/enemy_canvas_v18.gd")
 const SlashArt=preload("res://scripts/slash_art_v18.gd")
 const Attack = preload("res://scripts/attack_state.gd")
@@ -205,7 +212,7 @@ var drop_label_target: int = -1
 var draw_clock: float = 0.0
 var metrics_timer: float = 0.0
 var fps_smoothed: float = 60.0
-var low_effects: bool = true
+var low_effects: bool = false
 var _rune_cache: Dictionary = {}
 var _rune_cache_key: String = ""
 
@@ -282,6 +289,9 @@ func _ready() -> void:
 	Tuning.activate(meta.get("rd_tuning",{}))
 	backdrop = Cache.new();backdrop.z_index=-20;backdrop.paint=_paint_background;add_child(backdrop)
 	terrain = Cache.new();terrain.z_index=-10;terrain.paint=_paint_terrain;add_child(terrain)
+	terrain.material=ShaderMaterial.new()
+	terrain.material.shader=preload("res://shaders/terrain_core_v74.gdshader")
+	terrain.set_meta("graded_terrain",true)
 	static_props=Cache.new();static_props.z_index=-1;static_props.paint=_paint_static_props;add_child(static_props)
 	edge_background=Cache.new();edge_background.z_index=-3;edge_background.paint=_paint_edge_background;add_child(edge_background)
 	edge_foreground=Cache.new();edge_foreground.z_index=7;edge_foreground.paint=_paint_edge_foreground;add_child(edge_foreground)
@@ -296,6 +306,10 @@ func _ready() -> void:
 	slash_canvas=Cache.new();slash_canvas.z_index=1;slash_canvas.paint=_paint_player_slash;add_child(slash_canvas)
 	p_attack.active_started.connect(_start_player_slash)
 	player_flash_layer=EnemyCanvas.new();player_flash_layer.z_index=1;player_flash_layer.paint=_paint_player_flash;add_child(player_flash_layer)
+	visual_depth=DepthPass.new()
+	add_child(visual_depth)
+	visual_juice=Juice.new()
+	add_child(visual_juice)
 	ui = UI.new()
 	add_child(ui)
 	ui.setup()
@@ -326,6 +340,7 @@ func _ready() -> void:
 		new_run("rogue",12345)
 
 func _reset_player(at: Vector2) -> void:
+	if visual_juice!=null:visual_juice.clear()
 	player_slashes.clear()
 	combo_index=0
 	p = {"pos":at,"vel":Vector2.ZERO,"face":1.0,"hp":5,"max_hp":5,"energy":3,"max_energy":6,"grounded":true,"wall":0,"jumps":0,"air_dash":false,"dash_t":0.0,"dash_dir":Vector2.RIGHT,"invul":0.0,"hurt":0.0,"wall_lock":0.0,"wall_hold_left":0.0,"wall_slide_age":0.0,"jump_rise_age":-1.0,"slam_age":0.0,"slam_land_left":0.0,"shield":0.0,"slam":false,"slam_speed":520.0,"knockback_t":0.0,"knockback_dir":1.0,"recoil_left":0.0,"recoil_velocity":Vector2.ZERO,"impact_root":0.0,"jump_cut_allowed":false,"jump_released":false,"landing_left":0.0,"wall_kick_left":0.0,"wall_kick_velocity":0.0,"hp_recovery":0.0,"energy_recovery":0.0,"flash_left":0.0,"coyote_left":0.0,"jump_buffer_left":0.0,"flap_left":0.0,"heavy_land_left":0.0,"fall_distance":0.0,"mantle_left":0.0}
@@ -590,6 +605,19 @@ func _process_profiled_body(delta: float) -> void:
 	if region!=terrain_region:
 		terrain_region=region
 		terrain.invalidate();edge_background.invalidate();edge_foreground.invalidate()
+	if not is_same(visual_layout,layout):
+		visual_layout=layout
+		var sources:Array=doors if screen=="game" else ([{"pos":HomeArt.STATIONS["musou"]},{"pos":HomeArt.STATIONS["rogue"]}] if not trophy_room else [])
+		visual_depth.configure(layout,solids,sources,props,screen=="game",str(_ecology()["id"]))
+	var fog_floor:float=_room_floor()
+	var feet:Vector2=p["pos"]
+	if screen=="game":
+		for platform:Rect2 in platforms:
+			if feet.x>=platform.position.x-25 and feet.x<=platform.end.x+25 and platform.position.y>=feet.y-4:
+				fog_floor=minf(fog_floor,platform.position.y)
+	var visible_world:bool=screen in ["game","hub"] and lab_mode not in ["rd","tuning"]
+	visual_depth.update_view(render_camera,world_transform,display_safe,feet,fog_floor,draw_clock,visible_world,low_effects,perf_paused or hitstop>0 or minimap_open or ui.is_panel_open(),terrain_region)
+	visual_juice.update_view(world_transform,draw_clock,low_effects)
 	_sync_enemy_canvases()
 	if player_flash_layer!=null:
 		player_flash_layer.actor=p;player_flash_layer.refresh(world_transform,screen=="game" and life_event.is_empty() and float(p.get("flash_left",0))>0 and not _wind_form_active())
@@ -631,6 +659,7 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if lab_mode=="practice":p["energy"]=p["max_energy"];p["invul"]=2;freeze_timer=0 if lab_ai else 999
 	real_clock+=delta
 	if minimap_open:return
+	if screen=="game":_update_hit_white(delta)
 	# Physics, pose sampling and VFX share the same frozen game clock.
 	if hitstop>0 and life_event.is_empty():
 		hitstop=maxf(0,hitstop-delta);return
@@ -647,7 +676,6 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if screen=="hub":
 		_update_home(delta);return
 	if screen!="game":return
-	_update_hit_white(delta)
 	_update_dream(delta)
 	room_cooldown=maxf(0,room_cooldown-delta);freeze_timer=maxf(0,freeze_timer-delta)
 	for key in ["invul","hurt","wall_lock","shield","impact_root","flash_left","heavy_land_left","power_item_left","shield_item_left"]:p[key]=maxf(0,float(p.get(key,0))-delta)
@@ -919,6 +947,7 @@ func _step_player(delta: float) -> void:
 			jumped=true
 			vel.y=-JUMP_SPEED*.92*Tuning.value("jump_speed");p["jumps"]=2;p["flap_left"]=.32;combat_feedback.double_jump(pos-Vector2(0,18));_sound("double_jump")
 		if jumped:
+			if vel.y<0:Juice.squash(p,Juice.LAUNCH,draw_clock,.15)
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
 	var can_glide:bool=_key("jump") and not p["grounded"] and int(p["wall"])==0 and not _wind_form_active() and float(p["dash_t"])<=0 and not knocked and float(p["hurt"])<=0 and not _in_bath()
@@ -976,6 +1005,9 @@ func _step_player(delta: float) -> void:
 	if not was_grounded and not was_slam:p["fall_distance"]=float(p.get("fall_distance",0))+maxf(0,pos.y-old_pos.y)
 	if bool(p["grounded"]) and not was_grounded and not was_slam:
 		p["landing_left"]=.09
+		if not p.has("launch_pending_velocity") and not _in_bath():
+			Juice.squash(p,Juice.LAND,draw_clock,.12)
+			visual_juice.flash(pos-Vector2(0,2),Vector2.UP,draw_clock,"dust")
 		if float(p.get("fall_distance",0))>float(layout.get("tile_size",96))*6.0 and not p.has("launch_pending_velocity") and not _in_bath():
 			_begin_heavy_landing(pos);vel.x=0
 		elif not p.has("launch_pending_velocity"):_sound("land")
@@ -1018,6 +1050,7 @@ func _dash_pressed() -> void:
 	if bool(p["air_dash"]) and not bool(p["grounded"]) and int(p["wall"])==0:dash_chain_open=false;return
 	p_attack.cancel();pending_attack.clear();p["impact_root"]=0
 	p["dash_dir"]=Vector2(float(p["face"]),0);p["dash_t"]=.16;p["air_dash"]=true;p["wall_lock"]=.1
+	Juice.squash(p,Juice.LAUNCH,draw_clock,.15)
 	combat_feedback.single_dash(p["pos"]-Vector2(0,24)-Vector2(p["dash_dir"])*12,p["dash_dir"])
 	_sound("dash_wind")
 
@@ -1025,6 +1058,7 @@ func _dash_pressed() -> void:
 func _begin_dash_followup(dir:Vector2) -> void:
 	if _rune_effect("single_pierce")<=0 and not _skill("dash_vertical" if dir.y>0 else "dash_horizontal"):_toast("穿刺技能尚未解鎖，請查看技能樹");return
 	if float(p["energy"])<1:_toast("穿刺需要1能量");return
+	Juice.squash(p,Juice.LAUNCH,draw_clock,.15)
 	p["energy"]-=1;p_attack.cancel();pending_attack.clear();p["impact_root"]=0;charge_timer=0
 	var definition:Dictionary={"kind":"slam" if dir.y>0 else "pierce","windup":0.0,"active":1.8 if dir.y>0 else .24,"recovery":0.0,"damage":2.0,"range":38.0,"width":40.0,"dir":dir,"direction":"down" if dir.y>0 else ("right" if dir.x>0 else "left"),"color":Color("d3eaff"),"primary":false}
 	p_attack.begin(Dream.instant(definition) if mode=="musou" else definition)
@@ -1170,6 +1204,9 @@ func _attack_box(pos: Vector2, def: Dictionary, face: float) -> Rect2:
 	if dir=="down": return _attack_volume(Rect2(pos.x-width*.5,center_y+16*box_scale,width,reach+12*box_scale),def)
 	return _attack_volume(Rect2(pos.x if dir=="right" else pos.x-reach,center_y-width*.5,reach,width),def)
 
+func _player_strike_box(def:Dictionary) -> Rect2:
+	return _attack_box(def.get("strike_origin",p["pos"]),def,float(def.get("strike_face",p["face"])))
+
 func _attack_volume(box:Rect2,definition:Dictionary) -> Rect2:
 	var added:float=box.size.y*(float(definition.get("hitbox_height_mult",1)) - 1)
 	return Rect2(box.position-Vector2(0,added*.5),box.size+Vector2(0,added))
@@ -1189,14 +1226,14 @@ func _process_player_attack_profiled_body() -> void:
 	var kind: String=str(def.get("kind",""))
 	if kind=="secondary" and def.get("weapon_kind","")!="sword": return
 	if kind in ["slam","item_bomb"]: return
-	var hitbox: Rect2=_body_box(p["pos"]).grow(12) if kind=="pierce" else _attack_box(p["pos"],def,float(p["face"]))
+	var hitbox: Rect2=_body_box(p["pos"]).grow(12) if kind=="pierce" else _player_strike_box(def)
 	for en in enemies:
 		if float(en["hp"])<=0: continue
 		var ea = en["attack"]
 		if bool(def.get("primary",false)) and ea.is_active() and bool(ea.attack.get("primary",false)) and hitbox.intersects(_attack_box(en["pos"],ea.attack,float(en["face"]))):
 			_parry(en)
 		if hitbox.intersects(_enemy_body_box(en)) and (p_attack.mark_timed_hit(int(en["uid"]),.5,3) if def.get("charged",false) else p_attack.mark_hit(int(en["uid"]))):
-			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def),true,def.get("kind","")!="primary")
+			_hit_enemy(en,float(def.get("damage",1)),Color(def.get("color",Color.WHITE)),float(def.get("knockback",76)),Vector2.INF,_attack_direction(def),true,def.get("kind","")!="primary",.07 if def.get("primary",false) else .125)
 			if float(def.get("recoil",0))>0:_recoil(float(def["recoil"]),en["pos"],-_attack_direction(def))
 			_restore_vital("energy",float(def.get("energy_gain",0))*(1.0+_rune_effect("energy")))
 			p["air_dash"]=false
@@ -1228,6 +1265,9 @@ func _slam_impact(at: Vector2) -> void:
 	# Debris remains on the air side of this exact contacted platform.
 	for i in (10 if low_effects else 18):
 		effects.append({"pos":at-Vector2(0,3),"ground_y":at.y,"color":Color("ddece4"),"life":.3,"max":.3,"radius":2.0,"ring":false,"vel":Vector2(rng.randf_range(-300,300),rng.randf_range(-280,-100))})
+	Juice.squash(p,Juice.LAND,draw_clock,.12)
+	visual_juice.flash(at-Vector2(0,3),Vector2.UP,draw_clock)
+	hitstop=maxf(hitstop,.075)
 	shake=10;_sound("ground_slam")
 
 func _parry(en: Dictionary) -> void:
@@ -1235,7 +1275,8 @@ func _parry(en: Dictionary) -> void:
 	en["attack"].cancel();en["stun"]=.72
 	p["invul"]=maxf(float(p["invul"]),.5);_restore_vital("energy",2)
 	var at: Vector2=(p["pos"]+en["pos"])*.5-Vector2(0,25)
-	_particles(at,Color("fff0b8"),24,260);_effect(at,Color("ffe3a0"),80,.35)
+	visual_juice.flash(at,_attack_direction(p_attack.attack),draw_clock)
+	_effect(at,Color("ffe3a0"),80,.35)
 	_contact_fx("parry",at)
 	_float(at,"拼刀！ +2 能量",Color("ffe3a0"));hitstop=.055;shake=7;_sound("parry")
 
@@ -1261,18 +1302,19 @@ func _update_hit_white(delta:float) -> void:
 		en["flash_left"]=maxf(0,remaining-delta)
 		if float(en["hp"])<=0 and en["flash_left"]<=0 and corpse_layer!=null:corpse_layer.invalidate()
 
-func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true,show_crescent:bool=true) -> void:
+func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true,show_crescent:bool=true,impact_duration:float=.125) -> void:
 	if float(en["hp"])<=0:return
 	if mode=="musou":damage*=dream.damage_factor()
 	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
 	en["flash_left"]=HIT_WHITE_SECONDS;en["_impact_time"]=clock
 	if int(en.get("model",0))!=4 or float(en.get("boss_impact_guard",0))<=0:
-		en["impact_freeze_left"]=.125;en["impact_pose_clock"]=draw_clock
+		en["impact_freeze_left"]=impact_duration;en["impact_pose_clock"]=draw_clock
 		if int(en.get("model",0))==4:en["boss_impact_guard"]=.45
 	var training:bool=en.get("training",false)
 	if training:en["training_total"]=float(en.get("training_total",0))+damage
 	else:
 		if mode=="musou" and gain_dream and damage>0:dream.hit()
+		if damage>0:EnemyVitals.damaged(en,clock)
 		en["hp"]-=damage
 	en["hurt"]=.2
 	var away:float=signf(en["pos"].x-(source.x if source.is_finite() else p["pos"].x))
@@ -1286,7 +1328,10 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 		en["push_left"]=.18;en["push_velocity"]=impulse*knockback/.18;en["push_base_y"]=en.get("vel",Vector2.ZERO).y;en["stun"]=maxf(float(en.get("stun",0)),.12)
 	en["death_direction"]=impulse;en["death_knockback"]=knockback
 	var contact:Vector2=en["pos"]-Vector2(0,_enemy_body_box(en).size.y*.5)
-	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse,str(Data.PRIMARY[weapon_index]["style"]),float(en["hp"])<=0,show_crescent)
+	if impact_duration<.1 and visual_juice!=null:
+		visual_juice.flash(contact,impulse,draw_clock)
+		shake=maxf(shake,4.5)
+	if combat_feedback!=null:combat_feedback.hit(en,contact,impulse,str(Data.PRIMARY[weapon_index]["style"]),float(en["hp"])<=0,show_crescent,not show_crescent)
 
 	if not training and rng.randf()<clampf(_rune_effect("lifesteal"),0,1):_restore_vital("hp",1);_contact_fx("lifesteal",p["pos"]-Vector2(0,25))
 	_float(en["pos"]-Vector2(0,55),"%.1f"%damage,color);shake=maxf(shake,2.2)
@@ -1469,9 +1514,11 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			var previous_charge:String=en.get("charge_phase","idle")
 			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size,engaged,support)
 			if engaged and previous_charge!="active" and en.get("charge_phase","idle")=="active":
+				Juice.squash(en,Juice.LAUNCH,draw_clock,.15)
 				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else "enemy_ram"
 				_sound(cue if sounds.has(cue) else "enemy_ram")
 			if engaged and grounded and vel.y<-140 and Motion.current(en)=="jump":
+				Juice.squash(en,Juice.LAUNCH,draw_clock,.15)
 				_sound("boss_jump" if int(en["model"])==4 else "enemy_jump")
 		# A ram is one deliberately telegraphed attack, not a second movement attack.
 		if not frozen and float(en["stun"])<=0 and atk.is_active() and atk.attack.get("ram",false):
@@ -1482,6 +1529,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			var margin:float=20.0*float(en["scale"])
 			if (vel.x<0 and en["pos"].x+vel.x*movement_delta<support.position.x+margin) or (vel.x>0 and en["pos"].x+vel.x*movement_delta>support.end.x-margin):vel.x=0
 		var old:Vector2=en["pos"]
+		var falling:bool=vel.y>75.0
 		var resolved:Dictionary=Coll.move_body(old,vel,movement_delta,body_size,world if flying else solids)
 		Motion.resolve_collision(en,vel,resolved["vel"])
 		if atk.is_active() and atk.attack.get("ram",false) and absf(vel.x)>80 and absf(resolved["vel"].x)<absf(vel.x)*.25:
@@ -1494,6 +1542,9 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		else:
 			var ground:float=_support_y(old,en["pos"],vel.y,9.0*float(en["scale"]))
 			if ground<INF:en["pos"].y=ground;vel.y=0
+			if falling and not grounded and (ground<INF or bool(resolved.get("grounded",false))) and not en.get("training",false):
+				Juice.squash(en,Juice.LAND,draw_clock,.12)
+				if view_rect.has_point(en["pos"]):visual_juice.flash(Vector2(en["pos"])-Vector2(0,2),Vector2.UP,draw_clock,"dust")
 			en["pos"].y=maxf(55+body_size.y,en["pos"].y)
 		if en.get("render_face",en["face"])!=en["face"]:en["turn_left"]=.25
 		else:en["turn_left"]=maxf(0,float(en.get("turn_left",0))-delta)
@@ -1506,6 +1557,10 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		if frozen:continue
 		if atk.is_active() and not bool(atk.attack.get("emitted",false)):
 			atk.attack["emitted"]=true
+			if atk.attack.get("primary",false) and not atk.attack.get("ram",false) and view_rect.has_point(en["pos"]):
+				var face:=Vector2(float(en["face"]),0)
+				var origin:Vector2=Vector2(en["pos"])+Vector2(face.x*8,float(atk.attack.get("origin_y",-30)))
+				visual_juice.flash(origin,face,draw_clock,"smear",clampf(float(atk.attack.get("range",75))*.65,32.0,145.0))
 			_sound(AudioCues.attack_cue(atk.attack))
 			if atk.attack.get("poison_cloud",false):
 				poison_clouds.append({"pos":Vector2(en["pos"])+Vector2(float(en["face"])*48,-26),"left":3.0,"hostile":true})
@@ -1514,7 +1569,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			elif not bool(atk.attack.get("primary",true)):
 				_emit_weapon(en["pos"]+Vector2(0,float(atk.attack.get("origin_y",-30))),atk.attack.get("aim",toward.normalized()),atk.attack,false)
 		if atk.is_active() and bool(atk.attack.get("primary",false)):
-			if not atk.attack.get("ram",false) and p_attack.is_active() and bool(p_attack.attack.get("primary",false)) and _attack_box(p["pos"],p_attack.attack,float(p["face"])).intersects(_attack_box(en["pos"],atk.attack,float(en["face"]))):
+			if not atk.attack.get("ram",false) and p_attack.is_active() and bool(p_attack.attack.get("primary",false)) and _player_strike_box(p_attack.attack).intersects(_attack_box(en["pos"],atk.attack,float(en["face"]))):
 				_parry(en);continue
 			var swing:int=mini(int(atk.attack.get("count",1))-1,int(atk.progress()*int(atk.attack.get("count",1))))
 			var enemy_hit:Rect2=_enemy_body_box(en) if atk.attack.get("ram",false) else _attack_box(en["pos"],atk.attack,float(en["face"]))
@@ -2048,6 +2103,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 	_save_meta()
 
 func _enter_room(id: int, from_dir: String="center") -> void:
+	if visual_juice!=null:visual_juice.clear()
 	player_slashes.clear()
 	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
 	_return_trial(false);bath.reset();spring_particles.clear();poison_clouds.clear()
@@ -2460,6 +2516,10 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"practice":practice_mode=not practice_mode;_show_settings()
 		"audio":audio_enabled=not audio_enabled;_save_settings();_show_settings()
 		"mute":audio_enabled=not audio_enabled;_save_settings();_update_hud()
+		"performance_panel":
+			if perf_bridge!=null:
+				_close_panel()
+				perf_bridge.open()
 		"effects":low_effects=not low_effects;terrain.invalidate();_show_settings()
 		"timing_slower":phase_multiplier=1.6 if phase_multiplier<1.2 else 1.0;_show_settings()
 		"reward":_claim_reward(int(payload))
@@ -2662,6 +2722,8 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 		if not NewBiome.draw_terrain(canvas,id,layout,solids,terrain_region,low_effects):
 			for solid:Rect2 in solids:BiomeArt.terrain(canvas,id,solid)
 			for plat:Rect2 in layout.get("one_way",[]):BiomeArt.terrain(canvas,id,plat,true)
+			Overhang.shade_fallback(canvas,solids,terrain_region)
+		Overhang.shade_fallback(canvas,layout.get("one_way",[]),terrain_region)
 		if show_hitboxes:
 			for solid:Rect2 in solids:canvas.draw_rect(solid,Color(1,.3,.1,.5),false,1)
 		return
@@ -2670,9 +2732,11 @@ func _paint_terrain(canvas:CanvasItem) -> void:
 		var biome:String=_ecology()["id"]
 		for solid:Rect2 in solids:BiomeArt.terrain(canvas,biome,solid)
 		for ledge:Rect2 in layout.get("one_way",[]):BiomeArt.terrain(canvas,biome,ledge,true)
+		Overhang.shade_fallback(canvas,solids+layout.get("one_way",[]),terrain_region)
 		return
 	for plat in platforms:Art.draw_platform(canvas,plat,_height(),show_hitboxes)
 	_draw_terrain_details(canvas)
+	Overhang.shade_fallback(canvas,platforms,terrain_region)
 
 
 func _draw() -> void:
@@ -2715,10 +2779,7 @@ func _draw_profiled_body() -> void:
 		MonsterDesign.draw_charge(self,en,clock,world_transform)
 		_draw_attack(en["pos"]+Vector2(0,5),atk,float(en["face"]),false)
 		_draw_enemy_warning(en)
-		var hpw:float=70 if int(en["model"])==4 else (54 if en.get("elite",false) else 36)
-		var health_at:=Vector2(float(en["pos"].x)-hpw*.5,_enemy_body_box(en).position.y-10)
-		draw_rect(Rect2(health_at,Vector2(hpw,4)),Color("20383b"))
-		draw_rect(Rect2(health_at,Vector2(hpw*maxf(0,float(en["hp"])/float(en["max_hp"])),4)),Color("e9b97d"))
+		if int(en["model"])!=4:EnemyVitals.draw(self,en,_enemy_body_box(en),clock)
 	_draw_player_body()
 	if room.get("fountain",false) and layout.has("fountain_pos"):
 		preload("res://scripts/spring_v33.gd").draw_water(self,layout["fountain_pos"],str(_ecology()["id"]),world_transform,bath,draw_clock)
@@ -2779,7 +2840,7 @@ func _draw_profiled_body() -> void:
 			if en["hp"]>0:draw_rect(_enemy_body_box(en),Color("f6aa82"),false,1)
 	if lab_mode=="tutorial":_draw_tutorial_stations(focus)
 	draw_set_transform(Vector2.ZERO)
-	if combat_feedback!=null:combat_feedback.draw_screen(self,world_transform)
+	if combat_feedback!=null:combat_feedback.draw_screen(self,world_transform,display_safe.size.x)
 	_draw_boss_bar()
 	_draw_exit_indicators()
 	if float(p["hurt"])>0:draw_rect(Rect2(0,0,1280,720),Color(1,.35,.25,float(p["hurt"])*.35))
@@ -2802,10 +2863,11 @@ func _draw_boss_bar() -> void:
 			draw_line(Vector2(492+396*threshold,101),Vector2(492+396*threshold,108),Color("10282c"),2)
 
 func _draw_enemy_warning(en:Dictionary) -> void:
-	# Boss tells are combat information, not a developer hitbox option.
-	if not show_hitboxes and int(en.get("model",0))!=4:return
 	var atk=en["attack"]
 	if atk.phase!="windup":return
+	var body:Rect2=_enemy_body_box(en)
+	Juice.warning(self,Vector2(body.get_center().x+float(en["face"])*body.size.x*.20,body.position.y+body.size.y*.35),atk.progress())
+	if not show_hitboxes and int(en.get("model",0))!=4:return
 	var def:Dictionary=atk.attack
 	if BossDirector.draw_tell(self,en,def,atk.progress(),world_transform,world_speed):return
 	var kind:String=def.get("library_kind","")
@@ -2840,9 +2902,9 @@ func _draw_player_body() -> void:
 	if float(p["invul"])>0 and int(clock*20)%2==0:tint.a=.5
 	var player_base:Transform2D=world_transform
 	var dream_progress:float=dream_visual.body_progress() if mode=="musou" else -1.0
-	if float(p.get("landing_left",0))>0 and anim in ["idle","run","limp"]:
-		var squash:float=sin(float(p["landing_left"])/.09*PI)*.08
-		player_base=world_transform*Transform2D(0,Vector2(1+squash,1-squash),0,p["pos"])*Transform2D(0,-Vector2(p["pos"]))
+	var body_scale:Vector2=Juice.pose(p,draw_clock,anim=="idle")
+	if body_scale!=Vector2.ONE:
+		player_base=world_transform*Transform2D(0,body_scale,0,p["pos"])*Transform2D(0,-Vector2(p["pos"]))
 	if float(p["slam_land_left"])>0:
 		AdventurePose.draw_action(self,3,3,p["pos"],p["face"],player_base,tint)
 	elif bool(p["slam"]):
@@ -3168,7 +3230,7 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 			Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,atk.attack["dir"],float(p["slam_age"]) if down else atk.elapsed,float(atk.attack["active"]),world_transform,down)
 		return
 	if is_player and atk.attack.get("primary",false) and (not atk.attack.get("charged",false) or atk.attack.get("great_spin_release",false)):
-		if show_hitboxes and atk.is_active():draw_rect(_attack_box(at,atk.attack,face),Color("ffe3a0"),false,1)
+		if show_hitboxes and atk.is_active():draw_rect(_player_strike_box(atk.attack),Color("ffe3a0"),false,1)
 		return
 	if is_player and atk.attack.has("fx_clip"):
 		var primary:Dictionary=atk.attack
@@ -3593,7 +3655,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 			combat_feedback.grass_hit(prop["pos"]-Vector2(0,18),Vector2(float(p["face"]),0),str(p_attack.attack.get("style","quick")))
 			_particles(prop["pos"]-Vector2(0,15),Color("a9c6a0"),7,80);continue
 		prop["hurt"]=.3
-		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false,attack_id>=0 or p_attack.attack.get("kind","")!="primary")
+		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector(),str(p_attack.attack.get("style","quick")),false,attack_id>=0 or p_attack.attack.get("kind","")!="primary",attack_id<0 and p_attack.attack.get("kind","")=="primary")
 		else:_hit_flash(prop["pos"]-Vector2(0,35),damage,Color("aee8dc"))
 		if prop["kind"]=="health":p["hp"]=p["max_hp"];prop["used"]=true;prop["break_left"]=.5;p["hp_recovery"]=0.0;_toast("生命已回滿")
 		elif prop["kind"] in ["energy","energy_infinite"]:_restore_vital("energy",2);prop["used"]=prop["kind"]=="energy";prop["break_left"]=.5 if prop["used"] else 0
@@ -3729,7 +3791,7 @@ func _recover_feather() -> void:
 func _block_box() -> Rect2:
 	var def:Dictionary=p_attack.attack.duplicate()
 	def["width"]=float(def.get("block_width",def.get("width",48)))
-	return _attack_box(p["pos"],def,float(p["face"]))
+	return _player_strike_box(def)
 
 func _projectile_explosion(pr:Dictionary) -> void:
 	if pr.get("ground_fire",false) and not pr.get("fire_created",false):
@@ -4423,7 +4485,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 		var enabled:bool=screen=="game" and view_rect.intersects(_enemy_body_box(en).grow(24))
 		if not enemy_canvases.has(id):
 			if not enabled and float(en.get("flash_left",0))<=0:continue
-			var fresh=EnemyCanvas.new();fresh.profiler=perf_log;fresh.local_origin=true;fresh.paint=_paint_enemy_body;add_child(fresh);enemy_canvases[id]=fresh
+			var fresh=EnemyCanvas.new();fresh.profiler=perf_log;fresh.local_origin=true;fresh.toon=not en.get("training",false);fresh.paint=_paint_enemy_body;add_child(fresh);enemy_canvases[id]=fresh
 		var sprite=enemy_canvases[id];sprite.actor=en
 		var attack=en["attack"]
 		var pose_clock:float=_enemy_pose_clock(en)
@@ -4434,6 +4496,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 		signature.append(ceili(float(en.get("frost_left",0))*15))
 		var base:Transform2D=world_transform if en.get("training",false) else world_transform.translated_local(Vector2(0,5))
 		sprite.refresh(base,enabled,signature)
+		if enabled and sprite.toon:sprite.transform*=Juice.enemy_pose(en,draw_clock)
 	for id in enemy_canvases.keys():
 		if not alive.has(id):enemy_canvases[id].queue_free();enemy_canvases.erase(id)
 
@@ -4443,7 +4506,10 @@ func _start_player_slash() -> void:
 	while not player_slashes.is_empty() and draw_clock-float(player_slashes[0]["start"])>=SlashArt.DURATION:
 		player_slashes.pop_front()
 	if player_slashes.size()>=8:player_slashes.pop_front()
-	player_slashes.append({"box":_attack_box(p["pos"],def,float(p["face"])),"definition":def.duplicate(),"start":draw_clock})
+	if def.get("kind","")=="primary":
+		def["strike_origin"]=p["pos"]
+		def["strike_face"]=p["face"]
+	player_slashes.append({"box":_player_strike_box(def),"definition":def.duplicate(),"start":draw_clock})
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
 	if screen not in ["game","hub"]:return

@@ -1,5 +1,6 @@
 class_name MonsterArtV36
 extends RefCounted
+const Ink=preload("res://scripts/enemy_ink_v74.gd")
 const ROOT:String="res://assets/v36/monsters/"
 const PHASE_COLUMNS:Dictionary={"move":0,"windup":3,"active":6,"recovery":9}
 static var manifests:Dictionary={}
@@ -45,7 +46,9 @@ static func _draw(c:CanvasItem,data:Dictionary,sheet:String,item:Dictionary,at:V
 	var tex:Texture2D=texture(data["sheets"][sheet]["path"])
 	if tex==null:return false
 	var r:Array=item["rect"];var pivot:Array=item["pivot"]
-	c.draw_set_transform_matrix(base*Transform2D(angle,Vector2(face*factor,factor),0,at))
+	var pose:=base*Transform2D(angle,Vector2(face*factor,factor),0,at)
+	if sheet!="projectiles" and Ink.draw_frame(c,tex,Vector2(pivot[0],pivot[1]),Rect2(r[0],r[1],r[2],r[3]),pose,tint):return true
+	c.draw_set_transform_matrix(pose)
 	c.draw_texture_rect_region(tex,Rect2(-Vector2(pivot[0],pivot[1]),Vector2(r[2],r[3])),Rect2(r[0],r[1],r[2],r[3]),tint)
 	c.draw_set_transform_matrix(base);return true
 static func actor_bounds(en:Dictionary,time:float=0) -> Rect2:

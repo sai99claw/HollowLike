@@ -1,5 +1,6 @@
 class_name MonsterArtV55
 extends RefCounted
+const Ink=preload("res://scripts/enemy_ink_v74.gd")
 
 const ROOT: String = "res://assets/v55/monsters/"
 const CELL := Vector2(144, 112)
@@ -95,9 +96,11 @@ static func _draw(c: CanvasItem, en: Dictionary, column: int, at: Vector2, face:
 		sheets[biome] = load(path)
 	var factor: float = float(en.get("world_height", 51.0)) / REFERENCE_HEIGHT
 	var source := Rect2(Vector2(column, row) * CELL, CELL)
-	c.draw_set_transform_matrix(base * Transform2D(0.0, Vector2(face * factor, factor), 0.0, at))
+	var pose:Transform2D=base * Transform2D(0.0, Vector2(face * factor, factor), 0.0, at)
 	var anchor:Vector2=ANCHOR
 	if column<2:anchor.y=MOVEMENT_BASELINES[biome][row][column]
+	if Ink.draw_frame(c,sheets[biome],anchor,source,pose,tint):return true
+	c.draw_set_transform_matrix(pose)
 	c.draw_texture_rect_region(sheets[biome], Rect2(-anchor, CELL), source, tint)
 	c.draw_set_transform_matrix(base)
 	return true

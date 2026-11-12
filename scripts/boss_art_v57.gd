@@ -1,5 +1,6 @@
 class_name BossArtV57
 extends RefCounted
+const Ink=preload("res://scripts/enemy_ink_v74.gd")
 
 const SkillArt=preload("res://scripts/skill_art_v59.gd")
 const Motion=preload("res://scripts/enemy_motion.gd")
@@ -86,7 +87,9 @@ static func _draw_hd_motion(c:CanvasItem,en:Dictionary,biome:String,row:int,time
 		hd_neutral_height[biome]=texture.get_image().get_region(Rect2i(Vector2i.ZERO,Vector2i(HD_CELL))).get_used_rect().size.y
 	var column:int=posmod(int(time*(9.0 if row==1 else 5.0)),4)
 	var factor:float=float(MotionArt.definition(biome).get("world_height",99.0))/maxf(1.0,float(hd_neutral_height[biome]))
-	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(float(en["face"]),1)*factor,0,en["pos"]))
+	var pose:=base*Transform2D(0,Vector2(float(en["face"]),1)*factor,0,en["pos"])
+	if Ink.draw_frame(c,hd_motion[biome],HD_ANCHOR,Rect2(Vector2(column,row)*HD_CELL,HD_CELL),pose,tint):return true
+	c.draw_set_transform_matrix(pose)
 	c.draw_texture_rect_region(hd_motion[biome],Rect2(-HD_ANCHOR,HD_CELL),Rect2(Vector2(column,row)*HD_CELL,HD_CELL),tint)
 	c.draw_set_transform_matrix(base)
 	return true
@@ -98,10 +101,12 @@ static func _draw(c:CanvasItem,biome:String,sheet:String,cell:Vector2i,at:Vector
 	var tex:Texture2D=_texture(sheet)
 	if tex==null:return false
 	var scale_value:float=_factor(biome)
-	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face,1)*scale_value,0,at))
+	var pose:=base*Transform2D(0,Vector2(face,1)*scale_value,0,at)
 	var redraw:bool=_is_redraw(tex)
 	var pixels:Vector2=REDRAW_CELL if redraw else CELL
 	var anchor:Vector2=REDRAW_ANCHOR if redraw else ANCHOR
+	if Ink.draw_frame(c,tex,anchor,Rect2(Vector2(cell)*pixels,pixels),pose,tint):return true
+	c.draw_set_transform_matrix(pose)
 	c.draw_texture_rect_region(tex,Rect2(-anchor,pixels),Rect2(Vector2(cell)*pixels,pixels),tint)
 	c.draw_set_transform_matrix(base)
 	return true

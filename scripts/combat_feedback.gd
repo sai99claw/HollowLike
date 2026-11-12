@@ -16,11 +16,11 @@ var trail_texture:GradientTexture2D
 var cache_motes:CPUParticles2D
 const FLASH_LENGTH:float=1280.0/3.0*1.2
 var impact_rng:=RandomNumberGenerator.new()
-func hit(en:Dictionary,at:Vector2,direction:Vector2,style:String,_killed:bool,show_crescent:bool=true) -> void:
+func hit(en:Dictionary,at:Vector2,direction:Vector2,style:String,_killed:bool,show_crescent:bool=true,straight_slash:bool=false) -> void:
 	if flashes.size()>=12:flashes.pop_front()
 	at=impact_center(en,at)
 	var spray:Vector2=direction.normalized() if direction.length_squared()>.01 else Vector2.RIGHT
-	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.25,"max":.25,"length":1280.0/3.0,"started_usec":Time.get_ticks_usec(),"feathers":true,"crescent":show_crescent})
+	flashes.append({"at":at,"spray_at":spray_origin(en,at,spray),"dir":spray,"angle":spray.angle()+impact_rng.randf_range(-.24,.24),"style":style,"life":.25,"max":.25,"length":1280.0/3.0,"started_usec":Time.get_ticks_usec(),"feathers":true,"crescent":show_crescent,"straight":straight_slash,"straight_angle":spray.angle()+impact_rng.randf_range(-.56,.56) if straight_slash else 0.0})
 	queue_redraw()
 
 static func impact_center(en:Dictionary,fallback:Vector2) -> Vector2:
@@ -92,8 +92,8 @@ func _draw() -> void:
 		if int(en.get("model",0))==4:
 			Boss.delivered(self,en,"death",progress,Transform2D.IDENTITY,Color(1,1,1,1-progress*.7));continue
 		FX.actor(self,FX.enemy_clip(en,"death"),progress,en["pos"],Transform2D.IDENTITY,float(en["face"]),float(en.get("scale",1)),Color(1,1,1,1-progress*.8),"death",-1,str(en.get("visual_movement",en.get("movements",["walk"])[0])) in ["hover","drift"])
-func draw_screen(c:CanvasItem,base:Transform2D) -> void:
-	for flash:Dictionary in flashes:preload("res://scripts/hit_art_v37.gd").draw(c,flash,base)
+func draw_screen(c:CanvasItem,base:Transform2D,screen_width:float=1280.0) -> void:
+	for flash:Dictionary in flashes:preload("res://scripts/hit_art_v37.gd").draw(c,flash,base,screen_width)
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 func projectile_trail(pr:Dictionary,speed:float=1) -> void:

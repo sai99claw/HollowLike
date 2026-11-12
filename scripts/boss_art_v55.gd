@@ -1,5 +1,6 @@
 class_name BossArtV55
 extends RefCounted
+const Ink=preload("res://scripts/enemy_ink_v74.gd")
 
 const Motion=preload("res://scripts/monster_motion_v18.gd")
 const ROOT:String="res://assets/v55/bosses/"
@@ -48,7 +49,9 @@ static func draw_frame(c:CanvasItem,biome:String,frame:int,at:Vector2,face:float
 		if not ResourceLoader.exists(path):return false
 		sheets[biome]=load(path)
 	var scale_value:float=_factor(biome)
-	c.draw_set_transform_matrix(base*Transform2D(0,Vector2(face/stretch,stretch)*scale_value,0,at))
+	var pose:Transform2D=base*Transform2D(0,Vector2(face/stretch,stretch)*scale_value,0,at)
+	if Ink.draw_frame(c,sheets[biome],ANCHOR,Rect2(Vector2(frame*CELL.x,0),CELL),pose,tint):return true
+	c.draw_set_transform_matrix(pose)
 	c.draw_texture_rect_region(sheets[biome],Rect2(-ANCHOR,CELL),Rect2(Vector2(frame*CELL.x,0),CELL),tint)
 	c.draw_set_transform_matrix(base)
 	return true

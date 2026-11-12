@@ -104,7 +104,7 @@ func set_safe_rect(safe:Rect2) -> void:
 	ui_root.scale=Vector2.ONE*factor
 	ui_root.size=safe.size/factor
 	var extra:Vector2=ui_root.size-logical
-	edge_tools.position=Vector2(944+extra.x,18)
+	edge_tools.position=Vector2(1225+extra.x,13)
 	mute_button.position=Vector2(809+extra.x,18)
 	quickbar.position=Vector2(20,642+extra.y)
 
@@ -199,16 +199,19 @@ func _build_header() -> void:
 	dream_row.add_child(dream_label)
 	var tools := HBoxContainer.new()
 	edge_tools=tools
-	tools.position = Vector2(944,18)
+	tools.position = Vector2(1225,13)
 	tools.add_theme_constant_override("separation",6)
 	ui_root.add_child(tools)
-	for entry: Array in [["裝備 E","bag"],["符文 R","runes"],["選單 Esc","settings"]]:
+	for entry: Array in [["≡","settings"]]:
 		var button := _button(str(entry[0]),str(entry[1]),null)
 		shortcut_buttons[str(entry[1])]=button;button.focus_mode=Control.FOCUS_NONE
-		button.custom_minimum_size = Vector2(98,34)
+		button.flat=true
+		button.tooltip_text="暫停選單 · Esc"
+		button.custom_minimum_size = Vector2(34,34)
 		button.add_theme_font_size_override("font_size",12)
 		tools.add_child(button)
 	mute_button=_button("聲音：開", "mute", null);mute_button.focus_mode=Control.FOCUS_NONE;mute_button.name="TopMuteButton";mute_button.position=Vector2(809,18);mute_button.custom_minimum_size=Vector2(120,34);ui_root.add_child(mute_button)
+	mute_button.hide()
 	prep_button = _button("安全屋 ↑","prep",null)
 	prep_button.focus_mode=Control.FOCUS_NONE
 	prep_button.position = Vector2(20,190)
@@ -430,8 +433,7 @@ func show_panel(title: String, sections: Array[Dictionary]) -> void:
 
 func update_shortcuts(names:Dictionary) -> void:
 	prep_button.text="安全屋 "+str(names.get("up","↑"))
-	for action in shortcut_buttons:
-		shortcut_buttons[action].text={"bag":"裝備","runes":"符文","settings":"選單"}[action]+" "+str(names.get("interact" if action=="bag" else action,""))
+	shortcut_buttons["settings"].tooltip_text="暫停選單 · "+str(names.get("settings","Esc"))
 	legend_label.text="移動 %s %s %s %s    跳 %s    攻擊 %s    衝刺 %s ×2    副武器 %s    回血 %s    地圖 按住 %s ／ M"%[names.get("up","↑"),names.get("down","↓"),names.get("left","←"),names.get("right","→"),names.get("jump","Space"),names.get("attack","X"),names.get("dash","C"),names.get("sub","Z"),names.get("heal","A"),names.get("map","Tab")]
 
 

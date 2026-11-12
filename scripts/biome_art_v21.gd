@@ -86,7 +86,7 @@ static func fill_patches(rect:Rect2,seed_value:int=0) -> Array[Dictionary]:
 			if flip_y:uv.y=1-uv.y-extent.y
 			result.append({"rect":target,"uv":Rect2(uv,extent),"flip_x":flip_x,"flip_y":flip_y,"section":Vector2i(x,y)})
 	return result
-static func _fill(c:CanvasItem,image:Texture2D,rect:Rect2,_seed_value:int) -> void:
+static func _fill(c:CanvasItem,image:Texture2D,rect:Rect2,_seed_value:int,top:float) -> void:
 	var period:float=Terrain.PERIOD
 	for row in range(floori(rect.position.y/period),ceili(rect.end.y/period)):
 		for column in range(floori(rect.position.x/period),ceili(rect.end.x/period)):
@@ -96,20 +96,44 @@ static func _fill(c:CanvasItem,image:Texture2D,rect:Rect2,_seed_value:int) -> vo
 			var horizontal:bool=posmod(column,2)==1;var vertical:bool=posmod(row,2)==1
 			if horizontal:uv.x=1-uv.x-extent.x
 			if vertical:uv.y=1-uv.y-extent.y
-			c.draw_set_transform_matrix(Transform2D(0,Vector2(-1 if horizontal else 1,-1 if vertical else 1),0,part.get_center()))
-			c.draw_texture_rect_region(image,Rect2(-part.size*.5,part.size),Rect2(uv*image.get_size(),extent*image.get_size()))
+			if c.has_meta("graded_terrain") and part.end.y>top+20.0:
+				_graded_patch(c,image,part,uv,extent,horizontal,vertical,top)
+			else:
+				c.draw_set_transform_matrix(Transform2D(0,Vector2(-1 if horizontal else 1,-1 if vertical else 1),0,part.get_center()))
+				c.draw_texture_rect_region(image,Rect2(-part.size*.5,part.size),Rect2(uv*image.get_size(),extent*image.get_size()))
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
+
+static func _graded_patch(c:CanvasItem,image:Texture2D,part:Rect2,uv:Vector2,extent:Vector2,flip_x:bool,flip_y:bool,top:float) -> void:
+	c.draw_set_transform_matrix(Transform2D.IDENTITY)
+	var rows:Array[float]=[part.position.y]
+	for boundary:float in [top+20.0,top+32.0]:
+		if boundary>part.position.y and boundary<part.end.y:rows.append(boundary)
+	rows.append(part.end.y)
+	var left:float=uv.x+(extent.x if flip_x else 0.0)
+	var right:float=uv.x+(0.0 if flip_x else extent.x)
+	for i in rows.size()-1:
+		var y0:float=rows[i]
+		var y1:float=rows[i+1]
+		var v0:float=(y0-part.position.y)/part.size.y
+		var v1:float=(y1-part.position.y)/part.size.y
+		var t0:float=uv.y+extent.y*(1.0-v0 if flip_y else v0)
+		var t1:float=uv.y+extent.y*(1.0-v1 if flip_y else v1)
+		# RGB identifies this material pass. Alpha carries the depth weight.
+		var a:=Color(.125,.5,.875,clampf((y0-top-20.0)/12.0,0,1))
+		var b:=Color(.125,.5,.875,clampf((y1-top-20.0)/12.0,0,1))
+		c.draw_polygon(PackedVector2Array([Vector2(part.position.x,y0),Vector2(part.end.x,y0),Vector2(part.end.x,y1),Vector2(part.position.x,y1)]),PackedColorArray([a,a,b,b]),PackedVector2Array([Vector2(left,t0),Vector2(right,t0),Vector2(right,t1),Vector2(left,t1)]),image)
 static func draw_terrain(c:CanvasItem,biome:String,layout:Dictionary,solids:Array,visible:Rect2=Rect2(),reduced:bool=false) -> bool:
 	var fill:Texture2D=Terrain.texture("material-"+biome+".png")
 	if fill==null:fill=Surfaces.material(biome)
 	if fill==null:return false
 	var seed_value:int=int(layout.get("seed",0));var edge_list:Array=layout.get("art_edges_v21",[])
 	for rect:Rect2 in solids:
+		var top:float=rect.position.y
 		if visible.has_area():
 			rect=rect.intersection(visible)
 			if not rect.has_area():continue
 		c.draw_rect(rect,Surfaces.BASE_COLORS.get(biome,Color("354331")))
-		_fill(c,fill,rect,seed_value)
+		_fill(c,fill,rect,seed_value,top)
 	for edge:Dictionary in edge_list:
 		var span:Vector2=edge["span"];var side:String=edge["side"]
 		if visible.has_area():

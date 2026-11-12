@@ -79,7 +79,7 @@ func test_viewer() -> void:
 	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("歸屬/主角"))
 	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("用途/特效"))
 	viewer._exclude_menu.get_popup().id_pressed.emit(viewer.tag_options.find("使用狀態/未使用"))
-	check(slash in viewer.filtered_entries and not Catalog.entry("v72:straight_slash") in viewer.filtered_entries,"The menus combine multiple inclusions with an exclusion")
+	check(slash in viewer.filtered_entries and not Catalog.entry("v70:pigeon:attack:0") in viewer.filtered_entries,"The menus combine multiple inclusions with an exclusion")
 	viewer.select_entry("slash:v18")
 	viewer.set_custom_tag("動作驗收",true)
 	var custom_index:int=viewer.tag_options.find("自訂/動作驗收")

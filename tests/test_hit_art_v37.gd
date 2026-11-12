@@ -47,15 +47,26 @@ func run() -> void:
 	game.p_attack.tick(float(game.p_attack.attack["windup"])+.001)
 	check(game.p_attack.is_active(),"Primary attack reaches the active strike")
 	var target:Dictionary=game.enemies[0]
-	var hitbox:Rect2=game._attack_box(game.p["pos"],game.p_attack.attack,1)
+	var hitbox:Rect2=game._player_strike_box(game.p_attack.attack)
+	game.p["pos"]+=Vector2(200,0)
+	check(game._player_strike_box(game.p_attack.attack)==hitbox and game.player_slashes.back()["box"]==hitbox,"Moving cannot drag a strike box or effect")
 	target["pos"]+=hitbox.get_center()-game._enemy_body_box(target).get_center()
 	game.combat_feedback.clear()
 	game._process_player_attack()
-	check(game.combat_feedback.flashes.size()==1 and not game.combat_feedback.flashes[0]["crescent"],"An ordinary strike ejects feathers without layering the old crescent")
+	check(game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["straight"] and not game.combat_feedback.flashes[0]["crescent"],"An ordinary strike ejects feathers without layering the old crescent")
+	var flash:Dictionary=game.combat_feedback.flashes[0]
+	check(flash["at"].is_equal_approx(Feedback.impact_center(target,Vector2.ZERO)),"Straight strike is centered on the target sprite")
+	var variations:Dictionary={}
+	for i in 12:
+		feedback.hit({},Vector2(90,40),Vector2.RIGHT,"quick",false,false,true)
+		var angle:float=feedback.flashes.back()["straight_angle"]
+		variations[snappedf(angle,.005)]=true
+		check(absf(angle)<=.561,"Impact rotates around the hit direction within its intended arc")
+	check(variations.size()>1,"Repeated hits vary the angle")
 	var frozen_pose:float=game._enemy_pose_clock(target)
 	game.draw_clock+=.1
-	game._update_enemies_profiled_body(.1)
-	check(is_equal_approx(target["impact_freeze_left"],.025) and game._enemy_pose_clock(target)==frozen_pose and game.hitstop==0,"Only the struck enemy pose freezes")
-	game._update_enemies_profiled_body(.025)
-	check(is_zero_approx(target["impact_freeze_left"]),"Enemy resumes after 1/8 second")
+	game._update_enemies_profiled_body(.05)
+	check(is_equal_approx(target["impact_freeze_left"],.02) and game._enemy_pose_clock(target)==frozen_pose and game.hitstop==0,"Only the struck enemy pose freezes")
+	game._update_enemies_profiled_body(.021)
+	check(is_zero_approx(target["impact_freeze_left"]),"Enemy resumes after roughly 70 ms of local hitstop")
 	game.queue_free();feedback.queue_free();await process_frame;print("v37 hit and animation checks: ",failures);quit(0 if failures.is_empty() else 1)
