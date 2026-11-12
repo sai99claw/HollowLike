@@ -24,7 +24,7 @@ static func texture(clip:String) -> Texture2D:
 		var weapon:Texture2D=preload("res://scripts/weapon_art_v24.gd").texture(clip.trim_prefix("secondary_"))
 		if weapon!=null:
 			var atlas:=AtlasTexture.new();atlas.atlas=weapon;atlas.region=Rect2(Vector2.ZERO,weapon.get_size());icons[clip]=atlas;return atlas
-	clip={"runes_sub_velocity":"runes_gale","runes_sub_reach":"runes_reach","runes_sub_power":"runes_pierce","runes_sub_volume":"runes_multishot"}.get(clip,clip)
+	clip={"runes_rapid_slash":"runes_gale","runes_quick_charge":"runes_soul","runes_fleet_foot":"runes_wing","runes_sub_velocity":"runes_gale","runes_sub_reach":"runes_reach","runes_sub_power":"runes_pierce","runes_sub_volume":"runes_multishot"}.get(clip,clip)
 	var new_art:Texture2D=InventoryArt.texture(clip)
 	if new_art!=null:return new_art
 	clip={"runes_dewflow":"runes_soul","runes_swarm":"strong_orbit_bee","runes_multishot":"growth_shots","secondary_multibounce":"secondary_ricochet","secondary_impact_bomb":"weapon_bomb","secondary_piercing_laser":"beam_body","secondary_shockwave":"flying_slash_weapon","secondary_chain_staff":"weapon_spear"}.get(clip,clip)

@@ -1,7 +1,7 @@
 class_name InputSettings
 extends RefCounted
-const DEFAULTS:Dictionary={"left":KEY_LEFT,"right":KEY_RIGHT,"up":KEY_UP,"down":KEY_DOWN,"jump":KEY_SPACE,"attack":KEY_X,"dash":KEY_C,"sub":KEY_Z,"heal":KEY_A,"interact":KEY_E,"bag":KEY_I,"runes":KEY_R,"skills":KEY_K,"map":KEY_TAB,"cycle":KEY_Q,"primary_1":KEY_1,"primary_2":KEY_2,"primary_3":KEY_3,"settings":KEY_ESCAPE}
-const NAMES:Dictionary={"left":"向左","right":"向右","up":"向上／站點互動","down":"向下","jump":"跳躍","attack":"普攻／集氣","dash":"衝刺／雙 C 穿刺","sub":"副武器","heal":"長按回血","interact":"裝備狀態面板","bag":"背包","runes":"符文盤","skills":"技能樹","map":"地圖","cycle":"切換副武器","primary_1":"主武器 1","primary_2":"主武器 2","primary_3":"主武器 3","settings":"開關選單"}
+const DEFAULTS:Dictionary={"left":KEY_LEFT,"right":KEY_RIGHT,"up":KEY_UP,"down":KEY_DOWN,"jump":KEY_SPACE,"attack":KEY_X,"dash":KEY_C,"sub":KEY_Z,"heal":KEY_A,"interact":KEY_E,"bag":KEY_I,"runes":KEY_R,"skills":KEY_K,"map":KEY_TAB,"cycle":KEY_Q,"primary_1":KEY_1,"primary_2":KEY_2,"primary_3":KEY_3,"ultimate":KEY_S,"settings":KEY_ESCAPE}
+const NAMES:Dictionary={"left":"向左","right":"向右","up":"向上／站點互動","down":"向下","jump":"跳躍","attack":"普攻／集氣","dash":"衝刺／雙 C 穿刺","sub":"副武器","heal":"長按回血","interact":"裝備狀態面板","bag":"背包","runes":"符文盤","skills":"技能樹","map":"地圖","cycle":"切換副武器","primary_1":"主武器 1","primary_2":"主武器 2","primary_3":"主武器 3","ultimate":"滿能量大招","settings":"開關選單"}
 static func load_bindings(raw:Variant) -> Dictionary:
 	var result:Dictionary=DEFAULTS.duplicate()
 	if raw is Dictionary:

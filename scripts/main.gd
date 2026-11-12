@@ -144,6 +144,11 @@ var projectiles: Array[Dictionary] = []
 var hazards: Array[Dictionary] = []
 var effects: Array[Dictionary] = []
 var floaters: Array[Dictionary] = []
+const LIFT_CHARGE_SECONDS:float=1.0
+const LIFT_SPEED:float=1070.0
+const ULTIMATE_RADIUS:float=280.0
+const ULTIMATE_DAMAGE:float=12.0
+const ULTIMATE_KNOCKBACK:float=680.0
 const ROOM_CLEAR_SLOW_SECONDS:float=2.0
 const ROOM_CLEAR_WORLD_RATE:float=.28
 var room_clear_slow_left:float=0.0
@@ -423,7 +428,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.axis==JOY_AXIS_LEFT_Y:
 			_set_action("up",event.axis_value<-.5);_set_action("down",event.axis_value>.5)
 	elif event is InputEventJoypadButton:
-		var pad_action:String={JOY_BUTTON_A:"jump",JOY_BUTTON_B:"dash",JOY_BUTTON_X:"attack",JOY_BUTTON_Y:"sub",JOY_BUTTON_DPAD_UP:"up",JOY_BUTTON_DPAD_DOWN:"down",JOY_BUTTON_DPAD_LEFT:"left",JOY_BUTTON_DPAD_RIGHT:"right",JOY_BUTTON_RIGHT_SHOULDER:"heal"}.get(event.button_index,"")
+		var pad_action:String={JOY_BUTTON_A:"jump",JOY_BUTTON_B:"dash",JOY_BUTTON_X:"attack",JOY_BUTTON_Y:"sub",JOY_BUTTON_DPAD_UP:"up",JOY_BUTTON_DPAD_DOWN:"down",JOY_BUTTON_DPAD_LEFT:"left",JOY_BUTTON_DPAD_RIGHT:"right",JOY_BUTTON_RIGHT_SHOULDER:"heal",JOY_BUTTON_LEFT_SHOULDER:"ultimate"}.get(event.button_index,"")
 		if not pad_action.is_empty():_set_action(pad_action,event.pressed)
 		if event.pressed and event.button_index==JOY_BUTTON_START:_show_settings()
 	elif event is InputEventKey:
@@ -485,7 +490,7 @@ func _set_action(action: String, pressed: bool) -> void:
 		return
 	if screen=="hub" and pressed and action in ["jump","dash","attack"]:home_sleeping=false;home_wake_left=0
 	if action=="jump":
-		if pressed and not _key("jump"):p["jump_buffer_left"]=.12;p["jump_released"]=false
+		if pressed and not _key("jump"):p["jump_buffer_left"]=0.0 if screen=="game" and _key("up") else .12;p["jump_released"]=false
 		elif not pressed:p["jump_released"]=true
 	if _action_locked() and action in (["attack","sub","interact","up"] if _release_locked() else ["jump","attack","sub","interact","up"]):
 		if pressed and action in ["attack","sub"]:_reject_attack("locked")
@@ -498,7 +503,7 @@ func _set_action(action: String, pressed: bool) -> void:
 	keys[action]=pressed
 	if pressed and not was:
 		match action:
-			"jump": jump_request=true;p["jump_released"]=false
+			"jump": jump_request=not (screen=="game" and _key("up"));p["jump_released"]=false
 			"dash":
 				if screen in ["game","hub"]: _dash_pressed()
 			"attack":
@@ -508,8 +513,12 @@ func _set_action(action: String, pressed: bool) -> void:
 			"sub":
 				if screen=="game": _begin_secondary()
 			"interact": _show_equipment(0)
-			"up": _interact()
+			"up":
+				if not _key("jump"):_interact()
+			"ultimate":_cast_ultimate()
+	if action=="up" and not pressed:p.erase("lift_charge")
 	if action=="jump" and not pressed and was:
+		_release_lift()
 		p["jump_released"]=true
 		if bool(p.get("jump_cut_allowed",false)) and p["vel"].y<0:p["vel"].y=PlayerMotion.cut(p["vel"].y);p["jump_cut_allowed"]=false
 	if action=="attack" and not pressed and was and screen in ["game","hub"]:
@@ -556,7 +565,7 @@ func _clear_keys(close_map:bool=true) -> void:
 	if close_map:map_pinned=false
 	_set_map_held(false)
 	keys.clear(); jump_request=false;
-	if not p.is_empty():p["jump_buffer_left"]=0.0;p["coyote_left"]=0.0
+	if not p.is_empty():p["jump_buffer_left"]=0.0;p["coyote_left"]=0.0;p.erase("lift_charge")
 	charge_timer=0.0; pending_attack.clear(); dash_chain_open=false
 
 func _process(delta: float) -> void:
@@ -891,6 +900,15 @@ func _update_player_profiled_body(delta:float) -> void:
 	for step in steps:_step_player(delta/steps)
 
 func _step_player(delta: float) -> void:
+	if p.get("lift_flying",false):
+		_step_lift(delta)
+		return
+	var preparing_lift:bool=screen=="game" and _key("up") and _key("jump") and not _action_locked() and not _is_healing() and float(p["hurt"])<=0 and float(p.get("dash_t",0))<=0 and not p_attack.is_busy() and not _in_bath()
+	if preparing_lift:
+		p["lift_charge"]=minf(_lift_threshold(),float(p.get("lift_charge",0))+delta)
+		p["jump_buffer_left"]=0.0
+		jump_request=false
+	else:p.erase("lift_charge")
 	if float(p.get("mantle_left",0))>0:
 		Ledge.step(p,delta);return
 	p["_motion_step"]=true
@@ -914,7 +932,7 @@ func _step_player(delta: float) -> void:
 	if float(p["jump_rise_age"])>=0:p["jump_rise_age"]+=delta
 	p["slam_land_left"]=maxf(0,float(p["slam_land_left"])-delta)
 	drop_through_timer=maxf(0,drop_through_timer-delta)
-	var axis: float=0.0 if _movement_locked() else float(int(_key("right"))-int(_key("left")))
+	var axis: float=0.0 if preparing_lift or _movement_locked() else float(int(_key("right"))-int(_key("left")))
 	var speed_factor:float=_movement_factor()
 	if _movement_locked():vel.x=0
 	if axis!=0 and not _release_locked(): p["face"]=signf(axis)
@@ -974,6 +992,7 @@ func _step_player(delta: float) -> void:
 	p["flight_boosting"]=floating
 	if floating:vel.y=-230.0
 	elif gliding:vel.y=minf(vel.y,PlayerMotion.GLIDE_FALL_SPEED)
+	if preparing_lift and not was_grounded:vel.y=clampf(vel.y,-60.0,48.0)
 	if _in_bath() and vel.y>200:vel.y=200
 	if was_attached and int(p["wall"])!=0 and not dash_contact:vel.y=0.0 if float(p.get("wall_hold_left",0))>0 else PlayerMotion.WALL_SLIDE_SPEED
 	var rising:bool=vel.y<0.0
@@ -1036,6 +1055,56 @@ func _step_player(delta: float) -> void:
 	p["_motion_step"]=false
 	p["gliding"]=(floating or gliding) and not p["grounded"] and int(p["wall"])==0
 	p["pos"]=pos;p["vel"]=vel
+	if visual_depth!=null and (dash_contact or (p_attack.is_active() and p_attack.attack.get("kind","")=="pierce")):
+		visual_depth.record_grass_wind(old_pos,pos,draw_clock)
+
+func _lift_threshold() -> float:
+	return LIFT_CHARGE_SECONDS*maxf(.25,1.0-_rune_effect("charge_cut"))
+
+func _release_lift() -> void:
+	var charged:bool=p.has("lift_charge") and float(p["lift_charge"])+.00001>=_lift_threshold()
+	p.erase("lift_charge")
+	if not charged or not _key("up") or _action_locked() or p_attack.is_busy() or float(p["hurt"])>0:return
+	p["lift_flying"]=true
+	p["recoil_left"]=0.0
+	p["vel"]=Vector2(0,-LIFT_SPEED)
+	p["grounded"]=false
+	p["wall"]=0
+	p["jump_cut_allowed"]=false
+	p["jump_buffer_left"]=0.0
+	p["coyote_left"]=0.0
+	p["fall_distance"]=0.0
+	_sound("flight_boost")
+	_contact_fx("vertical_launch",p["pos"],.48,152.0)
+
+func _step_lift(delta:float) -> void:
+	var motion:Dictionary=Coll.move_body(p["pos"],Vector2(0,-LIFT_SPEED),delta,Vector2(34,42),solids,4)
+	var at:Vector2=motion["pos"]
+	var blocked:bool=float(motion["vel"].y)>=0.0 or at.y<=42.0
+	if blocked:
+		p.erase("lift_flying")
+		p["vel"]=Vector2.ZERO
+		p["pos"]=Vector2(at.x,maxf(42.0,at.y))
+	else:
+		p["pos"]=at
+		p["vel"]=Vector2(0,-LIFT_SPEED)
+
+func _cast_ultimate() -> void:
+	if screen!="game" or _action_locked() or p_attack.is_busy() or _ordinary_slash_playing() or float(p["hurt"])>0:return
+	if int(p["energy"])<int(p["max_energy"]):_toast("能量全滿才能施放大招");return
+	p["energy"]=0
+	p["energy_recovery"]=0.0
+	p_attack.begin({"kind":"ultimate","windup":0.0,"active":.24,"recovery":.18})
+	var center:Vector2=_body_box(p["pos"]).get_center()
+	_contact_fx("feather_charge",center,.45,ULTIMATE_RADIUS*2)
+	for enemy:Dictionary in enemies:
+		var body:Rect2=_enemy_body_box(enemy)
+		var closest:Vector2=center.clamp(body.position,body.end)
+		if float(enemy["hp"])<=0 or center.distance_squared_to(closest)>ULTIMATE_RADIUS*ULTIMATE_RADIUS:continue
+		_hit_enemy(enemy,ULTIMATE_DAMAGE,Color("f6e8ff"),ULTIMATE_KNOCKBACK,center,center.direction_to(body.get_center()))
+	_sound("attack_heavy")
+	shake=maxf(shake,11.0)
+	_update_hud()
 
 func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0) -> float:
 	if vertical_speed<0: return INF
@@ -1050,6 +1119,7 @@ func _restore_ground_movement() -> void:
 	p["jumps"]=0;p["air_dash"]=false
 
 func _dash_pressed() -> void:
+	if p.get("lift_flying",false):return
 	if float(p.get("heavy_land_left",0))>0 or float(p.get("mantle_left",0))>0:return
 	if float(p.get("knockback_t",0))>0 or not life_event.is_empty():return
 	if _key("up"):return
@@ -1087,7 +1157,11 @@ func _primary_definition(request:Dictionary) -> Dictionary:
 	var haste:float=(1+float(upgrades["haste"])*.07+_rune_effect("haste"))*(1+_rune_effect("haste_mult"))
 	def["windup"]=0.0
 	def["recovery"]=float(def["recovery"])/haste*phase_multiplier
-	if not bool(def["charged"]):def["active"]=float(def["active"])*phase_multiplier
+	if not bool(def["charged"]):
+		var rate:float=1.0+_rune_effect("attack_rate")
+		def["active"]=float(def["active"])*phase_multiplier/rate
+		def["recovery"]=float(def["recovery"])/rate
+		def["animation_rate"]=rate
 	def["range"]=float(def["range"])*(1+float(upgrades["reach"])*.07+_rune_effect("reach"))*(1+_rune_effect("reach_mult"))
 	if mode=="musou":def["damage"]=ceilf(float(def["damage"])*(1+float(upgrades["power"])*.14))
 	def["face"]=float(p["face"])
@@ -1109,7 +1183,7 @@ func _slam_invulnerable() -> bool:
 	return bool(p.get("slam",false)) or (p_attack.is_busy() and p_attack.attack.get("kind","") in ["pierce","slam"] and p_attack.phase in ["windup","active"])
 
 func _action_locked() -> bool:
-	return float(p.get("mantle_left",0))>0 or float(p.get("heavy_land_left",0))>0 or _wind_form_active() or _release_locked() or (p_attack.is_active() and p_attack.attack.get("style","")=="heavy") or float(p.get("impact_root",0))>0
+	return p.get("lift_flying",false) or float(p.get("mantle_left",0))>0 or float(p.get("heavy_land_left",0))>0 or _wind_form_active() or _release_locked() or (p_attack.is_active() and p_attack.attack.get("style","")=="heavy") or float(p.get("impact_root",0))>0
 
 func _normal_damage() -> float:
 	return float(_primary_definition({"dir":"right","charged":false,"dash_charge":false})["damage"])
@@ -1117,7 +1191,7 @@ func _normal_damage() -> float:
 func _ordinary_slash_playing() -> bool:
 	if player_slashes.is_empty():return false
 	var last:Dictionary=player_slashes.back()
-	return not last["definition"].get("charged",false) and draw_clock-float(last["start"])<SlashArt.DURATION
+	return not last["definition"].get("charged",false) and (draw_clock-float(last["start"]))*float(last["definition"].get("animation_rate",1.0))<SlashArt.DURATION
 
 func _begin_primary(request:Dictionary) -> void:
 	if not request.get("charged",false) and _ordinary_slash_playing():_reject_attack("busy");return
@@ -1248,7 +1322,7 @@ func _process_player_attack_profiled_body() -> void:
 	var def: Dictionary=p_attack.attack
 	var kind: String=str(def.get("kind",""))
 	if kind=="secondary" and def.get("weapon_kind","")!="sword": return
-	if kind in ["slam","item_bomb"]: return
+	if kind in ["slam","item_bomb","ultimate"]: return
 	var hitbox: Rect2=_body_box(p["pos"]).grow(12) if kind=="pierce" else _player_strike_box(def)
 	for en in enemies:
 		if float(en["hp"])<=0: continue
@@ -1363,6 +1437,7 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 func _hurt_player(amount:float,source:Vector2) -> bool:
 	if lab_mode=="tutorial":return false
 	if _slam_invulnerable() or not life_event.is_empty() or float(p["invul"])>0 or float(p["shield"])>0 or _healing_guard():return false
+	p.erase("lift_flying");p.erase("lift_charge")
 	amount=maxi(1,roundi(amount)) if amount>0 else 0
 	charge_timer=0;keys["attack"]=false;idle_time=0
 	p["mantle_left"]=0
@@ -2141,6 +2216,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 	_save_meta()
 
 func _enter_room(id: int, from_dir: String="center") -> void:
+	p.erase("lift_charge");p.erase("lift_flying")
 	if visual_juice!=null:visual_juice.clear()
 	player_slashes.clear()
 	if perf_log.active:perf_log.mark(_performance_context(),"room_change")
@@ -2727,7 +2803,7 @@ func _update_hud() -> void:
 func _update_hud_profiled_body() -> void:
 	if ui==null:return
 	var phase_name:String=p_attack.phase
-	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","dash_key":Bindings.label(int(key_bindings["dash"])),"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
+	ui.update_hud({"hp":p.get("hp",5),"max_hp":p.get("max_hp",5),"energy":p.get("energy",3),"max_energy":p.get("max_energy",6),"hp_recovery":float(p.get("hp_recovery",0)),"energy_recovery":float(p.get("energy_recovery",0)),"hp_recovering":heal_timer>0 or float(p.get("hp_recovery",0))>0,"energy_recovering":float(p.get("energy_recovery",0))>0 or (float(p.get("energy",1))<1 and empty_energy_time>0),"injured":injured,"coins":int(meta["coins"]) if screen=="hub" else run_coins,"mode":"新手教學" if lab_mode=="tutorial" else ("鳥巢" if screen=="hub" else _mode_name()),"weapon":Data.PRIMARY[weapon_index]["name"],"sub":_secondary()["name"] if not bag_weapons.is_empty() else "尚未裝備","phase":phase_name,"phase_progress":p_attack.progress(),"phase_remaining":maxf(0,float(p_attack.attack.get(p_attack.phase,0))-p_attack.elapsed),"show_attack":screen=="game","ultimate_key":Bindings.label(int(key_bindings["ultimate"])),"lift_progress":float(p.get("lift_charge",-1.0))/_lift_threshold(),"dash_key":Bindings.label(int(key_bindings["dash"])),"audio_enabled":audio_enabled,"sub_count":0 if bag_weapons.is_empty() else (bag_weapons.size() if mode=="musou" else int(_secondary()["count"])),"sub_icon":UI.Icons.secondary(_secondary()) if not bag_weapons.is_empty() else "","cycle_key":Bindings.label(int(key_bindings["cycle"])),"dream_energy":dream.energy,"dream_rage":dream.rage_left,"in_start":_is_start()})
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
 	ui.update_quickbar(bag_items,Data.ITEMS)
 	ui.quickbar.visible=screen=="game" and not ui.is_panel_open() and not minimap_open
@@ -2857,7 +2933,9 @@ func _draw_profiled_body() -> void:
 		elif e.has("combat_fx"):
 			var extent:float=float(e.get("fx_extent",65))
 			var alpha:float=Explosion.OPACITY if str(e["combat_fx"]).begins_with("explosion_") else 1.0
-			FX.fitted(self,e["combat_fx"],1-float(e["life"])/float(e["max"]),Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,alpha))
+			var progress:float=1-float(e["life"])/float(e["max"])
+			if e["combat_fx"]=="vertical_launch":FX.frame(self,"vertical_launch",progress,e["pos"],world_transform,1.0,extent)
+			else:FX.fitted(self,e["combat_fx"],progress,Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","active" if e["combat_fx"]=="feather_charge" else "",Color(1,1,1,alpha))
 		elif bool(e["ring"]):
 			var radius:float=float(e["radius"])
 			SkillArt.draw_ring(self,1.0-c.a,Rect2(Vector2(e["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),e["color"])
@@ -2938,6 +3016,12 @@ func _draw_player_body() -> void:
 		player_base=world_transform*Transform2D(0,body_scale,0,p["pos"])*Transform2D(0,-Vector2(p["pos"]))
 	if float(p["slam_land_left"])>0:
 		AdventurePose.draw_action(self,3,3,p["pos"],p["face"],player_base,tint)
+	elif p.get("lift_flying",false):
+		AdventurePose.draw_glide(self,p["pos"],p["face"],player_base,tint)
+	elif p.has("lift_charge"):
+		preload("res://scripts/double_jump_v27.gd").draw(self,p["pos"],float(p["face"]),fposmod(draw_clock,.70)*.32/.70,player_base,tint)
+	elif p_attack.is_busy() and p_attack.attack.get("kind","")=="ultimate":
+		FX.actor(self,"pigeon_feather_charge",p_attack.progress(),p["pos"],player_base,float(p["face"]),1.0,tint,"active")
 	elif bool(p["slam"]):
 		AdventurePose.draw_action(self,3,AdventurePose.slam_frame(p["slam_age"]),p["pos"],p["face"],player_base,tint)
 	elif _wind_form_active():
@@ -3389,9 +3473,9 @@ func _recoil(distance:float,source:Vector2,direction:Vector2=Vector2.ZERO) -> vo
 	p["recoil_left"]=.18;p["recoil_base_y"]=p["vel"].y
 	p["recoil_velocity"]=(direction.normalized() if direction.length_squared()>.01 else Vector2(away,0))*distance/.18
 
-func _contact_fx(clip:String,at:Vector2) -> void:
+func _contact_fx(clip:String,at:Vector2,duration:float=.3,extent:float=65.0) -> void:
 	if effects.size()>=MAX_PARTICLES:effects.pop_front()
-	effects.append({"pos":at,"color":Color.WHITE,"life":.3,"max":.3,"ring":false,"radius":0.0,"vel":Vector2.ZERO,"combat_fx":clip})
+	effects.append({"pos":at,"color":Color.WHITE,"life":duration,"max":duration,"ring":false,"radius":0.0,"vel":Vector2.ZERO,"combat_fx":clip,"fx_extent":extent})
 
 func _hit_flash(at:Vector2,damage:float,color:Color) -> void:
 	if effects.size()>=MAX_PARTICLES:effects.pop_front()
@@ -3488,7 +3572,7 @@ func _update_passives_profiled_body(delta:float) -> void:
 	var distance:float=p["pos"].distance_to(last_motion_pos);last_motion_pos=p["pos"]
 	if _rune_effect("motion_energy")>0 and distance<80:
 		move_energy_distance+=distance
-		while move_energy_distance>=220:move_energy_distance-=220;_restore_vital("energy",1);_contact_fx("motion_energy",p["pos"]-Vector2(0,24))
+		while move_energy_distance>=220:move_energy_distance-=220;_restore_vital("energy",1)
 	bee_timer-=delta
 	if _rune_effect("orbit_bee")>0 and bee_timer<=0:
 		bee_timer=1.0
@@ -3949,7 +4033,7 @@ func _draw_props(focus:Dictionary={}) -> void:
 			if not prop.get("used",false):continue
 			BiomeArt.prop(self,prop,biome,clock,prop_base);continue
 		if kind=="grass":
-			WorldDetail.grass(self,prop,clock,prop_base);continue
+			WorldDetail.grass(self,prop,clock,prop_base,visual_depth.grass_bend(at,draw_clock));continue
 		if kind=="spring" and layout.get("pool",Rect2()).size.x>0:
 			continue # Pool masonry and steam use a retained draw list.
 		if kind=="shop_dummy":SanctuaryArt.dummy(self,at,clock,prop_base);continue
@@ -4011,7 +4095,7 @@ func _draw_life_event() -> void:
 	_text(Vector2(570,180),"重傷" if kind=="injury" else ("光榮返巢" if kind=="victory" else ("靈魂返程" if kind=="soul" else "羽翼碎落")),32,Color.WHITE)
 
 func _movement_factor() -> float:
-	var factor:float=(.8 if injured else 1.0)*Tuning.value("move_speed")
+	var factor:float=(.8 if injured else 1.0)*Tuning.value("move_speed")*(1.0+_rune_effect("run_speed"))
 	if charge_timer>.15 and _key("attack"):factor*=.8
 	if _is_healing():factor*=.4
 	if _in_bath():factor*=.55
@@ -4554,7 +4638,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 func _start_player_slash() -> void:
 	var def:Dictionary=p_attack.attack
 	if not def.get("primary",false) or (def.get("charged",false) and not def.get("great_spin_release",false)):return
-	while not player_slashes.is_empty() and draw_clock-float(player_slashes[0]["start"])>=SlashArt.DURATION:
+	while not player_slashes.is_empty() and (draw_clock-float(player_slashes[0]["start"]))*float(player_slashes[0]["definition"].get("animation_rate",1.0))>=SlashArt.DURATION:
 		player_slashes.pop_front()
 	if player_slashes.size()>=8:player_slashes.pop_front()
 	var definition:Dictionary=def.duplicate()
@@ -4565,7 +4649,7 @@ func _paint_player_slash(canvas:CanvasItem) -> void:
 	if screen not in ["game","hub"]:return
 	for slash:Dictionary in player_slashes:
 		var definition:Dictionary=slash["definition"]
-		SlashArt.draw(canvas,_player_strike_box(definition),definition,draw_clock-float(slash["start"]),world_transform)
+		SlashArt.draw(canvas,_player_strike_box(definition),definition,(draw_clock-float(slash["start"]))*float(definition.get("animation_rate",1.0)),world_transform)
 
 func _pogo() -> void:
 	p["jump_cut_allowed"]=false;p["recoil_left"]=0;p["wall_kick_left"]=0
@@ -4578,7 +4662,7 @@ func _melee_hitstop() -> void:
 	hitstop=maxf(hitstop,{"foot":.05,"quick":4.0/60,"heavy":.08}.get(style,.05))
 
 func _charge_threshold() -> float:
-	return Tuning.value("charge_seconds")/(1+float(upgrades["charge"])*.08)
+	return Tuning.value("charge_seconds")*maxf(.25,1.0-_rune_effect("charge_cut"))/(1+float(upgrades["charge"])*.08)
 
 func _update_idle(delta:float) -> void:
 	var quiet:bool=bool(p["grounded"]) and p["vel"].length_squared()<1 and not p_attack.is_busy() and not _key("attack") and not _key("heal") and float(p["hurt"])<=0 and float(p["dash_t"])<=0

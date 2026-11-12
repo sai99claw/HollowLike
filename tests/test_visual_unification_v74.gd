@@ -68,7 +68,15 @@ func run() -> void:
 	check(not world.root_sprites.is_empty() and Edge.ART.size()==3,"Both foreground depths use painted textures")
 	for sprite:Dictionary in world.root_sprites:
 		var local:Rect2=sprite["local"]
-		check(local.has_point(Vector2.ZERO) and local.size.x<=46.01 and local.size.y<=41.01,"Opaque near sprite remains small and attached at its edge anchor")
+		check(local.grow(.01).has_point(Vector2.ZERO) and local.size.x<=46.01 and local.size.y<=41.01,"Opaque near sprite remains small and attached at its edge anchor")
+	for shape:Dictionary in decoration:
+		var rect:Rect2=shape["rect"]
+		var span:Vector2=shape["span"]
+		var at:Vector2=shape["at"]
+		check(rect.position.x>=span.x-.001 and rect.end.x<=span.y+.001,"Attached textures fit the supporting edge span")
+		check(is_equal_approx(rect.end.y-at.y if shape["top"] else at.y-rect.position.y,5.0),"Each terrain attachment overlaps its edge by 5 px")
+	world.record_grass_wind(Vector2(80,500),Vector2(130,500),1.0)
+	check(world.grass_bend(Vector2(120,500),1.0)>0.0 and world.grass_bend(Vector2(120,800),1.0)==0.0 and world.grass_bend(Vector2(120,500),1.5)==0.0,"Dash wake is local, directional and settles")
 	game.queue_free()
 	await process_frame
 	print("v74 visual checks: ",failures)

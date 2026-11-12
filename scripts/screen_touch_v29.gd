@@ -2,7 +2,7 @@ class_name ScreenTouchV29
 extends Control
 signal action_changed(action:String,pressed:bool)
 
-const ACTIONS:Array[String]=["left","right","up","down","sub","attack","dash","jump","heal"]
+const ACTIONS:Array[String]=["left","right","up","down","sub","attack","dash","jump","heal","ultimate"]
 var held:Dictionary={}
 var fingers:Dictionary={}
 var stick_finger:int=-1
@@ -58,7 +58,7 @@ func geometry() -> Dictionary:
 	var unit:float=clampf(minf(extent.x/1280.0,extent.y/720.0),.55,1.5)
 	var r:float=64*unit;var b:float=70*unit;var margin:float=24*unit
 	var right:Vector2=extent-Vector2(margin+b*.5,margin+b*.5)
-	return {"stick":Vector2(margin+r,extent.y-margin-r),"radius":r,"button_radius":b*.5,"sub":right-Vector2(b+12*unit,b+12*unit),"attack":right-Vector2(0,b+12*unit),"dash":right-Vector2(b+12*unit,0),"jump":right,"heal":Vector2(extent.x-margin-b*.5,margin+b*.5+45*unit)}
+	return {"stick":Vector2(margin+r,extent.y-margin-r),"radius":r,"button_radius":b*.5,"sub":right-Vector2(b+12*unit,b+12*unit),"attack":right-Vector2(0,b+12*unit),"dash":right-Vector2(b+12*unit,0),"jump":right,"heal":Vector2(extent.x-margin-b*.5,margin+b*.5+45*unit),"ultimate":Vector2(extent.x-margin-b*.5,margin+b*1.5+57*unit)}
 
 func _input(event:InputEvent) -> void:
 	if bridge!=null or not is_visible_in_tree():return
@@ -71,7 +71,7 @@ func press(index:int,at:Vector2) -> void:
 	var g:Dictionary=geometry()
 	if stick_finger<0 and at.distance_to(g["stick"])<=float(g["radius"])*1.3:
 		stick_finger=index;drag(index,at);get_viewport().set_input_as_handled();return
-	for action:String in ["sub","attack","dash","jump","heal"]:
+	for action:String in ["sub","attack","dash","jump","heal","ultimate"]:
 		if at.distance_to(g[action])<=float(g["button_radius"])*1.12:
 			fingers[index]=action;_set_action(action,true);get_viewport().set_input_as_handled();return
 
@@ -97,7 +97,7 @@ func _draw() -> void:
 	draw_circle(center,r,Color(.04,.12,.15,.55));draw_arc(center,r,0,TAU,48,Color("c5d3b9",.65),2,true)
 	draw_circle(center+stick_vector*r*.63,r*.4,Color("c7d7c3",.82))
 	var font:Font=get_theme_default_font()
-	for entry:Array in [["sub","副武器"],["attack","主武器"],["dash","衝"],["jump","跳躍"],["heal","回血"]]:
+	for entry:Array in [["sub","副武器"],["attack","主武器"],["dash","衝"],["jump","跳躍"],["heal","回血"],["ultimate","大招"]]:
 		var at:Vector2=g[entry[0]];var br:float=g["button_radius"]
 		draw_circle(at,br,Color(.38,.55,.49,.8) if held.get(entry[0],false) else Color(.04,.12,.15,.58))
 		draw_arc(at,br,0,TAU,40,Color("d9cda5",.8),2,true)

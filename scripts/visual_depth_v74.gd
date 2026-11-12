@@ -25,6 +25,11 @@ var origin:=Vector2.INF
 var drift:=Vector2.ZERO
 var fog_y:float=INF
 var time:float=0.0
+const GRASS_WIND_SECONDS:float=.44
+var wind_start:=Vector2.ZERO
+var wind_end:=Vector2.ZERO
+var wind_sign:float=0.0
+var wind_time:float=-INF
 var reduced:bool=false
 
 func _ready() -> void:
@@ -146,6 +151,7 @@ func _ramp(offsets:PackedFloat32Array,colors:PackedColorArray) -> GradientTextur
 func configure(layout:Dictionary,solids:Array,doors:Array,props:Array,active:bool,biome:String="trunk") -> void:
 	origin=Vector2.INF
 	fog_y=INF
+	wind_time=-INF
 	shapes.clear()
 	root_sprites.clear()
 	if active:
@@ -162,6 +168,23 @@ func configure(layout:Dictionary,solids:Array,doors:Array,props:Array,active:boo
 	for prop:Dictionary in props:
 		if prop.get("kind")=="launcher" or (prop.get("kind")=="ecology_object" and int(prop.get("variant",-1)) in luminous):
 			_warm(Vector2(prop["pos"])-Vector2(0,23),144)
+
+func record_grass_wind(from:Vector2,to:Vector2,now:float) -> void:
+	var sign_x:float=signf(to.x-from.x)
+	if sign_x==0.0:return
+	if now-wind_time>.05 or wind_sign!=sign_x or from.distance_squared_to(wind_end)>16.0:wind_start=from
+	wind_end=to
+	wind_start=to+(wind_start-to).limit_length(235.0)
+	wind_sign=sign_x
+	wind_time=now
+
+func _grass_wind_amount(now:float) -> float:
+	var age:float=clampf((now-wind_time)/GRASS_WIND_SECONDS,0.0,1.0)
+	return wind_sign*(1.0-age)*cos(age*TAU*1.25)
+
+func grass_bend(at:Vector2,now:float) -> float:
+	var nearby:Vector2=Geometry2D.get_closest_point_to_segment(at,wind_start,wind_end)
+	return 12.0*_grass_wind_amount(now)*(1.0-smoothstep(12.0,56.0,at.distance_to(nearby)))
 
 func _warm(at:Vector2,radius:float) -> void:
 	var light:=_light(Color("ffc178"),.53)
@@ -220,7 +243,9 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	if bokeh.visible:bokeh.invalidate()
 	details.visible=active
 	details.transform=base
-	details.material.set_shader_parameter("sway_time",time)
+	details.material.set_shader_parameter("wind_start",wind_start)
+	details.material.set_shader_parameter("wind_end",wind_end)
+	details.material.set_shader_parameter("wind_amount",_grass_wind_amount(now))
 	if region!=visible_region:
 		region=visible_region
 		details.invalidate()
@@ -229,9 +254,7 @@ func _paint_canopy(canvas:CanvasItem) -> void:
 	for sprite:Dictionary in root_sprites:
 		var at:Vector2=sprite["at"]
 		if region.has_area() and not region.has_point(at):continue
-		# Anchor stays on the ledge. The exposed tip responds to the near-layer camera offset.
-		var angle:float=sin((drift.x+drift.y*.7+at.x)*.009)*.12
-		canvas.draw_set_transform_matrix(canopy_base*Transform2D(angle,at))
+		canvas.draw_set_transform_matrix(canopy_base*Transform2D(0,at))
 		canvas.draw_texture_rect(sprite["art"],sprite["local"],false)
 	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
 

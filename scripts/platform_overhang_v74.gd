@@ -35,23 +35,28 @@ static func plan(layout:Dictionary,solids:Array,biome:String="trunk") -> Array[D
 			if geometry.any(func(r:Rect2)->bool:return r.has_point(at+Vector2(facing*3,y*3))):continue
 			corners[at]=true
 			var extent:float=random.randf_range(23,43)
-			var rect:=Rect2(at-Vector2(extent*.5,extent*(.65 if top else .25)),Vector2(extent,extent))
-			result.append({"at":at,"rect":rect,"art":art[1] if top else art[2],"sway":false,"top":top})
+			var rect:Rect2=attached_rect(at,Vector2(extent,extent),span,top)
+			result.append({"at":at,"rect":rect,"art":art[1] if top else art[2],"sway":false,"top":top,"span":span,"grass":false})
 		var x:float=span.x+random.randf_range(18,37)
 		while x<span.y-13:
 			var at:=Vector2(x,edge["at"])
 			if _allowed(at,reserved):
 				var extent:float=random.randf_range(5,14) if top else random.randf_range(25,60)
-				at.y+=random.randf_range(-3,2) if top else 0.0
-				var rect:=Rect2(at-Vector2(extent*.62,extent if top else 0.0),Vector2(extent*1.24,extent))
-				result.append({"at":at,"rect":rect,"art":art[0] if top else art[2+posmod(floori(x/70),2)],"sway":not top,"top":top})
+				var span_with_margin:Vector2=span+Vector2(8,-8) if top and span.y-span.x>20 else span
+				var rect:Rect2=attached_rect(at,Vector2(extent*1.24,extent+5.0 if top else extent),span_with_margin,top)
+				result.append({"at":at,"rect":rect,"art":art[0] if top else art[2+posmod(floori(x/70),2)],"sway":not top,"top":top,"span":span,"grass":top})
 			x+=random.randf_range(40,90)
 	return result
+
+static func attached_rect(at:Vector2,extent:Vector2,span:Vector2,top:bool) -> Rect2:
+	extent.x=minf(extent.x,span.y-span.x)
+	var x:float=clampf(at.x-extent.x*.5,span.x,span.y-extent.x)
+	return Rect2(Vector2(x,at.y-extent.y+5.0 if top else at.y-5.0),extent)
 
 static func near_plan(shapes:Array[Dictionary]) -> Array[Dictionary]:
 	var result:Array[Dictionary]=[]
 	for index in shapes.size():
-		if index%4!=0:continue
+		if index%4!=0 or shapes[index].get("grass",false):continue
 		var shape:Dictionary=shapes[index]
 		var at:Vector2=shape["at"]
 		if result.any(func(item:Dictionary)->bool:return at.distance_squared_to(item["at"])<76.0*76.0):continue
@@ -59,8 +64,8 @@ static func near_plan(shapes:Array[Dictionary]) -> Array[Dictionary]:
 		var limit:=Vector2(46,41)
 		var extent:Vector2=texture.get_size()
 		extent*=minf(limit.x/extent.x,limit.y/extent.y)
-		var pivot:=Vector2(extent.x*.5,extent.y*(.88 if shape["top"] else .12))
-		result.append({"at":at,"local":Rect2(-pivot,extent),"art":texture})
+		var rect:Rect2=attached_rect(at,extent,shape["span"],shape["top"])
+		result.append({"at":at,"local":Rect2(rect.position-at,rect.size),"art":texture})
 	return result
 
 static func _allowed(at:Vector2,reserved:Array) -> bool:
@@ -71,4 +76,4 @@ static func draw(canvas:CanvasItem,shapes:Array,visible:Rect2) -> void:
 	for shape:Dictionary in shapes:
 		var at:Vector2=shape["at"]
 		if visible.has_area() and not active.has_point(at):continue
-		canvas.draw_texture_rect(shape["art"],shape["rect"],false,Color(1,1,1,1.0 if shape["sway"] else .1))
+		canvas.draw_texture_rect(shape["art"],shape["rect"],false,Color(1,1,1,.65 if shape["grass"] else .1))

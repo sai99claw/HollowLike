@@ -27,6 +27,8 @@ var dream_label:Label
 var dream_cells:Array[ColorRect]=[]
 var health_cells:HBoxContainer
 var energy_cells:HBoxContainer
+var ultimate_hint:Label
+var lift_hint:Label
 var message_label: Label
 var legend_label: Label
 var prep_button: Button
@@ -154,6 +156,12 @@ func _build_header() -> void:
 	vitals.add_child(coin_art)
 	coins_label=_label("0",13,GOLD)
 	vitals.add_child(coins_label)
+	ultimate_hint=_label("",12,GOLD)
+	ultimate_hint.visible=false
+	vitals.add_child(ultimate_hint)
+	lift_hint=_label("",12,MINT)
+	lift_hint.visible=false
+	main.add_child(lift_hint)
 
 	var equipment_row:=HBoxContainer.new()
 	equipment_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -352,6 +360,11 @@ func update_hud(info: Dictionary) -> void:
 		for i in dream_cells.size():dream_cells[i].color=GOLD if i<amount else Color("30434e")
 	for control:Control in [health_art,energy_art,health_cells,energy_cells]:control.visible=not home
 	health_background.visible=not home and header.visible
+	ultimate_hint.visible=not home and energy>=max_energy
+	ultimate_hint.text="大招 %s"%str(info.get("ultimate_key","S"))
+	var lift:float=float(info.get("lift_progress",-1.0))
+	lift_hint.visible=not home and lift>=0.0
+	lift_hint.text="放開跳躍升空" if lift>=.999 else "升空集氣 %d%%"%int(lift*100.0)
 	primary_art.get_parent().visible=not home
 	injury_art.visible=not home and bool(info.get("injured",false))
 	var sub_count:int=int(info.get("sub_count",0))

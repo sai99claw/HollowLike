@@ -700,6 +700,104 @@
       ]
     },
     "feather_charge": {
+      "fps": 8.88888888888889,
+      "active_duration": 0.45,
+      "frames": [
+        {
+          "path": "common/v78/feather_charge_00.webp",
+          "pivot": [
+            256,
+            256
+          ],
+          "size": [
+            512,
+            512
+          ],
+          "visible_bounds": [
+            145,
+            70,
+            219,
+            372
+          ]
+        },
+        {
+          "path": "common/v78/feather_charge_01.webp",
+          "pivot": [
+            256,
+            256
+          ],
+          "size": [
+            512,
+            512
+          ],
+          "visible_bounds": [
+            46,
+            36,
+            423,
+            435
+          ]
+        },
+        {
+          "path": "common/v78/feather_charge_02.webp",
+          "pivot": [
+            256,
+            256
+          ],
+          "size": [
+            512,
+            512
+          ],
+          "visible_bounds": [
+            60,
+            28,
+            388,
+            432
+          ]
+        },
+        {
+          "path": "common/v78/feather_charge_03.webp",
+          "pivot": [
+            256,
+            256
+          ],
+          "size": [
+            512,
+            512
+          ],
+          "visible_bounds": [
+            69,
+            58,
+            369,
+            392
+          ]
+        }
+      ],
+      "biome": "common",
+      "object": "fx_feather",
+      "description": "Full-energy radial feather burst.",
+      "phases": {
+        "active": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "visual_bounds": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "active_bounds": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "complete_release": true
+    },
+    "dream_feather_charge": {
       "fps": 12,
       "loop_start": 2,
       "loop_end": 9,
@@ -944,6 +1042,104 @@
         130,
         518,
         500
+      ],
+      "complete_release": true
+    },
+    "vertical_launch": {
+      "fps": 8.333333333333334,
+      "active_duration": 0.48,
+      "frames": [
+        {
+          "path": "common/v78/vertical_launch_00.webp",
+          "pivot": [
+            96,
+            4
+          ],
+          "size": [
+            192,
+            256
+          ],
+          "visible_bounds": [
+            39,
+            4,
+            115,
+            233
+          ]
+        },
+        {
+          "path": "common/v78/vertical_launch_01.webp",
+          "pivot": [
+            96,
+            4
+          ],
+          "size": [
+            192,
+            256
+          ],
+          "visible_bounds": [
+            45,
+            4,
+            103,
+            231
+          ]
+        },
+        {
+          "path": "common/v78/vertical_launch_02.webp",
+          "pivot": [
+            96,
+            4
+          ],
+          "size": [
+            192,
+            256
+          ],
+          "visible_bounds": [
+            52,
+            4,
+            94,
+            225
+          ]
+        },
+        {
+          "path": "common/v78/vertical_launch_03.webp",
+          "pivot": [
+            96,
+            4
+          ],
+          "size": [
+            192,
+            256
+          ],
+          "visible_bounds": [
+            64,
+            4,
+            62,
+            204
+          ]
+        }
+      ],
+      "biome": "common",
+      "object": "fx_feather",
+      "description": "Airflow expelled down from the launch point.",
+      "phases": {
+        "active": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "visual_bounds": [
+        0,
+        0,
+        192,
+        256
+      ],
+      "active_bounds": [
+        0,
+        0,
+        192,
+        256
       ],
       "complete_release": true
     },

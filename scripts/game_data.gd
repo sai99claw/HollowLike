@@ -53,7 +53,11 @@ const RUNES: Array[Dictionary] = [
 	{"id":"sub_velocity","name":"疾矢","icon":"V","color":Color("79dbd0"),"desc":"附武器投射物速度 +15%","description":"附武器投射物速度 +15%","effect":"sub_speed","value":.15},
 	{"id":"sub_reach","name":"遠星","icon":"D","color":Color("abb9f7"),"desc":"附武器射程 +15%","description":"附武器射程 +15%","effect":"sub_range","value":.15},
 	{"id":"sub_power","name":"熾羽","icon":"P+","color":Color("eeaa87"),"desc":"附武器傷害 +15%","description":"附武器傷害 +15%","effect":"sub_damage","value":.15},
-	{"id":"sub_volume","name":"盛羽","icon":"S+","color":Color("daa8ee"),"desc":"投射物尺寸及爆炸範圍 +5%","description":"投射物尺寸及爆炸範圍 +5%","effect":"sub_size","value":.05}
+	{"id":"sub_volume","name":"盛羽","icon":"S+","color":Color("daa8ee"),"desc":"投射物尺寸及爆炸範圍 +5%","description":"投射物尺寸及爆炸範圍 +5%","effect":"sub_size","value":.05},
+	{"id":"rapid_slash","name":"疾刃","icon":"W","color":Color("a4eee0"),"desc":"普攻與斬擊動畫速度 +10%","description":"普攻與斬擊動畫速度 +10%","effect":"attack_rate","value":.10},
+	{"id":"quick_charge","name":"聚羽","icon":"E","color":Color("a7dfff"),"desc":"武器與升空集氣時間縮短12%","description":"武器與升空集氣時間縮短12%","effect":"charge_cut","value":.12},
+	{"id":"fleet_foot","name":"輕足","icon":"J","color":Color("c2e9ad"),"desc":"移動與跑速 +10%","description":"移動與跑速 +10%","effect":"run_speed","value":.10}
+
 
 
 ]
@@ -114,7 +118,7 @@ static func primary_attack(index:int,direction:String,charged:bool,dash_charge:b
 	if charged:
 		def["damage"]=ceilf(float(def["damage"])*1.5);def["active"]=1.5;def["energy_gain"]=2.0
 		if style=="foot":def.merge({"windup":.10,"recovery":.18,"range":100.0,"width":55.0,"knockback":120.0,"recoil":0.0,"fx_clip":"claw_charge"},true)
-		elif style=="quick":def.merge({"windup":.18,"recovery":.22,"range":105.0,"width":100.0,"shape":"spin","knockback":60.0,"recoil":30.0,"fx_clip":"feather_charge"},true)
+		elif style=="quick":def.merge({"windup":.18,"recovery":.22,"range":105.0,"width":100.0,"shape":"spin","knockback":60.0,"recoil":30.0,"fx_clip":"dream_feather_charge"},true)
 		else:def.merge({"windup":.5,"recovery":.55,"range":165.0,"width":140.0,"shape":"ground_wave","knockback":120.0,"recoil":0.0,"fx_clip":"heavy_charge"},true)
 	def["range"]*=1.2;def["width"]*=1.2;def["block_width"]*=1.2;def["active"]*=2.4;def["windup"]*=2.0;def["recovery"]*=2.0;def["hitbox_scale"]=1.2
 	if style=="quick":
