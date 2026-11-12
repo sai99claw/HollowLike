@@ -6,6 +6,8 @@ const Routes=preload("res://scripts/maze_routes_v20.gd")
 const Scale=preload("res://scripts/world_scale_v17.gd")
 const Surfaces=preload("res://scripts/surface_art_v22.gd")
 const TILE:float=Scale.TILE
+const CELL:Vector2=Scale.CELL_SIZE
+const CELL_Y:float=Scale.TILE_HEIGHT
 static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	var safe:bool=room["type"] in ["start","merchant","reward"] or room.get("spring",false)
 	var cfg:=Maze.MazeConfig.new();cfg.width=room["width"];cfg.height=room["height"];cfg.seed_value=room.get("maze_seed",seed_value)
@@ -24,7 +26,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 		var y:int=cfg.height-6
 		for cell in [Vector2i(4,y),Vector2i(4,y+1),Vector2i(5,y+1),Vector2i(cfg.width-5,y),Vector2i(cfg.width-5,y+1),Vector2i(cfg.width/2,y-2)]:
 			maze.grid[cell.y][cell.x]=Maze.WALL
-	var size:=Vector2(cfg.width*TILE,cfg.height*TILE);var floor_y:float=size.y-TILE
+	var size:=Vector2(cfg.width,cfg.height)*CELL;var floor_y:float=Vector2(0,size.y-CELL_Y).y
 	var walls:Array[Rect2]=[];var platforms:Array[Rect2]=[];var one_way:Array[Rect2]=[];var navigation:Array[Rect2]=[]
 	var solid_lookup:Dictionary={}
 	# Merge matching horizontal wall runs vertically: small collision/render count.
@@ -37,12 +39,12 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 			var key:=Vector2i(start,x-start)
 			if solid_lookup.has(key):
 				var index:int=solid_lookup[key];var prior:Rect2=walls[index]
-				if is_equal_approx(prior.end.y,y*TILE):prior.size.y+=TILE;walls[index]=prior;continue
-			solid_lookup[key]=walls.size();walls.append(Rect2(start*TILE,y*TILE,(x-start)*TILE,TILE))
+				if is_equal_approx(prior.end.y,y*CELL_Y):prior.size.y+=CELL_Y;walls[index]=prior;continue
+			solid_lookup[key]=walls.size();walls.append(Rect2(start*TILE,y*CELL_Y,(x-start)*TILE,CELL_Y))
 	# Top faces are genuine support surfaces and remain destructible-prop anchors.
 	for wall:Rect2 in walls:
-		if wall.position.y<TILE:continue
-		var y:int=int(wall.position.y/TILE)-1;var x:int=int(wall.position.x/TILE)
+		if wall.position.y<CELL_Y-.01:continue
+		var y:int=roundi(wall.position.y/CELL_Y)-1;var x:int=int(wall.position.x/TILE)
 		while x<int(wall.end.x/TILE):
 			if not maze.is_floor(Vector2i(x,y)):x+=1;continue
 			var start:int=x
@@ -54,7 +56,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	if not safe:
 		for plaza:Rect2i in maze.rooms:
 			if plaza.size.x<=5 or plaza.size.y<=5:continue
-			var area:=Rect2(Vector2(plaza.position)*TILE,Vector2(plaza.size)*TILE)
+			var area:=Rect2(Vector2(plaza.position)*CELL,Vector2(plaza.size)*CELL)
 			for i in random.randi_range(1,3):
 				var width:float=TILE*random.randi_range(1,4)
 				var at:=Vector2(random.randf_range(area.position.x+36,area.end.x-width-36),random.randf_range(area.position.y+100,area.end.y-50))
@@ -63,19 +65,19 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 				if one_way.any(func(other:Rect2)->bool:return absf(other.position.y-at.y)<96):continue
 				one_way.append(ledge);platform_voids.append(area)
 	var random_ledges:Array[Rect2]=one_way.duplicate()
-	if cfg.arena and not safe:
+	if cfg.arena and (not safe or not maze.doors.is_empty()):
 		# Traversal ledges can be jumped through and dropped through. No thin solid
 		# treads, floating solid perches or solid gallery remain anywhere in the room.
 		for side in 2:
 			var direction:String="left" if side==0 else "right"
-			var anchor:float=(float(maze.doors[direction].y)+2)*TILE if maze.doors.has(direction) else floor_y
-			for level in range(-30,31):
-				var y:float=anchor+level*96
-				if y<192 or y>=floor_y:continue
+			var anchor:float=(float(maze.doors[direction].y)+2)*CELL_Y if maze.doors.has(direction) else floor_y
+			for level in range(-ceili(size.y/Scale.CLIMB_STEP),ceili(size.y/Scale.CLIMB_STEP)):
+				var y:float=anchor+level*Scale.CLIMB_STEP
+				if y<192 or y>=floor_y-.01:continue
 				var x:float=TILE if side==0 else size.x-TILE*3
 				var ledge:=Rect2(x,y,TILE*2,9)
 				one_way.append(ledge);navigation.append(ledge)
-		var gallery:=Rect2(TILE,192,size.x-TILE*2,9)
+		var gallery:=Rect2(TILE,CELL_Y,size.x-TILE*2,9)
 		one_way.append(gallery);navigation.append(gallery)
 	elif not safe:
 		navigation=Routes.generate(maze,cfg.seed_value)
@@ -86,7 +88,11 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	if safe:
 		var furnished:Dictionary=Sanctuary.generate(room,seed_value) if room["type"]!="start" else {}
 		if room["type"]=="start":
-			for rect in [Rect2(222,954,TILE*3,18),Rect2(280,850,TILE*11,18)]:platforms.append(Rect2(rect.position+offset,rect.size));one_way.append(platforms[-1])
+			for rect in [Rect2(222,954,TILE*3,18),Rect2(280,850,TILE*11,18)]:
+				var authored:=Rect2(rect.position+offset,rect.size)
+				navigation=navigation.filter(func(ledge:Rect2)->bool:return not ledge.intersects(authored))
+				platforms.append(authored);one_way.append(authored)
+			one_way=one_way.filter(func(ledge:Rect2)->bool:return not (ledge.size.y==9 and not navigation.has(ledge)))
 		else:
 			if room.get("spring",false):
 				pool=Rect2(furnished["pool"].position+offset,furnished["pool"].size)
@@ -106,7 +112,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	# those solids as well, so furniture cannot silently seal a bottom exit.
 	if maze.doors.has("down"):
 		var cell:Vector2i=maze.doors["down"]
-		walls=_subtract(walls,Rect2((cell.x-1)*TILE,size.y-TILE*3,TILE*3,TILE*3))
+		walls=_subtract(walls,Rect2((cell.x-1)*TILE,size.y-CELL_Y*3,TILE*3,CELL_Y*3))
 	walls.assign(walls.map(func(rect:Rect2)->Rect2:return rect.intersection(Rect2(Vector2.ZERO,size))))
 	# Rebuild lower supports after carving the bath, including the outer floor
 	# pieces beyond its central furniture area. Pool steps keep their exact x.
@@ -116,19 +122,26 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	var doors:Dictionary={};var spawn:Dictionary={};var reserved:Array[Rect2]=[]
 	for direction in maze.doors:
 		var cell:Vector2i=maze.doors[direction]
-		var at:Vector2=Vector2(cell)*TILE+Vector2(TILE*.5,TILE)
-		if direction=="left":at.x=18;at.y+=TILE
-		elif direction=="right":at.x=size.x-18;at.y+=TILE
+		var at:Vector2=(Vector2(cell)+Vector2(.5,1))*CELL
+		if direction=="left":at.x=18;at.y+=CELL_Y
+		elif direction=="right":at.x=size.x-18;at.y+=CELL_Y
 		elif direction=="up":at.y=20
 		elif direction=="down":at.y=size.y-10
 		doors[direction]=at;reserved.append(Rect2(at-Vector2(TILE*2.2,TILE*3),Vector2(TILE*4.4,TILE*4)))
-		var inside:Vector2=Vector2(cell)*TILE+Vector2(TILE*.5,TILE)
+		var inside:Vector2=(Vector2(cell)+Vector2(.5,1))*CELL
 		if direction=="left":inside.x=TILE*1.7;inside.y=at.y
 		elif direction=="right":inside.x=size.x-TILE*1.7;inside.y=at.y
 		elif direction=="up":inside.y=192
 		elif direction=="down":inside.y=size.y-144;inside.x-=72
 		# from_dir is the direction travelled, so entry is on its opposite edge.
 		spawn[{"up":"down","down":"up","left":"right","right":"left"}[direction]]=inside
+		if direction=="up":
+			for y:float in [192.0,CELL_Y,CELL_Y+Scale.CLIMB_STEP,CELL_Y+Scale.CLIMB_STEP*2]:
+				var step:=Rect2(inside.x-TILE,y,TILE*2,9)
+				one_way.append(step);navigation.append(step);platforms.append(step)
+		if direction=="down":
+			var step:=Rect2(inside.x-TILE,floor_y+Scale.CLIMB_STEP,TILE*2,9)
+			one_way.append(step);navigation.append(step);platforms.append(step)
 		var ledge:Rect2
 		if direction in ["up","down"]:ledge=Rect2(inside.x-TILE,96 if direction=="up" else size.y-144,TILE*2,9)
 		else:ledge=Rect2(0 if direction=="left" else size.x-TILE*3,at.y,TILE*3,9)
@@ -152,7 +165,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 	navigation=one_way.filter(func(part:Rect2)->bool:return navigation.any(func(route:Rect2)->bool:return absf(part.position.y-route.position.y)<1 and part.end.x>route.position.x and part.position.x<route.end.x))
 	platforms=platforms.filter(func(rect:Rect2)->bool:return not old_one_way.has(rect))
 	platforms.append_array(one_way)
-	var center:=Vector2(offset.x+230,floor_y) if safe else Vector2(TILE*1.5,TILE*2)
+	var center:=Vector2(offset.x+230,floor_y) if safe else Vector2(TILE*1.5,CELL_Y*2)
 	if not safe:
 		# The reserved lower-left perimeter lane is clear;3+odd bottom doors
 		# cannot remove its support. Keep the whole34px body beyond the wall.
@@ -175,7 +188,7 @@ static func generate(room:Dictionary,seed_value:int) -> Dictionary:
 			if reserved.any(func(rect:Rect2)->bool:return rect.has_point(at)):continue
 			if enemy_spawns.any(func(other:Vector2)->bool:return other.distance_to(at)<80):continue
 			enemy_spawns.append(at)
-	return {"size":size,"floor_y":floor_y,"ceiling_y":0.0,"single_screen":safe,"furniture_offset":offset if safe else Vector2.ZERO,"pool":pool,"platforms":platforms,"one_way":one_way,"platform_art_runs":runs,"random_one_way":random_ledges,"navigation_one_way":navigation,"platform_voids":platform_voids,"door_width":3,"solids":walls,"walls":walls,"blocks":[],"trunks":[],"shapes":[],"doors":doors,"spawn_positions":spawn,"enemy_spawns":enemy_spawns,"ground_spawns":enemy_spawns.filter(func(at:Vector2)->bool:return not one_way.any(func(ledge:Rect2)->bool:return absf(ledge.position.y-at.y)<1 and at.x>=ledge.position.x and at.x<=ledge.end.x)),"reserved_regions":reserved,"decorations":[],"route_indices":[],"archetype":"stitched_arena" if cfg.arena else (cfg.layout_profile if not cfg.layout_profile.is_empty() else "braided_prim"),"seed":cfg.seed_value,"launcher_spawns":_launcher_spawns(maze.rooms,platforms,walls,reserved) if not safe else [],"dead_end_rewards":maze.dead_end_rewards,"maze_grid":maze.grid,"maze_doors":maze.doors,"maze_plazas":maze.rooms,"tile_size":TILE,"generation_order":["topology","stitched_doors","prim","plazas","braiding","pass_through_routes"]}
+	return {"size":size,"floor_y":floor_y,"ceiling_y":0.0,"single_screen":safe,"furniture_offset":offset if safe else Vector2.ZERO,"pool":pool,"platforms":platforms,"one_way":one_way,"platform_art_runs":runs,"random_one_way":random_ledges,"navigation_one_way":navigation,"platform_voids":platform_voids,"door_width":3,"solids":walls,"walls":walls,"blocks":[],"trunks":[],"shapes":[],"doors":doors,"spawn_positions":spawn,"enemy_spawns":enemy_spawns,"ground_spawns":enemy_spawns.filter(func(at:Vector2)->bool:return not one_way.any(func(ledge:Rect2)->bool:return absf(ledge.position.y-at.y)<1 and at.x>=ledge.position.x and at.x<=ledge.end.x)),"reserved_regions":reserved,"decorations":[],"route_indices":[],"archetype":"stitched_arena" if cfg.arena else (cfg.layout_profile if not cfg.layout_profile.is_empty() else "braided_prim"),"seed":cfg.seed_value,"launcher_spawns":_launcher_spawns(maze.rooms,platforms,walls,reserved) if not safe else [],"dead_end_rewards":maze.dead_end_rewards,"maze_grid":maze.grid,"maze_doors":maze.doors,"maze_plazas":maze.rooms,"tile_size":TILE,"tile_height":CELL_Y,"generation_order":["topology","stitched_doors","prim","plazas","braiding","pass_through_routes"]}
 static func validate(layout:Dictionary) -> Array[String]:
 	var errors:Array[String]=[];var size:Vector2=layout["size"]
 	for rect:Rect2 in layout["solids"]:
@@ -217,7 +230,7 @@ static func _launcher_spawns(plazas:Array,platforms:Array,solids:Array,reserved:
 	var result:Array[Vector2]=[]
 	for plaza:Rect2i in plazas:
 		if plaza.size.x<=5 or plaza.size.y<=5:continue
-		var area:=Rect2(Vector2(plaza.position)*TILE,Vector2(plaza.size)*TILE)
+		var area:=Rect2(Vector2(plaza.position)*CELL,Vector2(plaza.size)*CELL)
 		var best:=Vector2.INF;var cost:float=INF
 		for surface:Rect2 in platforms:
 			if surface.position.y<area.position.y+192 or surface.position.y>area.end.y+1:continue

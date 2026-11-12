@@ -14,8 +14,9 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 	layout["hazard_room"]=variant
 	var floating:bool=variant=="mushroom_air"
 	var tile:float=float(layout.get("tile_size",96))
+	var cell:=Vector2(tile,float(layout.get("tile_height",tile)))
 	if floating:
-		var expanded:=Vector2(maxf(bounds.x+384.0,52.0*tile),maxf(bounds.y,13.0*tile))
+		var expanded:=Vector2(maxf(bounds.x+384.0,52.0*tile),maxf(bounds.y,13.0*cell.y))
 		var extra:Vector2=expanded-bounds
 		layout["size"]=expanded
 		var doors:Dictionary=layout.get("doors",{})
@@ -24,11 +25,11 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 		var starts:Dictionary=layout["spawn_positions"]
 		if starts.has("left"):starts["left"]+=Vector2(extra.x,0)
 		for key in starts:
-			if is_equal_approx(starts[key].y,float(layout.get("floor_y",bounds.y-tile))):starts[key].y+=extra.y
-		layout["floor_y"]=expanded.y-tile
+			if is_equal_approx(starts[key].y,float(layout.get("floor_y",bounds.y-cell.y))):starts[key].y+=extra.y
+		layout["floor_y"]=Vector2(0,expanded.y-cell.y).y
 		bounds=expanded
 	layout.erase("maze_grid")
-	var interior:=Rect2(Vector2.ONE*tile,bounds-Vector2.ONE*tile*2)
+	var interior:=Rect2(cell,bounds-cell*2)
 	var supports:Array[Rect2]=[]
 	var islands:Array[Rect2]=[]
 	var spikes:Array[Rect2]=[]
@@ -37,14 +38,30 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 		var left:float=0.0 if key=="right" else entry.x-60
 		var right:float=bounds.x if key=="left" else entry.x+60
 		supports.append(Rect2(left,entry.y,right-left,12))
-	var boundary:Array[Rect2]=perimeter(bounds,layout.get("doors",{}),tile,int(layout.get("door_width",3)))
+	var portals:Dictionary=layout.get("doors",{})
+	var floor_y:float=layout.get("floor_y",Vector2(0,bounds.y-cell.y).y)
+	# Keep a climbable approach to tall-room exits, leaving the middle of the
+	# chamber open for the mushroom and spike encounters.
+	if portals.has("up"):
+		var ledge_x:float=Vector2(portals["up"]).x-tile
+		var ascent_steps:int=ceili((floor_y-96.0)/96.0)
+		for level in ascent_steps:
+			supports.append(Rect2(ledge_x,lerpf(96.0,floor_y,float(level)/ascent_steps),tile*2,9))
+	for side:String in ["left","right"]:
+		if not portals.has(side):continue
+		var portal_y:float=Vector2(portals[side]).y
+		var ascent_steps:int=ceili((floor_y-portal_y)/96.0)
+		for level in range(1,ascent_steps):
+			var ledge_x:float=tile if side=="left" else bounds.x-tile*3
+			supports.append(Rect2(ledge_x,lerpf(portal_y,floor_y,float(level)/ascent_steps),tile*2,9))
+	var boundary:Array[Rect2]=perimeter(bounds,portals,tile,int(layout.get("door_width",3)),cell.y)
 	if not floating:
 		var candidates:Array[Rect2]=[]
 		for y in range(260,int(bounds.y)-80,215):
 			for x in range(285,int(bounds.x)-150,260):
 				var at:=Vector2(x+rng.randf_range(-40,40),y+rng.randf_range(-24,24))
-				if supports.any(func(s:Rect2)->bool:return s.grow(112).has_point(at)):continue
-				var island:=Rect2(at,Vector2(tile if rng.randf()<.5 else tile*2,tile))
+				var island:=Rect2(at,Vector2(tile if rng.randf()<.5 else tile*2,cell.y))
+				if supports.any(func(s:Rect2)->bool:return s.grow(45).intersects(island)):continue
 				if interior.encloses(island):candidates.append(island)
 		var original_tiles:int=0
 		for candidate:Rect2 in candidates:original_tiles+=roundi(candidate.size.x/tile)
@@ -62,11 +79,11 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 	layout["solids"]=boundary+islands
 	layout["walls"]=layout["solids"]
 	layout["spike_rects"]=spikes
-	layout["launcher_spawns"]=_mushrooms(rng,bounds,tile,boundary,supports) if floating else []
+	layout["launcher_spawns"]=_mushrooms(rng,bounds,cell.y,boundary,supports) if floating else []
 
-static func _mushrooms(rng:RandomNumberGenerator,bounds:Vector2,tile:float,boundary:Array[Rect2],supports:Array[Rect2]) -> Array[Vector2]:
+static func _mushrooms(rng:RandomNumberGenerator,bounds:Vector2,cell_height:float,boundary:Array[Rect2],supports:Array[Rect2]) -> Array[Vector2]:
 	var result:Array[Vector2]=[]
-	var floor_y:float=bounds.y-tile
+	var floor_y:float=Vector2(0,bounds.y-cell_height).y
 	var offset:float=rng.randf_range(0,24)
 	for row in 3:
 		var candidates:Array[Vector2]=[]
@@ -86,25 +103,27 @@ static func _mushrooms(rng:RandomNumberGenerator,bounds:Vector2,tile:float,bound
 			result.append(candidates.pop_at(rng.randi_range(0,candidates.size()-1)))
 	return result
 
-static func perimeter(size:Vector2,doors:Dictionary,tile:float,door_width:int) -> Array[Rect2]:
+static func perimeter(size:Vector2,doors:Dictionary,tile:float,door_width:int,tile_height:float=0) -> Array[Rect2]:
 	var result:Array[Rect2]=[]
-	var opening:float=tile*door_width
+	var height:float=tile_height if tile_height>0 else tile
 	for side:String in ["up","down","left","right"]:
 		var horizontal:bool=side in ["up","down"]
-		var start:float=0.0 if horizontal else tile
-		var end:float=size.x if horizontal else size.y-tile
+		var span_size:float=tile if horizontal else height
+		var opening:float=span_size*door_width
+		var start:float=0.0 if horizontal else height
+		var end:float=size.x if horizontal else size.y-height
 		var gap:=Vector2(-1,-1)
 		if doors.has(side):
 			var at:Vector2=doors[side]
 			gap=Vector2(at.x-opening*.5,at.x+opening*.5) if horizontal else Vector2(at.y-opening,at.y)
-		var fixed:float=0.0 if side in ["up","left"] else (size.y-tile if horizontal else size.x-tile)
-		for cell:int in range(floori(start/tile),ceili(end/tile)):
-			var low:float=maxf(start,cell*tile)
-			var high:float=minf(end,(cell+1)*tile)
+		var fixed:float=0.0 if side in ["up","left"] else (size.y-height if horizontal else size.x-tile)
+		for cell:int in range(floori(start/span_size),ceili(end/span_size)):
+			var low:float=maxf(start,cell*span_size)
+			var high:float=minf(end,(cell+1)*span_size)
 			for span:Vector2 in [Vector2(low,minf(high,gap.x)),Vector2(maxf(low,gap.y),high)]:
 				if span.y<=span.x:continue
 				var length:float=span.y-span.x
-				result.append(Rect2(span.x,fixed,length,tile) if horizontal else Rect2(fixed,span.x,tile,length))
+				result.append(Rect2(span.x,fixed,length,height) if horizontal else Rect2(fixed,span.x,tile,length))
 	return result
 
 static func draw_spikes(canvas:CanvasItem,rect:Rect2) -> void:

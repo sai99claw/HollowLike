@@ -167,7 +167,7 @@ static func generate(seed_value:int,stage_count:int=6,per_stage:int=0,options:Di
 			if direction in ["up","down"] and (rm.get("spring",false) or other.get("spring",false)):value=dim-4
 			if direction in ["left","right"] and (rm["type"] in ["start","merchant","reward"] or other["type"] in ["start","merchant","reward"]):value=dim-4
 			rm["doors_config"][direction]=value;other["doors_config"][OPPOSITE[direction]]=value
-	return {"rooms":rooms,"maps":maps,"seed":seed_value,"version":34,"tile_size":TILE_SIZE,"straight_bias":maze_settings["straight_bias"],"braid_rate":braid_weight,"vertical_bias":vertical_weight}
+	return {"rooms":rooms,"maps":maps,"seed":seed_value,"version":34,"tile_size":TILE_SIZE,"tile_height":Scale.TILE_HEIGHT,"straight_bias":maze_settings["straight_bias"],"braid_rate":braid_weight,"vertical_bias":vertical_weight}
 
 static func _assign_dimensions(rooms:Array[Dictionary],rng:RandomNumberGenerator,room_scale:float=1) -> void:
 	var bounds:Rect2i=_bounds(rooms.map(func(r:Dictionary)->Vector2i:return r["coord"]))
@@ -183,7 +183,7 @@ static func _assign_dimensions(rooms:Array[Dictionary],rng:RandomNumberGenerator
 	for room in rooms:
 		var coord:Vector2i=room["coord"];room["width"]=widths[coord.x];room["height"]=heights[coord.y]
 		room["world_tile_pos"]=Vector2i(xs[coord.x],ys[coord.y])-origin
-		room["world_pixel_pos"]=room["world_tile_pos"]*TILE_SIZE
+		room["world_pixel_pos"]=Vector2(room["world_tile_pos"])*Scale.CELL_SIZE
 
 static func _connect(rooms:Array[Dictionary],first_id:int,second_id:int) -> void:
 	var delta:Vector2i=rooms[second_id]["coord"]-rooms[first_id]["coord"]

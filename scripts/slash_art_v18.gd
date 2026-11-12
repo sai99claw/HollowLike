@@ -1,13 +1,14 @@
 class_name SlashArtV18
 extends RefCounted
 const PATH:String="res://assets/v18/slash-smear.png"
-const FPS:float=24.0
+const FPS:float=20.0
 const FRAME_COUNT:int=8
-const DURATION:float=FRAME_COUNT/FPS
+const SEQUENCE:Array[int]=[0,1,2,4]
+const DURATION:float=4.0/FPS
 static var texture:Texture2D
 
 static func frame_at(elapsed:float) -> int:
-	return -1 if elapsed<0.0 or elapsed>=DURATION else mini(FRAME_COUNT-1,floori(elapsed*FPS))
+	return -1 if elapsed<0.0 or elapsed>=DURATION else SEQUENCE[mini(SEQUENCE.size()-1,floori(elapsed*FPS))]
 
 static func draw(c:CanvasItem,box:Rect2,definition:Dictionary,elapsed:float,base:Transform2D) -> void:
 	var index:int=frame_at(elapsed)

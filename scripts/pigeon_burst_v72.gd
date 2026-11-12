@@ -1,14 +1,14 @@
 extends RefCounted
 
 const IMPULSE=preload("res://assets/v72/wing-impulse.webp")
-const IMPACT=preload("res://assets/v72/impact-feathers.webp")
+const IMPACT=preload("res://assets/v75/impact-feathers.webp")
 const CELL:=Vector2(384,192)
 const PIVOT:=Vector2(64,96)
 const FRAME_COUNT:int=4
 const IMPULSE_DURATION:float=.24
 const IMPACT_DURATION:float=.20
 const IMPACT_EXTENT:float=168.0
-const IMPACT_TINT:=Color(1.55,1.55,1.62,1)
+const IMPACT_TINT:=Color(1.3,1.22,1.24,1)
 
 static func frame_at(elapsed:float,duration:float) -> int:
 	if elapsed<0 or elapsed>=duration:return -1

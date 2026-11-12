@@ -61,5 +61,10 @@ static func generate(maze,seed_value:int) -> Array[Rect2]:
 			if not network.has(Vector2i(x,y)) or not maze.is_floor(Vector2i(x,y+1)):x+=1;continue
 			var first:int=x
 			while x<width-1 and network.has(Vector2i(x,y)) and maze.is_floor(Vector2i(x,y+1)):x+=1
-			result.append(Rect2(first*TILE,(y+1)*TILE,(x-first)*TILE,9))
+			result.append(Rect2(first*TILE,(y+1)*Scale.TILE_HEIGHT,(x-first)*TILE,9))
+	# A tall vertical cell needs two pass-through footholds to bridge adjacent rows.
+	for cell:Vector2i in network:
+		if not network.has(cell+Vector2i.UP):continue
+		for tier in [1,2]:
+			result.append(Rect2(cell.x*TILE,(cell.y+1)*Scale.TILE_HEIGHT-tier*Scale.CLIMB_STEP,TILE,9))
 	return result

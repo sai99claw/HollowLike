@@ -1,6 +1,6 @@
 class_name TowerMapView
 extends Control
-const CELL:float=preload("res://scripts/world_scale_v17.gd").TILE
+const CELL:Vector2=preload("res://scripts/world_scale_v17.gd").CELL_SIZE
 var tower:Dictionary={}
 var current:int=-1
 var map_font:Font

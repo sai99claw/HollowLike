@@ -2,6 +2,11 @@ class_name PlayerMotionV18
 extends RefCounted
 ## Shared by the live controller and generated-room traversal verification.
 const RISE_GRAVITY:float=1250.0
+const JUMP_SPEED:float=530.0
+const MOTION_STEP:float=1.0/120.0
+# The launch step integrates the full impulse before gravity first applies.
+const RISE_STEPS:int=ceili(JUMP_SPEED/(RISE_GRAVITY*MOTION_STEP))
+const BASE_JUMP_HEIGHT:float=MOTION_STEP*(RISE_STEPS*JUMP_SPEED-RISE_GRAVITY*MOTION_STEP*RISE_STEPS*(RISE_STEPS-1)*.5)
 const FALL_MULTIPLIER:float=2.0
 const MAX_FALL_SPEED:float=1000.0
 const RELEASE_SPEED:float=140.0

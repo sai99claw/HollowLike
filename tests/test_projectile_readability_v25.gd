@@ -30,4 +30,31 @@ func run() -> void:
 	for i in 3:await process_frame
 	check(view.painted,"Actual CanvasItem exercises the gradient trajectory draw path")
 	view.queue_free();await process_frame
+	var game=load("res://main.tscn").instantiate()
+	game.audio_enabled=false
+	root.add_child(game)
+	await process_frame
+	game.set_process(false);game.set_physics_process(false)
+	game.new_run("rogue",75079)
+	game.enemies.clear();game.platforms.clear();game.solids.clear()
+	game._rebuild_projectile_surfaces()
+	game.view_rect=Rect2(0,0,1280,720)
+	game.p["pos"]=Vector2(700,600)
+	game.low_effects=true
+	game._emit_weapon(Vector2(180,220),Vector2.RIGHT,{"id":"needle"},true)
+	game._emit_weapon(Vector2(180,280),Vector2.RIGHT,{"visual_id":"v36:underground:test"},false)
+	game._emit_weapon(Vector2(180,340),Vector2.RIGHT,{"style_id":"flying_slash"},true)
+	game._emit_traps({"pos":Vector2(180,420),"uid":-2},{"color":Color.CYAN,"size":16,"target":Vector2(430,520)})
+	for i in 3:game._update_projectiles(1.0/60.0)
+	check(game.projectiles.size()==4,"Player shot, enemy shot, flying slash and trap carrier are in flight")
+	for projectile:Dictionary in game.projectiles:
+		var points:PackedVector2Array=projectile.get("trail_points",PackedVector2Array())
+		check(points.size()>1 and points[-1]==projectile["pos"],"All flying projectile families record a trail in reduced mode")
+	var stones=preload("res://scripts/throwable_stones.gd")
+	var stone:Dictionary={"pos":Vector2(300,320),"large":false}
+	stones.launch(stone,Vector2.RIGHT,2)
+	game._step_stone(stone,1.0/60.0)
+	check(stone["trail_points"].size()>1 and stone["trail_points"][-1]==stones.center(stone),"Airborne attackable stones also carry a trajectory trail")
+	game.queue_free()
+	await process_frame
 	print("Projectile readability: ",failures.size()," failures");quit(0 if failures.is_empty() else 1)

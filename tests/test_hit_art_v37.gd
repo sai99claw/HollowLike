@@ -49,8 +49,14 @@ func run() -> void:
 	var target:Dictionary=game.enemies[0]
 	var hitbox:Rect2=game._player_strike_box(game.p_attack.attack)
 	game.p["pos"]+=Vector2(200,0)
-	check(game._player_strike_box(game.p_attack.attack)==hitbox and game.player_slashes.back()["box"]==hitbox,"Moving cannot drag a strike box or effect")
+	var moved_box:Rect2=game._player_strike_box(game.p_attack.attack)
+	var visual_definition:Dictionary=game.player_slashes.back()["definition"]
+	check(moved_box.position==hitbox.position+Vector2(200,0) and game._player_strike_box(visual_definition)==moved_box,"Both the hitbox and slash follow the player through an active strike")
 	target["pos"]+=hitbox.get_center()-game._enemy_body_box(target).get_center()
+	game.combat_feedback.clear()
+	game._process_player_attack()
+	check(game.combat_feedback.flashes.is_empty(),"The old swing position no longer hits")
+	target["pos"]+=moved_box.get_center()-game._enemy_body_box(target).get_center()
 	game.combat_feedback.clear()
 	game._process_player_attack()
 	check(game.combat_feedback.flashes.size()==1 and game.combat_feedback.flashes[0]["straight"] and not game.combat_feedback.flashes[0]["crescent"],"An ordinary strike ejects feathers without layering the old crescent")

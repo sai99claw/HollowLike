@@ -8,14 +8,14 @@ func _initialize() -> void:call_deferred("run")
 func check(ok:bool,label:String) -> void:
 	if not ok:failures.append(label);push_error(label)
 func run() -> void:
-	check(Scale.TILE==96 and Scale.TILE==int(64*1.5),"Every tile grows exactly1.5x")
+	check(Scale.TILE==96 and Scale.TILE==int(64*1.5),"Tile width is still 96 pixels")
 	for value in Scale.BASE_WIDTHS:check(Scale.WIDTHS.has(Scale.half_odd(value)),"Width baseline is halved and rounded to an odd maze size")
 	for value in Scale.BASE_HEIGHTS:check(Scale.HEIGHTS.has(Scale.half_odd(value)),"Height baseline is halved and rounded to an odd maze size")
 	for seed_value in [17,12345,91451,192]:
 		var tower:Dictionary=Tower.generate(seed_value)
 		check(Tower.validate(tower).is_empty(),"Smaller tower remains connected")
 		for room:Dictionary in tower["rooms"]:
-			check(room["world_pixel_pos"]==room["world_tile_pos"]*96,"World seam positions use the larger cell")
+			check(room["world_pixel_pos"]==Vector2(room["world_tile_pos"])*Scale.CELL_SIZE,"World seam positions use the larger cell")
 			var result:Dictionary=Layout.generate(room,seed_value)
 			check(Layout.validate(result).is_empty(),"No smaller-room spawn overlaps a solid: "+str([seed_value,room["id"]]))
 			for solid:Rect2 in result["solids"]:check(solid.size.y>24,"No thin, impassable stair/perch/gallery remains")

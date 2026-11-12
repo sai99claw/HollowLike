@@ -56,6 +56,9 @@ static func draw(canvas:CanvasItem,shapes:Array,visible:Rect2) -> void:
 		var at:Vector2=shape["at"]
 		if visible.has_area() and not active.has_point(at):continue
 		var points:PackedVector2Array=shape["points"].duplicate()
+		if Geometry2D.triangulate_polygon(points).is_empty():
+			points=Geometry2D.convex_hull(points)
+			points.resize(points.size()-1)
 		var colors:=PackedColorArray()
 		for i in points.size():
 			colors.append(Color(shape["color"],clampf(points[i].y/55.0,0.0,1.0) if shape["sway"] else 0.0))

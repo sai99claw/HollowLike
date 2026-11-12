@@ -2,11 +2,17 @@ extends Node2D
 const FOREGROUND_FACTOR:float=1.35
 const Cache=preload("res://scripts/cached_canvas.gd")
 const Edge=preload("res://scripts/platform_overhang_v74.gd")
+const CANOPY_ART:Array[Texture2D]=[preload("res://assets/v75/canopy-left.webp"),preload("res://assets/v75/canopy-right.webp")]
+const ROOT_ART:Array[Texture2D]=[preload("res://assets/v75/root-cluster.webp"),preload("res://assets/v75/thorn-branch.webp")]
 var ambient:CanvasModulate
 var grade:Environment
 var lantern:PointLight2D
 var lights:Array[PointLight2D]=[]
-var foreground:ColorRect
+var foreground:Control
+var canopy:Node2D
+var roots:Node2D
+var root_sprites:Array[Dictionary]=[]
+var foliage_tint:Color=Color.WHITE
 var vignette:ColorRect
 var fogs:Array[ColorRect]=[]
 var details:Node2D
@@ -52,7 +58,23 @@ func _ready() -> void:
 		var fog:=_overlay("GroundFog",depth,preload("res://shaders/ground_fog_v74.gdshader"))
 		fog.material.set_shader_parameter("haze",Color(.43,.46,.66,.19) if depth<0 else Color(.61,.48,.59,.15))
 		fogs.append(fog)
-	foreground=_overlay("SuperForeground",10,preload("res://shaders/super_foreground_v74.gdshader"))
+	foreground=Control.new()
+	foreground.name="SuperForeground"
+	foreground.z_index=10
+	foreground.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	foreground.clip_contents=true
+	add_child(foreground)
+	canopy=Cache.new()
+	canopy.paint=_paint_canopy
+	var canopy_material:=CanvasItemMaterial.new()
+	canopy_material.light_mode=CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	canopy.material=canopy_material
+	foreground.add_child(canopy)
+	roots=Cache.new()
+	roots.name="PaintedForeground"
+	roots.z_index=7
+	roots.paint=_paint_roots
+	add_child(roots)
 	vignette=_overlay("Vignette",12,preload("res://shaders/corner_vignette_v74.gdshader"))
 	feather=preload("res://scripts/combat_visual.gd").texture_for("death_feather_glow")
 	drifting_feathers=Cache.new()
@@ -134,7 +156,11 @@ func configure(layout:Dictionary,solids:Array,doors:Array,props:Array,active:boo
 	fog_y=INF
 	shapes.clear()
 	if active:shapes=Edge.plan(layout,solids)
+	root_sprites.clear()
+	foliage_tint={"underground":Color("c3a5b6"),"trunk":Color("e1d4e4"),"sky":Color("b1caeb")}.get(biome,Color.WHITE)
+	if active:_place_roots(solids,int(layout.get("seed",0)))
 	details.invalidate()
+	roots.invalidate()
 	for light:PointLight2D in lights:
 		light.hide()
 		light.queue_free()
@@ -175,12 +201,11 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 		count+=1
 		light.position=at
 		light.texture_scale=float(light.get_meta("radius"))*2.0*zoom/soft.get_width()
-	for layer:ColorRect in [foreground,vignette]:
+	for layer:Control in [foreground,vignette]:
 		layer.position=safe.position
 		layer.size=safe.size
 		layer.visible=active
-	foreground.material.set_shader_parameter("drift",drift)
-	foreground.material.set_shader_parameter("intensity",.82 if low else 1.0)
+	canopy.invalidate()
 	if not is_finite(fog_y):fog_y=floor_y
 	fog_y=lerpf(fog_y,floor_y,1.0-exp(-dt*4.5))
 	for i in fogs.size():
@@ -201,10 +226,44 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	if bokeh.visible:bokeh.invalidate()
 	details.visible=active
 	details.transform=base
+	roots.visible=active
+	roots.transform=base
 	details.material.set_shader_parameter("sway_time",time)
 	if region!=visible_region:
 		region=visible_region
 		details.invalidate()
+		roots.invalidate()
+
+func _place_roots(solids:Array,seed_value:int) -> void:
+	var rng:=RandomNumberGenerator.new()
+	rng.seed=seed_value+75031
+	for solid:Rect2 in solids:
+		if solid.size.x<96 or solid.position.y<100:continue
+		for offset in range(45,int(solid.size.x),340):
+			var at:=solid.position+Vector2(offset+rng.randf_range(-18,18),0)
+			if solids.any(func(other:Rect2)->bool:return other.has_point(at-Vector2(0,15))):continue
+			var texture:Texture2D=ROOT_ART[rng.randi_range(0,ROOT_ART.size()-1)]
+			var width:float=rng.randf_range(132,218)
+			var size:Vector2=texture.get_size()*width/texture.get_width()
+			root_sprites.append({"art":texture,"rect":Rect2(at-Vector2(width*.35,size.y*.28),size)})
+
+func _paint_roots(canvas:CanvasItem) -> void:
+	for sprite:Dictionary in root_sprites:
+		if region.intersects(sprite["rect"]):
+			canvas.draw_texture_rect(sprite["art"],sprite["rect"],false,Color(foliage_tint,.85))
+
+func _paint_canopy(canvas:CanvasItem) -> void:
+	var width:float=safe.size.x
+	var height:float=safe.size.y
+	var horizontal:float=sin(drift.x/maxf(1,width)*2.4)
+	var vertical:float=sin(drift.y/maxf(1,height)*2.4)
+	for side in 2:
+		var texture:Texture2D=CANOPY_ART[side]
+		var size:Vector2=texture.get_size()
+		size*=minf(width*.32/size.x,height*.33/size.y)
+		var x:float=-size.x*.15 if side==0 else width-size.x*.85
+		var at:=Vector2(x-horizontal*width*.045,-size.y*.25-vertical*height*.075)
+		canvas.draw_texture_rect(texture,Rect2(at,size),false,Color(foliage_tint,.9 if not reduced else .85))
 
 func _paint_feathers(canvas:CanvasItem) -> void:
 	if feather!=null:

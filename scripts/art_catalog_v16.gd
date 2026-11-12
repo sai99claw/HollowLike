@@ -16,7 +16,6 @@ const BIOME_NAMES:Dictionary={"sky":"天空","trunk":"樹幹","underground":"地
 const OBJECT_NAMES:Dictionary={"sky":["藍風草","白絨雲花","青晶蘆","藍羽薊","藍釉天甕","浮空浮石"],"trunk":["翡翠蕨","三葉幼苗","樹皮層菇","苔種莢","捲藤芽","橡果燈"],"underground":["琥珀晶簇","象牙洞菇","捲根叢","赤陶甕","發光根球","頁岩石堆"]}
 const HOME_SLEEP:Array[Array]=[[43,339,500,238],[543,301,531,274],[1122,132,495,458],[1657,178,477,406]]
 const ACTION_REGIONS=ACTOR_MOTION.ACTION_REGIONS
-const IMPACT_BASELINES:Array[int]=[300,300,300,300,647,647,647,647,972,972,972,972]
 static var _entries:Array[Dictionary]=[]
 static var _by_id:Dictionary={}
 static var _covered:Dictionary={}
@@ -187,8 +186,8 @@ static func _curated_sheets() -> void:
 	_sheet("explosion:surface","爆炸 · 貼面受限擴散","衝刺與爆炸特效",ROOT+"v16/explosion_surface.png",4,2,8,16,{"baseline":.875,"effect_plane":"surface"})
 	_sheet("explosion:air","爆炸 · 空中全向擴散","衝刺與爆炸特效",ROOT+"v16/explosion_air.png",4,2,8,16,{"effect_plane":"air"})
 	_sheet("wind:jet","單C · 小噴射","衝刺與爆炸特效",ROOT+"motion_v14/dash-jet.png",3,2,6,37.5)
-	_sheet("wind:form","雙C · 化身為風","衝刺與爆炸特效",ROOT+"motion_v14/wind-form.png",4,2,8,WIND_MOTION.FORM_FPS,{"hidden_frames":[2,4]})
-	_sheet("wind:impact","下衝 · 接地衝擊","衝刺與爆炸特效",ROOT+"motion_v14/ground-impact.png",4,3,12,24,{"clip_baselines":IMPACT_BASELINES})
+	_sheet("wind:form","雙C · 化身為風","衝刺與爆炸特效",ROOT+"v75/wind-form.webp",4,2,8,WIND_MOTION.FORM_FPS,{"hidden_frames":[2,4]})
+	_sheet("wind:impact","下衝 · 接地衝擊","衝刺與爆炸特效",ROOT+"v75/wind-impact.webp",2,2,4,8,{"baseline":1.0})
 	_sheet("merchant:owl","貓頭鷹商人 · 待機","角色與NPC",ROOT+"adventure_v08/owl_merchant.png",2,2,4,1.5)
 	for row in ACTION_REGIONS.size():
 		var frames:Array=[]
@@ -298,7 +297,7 @@ static func _procedural() -> void:
 		_add("procedural:"+pair[0],pair[1],"即時程式特效",frames,12,"直接執行遊戲的繪圖函式；時間樣本可逐格播放。",{"kind":"procedural"})
 
 static func _motion_v18() -> void:
-	_sheet("slash:v18","普攻 · 白色羽刃月牙","攻擊與命中特效",ROOT+"v18/slash-smear.png",4,2,Slash.FRAME_COUNT,Slash.FPS,{"phases":{"active":[0,1,2,3,4,5,6,7]}})
+	_sheet("slash:v18","普攻 · 白色羽刃月牙","攻擊與命中特效",ROOT+"v18/slash-smear.png",4,2,Slash.FRAME_COUNT,Slash.FPS,{"sequence":Slash.SEQUENCE,"hidden_frames":[3,5,6,7],"phases":{"active":Slash.SEQUENCE}})
 	var data:Dictionary=_json(ROOT+"v18/monster-motion-manifest.json")
 	for id:String in data.get("animations",{}):
 		var clip:Dictionary=data["animations"][id];var frames:Array=[]
@@ -420,9 +419,13 @@ static func _group_for(item:Dictionary) -> String:
 	return "物件"
 
 static func _recent_art() -> void:
+	for art:Array in [["canopy-left","左側垂枝"],["canopy-right","右側垂藤"],["root-cluster","盤根草叢"],["thorn-branch","荊刺枝葉"]]:
+		var category:String="超前景" if str(art[0]).begins_with("canopy") else "前景"
+		_add("v75:"+str(art[0]),category+" · "+str(art[1]),"地形與背景",[_descriptor(ROOT+"v75/"+str(art[0])+".webp")],1)
+
 	_sheet("v72:wing_impulse","單 C／二段跳 · 拍翅噴流","動作與特效",ROOT+"v72/wing-impulse.webp",2,2,4,4.0/.24)
-	_sheet("v72:impact_feathers","命中 · 身體向外噴出碎羽","攻擊與命中特效",ROOT+"v72/impact-feathers.webp",2,2,4,20)
-	_sheet("v72:straight_slash","普攻 · 直線閃光","攻擊與命中特效",ROOT+"v72/straight-slash.png",2,2,4,24)
+	_sheet("v72:impact_feathers","命中 · 身體向外噴出碎羽","攻擊與命中特效",ROOT+"v75/impact-feathers.webp",2,2,4,20)
+	_sheet("v72:straight_slash","普攻 · 直線閃光","攻擊與命中特效",ROOT+"v75/straight-slash.webp",2,2,4,24)
 	var motion:String=ROOT+"v68/pigeon_motion.webp"
 	_sheet("v68:pigeon:jump_rise","鴿子 · 起跳上升","主角姿態",motion,4,3,4,ACTOR_MOTION.JUMP_FPS,
 		{"sequence":ACTOR_MOTION.JUMP_SEQUENCE,"hidden_frames":[0,3],"phases":{"原始圖集":[0,1,2,3]}})
@@ -450,6 +453,8 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var used:bool=true
 	var note:String=""
 	match id:
+		"v75:canopy-left","v75:canopy-right":note="房間上緣的超前景枝葉，隨鏡頭移動，戰鬥區保持清楚。"
+		"v75:root-cluster","v75:thorn-branch":note="實心地形邊緣的前景根系與葉片，沒有碰撞。"
 		"pigeon_action:0":note="按住回血時的四張角色姿態。"
 		"pigeon_action:1:legacy":used=false;note="舊四幀跛行，已由新十幀步態取代。"
 		"pigeon_action:2":note="橫向雙 C 穿刺全程使用第 2 張，其他三張留在 RD。"
@@ -459,7 +464,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"v23:pigeon-motion:air":note="牆跳等其他上升、跳躍頂點、下降和普通落地姿勢。"
 		"v48:pigeon:quickdraw_walk":note="按住集氣且在地面移動時，按步態切換六張拔刀預備姿勢。"
 		"wind:form":note="雙 C 疊在鴿子中心，90% 不透明度；第 3、5 張停用，橫向播一次，垂直循環這六張。"
-		"wind:impact":note="向下雙 C 觸地後的地面風壓，90% 不透明度。"
+		"wind:impact":note="向下雙 C 觸地後向兩側張開的四幀風壓，90% 不透明度。"
 		"wind:jet":used=false;note="舊單 C 噴射；目前採用二段跳式拍翅與風尾。"
 		"pigeon_action:1":note="重傷移動時循環十幀，每五幀交替支撐腳。角色造型取自走路第 10 幀。"
 		"pigeon_action:1:v68":used=false;note="v0.68 舊八幀跛行，已由十幀步態取代。"
@@ -467,7 +472,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"idle:v19:idle":note="待機 5 FPS，依指定順序往返播放，第 4、8 張停用。"
 		"idle:v19:rest":note="閒置五秒後從第 2 張進入趴地休息。"
 		"walk_v2:pigeon_walk_master":note="正常走路依距離播第 7、3、8、9、10 張。"
-		"slash:v18":note="主角 A1、A2、上斬、下斬及手動集氣釋放的獨立攻擊特效。八幀以 24 FPS 播放。"
+		"slash:v18":note="主角 A1、A2、上斬、下斬及手動集氣釋放的獨立攻擊特效。跟隨主角，以 20 FPS 播原始第 1、2、3、5 幀。"
 		"combat_v05:pigeon_featherblade_up":note="普通上斬的角色動畫，沿用羽毛刀朝上姿勢。"
 		"combat_v05:pigeon_featherblade_down":note="普通下斬的角色動畫，沿用羽毛刀朝下姿勢。"
 		"combat_v05:pigeon_greatblade_up":used=false;note="舊衝刺上斬姿勢，已由右翅上揮取代。"
@@ -480,7 +485,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"combat_v05:pigeon_feather_charge":note="無雙夢境能量滿格自動擴散斬；手動集氣釋放使用大刀第三刀。"
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"
-		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，四幀由集中至飛散，遊戲內放大 40% 並提高亮度。"
+		"v72:impact_feathers":note="受擊中心沿攻擊方向噴出碎羽，象牙白與淡紫碎羽由集中至飛散，共四幀。"
 		"v72:straight_slash":note="普攻命中時從受擊者中心繪製，沿攻擊方向隨機偏轉，24 FPS。"
 		"v37:mantle":note="向牆移動且接觸平台上緣時，攀上牆頂的四格動作。"
 		"v38:laser":note="雷射副武器與使用連續光束的攻擊；貼圖寬度依命中範圍。"

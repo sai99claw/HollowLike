@@ -75,7 +75,7 @@ func test_viewer() -> void:
 		var clip:Dictionary=Catalog.entry("v70:pigeon:attack:"+str(i))
 		check(clip["frame_count"]==2 and Catalog.frame(clip,0)!=null and Catalog.frame(clip,1)!=null,"Each of the four attacks exposes two exported sprites")
 	var slash:Dictionary=Catalog.entry("slash:v18")
-	check(slash["fps"]==24 and slash["group"]=="主角" and "用途/特效" in slash["tags"],"RD catalogs the slash under the protagonist as a 24 FPS effect")
+	check(slash["fps"]==20 and Catalog.sequence(slash)==[0,1,2,4] and slash["group"]=="主角" and "用途/特效" in slash["tags"],"RD catalogs the slash under the protagonist with the specified four-frame order")
 	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("歸屬/主角"))
 	viewer._include_menu.get_popup().id_pressed.emit(viewer.tag_options.find("用途/特效"))
 	viewer._exclude_menu.get_popup().id_pressed.emit(viewer.tag_options.find("使用狀態/未使用"))
@@ -167,9 +167,9 @@ func test_game() -> void:
 		await process_frame
 		check(Slash.texture!=null,"Ordinary "+direction+" attack draws the retained slash even after its hit phase ends")
 		game.p_attack.cancel()
-	for i in 8:
-		check(Slash.frame_at((i+.5)/24.0)==i,"Slash displays every original frame at 24 FPS")
-	check(Slash.frame_at(8.0/24.0)==-1,"Slash expires after all eight frames")
+	for i in 4:
+		check(Slash.frame_at((i+.5)/20.0)==[0,1,2,4][i],"Slash draws source frames 1, 2, 3, and 5 at 20 FPS")
+	check(Slash.frame_at(.2)==-1,"Slash expires after four frames")
 	check(Catalog.entry("v72:wing_impulse").get("frame_count",0)==4 and Catalog.entry("v72:impact_feathers").get("frame_count",0)==4,"RD shows both four-frame feather effects")
 	slash_canvas.queue_free()
 	game._leave_lab()

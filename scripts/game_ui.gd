@@ -87,7 +87,10 @@ func setup() -> void:
 	theme_value.set_color("font_color","Label",INK)
 	theme_value.set_color("font_color","Button",INK)
 	if ResourceLoader.exists("res://assets/Chinese.otf"):
-		theme_value.default_font = load("res://assets/Chinese.otf") as Font
+		var readable_font:=FontVariation.new()
+		readable_font.base_font=load("res://assets/Chinese.otf") as Font
+		readable_font.fallbacks=[ThemeDB.fallback_font]
+		theme_value.default_font=readable_font
 	ui_root.theme = theme_value
 	_build_header()
 	_build_messages()
@@ -104,8 +107,7 @@ func set_safe_rect(safe:Rect2) -> void:
 	ui_root.scale=Vector2.ONE*factor
 	ui_root.size=safe.size/factor
 	var extra:Vector2=ui_root.size-logical
-	edge_tools.position=Vector2(1225+extra.x,13)
-	mute_button.position=Vector2(809+extra.x,18)
+	edge_tools.position=Vector2(ui_root.size.x-edge_tools.get_combined_minimum_size().x-20,13)
 	quickbar.position=Vector2(20,642+extra.y)
 
 func _build_header() -> void:
@@ -199,19 +201,12 @@ func _build_header() -> void:
 	dream_row.add_child(dream_label)
 	var tools := HBoxContainer.new()
 	edge_tools=tools
-	tools.position = Vector2(1225,13)
+	tools.position = Vector2(1186,13)
 	tools.add_theme_constant_override("separation",6)
 	ui_root.add_child(tools)
-	for entry: Array in [["≡","settings"]]:
-		var button := _button(str(entry[0]),str(entry[1]),null)
-		shortcut_buttons[str(entry[1])]=button;button.focus_mode=Control.FOCUS_NONE
-		button.flat=true
-		button.tooltip_text="暫停選單 · Esc"
-		button.custom_minimum_size = Vector2(34,34)
-		button.add_theme_font_size_override("font_size",12)
-		tools.add_child(button)
-	mute_button=_button("聲音：開", "mute", null);mute_button.focus_mode=Control.FOCUS_NONE;mute_button.name="TopMuteButton";mute_button.position=Vector2(809,18);mute_button.custom_minimum_size=Vector2(120,34);ui_root.add_child(mute_button)
-	mute_button.hide()
+	mute_button=_tool_button("mute","靜音",preload("res://assets/v75/audio-on.svg"))
+	mute_button.name="TopMuteButton"
+	shortcut_buttons["settings"]=_tool_button("settings","暫停選單 · Esc",preload("res://assets/v75/pause-menu.svg"))
 	prep_button = _button("安全屋 ↑","prep",null)
 	prep_button.focus_mode=Control.FOCUS_NONE
 	prep_button.position = Vector2(20,190)
@@ -219,6 +214,18 @@ func _build_header() -> void:
 	ui_root.add_child(prep_button)
 
 	quickbar=HBoxContainer.new();quickbar.position=Vector2(20,642);quickbar.add_theme_constant_override("separation",6);ui_root.add_child(quickbar)
+
+
+func _tool_button(action:String,tip:String,art:Texture2D) -> Button:
+	var button:=_button("",action,null)
+	button.focus_mode=Control.FOCUS_NONE
+	button.flat=true
+	button.tooltip_text=tip
+	button.icon=art
+	button.icon_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	button.custom_minimum_size=Vector2(34,34)
+	edge_tools.add_child(button)
+	return button
 
 
 func _build_messages() -> void:
@@ -339,7 +346,9 @@ func update_hud(info: Dictionary) -> void:
 	secondary_art.tooltip_text="%s · %s 切換"%[str(info.get("sub","")),str(info.get("cycle_key","Q"))]
 	secondary_art.get_parent().visible=not home and secondary_art.texture!=null
 	secondary_label.text="×%d"%sub_count
-	mute_button.text="聲音：開" if info.get("audio_enabled",true) else "聲音：靜音"
+	var audio_on:bool=bool(info.get("audio_enabled",true))
+	mute_button.icon=preload("res://assets/v75/audio-on.svg") if audio_on else preload("res://assets/v75/audio-off.svg")
+	mute_button.tooltip_text="靜音" if audio_on else "開啟聲音"
 	var phase:String=str(info.get("phase","idle"))
 	var remaining:float=float(info.get("phase_remaining",0))
 	var ready:bool=phase=="idle"

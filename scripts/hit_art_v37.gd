@@ -2,8 +2,8 @@ class_name HitArtV37
 extends RefCounted
 const PigeonBurst=preload("res://scripts/pigeon_burst_v72.gd")
 const CRESCENT_DURATION_USEC:int=125000
-const STRAIGHT=preload("res://assets/v72/straight-slash.png")
-const STRAIGHT_CELL:=Vector2(640,40)
+const STRAIGHT=preload("res://assets/v75/straight-slash.webp")
+const STRAIGHT_CELL:=Vector2(640,64)
 const STRAIGHT_SECONDS:float=4.0/24.0
 
 static func draw(c:CanvasItem,flash:Dictionary,base:Transform2D,screen_width:float=1280.0) -> void:
@@ -20,7 +20,7 @@ static func draw(c:CanvasItem,flash:Dictionary,base:Transform2D,screen_width:flo
 		var cell:=Rect2(Vector2(index%2,index/2)*STRAIGHT_CELL,STRAIGHT_CELL)
 		var extent:=Vector2(screen_width*.5,24.0)/zoom
 		c.draw_set_transform_matrix(base*Transform2D(float(flash["straight_angle"]),Vector2(flash["at"])))
-		c.draw_texture_rect_region(STRAIGHT,Rect2(-extent*.5,extent),cell,Color(.91,.94,1.0,.86))
+		c.draw_texture_rect_region(STRAIGHT,Rect2(-extent*.5,extent),cell,Color(1.1,1.06,1.04,.96))
 	if bool(flash.get("feathers",false)):
 		PigeonBurst.draw(c,PigeonBurst.IMPACT,flash.get("spray_at",flash["at"]),flash["dir"],elapsed,PigeonBurst.IMPACT_DURATION,PigeonBurst.IMPACT_EXTENT,base,PigeonBurst.IMPACT_TINT)
 	c.draw_set_transform_matrix(base)

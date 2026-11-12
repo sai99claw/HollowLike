@@ -74,7 +74,7 @@ func run() -> void:
 	check(started_damage and crossed["hp"]==98,"Swept descent deals exactly one hit to a crossed enemy")
 	check(landed["hp"]==98 and below["hp"]==100,"Ground impact hits nearby enemies above the contacted surface without crossing the floor")
 	check(not scene.p["slam"] and is_equal_approx(scene.p["pos"].y,700),"Landing terminates descent on the first physical platform")
-	check(is_equal_approx(scene.p["invul"],.5) and scene.effects.any(func(e):return e.get("ground_wind",false) and e["max"]==.5),"Landing starts twelve-frame impact animation and half-second protection")
+	check(is_equal_approx(scene.p["invul"],.5) and scene.effects.any(func(e):return e.get("ground_wind",false) and e["max"]==.5),"Landing starts the ground-impact effect and half-second protection")
 	scene.enemies.clear();scene._clear_keys();scene._physics_process(.49)
 	check(not scene._hurt_player(1,Vector2(700,600)),"Landing protection still blocks damage at 0.49 seconds")
 	scene._physics_process(.011);check(scene._hurt_player(1,Vector2(700,600)),"Incoming damage resumes after the half-second landing window")

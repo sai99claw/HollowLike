@@ -97,7 +97,7 @@ func draw_screen(c:CanvasItem,base:Transform2D,screen_width:float=1280.0) -> voi
 	c.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 func projectile_trail(pr:Dictionary,speed:float=1) -> void:
-	var dust:bool=preload("res://scripts/projectile_animation_v31.gd").has(str(pr.get("weapon_id",""))) or str(pr.get("visual_id","")).begins_with("v36:")
+	var dust:bool=preload("res://scripts/projectile_readability_v25.gd").uses_dust(pr)
 	if not pr.has("trail_id"):
 		if trails.size()>=(24 if reduced else 96):return
 		trail_serial+=1;pr["trail_id"]=trail_serial

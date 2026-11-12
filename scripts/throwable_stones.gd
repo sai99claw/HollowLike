@@ -83,6 +83,11 @@ static func scatter(stone:Dictionary,direction:Vector2,attack_damage:float) -> v
 
 static func launch(stone:Dictionary,direction:Vector2,attack_damage:float) -> void:
 	stone.erase("pile_slot")
+	stone.erase("trail_points")
+	stone.erase("trail_times")
+	stone["radius"]=radius(stone)
+	stone["from_player"]=true
+	stone["color"]=Color("dcc9b7")
 	var speed:float=520.0 if stone["large"] else 690.0
 	var lift:float=205.0 if absf(direction.y)<.5 else 0.0
 	stone["vel"]=direction.normalized()*speed-Vector2(0,lift)

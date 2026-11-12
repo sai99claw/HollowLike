@@ -98,7 +98,7 @@ const ROOM_H: float = 1120.0
 const FLOOR_Y: float = 1050.0
 const GRAVITY: float = 1250.0
 const MOVE_SPEED: float = 330.0
-const JUMP_SPEED: float = 530.0
+const JUMP_SPEED: float = PlayerMotion.JUMP_SPEED
 const SAVE_PATH = "user://pigeon_tower_v1.json"
 const SKINS = [
 	{"name":"原皮", "price":0, "color":Color.WHITE,"id":"original"},
@@ -662,6 +662,9 @@ func _physics_process_profiled_body(delta:float) -> void:
 	if screen=="game":_update_hit_white(delta)
 	# Physics, pose sampling and VFX share the same frozen game clock.
 	if hitstop>0 and life_event.is_empty():
+		# Landing protection measures real gameplay seconds, including impact hitstop.
+		if screen=="game" and float(p.get("slam_land_left",0))>0 and not ui.is_panel_open():
+			p["invul"]=maxf(0.0,float(p["invul"])-delta)
 		hitstop=maxf(0,hitstop-delta);return
 	clock+=delta
 	_update_visual_effects(delta*world_speed)
@@ -870,7 +873,7 @@ func _update_player_profiled_body(delta:float) -> void:
 		p["vel"]=Vector2.ZERO
 		return
 	# Preserve ordinary-jump clearance at every global speed setting.
-	var steps:int=maxi(1,int(ceil(delta/(1.0/120))))
+	var steps:int=maxi(1,int(ceil(delta/PlayerMotion.MOTION_STEP)))
 	for step in steps:_step_player(delta/steps)
 
 func _step_player(delta: float) -> void:
@@ -1008,7 +1011,7 @@ func _step_player(delta: float) -> void:
 		if not p.has("launch_pending_velocity") and not _in_bath():
 			Juice.squash(p,Juice.LAND,draw_clock,.12)
 			visual_juice.flash(pos-Vector2(0,2),Vector2.UP,draw_clock,"dust")
-		if float(p.get("fall_distance",0))>float(layout.get("tile_size",96))*6.0 and not p.has("launch_pending_velocity") and not _in_bath():
+		if float(p.get("fall_distance",0))>float(layout.get("tile_height",layout.get("tile_size",96)))*6.0 and not p.has("launch_pending_velocity") and not _in_bath():
 			_begin_heavy_landing(pos);vel.x=0
 		elif not p.has("launch_pending_velocity"):_sound("land")
 		p["fall_distance"]=0.0
@@ -1205,7 +1208,7 @@ func _attack_box(pos: Vector2, def: Dictionary, face: float) -> Rect2:
 	return _attack_volume(Rect2(pos.x if dir=="right" else pos.x-reach,center_y-width*.5,reach,width),def)
 
 func _player_strike_box(def:Dictionary) -> Rect2:
-	return _attack_box(def.get("strike_origin",p["pos"]),def,float(def.get("strike_face",p["face"])))
+	return _attack_box(p["pos"],def,float(p["face"]))
 
 func _attack_volume(box:Rect2,definition:Dictionary) -> Rect2:
 	var added:float=box.size.y*(float(definition.get("hitbox_height_mult",1)) - 1)
@@ -1801,7 +1804,7 @@ func _try_projectile_riposte(enemy:Dictionary,shot:Dictionary,old:Vector2,next:V
 func _update_projectiles_profiled_body(delta:float) -> void:
 	if projectiles.is_empty():return
 	var room_bounds:=Rect2(Vector2.ZERO,_room_size())
-	var trail_view:=view_rect.grow(80)
+	var trail_view:=view_rect.grow(250)
 	var initial_room:int=current_room
 	var world:Array=_projectile_surfaces()
 	for pr in projectiles:
@@ -1826,12 +1829,13 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 		var wall_hit:bool=wall_t<INF
 		if wall_hit:next=old+movement*maxf(0,wall_t-.0001)
 		pr["pos"]=next
-		if ProjectileReadability.uses_line_trail(pr):
+		if trail_view.has_point(next):
 			ProjectileReadability.record(pr,old,next,delta)
-		elif combat_feedback!=null and trail_view.has_point(next):
-			combat_feedback.projectile_trail(pr,world_speed)
-		elif combat_feedback!=null:
-			combat_feedback.finish_trail(pr)
+			if combat_feedback!=null and ProjectileReadability.uses_dust(pr):
+				combat_feedback.projectile_trail(pr,world_speed)
+		elif pr.has("trail_points"):
+			pr.erase("trail_points");pr.erase("trail_times")
+			if combat_feedback!=null:combat_feedback.finish_trail(pr)
 			pr.erase("trail_id")
 		pr["distance_left"]=float(pr.get("distance_left",INF))-old.distance_to(next)
 		if pr.get("trap_carrier",false):
@@ -1866,6 +1870,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 						if int(en["uid"])==int(pr.get("owner_uid",-2)):_parry(en);break
 				if _rune_effect("reflect")>0:
 					pr["from_player"]=true;pr["hits"]={};pr["vel"]=-pr["vel"];pr["base_velocity"]=pr["vel"];pr["pos"]=p["pos"]+Vector2(float(p["face"])*45,-25);pr["distance_left"]=maxf(200,float(pr["distance_left"]));pr["return_after"]=0
+					pr.erase("trail_points");pr.erase("trail_times")
 				else:pr["life"]=0
 				blocked=true;_projectile_impact(pr);_block_effect(next,"reflect" if _rune_effect("reflect")>0 else "block")
 			if not blocked and not pr["hits"].has(-1) and _segment_hits_box(old,next,_body_box(p["pos"]).grow(radius)):
@@ -1967,9 +1972,11 @@ func _enemy_defeated(en: Dictionary) -> void:
 	_check_room_clear()
 
 func _check_room_clear() -> void:
-	if room.get("type","") not in ["elite","boss"] or room.get("cleared",false):return
+	if room.get("type","") not in ["combat","elite","boss"] or room.get("cleared",false):return
 	if enemies.any(func(enemy:Dictionary)->bool:return float(enemy["hp"])>0 and not enemy.get("training",false)):return
-	room["cleared"]=true;hazards.clear()
+	room["cleared"]=true
+	if room["type"]=="combat":return
+	hazards.clear()
 	if room["type"]=="elite":
 		var at:Vector2=_trap_position(p["pos"])
 		props.append({"kind":"chest","pos":at,"used":false,"hurt":0.0,"guaranteed_strong":true});room["props"]=props
@@ -2003,6 +2010,7 @@ func _update_drops_profiled_body(delta:float) -> void:
 	if drops.is_empty():return
 	var target:Vector2=p["pos"]-Vector2(0,20)
 	var magnet_radius:float=125+_rune_effect("magnet")
+	var cleared:bool=bool(room.get("cleared",false))
 	var picked_gold:int=0
 	var bounds:=Rect2(Vector2(18,0),_room_size()-Vector2(36,0))
 	for drop in drops:
@@ -2012,16 +2020,23 @@ func _update_drops_profiled_body(delta:float) -> void:
 		if not drop.has("radius"):drop["radius"]=7.0 if drop["kind"]=="coin" else 18.0
 		Coins.initialize(drop,Vector2(rng.randf_range(-180,180),rng.randf_range(-350,-190)) if not drop.has("vel") else Vector2.ZERO)
 		drop["impact_cd"]=maxf(0,float(drop.get("impact_cd",0))-delta)
-		if drop["kind"]=="coin" and float(drop["age"])>.35 and Vector2(drop["pos"]).distance_squared_to(target)<magnet_radius*magnet_radius:
+		if cleared:
+			# Bypass terrain so distant loot can cross walls on the way back.
+			var speed:float=move_toward(float(drop.get("attract_speed",280.0)),1800.0,4000.0*delta)
+			drop["attract_speed"]=speed
+			drop["pos"]=Vector2(drop["pos"]).move_toward(target,speed*delta)
+			drop["age"]=maxf(.36,float(drop["age"])+delta)
+		elif drop["kind"]=="coin" and float(drop["age"])>.35 and Vector2(drop["pos"]).distance_squared_to(target)<magnet_radius*magnet_radius:
 			drop["sleeping"]=false;drop["vel"]=drop["vel"].move_toward((target-drop["pos"]).normalized()*450,delta*1200)
-		var nearby:Array=[] if drop.get("sleeping",false) and Vector2(drop["vel"]).length_squared()<.01 else coin_field.query(drop["pos"],drop["vel"],delta,float(drop["radius"])+3)
-		if Coins.step(drop,delta,nearby,bounds) and drop["kind"]=="coin" and float(drop["impact_cd"])<=0:
-			drop["impact_cd"]=.15;_particles(drop["pos"],Color("efdba3"),4,65);_sound("coin")
+		if not cleared:
+			var nearby:Array=[] if drop.get("sleeping",false) and Vector2(drop["vel"]).length_squared()<.01 else coin_field.query(drop["pos"],drop["vel"],delta,float(drop["radius"])+3)
+			if Coins.step(drop,delta,nearby,bounds) and drop["kind"]=="coin" and float(drop["impact_cd"])<=0:
+				drop["impact_cd"]=.15;_particles(drop["pos"],Color("efdba3"),4,65);_sound("coin")
 		if Vector2(drop["pos"]).distance_squared_to(target)<36*36 and float(drop.get("age",0))>.35:
 			drop["taken"]=true
 			if drop["kind"]=="coin":picked_gold+=int(drop["value"])
 			else:_give_drop(str(drop["kind"]),int(drop["value"]))
-	CoinField.collide(drops)
+	if not cleared:CoinField.collide(drops)
 	if picked_gold>0:run_coins+=picked_gold;_sound("coin")
 	drops=drops.filter(func(drop:Dictionary)->bool:return not bool(drop["taken"]))
 	room["drops"]=drops
@@ -2804,7 +2819,7 @@ func _draw_profiled_body() -> void:
 		if view_rect.has_point(hazard["pos"]) and not MonsterDesign.draw_hazard(self,hazard,clock,world_transform) and not FX.hazard(self,hazard,clock,world_transform):BossVisual.hazard(self,hazard,clock,world_transform,show_hitboxes)
 	for pr in projectiles:
 		if not view_rect.grow(160).has_point(pr["pos"]):continue
-		ProjectileReadability.draw_trail(self,pr,world_transform);ProjectileReadability.draw_cue(self,pr,world_transform)
+		ProjectileReadability.draw_trail(self,pr,world_transform,low_effects);ProjectileReadability.draw_cue(self,pr,world_transform)
 		var visual:Dictionary=pr.duplicate(false);visual["radius"]=ProjectileReadability.visual_radius(pr)
 		if WeaponArt.Animated.has(str(pr.get("weapon_id",""))) or (pr.get("from_player",false) and WeaponArt.texture(str(pr.get("weapon_id","")),true)!=null):
 			WeaponArt.draw(self,str(pr["weapon_id"]),pr["pos"],pr["vel"],float(visual["radius"]),true,world_transform,float(pr.get("elapsed",0)),float(pr.get("launch_angle",0)));draw_set_transform_matrix(world_transform);continue
@@ -3167,7 +3182,7 @@ func _draw_door(door:Dictionary) -> void:
 	var color:Color=Adventure.door_color(target,locked)
 	var at:Vector2=door["pos"]
 	if not view_rect.grow(180).has_point(at):return
-	Adventure.portal(self,at,color,clock,world_transform,str(room["ecology"]["id"]),str(door["dir"]),float(layout.get("tile_size",64))*3 if layout.get("door_width",1)==3 else 64,low_effects)
+	Adventure.portal(self,at,color,clock,world_transform,str(room["ecology"]["id"]),str(door["dir"]),_door_opening(str(door["dir"]),64.0),low_effects)
 	if locked:draw_line(at-Vector2(25,52),at+Vector2(25,-19),Color("e1b18b"),5)
 
 func _draw_exit_indicators() -> void:
@@ -3462,13 +3477,18 @@ func _update_passives_profiled_body(delta:float) -> void:
 func _bee_position(index:int) -> Vector2:
 	return p["pos"]-Vector2(0,35)+Vector2.from_angle(draw_clock*3+TAU*index/maxf(1,_rune_effect("orbit_bee")))*(50+int(index/8)*10)
 
+func _door_opening(direction:String,legacy_width:float) -> float:
+	if layout.get("door_width",1)!=3:return legacy_width
+	var width:float=float(layout.get("tile_size",64))
+	return 3.0*float(layout.get("tile_height",width)) if direction in ["left","right"] else 3.0*width
+
 func _check_portals() -> void:
 	if _release_locked():return
 	if room_cooldown>0 or not life_event.is_empty():return
 	var at:Vector2=p["pos"]
-	var opening:float=float(layout.get("tile_size",64))*3 if layout.get("door_width",1)==3 else 96
 	for door in doors:
 		var direction:String=door["dir"];var anchor:Vector2=door["pos"]
+		var opening:float=_door_opening(direction,96.0)
 		var crossed:bool=false
 		match direction:
 			"left":crossed=at.x<25 and at.y>anchor.y-opening+36 and at.y<anchor.y+24
@@ -3515,7 +3535,7 @@ func _make_props() -> Array[Dictionary]:
 	if room.get("fountain",false) and layout.has("fountain_pos"):result.append({"kind":"fountain","pos":layout["fountain_pos"],"used":false,"hurt":0.0,"water_cd":0.0})
 	if room["type"] in ["combat","elite"] and not room.get("spring",false):
 		for reward:Dictionary in layout.get("dead_end_rewards",[]):
-			var cell:Vector2i=reward["cell"];var at:=Vector2((cell.x+.5)*96,(cell.y+1)*96)
+			var cell:Vector2i=reward["cell"];var at:=(Vector2(cell)+Vector2(.5,1))*Scale.CELL_SIZE
 			result.append({"kind":"chest","pos":at,"used":false,"hurt":0.0,"dead_end_length":reward["length"]})
 		for at:Vector2 in layout.get("launcher_spawns",[]):
 			if result.any(func(prop:Dictionary)->bool:return Vector2(prop["pos"]).distance_to(at)<120):continue
@@ -3569,6 +3589,9 @@ func _step_stone(stone:Dictionary,delta:float) -> void:
 	var damage:float=stone["damage"]
 	var path:PackedVector2Array=Stones.step(stone,delta,solids+platforms)
 	var next:Vector2=Stones.center(stone)
+	if path.size()>1:
+		for index in range(1,path.size()):
+			ProjectileReadability.record(stone,path[index-1],path[index],delta/(path.size()-1))
 	if next.y>_room_size().y+96 or next.x< -96 or next.x>_room_size().x+96:
 		stone["used"]=true
 		return
@@ -3882,6 +3905,7 @@ func _draw_props(focus:Dictionary={}) -> void:
 		var at:Vector2=prop["pos"];var kind:String=prop["kind"]
 		if not view_rect.grow(140).has_point(at):continue
 		if kind=="stone":
+			if not prop["asleep"]:ProjectileReadability.draw_trail(self,prop,world_transform,low_effects)
 			Stones.draw(self,prop,biome)
 			if show_hitboxes:draw_arc(Stones.center(prop),Stones.radius(prop),0,TAU,32,Color("ffdf94"),1,true)
 			continue
@@ -4506,15 +4530,15 @@ func _start_player_slash() -> void:
 	while not player_slashes.is_empty() and draw_clock-float(player_slashes[0]["start"])>=SlashArt.DURATION:
 		player_slashes.pop_front()
 	if player_slashes.size()>=8:player_slashes.pop_front()
-	if def.get("kind","")=="primary":
-		def["strike_origin"]=p["pos"]
-		def["strike_face"]=p["face"]
-	player_slashes.append({"box":_player_strike_box(def),"definition":def.duplicate(),"start":draw_clock})
+	var definition:Dictionary=def.duplicate()
+	if not definition.has("direction"):definition["direction"]="right" if p["face"]>0 else "left"
+	player_slashes.append({"definition":definition,"start":draw_clock})
 
 func _paint_player_slash(canvas:CanvasItem) -> void:
 	if screen not in ["game","hub"]:return
 	for slash:Dictionary in player_slashes:
-		SlashArt.draw(canvas,slash["box"],slash["definition"],draw_clock-float(slash["start"]),world_transform)
+		var definition:Dictionary=slash["definition"]
+		SlashArt.draw(canvas,_player_strike_box(definition),definition,draw_clock-float(slash["start"]),world_transform)
 
 func _pogo() -> void:
 	p["jump_cut_allowed"]=false;p["recoil_left"]=0;p["wall_kick_left"]=0
