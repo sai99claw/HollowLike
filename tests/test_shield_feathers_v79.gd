@@ -74,6 +74,25 @@ func run() -> void:
 	game._update_hud()
 	check("10 秒" in game.ui.timed_effects_label.text,"Active effects show remaining whole seconds")
 	check(game.ui.energy_cells.get_child(0).texture==game.ui.ENERGY_FULL and game.ui.energy_cells.get_child(1).texture==game.ui.ENERGY_EMPTY,"Energy pips use matching full and empty feather textures")
+	game.p["hp"]=2
+	game.p["shield_cells"]=2
+	game.p["energy"]=game.p["max_energy"]
+	game._update_hud()
+	check(game.ui.health_cells.get_child(0).texture==game.ui.HEART_FULL and game.ui.health_cells.get_child(2).texture==game.ui.HEART_EMPTY,"Health cells show filled and empty hearts")
+	check(game.ui.shield_cells.get_child(0).texture==game.ui.SHIELD_FULL and game.ui.shield_cells.get_child(2).texture==game.ui.SHIELD_EMPTY,"Shield cells show filled and empty shields")
+	check(game.ui.energy_cells.get_child(0).custom_minimum_size==Vector2(22.5,28.5),"Energy feathers use 1.5x the old size")
+	game.ui._process(.1)
+	var bright:Color=game.ui.energy_cells.modulate
+	game.ui._process(.575)
+	check(game.ui.energy_cells.modulate!=bright and game.ui.energy_cells.modulate!=Color.WHITE,"Full energy breathes while the ultimate is ready")
+	game.ui._process(1.35)
+	check(game.ui.energy_cells.modulate.is_equal_approx(game.ui.ultimate_hint.modulate),"The full row and ultimate prompt pulse together")
+	game.p["energy"]-=1
+	game._update_hud()
+	game.ui._process(.01)
+	check(game.ui.energy_cells.modulate==Color.WHITE,"The full-energy pulse stops when a cell is spent")
+	game.ui.feather_collection.burst(Vector2.ZERO,Vector2.RIGHT,Transform2D.IDENTITY,false)
+	check(game.ui.feather_collection.shards.all(func(shard:Dictionary)->bool:return shard["size"]>=18.0 and shard["size"]<=36.0),"Absorption feathers use twice the previous dimensions")
 	check(game.PORTAL_HEIGHT==3.0*96.0,"Transition gate uses three standard cells across room layouts")
 	game.queue_free()
 	await process_frame

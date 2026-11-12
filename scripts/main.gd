@@ -992,8 +992,9 @@ func _step_player(delta: float) -> void:
 			_sound("wall_jump")
 		elif bool(p["grounded"]) or float(p.get("coyote_left",0))>0:
 			jumped=true
-			if _key("down") and pos.y<_room_floor()-15:
+			if _key("down") and bool(p["grounded"]) and _can_drop_through(pos):
 				drop_through_y=pos.y;drop_through_timer=.22
+				p["drop_to_lower_room"]=_in_lower_exit_lane(pos)
 				pos.y+=3;vel.y=130;p["grounded"]=false;_sound("drop_through")
 			else:
 				p["jump_rise_age"]=0.0
@@ -1005,7 +1006,7 @@ func _step_player(delta: float) -> void:
 			if vel.y<0:Juice.squash(p,Juice.LAUNCH,draw_clock,.15)
 			p["jump_buffer_left"]=0;p["coyote_left"]=0;p["jump_cut_allowed"]=true
 			if bool(p.get("jump_released",false)) and vel.y<0:vel.y=PlayerMotion.cut(vel.y);p["jump_cut_allowed"]=false
-	var can_glide:bool=_key("jump") and not p["grounded"] and int(p["wall"])==0 and not _wind_form_active() and float(p["dash_t"])<=0 and not knocked and float(p["hurt"])<=0 and not _in_bath()
+	var can_glide:bool=_key("jump") and not p.get("drop_to_lower_room",false) and not p["grounded"] and int(p["wall"])==0 and not _wind_form_active() and float(p["dash_t"])<=0 and not knocked and float(p["hurt"])<=0 and not _in_bath()
 	var floating:bool=can_glide and _rune_effect("held_flight")>0 and vel.y>-230.0
 	var gliding:bool=can_glide and vel.y>=0.0
 	if floating and not p.get("flight_boosting",false):_sound("flight_boost")
@@ -1038,7 +1039,9 @@ func _step_player(delta: float) -> void:
 		pos.x=4
 	elif pos.x>_room_size().x-4:
 		pos.x=_room_size().x-4
-	var landing_y:float=_support_y(old_pos,pos,vel.y,9.0,drop_through_y if drop_through_timer>0 else -10000.0)
+	var exit_drop:bool=p.get("drop_to_lower_room",false) and _key("down") and _in_lower_exit_lane(pos) and not p["grounded"]
+	if not exit_drop and p.has("drop_to_lower_room"):p.erase("drop_to_lower_room")
+	var landing_y:float=_support_y(old_pos,pos,vel.y,9.0,drop_through_y if drop_through_timer>0 else -10000.0,exit_drop)
 	if bool(p["slam"]):_slam_contacts(old_pos,Vector2(pos.x,minf(pos.y,landing_y)))
 	if landing_y<INF:
 		pos.y=landing_y;vel.y=0;p["grounded"]=true
@@ -1130,12 +1133,29 @@ func _cast_ultimate() -> void:
 	shake=maxf(shake,11.0)
 	_update_hud()
 
-func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0) -> float:
+func _in_lower_exit_lane(at:Vector2) -> bool:
+	if screen!="game" or at.y<_room_floor()-15.0:return false
+	var lower_exit:Vector2=layout.get("doors",{}).get("down",Vector2.INF)
+	return absf(at.x-lower_exit.x)<PORTAL_HEIGHT*.5-17.0
+
+func _can_drop_through(at:Vector2) -> bool:
+	for solid:Rect2 in solids:
+		if absf(at.y-solid.position.y)<.6 and at.x+17.0>solid.position.x and at.x-17.0<solid.end.x:
+			return false
+	# Generated exit ledges can be below the nominal room floor.
+	var ledges:Array=layout.get("one_way",[]) if at.y>=_room_floor()-15.0 else platforms
+	for ledge:Rect2 in ledges:
+		if absf(at.y-ledge.position.y)<.6 and at.x+9.0>ledge.position.x and at.x-9.0<ledge.end.x:
+			return true
+	return false
+
+func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0, skip_one_way:bool=false) -> float:
 	if vertical_speed<0: return INF
 	var best:float=INF
 	for plat in platforms:
 		if absf(plat.position.y-ignore_y)<.5: continue
 		if old.y<=plat.position.y+.6 and next.y>=plat.position.y and next.x+half_width>plat.position.x and next.x-half_width<plat.end.x:
+			if skip_one_way and layout.get("one_way",[]).has(plat):continue
 			best=minf(best,plat.position.y)
 	return best
 
@@ -2291,6 +2311,7 @@ func new_run(chosen_mode: String, seed_value: int=-1) -> void:
 	_save_meta()
 
 func _enter_room(id: int, from_dir: String="center") -> void:
+	p.erase("drop_to_lower_room")
 	p.erase("lift_charge");p.erase("lift_flying")
 	if visual_juice!=null:visual_juice.clear()
 	player_slashes.clear()

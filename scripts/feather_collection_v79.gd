@@ -3,6 +3,7 @@ extends Node2D
 const FX=preload("res://scripts/combat_visual.gd")
 const LIMIT:int=64
 const BURST_TIME:float=.13
+const SHARD_SCALE:float=2.0
 var shards:Array[Dictionary]=[]
 var rng:=RandomNumberGenerator.new()
 var texture:Texture2D
@@ -18,7 +19,7 @@ func burst(origin:Vector2,direction:Vector2,base:Transform2D,reduced:bool) -> vo
 		if shards.size()>=LIMIT:shards.pop_front()
 		var velocity:=direction.rotated(rng.randf_range(-1.2,1.2))*rng.randf_range(200.0,470.0)
 		shards.append({"origin":origin,"velocity":velocity,"age":0.0,
-			"duration":rng.randf_range(.38,.56),"size":rng.randf_range(9.0,18.0),
+			"duration":rng.randf_range(.38,.56),"size":rng.randf_range(9.0,18.0)*SHARD_SCALE,
 			"spin":rng.randf_range(-12.0,12.0)})
 	queue_redraw()
 

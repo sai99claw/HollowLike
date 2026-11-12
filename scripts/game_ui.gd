@@ -13,6 +13,11 @@ const GOLD := Color("e8c381")
 const Icons=preload("res://scripts/ui_asset_art.gd")
 const Inventory=preload("res://scripts/inventory_view.gd")
 const Cells=preload("res://scripts/vital_cells.gd")
+const HEART_EMPTY=preload("res://assets/v80/heart-empty.webp")
+const HEART_FULL=preload("res://assets/v80/heart-full.webp")
+const SHIELD_EMPTY=preload("res://assets/v80/shield-empty.webp")
+const SHIELD_FULL=preload("res://assets/v80/shield-full.webp")
+const ENERGY_ICON_SCALE:float=1.5
 const ENERGY_EMPTY=preload("res://assets/v79/energy-feather-empty.webp")
 const ENERGY_FULL=preload("res://assets/v79/energy-feather-full.webp")
 const FeatherCollection=preload("res://scripts/feather_collection_v79.gd")
@@ -34,6 +39,7 @@ var shield_row:HBoxContainer
 var timed_effects_label:Label
 var feather_collection:=FeatherCollection.new()
 var ultimate_hint:Label
+var _ultimate_breath:float=0.0
 var lift_hint:Label
 var message_label: Label
 var legend_label: Label
@@ -149,7 +155,9 @@ func _build_header() -> void:
 	vitals.add_child(health_art)
 	health_cells=Cells.new()
 	health_cells.name="HealthCells"
-	health_cells.filled_color=Color("e8a18c")
+	health_cells.empty_texture=HEART_EMPTY
+	health_cells.full_texture=HEART_FULL
+	health_cells.cell_size=Vector2(19,19)
 	vitals.add_child(health_cells)
 	energy_art=_icon("items_energy",20)
 	energy_art.mouse_filter=Control.MOUSE_FILTER_PASS
@@ -158,7 +166,7 @@ func _build_header() -> void:
 	energy_cells.name="EnergyCells"
 	energy_cells.empty_texture=ENERGY_EMPTY
 	energy_cells.full_texture=ENERGY_FULL
-	energy_cells.cell_size=Vector2(15,19)
+	energy_cells.cell_size=Vector2(15,19)*ENERGY_ICON_SCALE
 	vitals.add_child(energy_cells)
 	coin_art=_icon("coin",20)
 	coin_art.mouse_filter=Control.MOUSE_FILTER_PASS
@@ -177,8 +185,9 @@ func _build_header() -> void:
 	shield_row.add_child(shield_art)
 	shield_cells=Cells.new()
 	shield_cells.name="ShieldCells"
-	shield_cells.filled_color=Color("8acbff")
-	shield_cells.cell_size=Vector2(12,10)
+	shield_cells.empty_texture=SHIELD_EMPTY
+	shield_cells.full_texture=SHIELD_FULL
+	shield_cells.cell_size=Vector2(18,18)
 	shield_row.add_child(shield_cells)
 	timed_effects_label=_label("",13,Color("d5e9ff"))
 	timed_effects_label.name="TimedEffects"
@@ -239,7 +248,7 @@ func _build_header() -> void:
 		cell.texture=ENERGY_EMPTY
 		cell.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 		cell.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		cell.custom_minimum_size=Vector2(9,11)
+		cell.custom_minimum_size=Vector2(9,11)*ENERGY_ICON_SCALE
 		cell.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		cells.add_child(cell)
 		dream_cells.append(cell)
@@ -678,9 +687,19 @@ func clear_attack_feedback() -> void:
 func _process(delta: float) -> void:
 	_feedback_cooldown=maxf(0,_feedback_cooldown-delta)
 	attack_feedback_timer=maxf(0,attack_feedback_timer-delta)
-	var pulse:bool=attack_feedback_timer>0 and attack_feedback_reason=="energy"
-	var tint:Color=Color("ffb482") if pulse and fmod(.8-attack_feedback_timer,.24)<.14 else Color.WHITE
-	energy_art.modulate=tint;energy_cells.modulate=tint
+	var warning:bool=attack_feedback_timer>0 and attack_feedback_reason=="energy"
+	var tint:=Color.WHITE
+	if ultimate_hint.visible:
+		_ultimate_breath=fposmod(_ultimate_breath+delta/1.35,1.0)
+		var breath:float=.5-.5*cos(TAU*_ultimate_breath)
+		tint=Color(.96,.72,.45,.77).lerp(Color(1.35,1.31,1.17,1.0),breath)
+	elif warning and fmod(.8-attack_feedback_timer,.24)<.14:
+		tint=Color("ffb482")
+	else:
+		_ultimate_breath=0.0
+	energy_art.modulate=tint
+	energy_cells.modulate=tint
+	ultimate_hint.modulate=tint
 	if _message_timer > 0.0:
 		_message_timer = maxf(0.0, _message_timer - delta)
 		message_label.modulate.a = minf(1.0, _message_timer / 0.4)

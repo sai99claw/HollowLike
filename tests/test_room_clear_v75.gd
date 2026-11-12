@@ -84,6 +84,38 @@ func run() -> void:
 		game._enter_room(candidate["id"])
 		break
 	check(is_equal_approx(game._room_size().y,1080.0) and game._view_zoom()<=1.0,"Boss arena is at most one and a half visible screens high")
+	# Exercise a real generated downward hatch from its low traversal ledge.
+	var found_low_ledge:bool=false
+	for candidate:Dictionary in game.tower["rooms"]:
+		if candidate["type"]!="combat" or not candidate["neighbors"].has("down"):continue
+		game._enter_room(candidate["id"])
+		var down:Vector2=game.layout["doors"]["down"]
+		for ledge:Rect2 in game.layout["one_way"]:
+			if ledge.position.y<game._room_floor() or down.x<=ledge.position.x or down.x>=ledge.end.x:continue
+			var perch:=Vector2(down.x,ledge.position.y)
+			if not game._can_drop_through(perch):continue
+			found_low_ledge=true
+			game.room["cleared"]=true
+			game.enemies.clear()
+			game.room_cooldown=0.0
+			game._reset_player(perch)
+			game._set_action("down",true)
+			game._set_action("jump",true)
+			game._update_player(1.0/120.0)
+			check(game.p["pos"].y>perch.y and not game.p["grounded"],"Down + Jump drops through the low hatch ledge instead of jumping upward")
+			for tick in 150:
+				game._update_player(1.0/120.0)
+				game._check_portals()
+				if game.current_room!=candidate["id"]:break
+			check(game.current_room==candidate["neighbors"]["down"],"The drop reaches the connected room below")
+			break
+		if found_low_ledge:break
+	check(found_low_ledge,"The seeded tower supplies a ledge below the room floor")
+	var solid_floor:=Rect2(0,800,1200,40)
+	game.platforms.assign([Rect2(0,800,1200,9)])
+	game.solids.assign([solid_floor])
+	game.layout["floor_y"]=900.0
+	check(not game._can_drop_through(Vector2(500,800)),"Down + Jump cannot pass through a solid surface")
 	game.queue_free()
 	await process_frame
 	print("v75 clear and terrain checks: ",failures)

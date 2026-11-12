@@ -418,6 +418,8 @@ static func _group_for(item:Dictionary) -> String:
 	return "物件"
 
 static func _recent_art() -> void:
+	for icon:Array in [["heart-empty","血量空格"],["heart-full","血量滿格"],["shield-empty","護盾空格"],["shield-full","護盾滿格"]]:
+		_add("v80:"+icon[0],icon[1],"介面",[_descriptor(ROOT+"v80/"+icon[0]+".webp")],1,"左上資源格使用的圖標，畫布 64 × 64 px。")
 	_add("v79:energy-feather-empty","羽毛能量 · 空格","介面",[_descriptor(ROOT+"v79/energy-feather-empty.webp")],1)
 	_add("v79:energy-feather-full","羽毛能量 · 滿格","介面",[_descriptor(ROOT+"v79/energy-feather-full.webp")],1)
 	_add("v75:canopy-left","血量列 · 垂枝底圖","介面",[_descriptor(ROOT+"v75/canopy-left.webp")],1)
