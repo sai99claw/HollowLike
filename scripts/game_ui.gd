@@ -34,7 +34,7 @@ var phase_bar: ProgressBar
 var health_cells:HBoxContainer
 var energy_cells:HBoxContainer
 var shield_cells:HBoxContainer
-var shield_row:HBoxContainer
+var _shield_flash_left:float=0.0
 var timed_effects_label:Label
 var feather_collection:=FeatherCollection.new()
 var ultimate_hint:Label
@@ -158,6 +158,14 @@ func _build_header() -> void:
 	health_cells.full_texture=HEART_FULL
 	health_cells.cell_size=Vector2(19,19)
 	vitals.add_child(health_cells)
+	shield_cells=Cells.new()
+	shield_cells.name="ShieldCells"
+	shield_cells.tooltip_text="護盾"
+	shield_cells.mouse_filter=Control.MOUSE_FILTER_PASS
+	shield_cells.empty_texture=SHIELD_EMPTY
+	shield_cells.full_texture=SHIELD_FULL
+	shield_cells.cell_size=Vector2(18,18)
+	vitals.add_child(shield_cells)
 	energy_art=_icon("items_energy",20)
 	energy_art.mouse_filter=Control.MOUSE_FILTER_PASS
 	vitals.add_child(energy_art)
@@ -182,19 +190,6 @@ func _build_header() -> void:
 	ultimate_hint=_label("",12,GOLD)
 	ultimate_hint.visible=false
 	ultimate_row.add_child(ultimate_hint)
-	shield_row=HBoxContainer.new()
-	shield_row.name="Shield"
-	shield_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	main.add_child(shield_row)
-	var shield_art:=_icon("strong_orbit_shield",18)
-	shield_art.tooltip_text="護盾"
-	shield_row.add_child(shield_art)
-	shield_cells=Cells.new()
-	shield_cells.name="ShieldCells"
-	shield_cells.empty_texture=SHIELD_EMPTY
-	shield_cells.full_texture=SHIELD_FULL
-	shield_cells.cell_size=Vector2(18,18)
-	shield_row.add_child(shield_cells)
 	timed_effects_label=_label("",13,Color("d5e9ff"))
 	timed_effects_label.name="TimedEffects"
 	timed_effects_label.add_theme_color_override("font_outline_color",Color("15101e"))
@@ -348,8 +343,11 @@ func _build_touch() -> void:
 	touch_controls.action_changed.connect(func(action:String,pressed:bool)->void:touch_action.emit(action,pressed))
 
 
+func flash_shield() -> void:
+	_shield_flash_left=.12
+
 func update_shield_hud(amount:int,capacity:int,timed:PackedStringArray,show_combat:bool) -> void:
-	shield_row.visible=show_combat
+	shield_cells.visible=show_combat
 	shield_cells.set_state(amount,capacity)
 	timed_effects_label.visible=show_combat and not timed.is_empty()
 	timed_effects_label.text="\n".join(timed)
@@ -668,6 +666,9 @@ func clear_attack_feedback() -> void:
 	attack_feedback_reason="";attack_feedback_timer=0;_feedback_cooldown=0
 
 func _process(delta: float) -> void:
+	if _shield_flash_left>0.0:
+		_shield_flash_left=maxf(0.0,_shield_flash_left-delta)
+		shield_cells.modulate=Color.WHITE.lerp(Color(2.5,2.5,2.5),_shield_flash_left/.12)
 	_feedback_cooldown=maxf(0,_feedback_cooldown-delta)
 	attack_feedback_timer=maxf(0,attack_feedback_timer-delta)
 	var warning:bool=attack_feedback_timer>0 and attack_feedback_reason=="energy"

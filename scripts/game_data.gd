@@ -121,7 +121,7 @@ static func primary_attack(index:int,direction:String,charged:bool,dash_charge:b
 	if charged:
 		def["damage"]=ceilf(float(def["damage"])*1.5);def["active"]=1.5;def["energy_gain"]=2.0
 		if style=="foot":def.merge({"windup":.10,"recovery":.18,"range":100.0,"width":55.0,"knockback":120.0,"recoil":0.0,"fx_clip":"claw_charge"},true)
-		elif style=="quick":def.merge({"windup":.18,"recovery":.22,"range":105.0,"width":100.0,"shape":"spin","knockback":60.0,"recoil":30.0,"fx_clip":"dream_feather_charge"},true)
+		elif style=="quick":def.merge({"windup":.18,"recovery":.22,"range":105.0,"width":100.0,"shape":"spin","knockback":60.0,"recoil":30.0,"fx_clip":"feather_charge"},true)
 		else:def.merge({"windup":.5,"recovery":.55,"range":165.0,"width":140.0,"shape":"ground_wave","knockback":120.0,"recoil":0.0,"fx_clip":"heavy_charge"},true)
 	def["range"]*=1.2;def["width"]*=1.2;def["block_width"]*=1.2;def["active"]*=2.4;def["windup"]*=2.0;def["recovery"]*=2.0;def["hitbox_scale"]=1.2
 	if style=="quick":

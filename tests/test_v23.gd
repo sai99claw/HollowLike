@@ -71,7 +71,7 @@ func run() -> void:
 	game.props.assign([launcher])
 	game.p["pos"]=game.LaunchArt.body_box(launcher,str(game._ecology()["id"])).get_center()
 	game._update_props(.01)
-	check(is_equal_approx(game.p["vel"].y,-530) and not game.p["grounded"],"Touching the launcher fires immediately at normal jump velocity")
+	check(is_equal_approx(game.p["vel"].y,-530*.38) and not game.p["grounded"],"Touching the launcher causes a light bounce")
 	var touch_velocity:float=game.p["vel"].y;game._hit_props(Rect2(650,960,100,100),1,1)
 	check(game.p["vel"].y==touch_velocity,"A remote projectile cannot launch its owner from across the room")
 	game.p_attack.begin({"kind":"melee","windup":0.0,"active":.1,"recovery":.1,"damage":1,"direction":"down"});game._hit_props(Rect2(650,960,100,100),1)
@@ -81,13 +81,13 @@ func run() -> void:
 	check(game.p["vel"].y<0 and not game._wind_form_active(),"A swept down-slam into a launcher turns into an upward bounce, not another forced downward frame")
 	var heights:Array[float]=[]
 	for attacked:bool in [false,true]:
-		game._reset_player(Vector2(700,1000));game.p_attack.cancel();game._launch_from_object(launcher,attacked);var peak:float=1000
+		game._reset_player(Vector2(700,1000));game.p_attack.cancel();game._launch_from_object(launcher,Vector2.DOWN if attacked else Vector2.ZERO);var peak:float=1000
 		for tick in 240:
 			game._step_player(1.0/240);peak=minf(peak,game.p["pos"].y)
 			if game.p["vel"].y>=0:break
 		check(not game.p["jump_cut_allowed"],"Releasing jump cannot truncate a physical launcher impulse")
 		heights.append(1000-peak)
-	check(heights[1]/heights[0]>2.95 and heights[1]/heights[0]<3.05,"Actual controller integration produces threefold height rather than ninefold")
+	check(heights[0]<25.0 and heights[1]>330.0,"Only the down-cut produces a high launch")
 	game.room={"id":0,"type":"combat","map_index":0};game.layout=Layout.generate({"id":0,"type":"combat","width":21,"height":13,"maze_seed":2,"maze_config":{"dead_end_chance":1.0}},2);game.solids.assign(game.layout["solids"]);game.doors.clear();var props:Array=game._make_props()
 	var rewards:Array=props.filter(func(prop:Dictionary)->bool:return prop.has("dead_end_length"))
 	check(rewards.size()==game.layout["dead_end_rewards"].size() and not rewards.is_empty(),"Every retained long dead end creates its own actual chest")

@@ -22,7 +22,7 @@ func run() -> void:
 	game._reset_player(Vector2(550,700))
 	game.enemies.clear()
 	game.props.clear()
-	check(game.p["shield_cells"]==5 and game.p["max_shield"]==5,"The player starts with five shield pips")
+	check(game.p["shield_cells"]==2 and game.p["max_shield"]==2,"The player starts with two shield pips")
 	game.solids.clear()
 	game.platforms.clear()
 	game.projectiles.clear()
@@ -30,17 +30,16 @@ func run() -> void:
 	var origin:Vector2=game.p["pos"]-Vector2(150,21)
 	game._emit_weapon(origin,Vector2.RIGHT,game.Combat.attack("linear",{"speed":600,"damage":7}),false)
 	game._update_projectiles(.3)
-	check(game.projectiles.is_empty() and game.p["hp"]==5 and game.p["shield_cells"]==4 and game.p["knockback_t"]==0,"Projectile drains one shield and causes no recoil")
-	check(game.p["shield_flash_left"]>0,"Shield flashes after interception")
-	game._process(0)
-	check(game.feather_shield_layer.visible and game.feather_shield_layer.material!=null,"Feather shield uses the white flash material")
-	check(game._hurt_player(3,Vector2.ZERO,true) and game.p["shield_cells"]==3 and game.p["knockback_t"]>0 and game.p["hp"]==5,"Enemy body contact costs one shield and knocks the player back")
+	check(game.projectiles.is_empty() and game.p["hp"]==5 and game.p["shield_cells"]==1 and game.p["knockback_t"]==0,"Projectile drains one shield and causes no recoil")
+	check(game.ui._shield_flash_left>0,"Shield pips flash after interception")
+	check(game.ui.health_cells.get_index()+1==game.ui.shield_cells.get_index() and game.ui.health_cells.get_parent()==game.ui.shield_cells.get_parent(),"Shield pips immediately follow the hearts")
+	check(game._hurt_player(3,Vector2.ZERO,true) and game.p["shield_cells"]==0 and game.p["knockback_t"]>0 and game.p["hp"]==5,"Enemy body contact costs one shield and knocks the player back")
 	game._update_shield(5.99)
-	check(game.p["shield_cells"]==3,"Shield stays depleted until six seconds without damage")
+	check(game.p["shield_cells"]==0,"Shield stays depleted until six seconds without damage")
 	game._update_shield(.01)
-	check(game.p["shield_cells"]==4,"First shield pip returns at six seconds")
+	check(game.p["shield_cells"]==1,"First shield pip returns at six seconds")
 	game._update_shield(1.0)
-	check(game.p["shield_cells"]==5,"Shield regenerates one pip per subsequent second")
+	check(game.p["shield_cells"]==2,"Shield regenerates one pip per subsequent second")
 	game.p["invul"]=0
 	game.p["shield_cells"]=1
 	check(game._hurt_player(5,Vector2.ZERO) and game.p["hp"]==5 and game.p["shield_cells"]==0 and game.shake>=26.0,"The last feather absorbs the hit before breaking")
@@ -52,7 +51,7 @@ func run() -> void:
 
 	game.strong_slots.assign(["single_pierce","far_feather","shield_slot"])
 	game._reset_player(Vector2(550,700))
-	check(game.p["max_shield"]==6 and game.p["shield_cells"]==6,"Shield rune adds a sixth pip")
+	check(game.p["max_shield"]==3 and game.p["shield_cells"]==3,"Shield rune adds a third pip")
 	game.p["energy"]=0
 	game._set_action("dash",true)
 	game._set_action("dash",false)
@@ -87,11 +86,11 @@ func run() -> void:
 	check("10 秒" in game.ui.timed_effects_label.text,"Active effects show remaining whole seconds")
 	check(game.ui.energy_cells.get_child(0).texture==game.ui.ENERGY_FULL and game.ui.energy_cells.get_child(1).texture==game.ui.ENERGY_EMPTY,"Energy pips use matching full and empty feather textures")
 	game.p["hp"]=2
-	game.p["shield_cells"]=2
+	game.p["shield_cells"]=1
 	game.p["energy"]=game.p["max_energy"]
 	game._update_hud()
 	check(game.ui.health_cells.get_child(0).texture==game.ui.HEART_FULL and game.ui.health_cells.get_child(2).texture==game.ui.HEART_EMPTY,"Health cells show filled and empty hearts")
-	check(game.ui.shield_cells.get_child(0).texture==game.ui.SHIELD_FULL and game.ui.shield_cells.get_child(2).texture==game.ui.SHIELD_EMPTY,"Shield cells show filled and empty shields")
+	check(game.ui.shield_cells.get_child(0).texture==game.ui.SHIELD_FULL and game.ui.shield_cells.get_child(1).texture==game.ui.SHIELD_EMPTY,"Shield cells show filled and empty shields")
 	check(game.ui.energy_cells.get_child(0).custom_minimum_size==Vector2(22.5,28.5),"Energy feathers use 1.5x the old size")
 	game._restore_vital("energy",6)
 	game._update_hud()

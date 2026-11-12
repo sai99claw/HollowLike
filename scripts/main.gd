@@ -15,6 +15,8 @@ const Equipment=preload("res://scripts/equipment_view_v24.gd")
 const WeaponArt=preload("res://scripts/weapon_art_v24.gd")
 const ProjectileReadability=preload("res://scripts/projectile_readability_v25.gd")
 const LaunchArt=preload("res://scripts/launch_object_v23.gd")
+const GothicProps=preload("res://scripts/gothic_props_v82.gd")
+const PropStrike=preload("res://scripts/hit_art_v37.gd")
 const NewBiome=preload("res://scripts/biome_art_v21.gd")
 const PigeonPose=preload("res://scripts/pigeon_motion_v22.gd")
 const AdventurePose=preload("res://scripts/adventure_visual.gd")
@@ -149,8 +151,7 @@ const LIFT_SPEED:float=1070.0
 const ULTIMATE_CAPACITY:int=6
 const ULTIMATE_RADIUS:float=280.0
 const LIFT_HIT_DAMAGE:float=2.0
-const FEATHER_SHIELD_RADIUS:float=38.0
-const FEATHER_SHIELD_ART=preload("res://assets/v79/energy-feather-full.webp")
+const SHIELD_RADIUS:float=38.0
 const ULTIMATE_DAMAGE:float=12.0
 const ULTIMATE_KNOCKBACK:float=680.0
 const ROOM_CLEAR_SLOW_SECONDS:float=2.0
@@ -177,7 +178,7 @@ var rng = RandomNumberGenerator.new()
 var p_attack = Attack.new()
 var keys: Dictionary = {}
 var jump_request: bool = false
-const SHIELD_BASE_CELLS:int=5
+const SHIELD_BASE_CELLS:int=2
 const SHIELD_QUIET_SECONDS:float=6.0
 const SHIELD_RECHARGE_INTERVAL:float=1.0
 const PORTAL_HEIGHT:float=3.0*96.0
@@ -213,7 +214,6 @@ var backdrop: Node2D
 var static_props:Node2D
 var terrain_region:Rect2
 var player_flash_layer:Node2D
-var feather_shield_layer:Node2D
 var edge_foreground:Node2D
 var corpse_layer:Node2D
 var corpses:Array[Dictionary]=[]
@@ -323,11 +323,6 @@ func _ready() -> void:
 	slash_canvas=Cache.new();slash_canvas.z_index=1;slash_canvas.paint=_paint_player_slash;add_child(slash_canvas)
 	p_attack.active_started.connect(_start_player_slash)
 	player_flash_layer=EnemyCanvas.new();player_flash_layer.z_index=1;player_flash_layer.paint=_paint_player_flash;add_child(player_flash_layer)
-	feather_shield_layer=EnemyCanvas.new()
-	feather_shield_layer.hide()
-	feather_shield_layer.z_index=2
-	feather_shield_layer.paint=_paint_feather_shield
-	add_child(feather_shield_layer)
 	visual_depth=DepthPass.new()
 	add_child(visual_depth)
 	visual_juice=Juice.new()
@@ -662,10 +657,6 @@ func _process_profiled_body(delta: float) -> void:
 	_sync_enemy_canvases()
 	if player_flash_layer!=null:
 		player_flash_layer.actor=p;player_flash_layer.refresh(world_transform,screen=="game" and life_event.is_empty() and float(p.get("flash_left",0))>0 and not _wind_form_active())
-	if feather_shield_layer!=null:
-		var flash:float=float(p.get("shield_flash_left",0))
-		feather_shield_layer.actor={"pos":p["pos"],"flash_left":flash}
-		feather_shield_layer.refresh(world_transform,screen=="game" and life_event.is_empty() and (int(p["shield_cells"])>0 or flash>0))
 	if slash_canvas!=null:slash_canvas.invalidate()
 	if combat_feedback!=null:
 		combat_feedback.set_frozen(perf_paused or hitstop>0 or minimap_open or practice_rd_panel!=null,world_speed*_clear_world_rate())
@@ -788,8 +779,7 @@ func _clear_world_rate() -> float:
 func _view_zoom() -> float:
 	var bounds:Vector2=_room_size()
 	var fit:float=maxf(1280.0/bounds.x,720.0/bounds.y)
-	var requested:float=minf(camera_zoom,1.0) if room.get("type","")=="boss" else camera_zoom
-	return maxf(Scale.MIN_ZOOM,maxf(requested,fit))
+	return maxf(Scale.MIN_ZOOM,maxf(camera_zoom,fit))
 func _camera_target(at:Vector2) -> Vector2:
 	if screen=="hub":return Vector2(0,clampf(at.y-720.0*2.0/3.0,HomeArt.CEILING_Y,0)) if not trophy_room else Vector2.ZERO
 	var visible:Vector2=Vector2(1280,720)/_view_zoom();var bounds:Vector2=_room_size()
@@ -1163,7 +1153,7 @@ func _cast_ultimate() -> void:
 		return
 	p["ultimate_charge"]=0.0
 	var center:Vector2=_body_box(p["pos"]).get_center()
-	_effect(center,Color("ffe6ae"),ULTIMATE_RADIUS,.35)
+	_contact_fx("feather_charge",center,.45,ULTIMATE_RADIUS*2)
 	for enemy:Dictionary in enemies:
 		var body:Rect2=_enemy_body_box(enemy)
 		var closest:Vector2=center.clamp(body.position,body.end)
@@ -1504,7 +1494,12 @@ func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source
 		en["impact_freeze_left"]=impact_duration;en["impact_pose_clock"]=draw_clock
 		if int(en.get("model",0))==4:en["boss_impact_guard"]=.45
 	var training:bool=en.get("training",false)
-	if training:en["training_total"]=float(en.get("training_total",0))+damage
+	if training:
+		en["training_total"]=float(en.get("training_total",0))+damage
+		if not en.has("tutorial_respawn"):
+			var dummy:Dictionary={"kind":"dummy","gothic_broken":en.get("gothic_broken",false)}
+			_prop_impact(dummy,_enemy_body_box(en).get_center(),Vector2(float(p["face"]),0),true,false)
+			en["gothic_broken"]=dummy["gothic_broken"]
 	else:
 		if mode=="musou" and gain_dream and damage>0:dream.hit()
 		if damage>0:EnemyVitals.damaged(en,clock)
@@ -1541,7 +1536,7 @@ func _hurt_player(amount:float,source:Vector2,enemy_contact:bool=false,projectil
 	if int(p["shield_cells"])>0:
 		p["shield_cells"]-=1
 		var broken:bool=int(p["shield_cells"])==0
-		p["shield_flash_left"]=.12
+		ui.flash_shield()
 		_effect(_body_box(p["pos"]).get_center(),Color("acddff"),110.0 if broken else 44.0,.45 if broken else .21)
 		shake=maxf(shake,26.0 if broken else 3.0)
 		_sound("parry")
@@ -1569,16 +1564,6 @@ func _knock_player_back(source:Vector2) -> void:
 	p.erase("lift_flying")
 	p.erase("lift_charge")
 	p_attack.cancel();pending_attack.clear();jump_request=false;charge_timer=0;heal_timer=0;p["slam"]=false;p["dash_t"]=0
-
-func _paint_feather_shield(canvas:CanvasItem,actor:Dictionary) -> void:
-	if not actor.has("pos"):return
-	var center:Vector2=Vector2(actor["pos"])-Vector2(0,23)
-	for index in 3:
-		var angle:float=draw_clock*3.4+TAU*float(index)/3.0
-		var point:Vector2=center+Vector2.from_angle(angle)*FEATHER_SHIELD_RADIUS
-		canvas.draw_set_transform(point,angle+PI*.75)
-		canvas.draw_texture_rect(FEATHER_SHIELD_ART,Rect2(-10,-14,20,28),false,Color(.72,.91,1.2))
-	canvas.draw_set_transform(Vector2.ZERO)
 
 func _death() -> void:
 	_return_trial(false)
@@ -2113,7 +2098,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 				blocked=true;_projectile_impact(pr);_block_effect(next,"reflect" if _rune_effect("reflect")>0 else "block")
 			if not blocked and int(p["shield_cells"])>0:
 				var shield_center:Vector2=_body_box(p["pos"]).get_center()
-				if Geometry2D.get_closest_point_to_segment(shield_center,old,next).distance_to(shield_center)<=FEATHER_SHIELD_RADIUS+radius:
+				if Geometry2D.get_closest_point_to_segment(shield_center,old,next).distance_to(shield_center)<=SHIELD_RADIUS+radius:
 					if _hurt_player(float(pr["damage"]),next,false,true):
 						pr["life"]=0
 						blocked=true
@@ -2263,7 +2248,7 @@ func _update_drops_profiled_body(delta:float) -> void:
 		if bool(drop["taken"]):continue
 		if drop.get("display_only",false) or drop.get("gift",false):
 			drop["pos"]=drop.get("display_anchor",drop["pos"]);drop["vel"]=Vector2.ZERO;continue
-		if not drop.has("radius"):drop["radius"]=7.0 if drop["kind"]=="coin" else 18.0
+		if not drop.has("radius"):drop["radius"]=Coins.RADIUS if drop["kind"]=="coin" else 18.0
 		Coins.initialize(drop,Vector2(rng.randf_range(-180,180),rng.randf_range(-350,-190)) if not drop.has("vel") else Vector2.ZERO)
 		drop["impact_cd"]=maxf(0,float(drop.get("impact_cd",0))-delta)
 		var collected:bool=false
@@ -2660,7 +2645,7 @@ func _update_visual_effects_profiled_body(delta:float) -> void:
 	if combat_feedback!=null:combat_feedback.step(delta)
 	for e in effects:
 		e["life"]-=delta;e["pos"]+=e["vel"]*delta
-		if not bool(e["ring"]) and not e.has("beam") and not e.has("lightning") and not e.has("boss_fx") and not e.has("combat_fx") and not e.has("ground_wind") and not e.has("wind_burst") and not e.has("water_attack") and not e.has("fire_ember"):e["vel"].y+=180*delta
+		if not bool(e["ring"]) and not e.has("beam") and not e.has("lightning") and not e.has("boss_fx") and not e.has("combat_fx") and not e.has("ground_wind") and not e.has("wind_burst") and not e.has("water_attack") and not e.has("fire_ember") and not e.has("prop_flash"):e["vel"].y+=(700.0 if e.has("prop_fragment") else 180.0)*delta
 		if e.has("ground_y") and not e.has("ground_wind") and e["pos"].y>float(e["ground_y"])-float(e["radius"]):e["life"]=0
 	effects=effects.filter(func(e:Dictionary)->bool:return float(e["life"])>0)
 	for f in floaters:f["life"]-=delta;f["pos"].y-=35*delta
@@ -3090,7 +3075,6 @@ func _draw_profiled_body() -> void:
 		preload("res://scripts/spring_v33.gd").draw_water(self,layout["fountain_pos"],str(_ecology()["id"]),world_transform,bath,draw_clock)
 	elif room.get("spring",false):
 		bath.draw(self,_active_pool(),world_transform,draw_clock)
-		SanctuaryArt.pool_front(self,_active_pool(),draw_clock,world_transform)
 	if _is_healing():FX.fitted(self,"heal_guard",0,Rect2(p["pos"]-Vector2(35,65),Vector2(70,75)),world_transform,"right","idle",Color(.7,1,.8,.65),clock)
 	if p.has("lift_charge"):_draw_lift_charge()
 	if p.get("lift_flying",false):
@@ -3119,6 +3103,7 @@ func _draw_profiled_body() -> void:
 			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(pr["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,pr["color"])
 	for e in effects:
 		if not view_rect.has_point(e["pos"]):continue
+		if _draw_prop_impact(e):continue
 		var c:Color=e["color"];c.a=clampf(float(e["life"])/float(e["max"]),0,1)
 		if e.has("beam"):preload("res://scripts/laser_art_v38.gd").draw(self,e,world_transform)
 		elif e.has("lightning"):
@@ -3133,7 +3118,7 @@ func _draw_profiled_body() -> void:
 			var extent:float=float(e.get("fx_extent",65))
 			var alpha:float=Explosion.OPACITY if str(e["combat_fx"]).begins_with("explosion_") else 1.0
 			var progress:float=1-float(e["life"])/float(e["max"])
-			if e["combat_fx"]=="vertical_launch":FX.frame(self,"vertical_launch",progress,e["pos"],world_transform,1.0,extent)
+			if e["combat_fx"] in ["vertical_launch","feather_charge"]:FX.frame(self,"vertical_launch",progress,e["pos"],world_transform,1.0,extent)
 			else:FX.fitted(self,e["combat_fx"],progress,Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,alpha))
 		elif bool(e["ring"]):
 			var radius:float=float(e["radius"])
@@ -3272,11 +3257,10 @@ func _draw_hub() -> void:
 	if not focus.is_empty():HomeArt.station_light(self,HomeArt.STATIONS[focus])
 	HomeArt.gates(self,clock,low_effects,world_transform)
 	HomeArt.nest(self)
-	HomeArt.fixture(self,1,HomeArt.STATIONS["trophy"]+HomeArt.STATION_SINK,Vector2(134,121))
-	preload("res://scripts/home_visual_v33.gd").prop(self,"records",HomeArt.STATIONS["records"]+HomeArt.STATION_SINK,Vector2(90,105),world_transform)
-	_draw_home_projector()
 	for prop:Dictionary in props:
-		if prop["kind"]=="launcher":LaunchArt.draw(self,prop,"trunk",preload("res://scripts/world_placement_v27.gd").prop_base(world_transform))
+		if prop["kind"] in ["launcher","adventure_records","trophy_case"]:GothicProps.draw_prop(self,prop,"trunk",world_transform)
+	_draw_home_projector()
+	for effect:Dictionary in effects:_draw_prop_impact(effect)
 	draw_set_transform_matrix(world_transform)
 	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1,world_transform)
 	else:
@@ -3333,8 +3317,9 @@ func _draw_home_projector() -> void:
 			var tint:=Color(1,.92,.72,opacity) if line[1]==32 else Color(.88,.98,.91,opacity)
 			draw_string(PROJECTION_FONT,Vector2(center_x-width*.5,screen_rect.position.y+line[2]),line[0],HORIZONTAL_ALIGNMENT_LEFT,-1,line[1],tint)
 	var hit_age:float=clock-float(home_projector.get("hit_at",-10.0))
-	var flashing:bool=hit_age<.075
-	HomeArt.fixture(self,0,at+Vector2(0,29),Vector2(69,60),Color("fff2bb") if flashing else (Color("84746a") if broken else Color.WHITE))
+	var projector:=home_projector.duplicate(false)
+	projector["pos"]=Vector2(home_projector.get("break_origin",at) if broken else at)+Vector2(0,29)
+	GothicProps.draw_prop(self,projector,"trunk",world_transform)
 	if hit_age<.18:
 		var impact:Vector2=home_projector["hit_point"]
 		for i in 7:
@@ -3359,7 +3344,7 @@ func _configure_home(reset_lamp:bool=true) -> void:
 	platforms.assign([Rect2(40,600,1200,9),HomeArt.ROGUE_PLATFORM])
 	solids.assign([Rect2(0,600,1280,120),Rect2(18,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(1240,HomeArt.CEILING_Y,22,600-HomeArt.CEILING_Y),Rect2(0,HomeArt.CEILING_Y-20,1280,20)])
 	_rebuild_projectile_surfaces()
-	props.assign([{"kind":"adventure_records","pos":Vector2(790,600),"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
+	props.assign([{"kind":"adventure_records","pos":HomeArt.STATIONS["records"]+HomeArt.STATION_SINK,"used":false,"hurt":0.0},{"kind":"trophy_case","pos":HomeArt.STATIONS["trophy"]+HomeArt.STATION_SINK,"used":false,"hurt":0.0},{"kind":"launcher","pos":Vector2(455,600),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0,"launch_hit_cooldown":0.0}])
 	if reset_lamp:
 		home_projector={"kind":"home_projector","pos":Vector2(365,451),"used":false,"hurt":0.0,"hits":0}
 		home_hint_fade_at=INF
@@ -3540,11 +3525,11 @@ func _draw_drop(drop:Dictionary,show_label:bool=false) -> void:
 		"growth":icon="growth_"+str(Arms.GROWTH[posmod(int(drop["value"]),Arms.GROWTH.size())])
 		"heal":icon="items_heal"
 		"upgrade":icon="growth_damage"
-	var target:=Rect2(at-Vector2.ONE*(8 if kind=="coin" else 22),Vector2.ONE*(16 if kind=="coin" else 44))
+	var target:=Rect2(at-Vector2.ONE*22,Vector2.ONE*44)
 	if kind=="coin":
 		var angle:float=float(drop.get("rotation",0))
 		draw_set_transform_matrix(world_transform*Transform2D(angle,at))
-		draw_texture_rect(preload("res://assets/combat_v05/common/currency/coin_00.png"),Rect2(-8,-8,16,16),false)
+		draw_texture_rect(preload("res://assets/combat_v05/common/currency/coin_00.png"),Rect2(-16,-16,32,32),false)
 		draw_set_transform_matrix(world_transform)
 	else:
 		var icon_drawn:bool=WorldItems.draw_icon(self,icon,target,world_transform)
@@ -3724,7 +3709,6 @@ func _station_event(kind:String,event:String) -> void:
 		if prop["kind"]==kind:prop["event"]=event;prop["event_left"]=.8
 
 func _update_shield(delta:float) -> void:
-	p["shield_flash_left"]=maxf(0.0,float(p.get("shield_flash_left",0))-delta)
 	var cells:int=int(p["shield_cells"])
 	var capacity:int=int(p["max_shield"])
 	if cells>=capacity:return
@@ -3856,7 +3840,10 @@ func _check_portals() -> void:
 
 func _make_props() -> Array[Dictionary]:
 	if lab_mode=="tutorial":
-		return [{"kind":"launcher","pos":Vector2(1040,_room_floor()),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0}]
+		var tutorial_props:Array[Dictionary]=[{"kind":"launcher","pos":Vector2(1040,_room_floor()),"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0}]
+		for index in TUTORIAL_STATIONS.size():
+			tutorial_props.append({"kind":["gift_pedestal","reforge","dummy"][index],"pos":_tutorial_station_position(index),"hurt":0.0,"tutorial_fixture":true})
+		return tutorial_props
 	var result:Array[Dictionary]=[]
 	if layout.has("hazard_room"):
 		for at:Vector2 in layout["launcher_spawns"]:
@@ -3868,6 +3855,8 @@ func _make_props() -> Array[Dictionary]:
 		for entry in [["aid",540],["forge",720],["reforge",900],["mail",1080],["energy_infinite",1260]]:result.append({"kind":entry[0],"pos":_furniture_offset()+Vector2(entry[1],850),"used":false,"hurt":0.0})
 	elif room["type"]=="merchant":
 		result.append({"kind":"merchant","pos":_furniture_offset()+Vector2(160,1050),"used":false,"hurt":0.0})
+		for table:Vector2 in Sanctuary.TABLES:
+			result.append({"kind":"merchant_table","pos":table+_furniture_offset(),"hurt":0.0})
 	elif room.get("spring",false):result.append({"kind":"spring","pos":_furniture_offset()+Vector2(690,1050),"used":false,"hurt":0.0})
 	elif room["type"]=="reward":
 		_reward_choices()
@@ -3930,7 +3919,7 @@ func _update_props_profiled_body(delta:float) -> void:
 			var proximity:float=body.position.y-Vector2(p["pos"]).y
 			prop["compression"]=2 if proximity<35 else 1
 			if proximity<0 or proximity>100 or absf(p["pos"].x-body.get_center().x)>60 or p["vel"].y<=0:prop["compression"]=0
-			if float(prop.get("launch_cooldown",0))<=0 and _body_box(p["pos"]).intersects(body):_launch_from_object(prop,false)
+			if float(prop.get("launch_cooldown",0))<=0 and float(p["vel"].y)>=0.0 and _body_box(p["pos"]).intersects(body):_launch_from_object(prop,Vector2.ZERO)
 		prop["water_cd"]=maxf(0,float(prop.get("water_cd",0))-delta)
 		if prop["kind"] in ["spring","fountain"] and _in_bath():
 			_restore_vital("hp",delta)
@@ -3961,7 +3950,37 @@ func _step_stone(stone:Dictionary,delta:float) -> void:
 			_hit_enemy(enemy,damage,Color("e1c5a0"),90.0 if stone["large"] else 55.0,from,from.direction_to(to))
 			break
 
+func _prop_strike_direction(source:Vector2,at:Vector2) -> Vector2:
+	var direction:Vector2=source.direction_to(at) if source.is_finite() else _attack_direction(p_attack.attack)
+	return Vector2(float(p["face"]),0) if direction.is_zero_approx() else direction.normalized()
+
+func _prop_impact(prop:Dictionary,at:Vector2,direction:Vector2,break_apart:bool=true,flash:bool=true) -> void:
+	if flash:
+		if effects.size()>=MAX_PARTICLES:effects.pop_front()
+		effects.append({"prop_flash":true,"pos":at,"dir":direction,"at":at,"color":Color.WHITE,"life":PropStrike.STRAIGHT_SECONDS,"max":PropStrike.STRAIGHT_SECONDS,"ring":false,"radius":0.0,"vel":Vector2.ZERO})
+	if not break_apart or prop.get("gothic_broken",false):return
+	var art:Array=GothicProps.entry(prop,str(_ecology()["id"]))
+	if art.is_empty():return
+	prop["gothic_broken"]=true
+	if static_props!=null:static_props.invalidate()
+	if effects.size()>=MAX_PARTICLES:effects.pop_front()
+	effects.append({"prop_fragment":art,"pos":at,"color":Color.WHITE,"life":.75,"max":.75,"ring":false,"radius":0.0,"vel":direction*270.0+Vector2(0,-140.0)})
+
+func _draw_prop_impact(e:Dictionary) -> bool:
+	if e.has("prop_flash"):
+		PropStrike.draw(self,e,world_transform,155.0*world_transform.get_scale().x)
+		return true
+	if e.has("prop_fragment"):
+		var at:Vector2=e["pos"]
+		var angle:float=(.75-float(e["life"]))*signf(Vector2(e["vel"]).x)*7.0
+		draw_set_transform_matrix(world_transform*Transform2D(angle,at))
+		GothicProps.draw_region(self,e["prop_fragment"],2,Rect2(-18,-18,36,36),minf(1.0,float(e["life"])*5.0))
+		draw_set_transform_matrix(world_transform)
+		return true
+	return false
+
 func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.INF,projectile_hits:Variant=null) -> void:
+	if damage<=0.0:return
 	for i in props.size():
 		var prop:Dictionary=props[i]
 		if prop["kind"]=="stone":
@@ -3985,10 +4004,12 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 					var member:Dictionary=props[member_index]
 					if member["kind"]!="stone" or not member.has("pile_slot") or member.get("used",false):continue
 					if p_attack.is_active():p_attack.mark_hit(-10000-member_index)
+					if not member.has("gothic_base"):member["gothic_base"]=member["pos"]
 					Stones.scatter(member,direction,damage)
 			else:
+				if not prop.has("gothic_base"):prop["gothic_base"]=prop["pos"]
 				Stones.launch(prop,direction,damage)
-			_hit_flash(center,damage,Color("e1c5a0"))
+			_prop_impact(prop,center,direction,false)
 			_particles(center,Color("bca58d"),6,100)
 			_sound("metal_hit")
 			continue
@@ -4002,6 +4023,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 					prop["hit_at"]=clock
 					if int(prop["hits"])>=3:
 						prop["break_origin"]=center;prop["broken_at"]=clock;prop["used"]=true
+					_prop_impact(prop,center,_prop_strike_direction(source,center),prop["used"])
 					_sound("metal_hit")
 			continue
 		if prop["kind"]=="spikes":
@@ -4009,20 +4031,27 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 				_pogo()
 				if p.get("_motion_step",false):p["launch_pending_velocity"]=p["vel"]
 			continue
-		if prop.get("used",false) or prop["kind"] not in ["fountain","dummy","shop_dummy","energy_infinite","energy","health","grass","ecology_object","coin_urn","launcher"]:continue
+		if prop.get("used",false) or GothicProps.entry(prop,str(_ecology()["id"])).is_empty():continue
 		if prop["kind"]=="fountain":
 			if box.intersects(preload("res://scripts/spring_v33.gd").body(prop["pos"])) and float(prop.get("water_cd",0))<=0:
+				var at:Vector2=prop["pos"]-Vector2(0,28)
+				_prop_impact(prop,at,_prop_strike_direction(source,at))
 				prop["water_cd"]=.12;spring_particles.splash(preload("res://scripts/spring_v33.gd").water_at(prop["pos"],str(_ecology()["id"])),str(_ecology()["id"]),_aim_vector())
 			continue
 		if prop["kind"]=="launcher":
 			if attack_id>=0:continue # Remote projectiles do not teleport recoil to the player.
 			if box.intersects(LaunchArt.body_box(prop,str(_ecology()["id"]))) and float(prop.get("launch_hit_cooldown",0))<=0:
 				if attack_id<0 and not p_attack.mark_hit(-10000-i):continue
-				_launch_from_object(prop,true)
+				var strike:Vector2=_attack_direction(p_attack.attack)
+				_prop_impact(prop,LaunchArt.body_box(prop,str(_ecology()["id"])).get_center(),strike)
+				_launch_from_object(prop,strike)
 			continue
-		var prop_size:Vector2=BiomeArt.object_size(prop.get("variant",0)) if prop["kind"]=="ecology_object" else Vector2(84,120) if prop["kind"]=="shop_dummy" else Vector2(46,60)
+		var prop_size:Vector2=BiomeArt.object_size(prop.get("variant",0)) if prop["kind"]=="ecology_object" else GothicProps.SIZES.get(prop["kind"],Vector2(46,60))
 		if not box.intersects(Rect2(prop["pos"]-Vector2(prop_size.x*.5,prop_size.y),prop_size)):continue
 		if attack_id<0 and not (p_attack.mark_timed_hit(-10000-i,.5,3) if p_attack.attack.get("charged",false) else p_attack.mark_hit(-10000-i)):continue
+		var contact:Vector2=prop["pos"]-Vector2(0,prop_size.y*.55)
+		_prop_impact(prop,contact,_prop_strike_direction(source,contact))
+		if prop["kind"]=="chest":_open_chest(prop);continue
 		if prop["kind"]=="coin_urn":
 			prop["used"]=true;prop["break_left"]=.6;static_props.invalidate();_drop("coin",prop["pos"]-Vector2(0,32),int(prop["coins"]));_hit_flash(prop["pos"]-Vector2(0,30),damage,Color("ffdf94"));continue
 		if prop["kind"] in ["grass","ecology_object"]:
@@ -4031,10 +4060,9 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 			_particles(prop["pos"]-Vector2(0,15),Color("a9c6a0"),7,80);continue
 		prop["hurt"]=.3
 		if prop["kind"] in ["dummy","shop_dummy"]:combat_feedback.hit({},prop["pos"]-Vector2(0,35),_aim_vector())
-		else:_hit_flash(prop["pos"]-Vector2(0,35),damage,Color("aee8dc"))
 		if prop["kind"]=="health":p["hp"]=p["max_hp"];prop["used"]=true;prop["break_left"]=.5;p["hp_recovery"]=0.0;_toast("生命已回滿")
 		elif prop["kind"] in ["energy","energy_infinite"]:_restore_vital("energy",2);prop["used"]=prop["kind"]=="energy";prop["break_left"]=.5 if prop["used"] else 0
-		else:
+		elif prop["kind"] in ["dummy","shop_dummy"]:
 			_restore_vital("energy",1)
 			_float(prop["pos"]-Vector2(0,80),"%.0f"%damage,Color.WHITE)
 			pass # Training props never apply recoil to the player.
@@ -4248,44 +4276,44 @@ func _draw_props(focus:Dictionary={}) -> void:
 	var accent:Color=_ecology()["accent"]
 	var prop_base:Transform2D=preload("res://scripts/world_placement_v27.gd").prop_base(world_transform)
 	if room.get("type","")=="merchant":
+		for prop:Dictionary in props:
+			if prop["kind"]=="merchant_table" and view_rect.grow(170).has_point(prop["pos"]):GothicProps.draw_prop(self,prop,biome,prop_base)
 		var local_stock:Array=room.get("stock",[]).duplicate(true)
 		for item:Dictionary in local_stock:item["pos"]-=_furniture_offset()
 		SanctuaryArt.market(self,local_stock,p["pos"]-_furniture_offset(),clock,prop_base*Transform2D(0,_furniture_offset()),font)
 		draw_set_transform_matrix(world_transform)
 	if room.get("type","")=="reward":_draw_rewards()
 	for prop in props:
-		if prop.get("used",false) and prop["kind"]!="chest" and float(prop.get("break_left",0))<=0:continue
 		var at:Vector2=prop["pos"];var kind:String=prop["kind"]
-		if not view_rect.grow(140).has_point(at):continue
 		if kind=="stone":
+			var art:Array=GothicProps.entry(prop,biome)
+			var extent:Vector2=Stones.size(prop)
+			if prop.has("gothic_base") and view_rect.grow(70).has_point(prop["gothic_base"]):
+				var feet:Vector2=prop["gothic_base"]
+				draw_set_transform_matrix(world_transform)
+				GothicProps.draw_region(self,art,1,Rect2(feet-Vector2(extent.x*.5,extent.y),extent))
+			if prop.get("used",false) or not view_rect.grow(70).has_point(at):continue
 			if not prop["asleep"]:ProjectileReadability.draw_trail(self,prop,world_transform,low_effects)
-			Stones.draw(self,prop,biome,world_transform)
+			draw_set_transform_matrix(world_transform*Transform2D(float(prop.get("rotation",0)),Stones.center(prop)))
+			GothicProps.draw_region(self,art,2 if prop.has("gothic_base") else 0,Rect2(-extent*.5,extent))
+			draw_set_transform_matrix(world_transform)
 			if show_hitboxes:draw_arc(Stones.center(prop),Stones.radius(prop),0,TAU,32,Color("ffdf94"),1,true)
 			continue
-		if kind=="fountain":
-			if at.distance_to(p["pos"])<160:_text(at-Vector2(75,90),"泉水 · 回復生命與能量",14,accent)
-			continue
+		if not view_rect.grow(140).has_point(at):continue
 		if kind=="spikes":
 			HazardRoom.draw_spikes(self,prop["rect"]);continue
-		if kind=="launcher":
-			LaunchArt.draw(self,prop,biome,prop_base);continue
-		if kind=="coin_urn":
-			if not prop.get("used",false):continue
-			BiomeArt.prop(self,prop,"underground",clock,prop_base);continue
-		if kind=="ecology_object":
-			if not prop.get("used",false):continue
-			BiomeArt.prop(self,prop,biome,clock,prop_base);continue
-		if kind=="grass":
-			WorldDetail.grass(self,prop,clock,prop_base,visual_depth.grass_bend(at,draw_clock));continue
-		if kind=="spring" and layout.get("pool",Rect2()).size.x>0:
-			continue # Pool masonry and steam use a retained draw list.
-		if kind=="shop_dummy":SanctuaryArt.dummy(self,at,clock,prop_base);continue
-		if kind=="merchant":Adventure.merchant(self,at,clock,prop_base);continue
-		elif kind=="chest":preload("res://scripts/chest_art_v59.gd").draw(self,prop,biome,prop_base)
-		elif _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:pass # Station paintings live in the retained static layer.
-		elif kind in ["gift_pedestal","wardrobe"]:preload("res://scripts/adventure_art_v29.gd").station(self,kind,at,prop_base)
-		elif kind in ["forge","reforge","mail"]:preload("res://scripts/station_art_v26.gd").draw(self,kind,at,prop_base)
-		else:EnvArt.prop(self,prop,biome,clock,prop_base,weapon_index)
+		if kind in ["ecology_object","coin_urn","merchant_table"]:continue
+		if kind=="merchant":Adventure.merchant(self,at,clock,prop_base)
+		var retained:bool=_is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]
+		var extent:=Vector2.ZERO
+		if kind=="spring":
+			var wet:Rect2=layout.get("pool",Rect2())
+			if wet.has_area():extent=Vector2(wet.size.x+50,105)
+		if not retained and not GothicProps.draw_prop(self,prop,biome,prop_base,extent):
+			if prop.get("used",false):continue
+			EnvArt.prop(self,prop,biome,clock,prop_base,weapon_index)
+		draw_set_transform_matrix(world_transform)
+		if kind in ["launcher","grass","shop_dummy"] or prop.get("tutorial_fixture",false):continue
 		var label:String={"wardrobe":"披風換裝站","gift_pedestal":"免費附武器展示台","forge":"藍圖鍛造台","reforge":"符文重鑄台","aid":"急救站","mail":"倉庫","dummy":"試打假人","energy_infinite":"無限能量花","energy":"砍破回能量","health":"砍破回滿生命","spring":"溫泉 · 回復生命與能量","chest":"寶箱","merchant":"貓頭鷹商人"}.get(kind,kind)
 		var label_height:float=132 if kind in ["forge","reforge","mail","wardrobe"] else 92
 		if _is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe","dummy"]:
@@ -4390,6 +4418,7 @@ func _damage_traps(box:Rect2,damage:float,gain_dream:bool=true) -> void:
 
 func _open_chest(chest:Dictionary) -> void:
 	if chest.get("used",false):return
+	_prop_impact(chest,Vector2(chest["pos"])-Vector2(0,39),Vector2.UP,true,false)
 	chest["used"]=true
 	chest["open_left"]=preload("res://scripts/chest_art_v59.gd").DURATION
 	var at:Vector2=chest["pos"]
@@ -4803,21 +4832,18 @@ func _summon_monster(index:int,anchor:Vector2=Vector2.INF) -> void:
 
 func _paint_static_props(c:CanvasItem) -> void:
 	if screen!="game":return
-	if lab_mode=="tutorial":
-		for i in TUTORIAL_STATIONS.size():TutorialArt.draw_station(c,i,_tutorial_station_position(i))
 	for prop:Dictionary in props:
-		if prop.get("used",false):continue
-		if _is_start() and prop["kind"] in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]:preload("res://scripts/scene_art_v33.gd").station(c,str(_ecology()["id"]),prop["kind"],prop["pos"],preload("res://scripts/world_placement_v27.gd").prop_base())
-		if prop["kind"] in ["ecology_object","coin_urn"]:BiomeArt.prop(c,prop,"underground" if prop["kind"]=="coin_urn" else str(_ecology()["id"]),0,preload("res://scripts/world_placement_v27.gd").prop_base())
-	if room.get("fountain",false) and layout.has("fountain_pos"):preload("res://scripts/spring_v33.gd").draw(c,layout["fountain_pos"],str(_ecology()["id"]),preload("res://scripts/world_placement_v27.gd").prop_base())
-	if room.get("spring",false):SanctuaryArt.pool_back(c,layout.get("pool",Rect2()),0,Transform2D.IDENTITY)
+		var kind:String=prop["kind"]
+		if (_is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]) or kind in ["ecology_object","coin_urn"]:
+			var extent:Vector2=BiomeArt.object_size(prop.get("variant",0)) if kind=="ecology_object" else Vector2.ZERO
+			GothicProps.draw_prop(c,prop,str(_ecology()["id"]),preload("res://scripts/world_placement_v27.gd").prop_base(),extent)
 
 func _enemy_pose_clock(en:Dictionary) -> float:
 	return float(en["frost_pose_clock"]) if float(en.get("frost_left",0))>0 else (float(en["impact_pose_clock"]) if float(en.get("impact_freeze_left",0))>0 else draw_clock)
 
 func _paint_enemy_body(canvas:CanvasItem,en:Dictionary) -> void:
 	if en.get("training",false):
-		SanctuaryArt.dummy(canvas,en["pos"],clock,Transform2D.IDENTITY,MonsterMotion.body_size(en))
+		GothicProps.draw_prop(canvas,{"kind":"dummy","pos":en["pos"],"gothic_broken":en.get("gothic_broken",false)},str(_ecology()["id"]),Transform2D.IDENTITY,MonsterMotion.body_size(en))
 		return
 	_paint_enemy_actor(canvas,en)
 	var melt:float=clampf(float(en.get("frost_left",0))/2.0,0.0,1.0)
@@ -4873,6 +4899,7 @@ func _sync_enemy_canvases_profiled_body() -> void:
 			var sample:Dictionary=NewMonsterArt.actor_sample(en,pose_clock) if en.has("v55_row") else preload("res://scripts/monster_art_v36.gd").actor_sample(en,pose_clock)
 			signature=[sample["sheet"],sample["row"],sample["column"],en.get("face",1),float(en.get("hurt",0))>0,en.get("scale",1)]
 		signature.append(ceili(float(en.get("frost_left",0))*15))
+		signature.append(en.get("gothic_broken",false))
 		var base:Transform2D=world_transform if en.get("training",false) else world_transform.translated_local(Vector2(0,5))
 		sprite.refresh(base,enabled,signature)
 		if enabled and sprite.toon:sprite.transform*=Juice.enemy_pose(en,draw_clock)
@@ -4966,22 +4993,26 @@ func _paint_edge_foreground(canvas:CanvasItem) -> void:
 func _paint_player_flash(canvas:CanvasItem,_actor:Dictionary) -> void:
 	Art.draw_pigeon(canvas,p["pos"],float(p["face"]),clock,"hurt",Color.WHITE,1.0,1-float(p.get("hurt",0))/.25,Transform2D.IDENTITY,str(Data.PRIMARY[weapon_index]["style"]),p_attack.attack)
 
-func _launch_from_object(prop:Dictionary,attacked:bool) -> void:
+func _launch_from_object(prop:Dictionary,strike:Vector2) -> void:
 	if _wind_form_active():p_attack.cancel()
-	var height_multiplier:float=3.0 if attacked or prop.get("navigation",false) else 1.0
-	# Height is proportional to v²/(2g):3×height needs sqrt(3)×speed.
+	var down_cut:bool=strike.y>.5
+	var side_cut:bool=absf(strike.x)>.5
 	var normal_speed:float=JUMP_SPEED*(1+_rune_effect("wing"))*Tuning.value("jump_speed")
-	p["vel"]=Vector2(float(p["vel"].x),-normal_speed*sqrt(height_multiplier))
+	var lateral:float=-signf(strike.x)*480.0 if side_cut else float(p["vel"].x)
+	p["vel"]=Vector2(lateral,-normal_speed*sqrt(3.0) if down_cut else -normal_speed*.38)
 	# Swept down-slam contacts happen inside the AABB step. Preserve the new
 	# impulse after its local collision result is committed at step end.
 	if p.get("_motion_step",false):p["launch_pending_velocity"]=p["vel"]
 	p["grounded"]=false;p["wall"]=0;p["dash_t"]=0;p["slam"]=false
-	p["recoil_left"]=0;p["knockback_t"]=0;p["jump_cut_allowed"]=false
+	p["recoil_left"]=.16 if side_cut else 0.0
+	p["recoil_velocity"]=Vector2(lateral,0)
+	p["recoil_base_y"]=p["vel"].y
+	p["knockback_t"]=0;p["jump_cut_allowed"]=false
 	p["jump_buffer_left"]=0;p["coyote_left"]=0;p["landing_left"]=0;p["heavy_land_left"]=0;p["fall_distance"]=0
 	_restore_ground_movement()
 	prop["launch_left"]=.625;prop["launch_cooldown"]=.45
-	if attacked:prop["launch_hit_cooldown"]=.15
-	_contact_fx("block",prop["pos"]-Vector2(0,30));_sound("mushroom_pogo" if attacked else "mushroom_bounce")
+	if not strike.is_zero_approx():prop["launch_hit_cooldown"]=.15
+	_sound("mushroom_pogo" if down_cut else "mushroom_bounce")
 
 func _unlock_blueprint(id:String) -> void:
 	if Arsenal.index_of(id)<0:return

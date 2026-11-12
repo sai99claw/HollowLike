@@ -24,7 +24,6 @@ static func background(c:CanvasItem,room:Dictionary) -> void:
 		part(c,"sign",Rect2(1120,580,135,110),Color(.7,.88,.82,.5))
 static func market(c:CanvasItem,stock:Array,player:Vector2,time:float,base:Transform2D,font:Font) -> void:
 	c.draw_set_transform_matrix(base)
-	for at in Room.TABLES:part(c,"table",Rect2(at-Vector2(165,102),Vector2(330,102)))
 	var focused:int=Room.nearest_stock(stock,player)
 	for i in stock.size():
 		var item:Dictionary=stock[i];var at:Vector2=item["pos"]

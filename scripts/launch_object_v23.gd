@@ -1,13 +1,9 @@
 class_name LaunchObjectV23
 extends RefCounted
 const Atlas=preload("res://scripts/atlas_v23.gd")
-static func body_box(prop:Dictionary,biome:String="trunk") -> Rect2:
-	var clip:Dictionary=Atlas.clip("launcher",biome)
-	var size:=Vector2(84,84)
-	if not clip.is_empty():
-		var raw:Array=clip["frames"][0]["visible_bounds"]
-		size=Vector2(raw[2],raw[3])*float(clip["world_width"])/float(clip["reference_width"])*.9
-	return Rect2(Vector2(prop["pos"])-Vector2(size.x*.5,size.y*.5),size)
+static func body_box(prop:Dictionary,_biome:String="trunk") -> Rect2:
+	var height:float=42.0 if prop.get("gothic_broken",false) else 67.0
+	return Rect2(Vector2(prop["pos"])-Vector2(42,height),Vector2(84,height))
 static func draw(c:CanvasItem,prop:Dictionary,biome:String,base:Transform2D) -> bool:
 	var clip:Dictionary=Atlas.clip("launcher",biome)
 	if clip.is_empty():return false

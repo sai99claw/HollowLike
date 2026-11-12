@@ -83,7 +83,7 @@ func run() -> void:
 		if candidate["type"]!="boss":continue
 		game._enter_room(candidate["id"])
 		break
-	check(is_equal_approx(game._room_size().y,1080.0) and game._view_zoom()<=1.0,"Boss arena is at most one and a half visible screens high")
+	check(is_equal_approx(game._room_size().y,1080.0) and is_equal_approx(game._view_zoom(),game.camera_zoom),"Boss uses the same player camera scale as other rooms")
 	# Exercise a real generated downward hatch from its low traversal ledge.
 	var found_low_ledge:bool=false
 	for candidate:Dictionary in game.tower["rooms"]:

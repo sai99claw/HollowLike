@@ -40,11 +40,11 @@ func run() -> void:
 					var left:bool=not is_open(grid,lower+Vector2i.LEFT) and not is_open(grid,upper+Vector2i.LEFT)
 					var right:bool=not is_open(grid,lower+Vector2i.RIGHT) and not is_open(grid,upper+Vector2i.RIGHT)
 					check(left or right,"Climbing uses a continuous rock face")
-					check(not plan["launchers"].has(feet),"Climbable walls get no redundant mushroom")
+					check(link["step_height"]==Scale.TILE_HEIGHT,"Wall routes do not need assisted vertical tiers")
 				else:
 					mushrooms+=1
 					check(plan["launchers"].has(feet),"An open vertical link gets a launch mushroom")
-					check(Scale.TILE_HEIGHT<Motion.BASE_JUMP_HEIGHT*3.0,"A mushroom covers a full tall cell")
+					check(link["step_height"]<=Motion.BASE_JUMP_HEIGHT*3.0*.30,"Mushroom path is planned at 30% of actual down-cut height")
 					var approach:=Rect2(feet-Vector2(17,42),Vector2(34,41.9))
 					check(not layout["solids"].any(func(rock:Rect2)->bool:return approach.intersects(rock)),"Mushroom has room for the player at launch")
 			var cells:Dictionary={}
@@ -62,8 +62,10 @@ func run() -> void:
 					queue.append(next)
 			for target:Vector2i in plan["targets"]:
 				check(reached.has(target),"Door or reward has a route with available movement")
-			for bridge:Rect2 in plan["bridges"]:
-				check(bridge.size.x>Scale.TILE*2.0,"Short gaps and vertical links get no filler ledges")
+			check(plan["targets"].has(Vector2i(1,1)) and plan["targets"].has(Vector2i(grid[0].size()-2,1)),"Both upper corners are checked")
+			for span:Array in plan["horizontal_links"]:
+				for i in range(1,span.size()):
+					check(span[i]!=span[i-1],"Long spans alternate mushroom and platform")
 	check(rooms>80 and walls>0 and mushrooms>0,"Seeded rooms exercise walls and mushrooms")
 	var game=load("res://main.tscn").instantiate()
 	game.audio_enabled=false
@@ -93,12 +95,12 @@ func run() -> void:
 	game.solids.clear()
 	game._reset_player(Vector2(700,850))
 	var mushroom:Dictionary={"pos":Vector2(700,850),"navigation":true}
-	game._launch_from_object(mushroom,false)
+	game._launch_from_object(mushroom,Vector2.DOWN)
 	var highest:float=850.0
 	for tick in 80:
 		game._step_player(1.0/120.0)
 		highest=minf(highest,game.p["pos"].y)
-	check(highest<850.0-Scale.TILE_HEIGHT,"A navigation mushroom bounces the live controller through a tall cell")
+	check(highest<850.0-Scale.TILE_HEIGHT,"A down-cut bounces the live controller through a tall cell")
 	game.queue_free()
 	await process_frame
 	print("Traversal rooms: ",rooms,"  wall links: ",walls,"  mushroom links: ",mushrooms,"  failures: ",failures.size())

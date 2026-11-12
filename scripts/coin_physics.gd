@@ -6,7 +6,7 @@ extends RefCounted
 
 const GRAVITY: float = 1250.0
 const RESTITUTION: float = 0.35
-const RADIUS: float = 7.0
+const RADIUS: float = 14.0
 const GROUND_FRICTION: float = 85.0
 const STOP_BOUNCE_SPEED: float = 70.0
 const VISIBLE_IMPACT_SPEED: float = 35.0
@@ -94,7 +94,9 @@ static func step(drop: Dictionary, delta: float, platforms: Array, bounds: Rect2
 					velocity += normal * incoming * (1.0 + RESTITUTION)
 					grounded = false
 				if absf(normal.y) > 0.5:
-					velocity.x *= 0.88
+					# A rolling coin keeps its tangent speed across the expanded ledge corner.
+					if incoming >= STOP_BOUNCE_SPEED or _support_height(position, radius, platforms, bounds) < INF:
+						velocity.x *= 0.88
 				elif absf(normal.x) > 0.5:
 					velocity.y *= 0.98
 			time_left *= 1.0 - fraction

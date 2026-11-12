@@ -23,12 +23,6 @@ static func draw_water(c:CanvasItem,at:Vector2,biome:String,base:Transform2D,bat
 		var angle:float=TAU*float(i)/48;shimmer.append(wet.position+Vector2(wet.size.x*.5,3)+Vector2(cos(angle)*wet.size.x*.46,sin(angle)*3))
 	c.draw_colored_polygon(shimmer,Color(.72,.94,1,.16))
 	bath.draw(c,wet,base,time,true)
-	var d:Dictionary=info(biome);var image:Texture2D=texture(biome);var factor:float=scale_for(biome);var pivot:Array=d["pivot_source"];var original:Array=d["original_size"]
-	var cut:float=float(d["water_rect_source"][1])+float(d["water_rect_source"][3])*.82
-	var source:=Rect2(0,cut,float(original[0]),float(original[1])-cut)
-	var ratio:Vector2=image.get_size()/Vector2(original[0],original[1])
-	c.draw_set_transform_matrix(base)
-	c.draw_texture_rect_region(image,Rect2(at+Vector2(0,10)+(source.position-Vector2(pivot[0],pivot[1]))*factor,source.size*factor),Rect2(source.position*ratio,source.size*ratio))
 static func water_at(at:Vector2,biome:String) -> Vector2:
 	return Vector2(at.x,pool(at,biome).position.y)
 static func draw(c:CanvasItem,at:Vector2,biome:String,base:Transform2D) -> void:

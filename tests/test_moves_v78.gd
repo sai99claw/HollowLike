@@ -37,7 +37,7 @@ func run() -> void:
 	game._set_action("ultimate",true)
 	game._set_action("ultimate",false)
 	check(game.p["energy"]==2 and game._ultimate_progress()==0.0 and near["hp"]==88.0 and far["hp"]==100.0,"Full energy buys one radial hit on enemies in range")
-	check(near["push_velocity"].x>1000 and not game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="feather_charge"),"Ultimate hits outward and no longer uses the retired atlas")
+	check(near["push_velocity"].x>1000 and game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="feather_charge"),"Ultimate hits outward and plays feather_charge")
 	game.p_attack.cancel()
 	game.enemies.clear()
 	game.p["pos"]=Vector2(550,500)

@@ -418,6 +418,11 @@ static func _group_for(item:Dictionary) -> String:
 	return "物件"
 
 static func _recent_art() -> void:
+	for biome:String in ["underground","trunk","sky"]:
+		_gothic_prop_atlas(biome+"-props",["金幣甕","彈跳菇","能量花","生命花","寶箱","岩石"])
+		_gothic_prop_atlas(biome+"-flora",["植被一","植被二","植被三","植被四","植被五","植被六"])
+	_gothic_prop_atlas("stations",["鍛造","重鑄","披風","急救","倉庫","武器展台"])
+	_gothic_prop_atlas("facilities",["泉水","試打假人","投影燈","商人展台","冒險紀錄","戰利品櫃"])
 	for icon:Array in [["heart-empty","血量空格"],["heart-full","血量滿格"],["shield-empty","護盾空格"],["shield-full","護盾滿格"]]:
 		_add("v80:"+icon[0],icon[1],"介面",[_descriptor(ROOT+"v80/"+icon[0]+".webp")],1,"左上資源格使用的圖標，畫布 64 × 64 px。")
 	_add("v79:energy-feather-empty","羽毛能量 · 空格","介面",[_descriptor(ROOT+"v79/energy-feather-empty.webp")],1)
@@ -455,6 +460,12 @@ static func _recent_art() -> void:
 		_sheet("v59:chest:"+biome,BIOME_NAMES[biome]+" · 寶箱開啟","場景互動物件",ROOT+"v59/chests/"+biome+".webp",4,2,8,12.5)
 	_sheet("v48:pigeon:quickdraw_walk","鴿子 · 蓄氣步行","主角姿態",ROOT+"v48/pigeon_quickdraw_walk.webp",3,2,6,8)
 
+static func _gothic_prop_atlas(id:String,labels:Array) -> void:
+	for row in labels.size():
+		var frames:Array=[]
+		for state in 3:frames.append(_descriptor(ROOT+"v82/"+id+".webp",[],[3,6],[state,row]))
+		_add("v82:"+id+":"+str(row),labels[row],"場景互動物件",frames,4,"正常、破損、擊飛碎片。")
+
 static func _current_usage(item:Dictionary) -> Dictionary:
 	var id:String=item["id"]
 	var label:String=item["label"]
@@ -462,7 +473,7 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 	var used:bool=true
 	var note:String=""
 	match id:
-		"v79:energy-feather-empty","v79:energy-feather-full":note="左上普通能量的空格和滿格。滿格羽毛也用於角色周圍的旋轉護盾。畫布 52 × 60 px。"
+		"v79:energy-feather-empty","v79:energy-feather-full":note="左上普通能量的空格和滿格。畫布 52 × 60 px。"
 		"v75:canopy-left":note="左上血量列的垂枝底圖，固定於介面。"
 		"v76:near-roots","v76:near-vine","v77:underground-near-roots","v77:underground-near-vine","v77:sky-near-roots","v77:sky-near-vine":note="附著在地形下緣，部分繪在主角前方。"
 		"v76:near-stone","v76:near-thorns","v77:underground-near-stone","v77:underground-near-thorns","v77:sky-near-stone","v77:sky-near-thorns":note="平台的角石與荊枝，部分繪在主角前方。"
@@ -494,10 +505,10 @@ static func _current_usage(item:Dictionary) -> Dictionary:
 		"combat_v05:pigeon_feather_thrust":used=false;note="停用的第三下普攻。"
 		"combat_v05:pigeon_great_front","combat_v05:pigeon_great_side":used=false;note="舊單 C 衝刺攻擊姿勢，已換成雙翅輪流攻擊。"
 		"combat_v05:pigeon_great_spin":note="手動集氣釋放保留的原大刀迴旋斬。"
-		"combat_v05:feather_charge":used=false;note="舊版大招特效，已停用。"
+		"combat_v05:feather_charge":note="兩種模式按大招鍵後播放的羽刃環斬。"
 		"combat_v05:vertical_launch":note="集氣時從雙翅向下向外吹，起飛時朝下噴出的羽毛氣流。"
 		"combat_v05:motion_energy":used=false;note="已停用移動回能的光效。"
-		"combat_v05:dream_feather_charge":note="無雙夢境原有的擴散斬特效。"
+		"combat_v05:dream_feather_charge":used=false;note="舊版夢境擴散斬圖，已停用。"
 		"combat_v05:pigeon_feather_charge":note="無雙夢境滿能量後按大招鍵施放擴散斬；手動集氣釋放使用大刀第三刀。"
 		"v37:feathers":used=false;note="舊兩幀命中碎羽，已由 v72 四幀替換。"
 		"v72:wing_impulse":note="單 C 朝衝刺反方向噴出；二段跳朝腳下噴出。四幀固定在發力位置。"

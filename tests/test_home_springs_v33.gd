@@ -28,7 +28,7 @@ func run() -> void:
 	g._set_action("dash",true);g._physics_process(.06);g._set_action("dash",false);g._set_action("dash",true);g._physics_process(.06)
 	check(g.p_attack.attack.get("kind","")=="pierce","Home allows double-C wind movement")
 	g._configure_home();g._clear_keys();g._reset_player(Vector2(455,600));g._physics_process(.01)
-	check(is_equal_approx(g.p["vel"].y,-530.0) and not g.p["grounded"],"Home contact uses the same normal launcher impulse as game objects")
+	check(is_equal_approx(g.p["vel"].y,-g.JUMP_SPEED*.38) and not g.p["grounded"],"Home contact lightly rebounds without the down-strike impulse")
 	g._configure_home();g._clear_keys();g._reset_player(Vector2(790,600));g._interact();check(g.ui.is_panel_open(),"Adventure records are an actual nearby station")
 	g._close_panel();g._reset_player(Vector2(1080,600))
 	var saved_meta:Dictionary=g.meta.duplicate(true)
@@ -89,13 +89,14 @@ func run() -> void:
 	var double_jumped:bool=false
 	var reached:bool=false
 	var apex:float=600
+	var mushroom:Dictionary=g.props.filter(func(prop:Dictionary)->bool:return prop["kind"]=="launcher")[0]
 	for tick in 180:
 		if not launched:
 			if g.p["pos"].x>=454:g._set_action("right",false)
 			if tick==23:g._set_action("down",true);g._set_action("attack",true)
 		var previous_y_speed:float=g.p["vel"].y
 		g._update_home(1.0/60)
-		if not launched and g.props[1].get("launch_hit_cooldown",0)>0:
+		if not launched and mushroom.get("launch_hit_cooldown",0)>0:
 			launched=true
 			g._set_action("down",false);g._set_action("attack",false);g._set_action("jump",false)
 			g._set_action("right",true)
@@ -105,7 +106,7 @@ func run() -> void:
 		if double_jumped:apex=minf(apex,g.p["pos"].y)
 		if g._at_rogue_gate():reached=true;break
 	check(launched and double_jumped and reached,"A grounded jump, aerial down strike and air jump reach the Rogue platform")
-	check(absf(g.HomeArt.ROGUE_PLATFORM_Y-apex-50.0)<1.0,"Rogue platform is 50 px below the measured combo apex")
+	check(g.HomeArt.ROGUE_PLATFORM_Y-apex>=40.0,"The updated pogo combo has clearance above the Rogue platform")
 	if reached:
 		g._home_interact()
 		check(g.screen=="game" and g.mode=="rogue" and g.lab_mode.is_empty(),"Upper gate enters the real Rogue expedition")

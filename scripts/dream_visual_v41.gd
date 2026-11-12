@@ -61,6 +61,6 @@ func _draw() -> void:
 			draw_set_transform_matrix(world)
 			SkillArt.draw_ring(self,progress,bounds,Color(.72,.86,1))
 		else:
-			FX.fitted(self,"dream_feather_charge",progress,bounds,world,"right","active",Color(.8,.9,1))
+			FX.frame(self,"feather_charge",progress,wave["pos"],world,1.0,float(wave["radius"])*2.0)
 
 	draw_set_transform_matrix(Transform2D.IDENTITY)

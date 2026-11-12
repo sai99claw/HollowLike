@@ -3,7 +3,7 @@ extends RefCounted
 const ROOT="res://assets/home_v13/"
 const LEFT_GATE:=Rect2(80,315,240,285)
 const RIGHT_GATE:=Rect2(960,315,240,285)
-# Default pogo + air jump reaches feet Y=42 against the nest ceiling.
+# The mushroom down-strike and air jump give clearance above the upper gate.
 const ROGUE_PLATFORM_Y:float=64.44+50.0
 const ROGUE_PLATFORM:=Rect2(505,ROGUE_PLATFORM_Y,270,9)
 const ROGUE_GATE:=Rect2(520,ROGUE_PLATFORM_Y-285,240,285)
