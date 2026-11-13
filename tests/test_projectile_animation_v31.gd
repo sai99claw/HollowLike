@@ -38,12 +38,13 @@ func run() -> void:
 	check(not Animated.has("chain_staff") and not Animated.has("piercing_laser"),"Instant beams are not treated as rotating bodies")
 	var feedback:=Feedback.new();root.add_child(feedback)
 	var pr:Dictionary={"pos":Vector2(300,250),"vel":Vector2.RIGHT*400,"radius":5.09375,"weapon_id":"impact_bomb","color":Color.ORANGE}
-	feedback.projectile_trail(pr,1)
-	var emitter:CPUParticles2D=feedback.trails[int(pr["trail_id"])]["emitter"]
-	check(emitter.name.begins_with("ProjectileDust") and emitter.amount<=6 and emitter.lifetime<=.21 and emitter.modulate.a<.3,"Dust is restrained rather than a bright oversized glow")
-	check(emitter.local_coords and emitter.position==Vector2.ZERO,"Dust points remain in world space")
-	feedback.set_frozen(true);check(emitter.speed_scale==0,"Hitstop freezes dust alongside animation")
-	feedback.finish_trail(pr);check(not emitter.emitting,"Impact stops new dust emission")
+	var ribbon:=preload("res://scripts/projectile_readability_v25.gd")
+	ribbon.record(pr,Vector2(280,240),Vector2(293,243),.04)
+	ribbon.record(pr,Vector2(293,243),pr["pos"],.04)
+	feedback.finish_trail(pr)
+	check(feedback.fading_ribbons[0]["trail_points"][-1]==pr["pos"],"Rotating weapon keeps its own world-space trail")
+	feedback.step(.3)
+	check(feedback.fading_ribbons.is_empty(),"Impact tail fades without leaving an emitter")
 	var view:=Preview.new();root.add_child(view);await process_frame;await process_frame
 	check(view.painted,"Actual CanvasItem draws all fifty-six frames through the runtime adapter")
 	feedback.clear();feedback.queue_free();view.queue_free();await process_frame

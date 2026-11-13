@@ -1,7 +1,6 @@
 extends SceneTree
 const Ledge=preload("res://scripts/ledge_mantle_v37.gd")
 const Corpses=preload("res://scripts/corpse_field_v21.gd")
-const Spring=preload("res://scripts/spring_v33.gd")
 const Atmosphere=preload("res://scripts/atmosphere.gd")
 var failures:Array[String]=[]
 func _initialize() -> void:call_deferred("run")
@@ -70,12 +69,16 @@ func run() -> void:
 			if g.p["grounded"]:break
 		check((g.p["heavy_land_left"]>0)==(distance>384),"Only falls strictly greater than six64px tiles trigger heavy landing: "+str(distance))
 	for biome:String in ["underground","trunk","sky"]:
-		reset(g,Vector2(600,1000));g.room["ecology"]=g.Ecology.from_stage(["underground","trunk","sky"].find(biome)*2);g.room["fountain"]=true;g.layout["fountain_pos"]=g.p["pos"];g.props.assign([{"kind":"fountain","pos":g.p["pos"],"used":false,"hurt":0.0}]);g.p["hp"]=1;g.p["energy"]=0
-		check(Spring.pool(g.p["pos"],biome).has_point(g.p["pos"]-Vector2(0,4)),"Ecology pool contains the player's feet: "+biome)
-		check(g._in_bath(),"Combat fountain uses real bathing interaction")
+		reset(g,Vector2(600,1000))
+		g.room["ecology"]=g.Ecology.from_stage(["underground","trunk","sky"].find(biome)*2)
+		g.layout["pool"]=Rect2(468,955,264,45)
+		g.p["hp"]=1;g.p["energy"]=0
+		check(g._in_bath(),"Recessed pool contains the player's feet: "+biome)
 		g._update_props(1);check(g.p["hp"]==2 and g.p["energy"]==2,"Bathing restores health and energy")
-		g._hit_props(Spring.body(g.p["pos"]),1,99);check(not g.spring_particles.bursts.is_empty(),"Striking pool produces water droplet particles")
-		g.room["fountain"]=false
+		g._hit_props(Rect2(588,963,24,30),1,99)
+		check(not g.spring_particles.bursts.is_empty(),"Striking pool produces droplets")
+		g.layout["pool"]=Rect2()
+		g.bath.reset()
 	var body:Dictionary=Corpses.create({"roster_id":"test","roster_biome":"sky","roster_row":0,"roster_elite":false,"pos":Vector2(500,500),"face":-1,"death_direction":Vector2.RIGHT,"death_knockback":76,"body_size":Vector2(34,45)})
 	check(is_equal_approx(body["vel"].x,76*1.5) and body["factor"]==1,"Corpse preserves hit direction with1.5x lethal knockback and no scaling")
 	g.atmosphere.configure("trunk",37,true,false,true,g.layout);g.atmosphere.depth_origin=Vector2.ZERO;g.atmosphere.depth_origin_ready=true

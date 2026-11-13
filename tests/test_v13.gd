@@ -77,9 +77,12 @@ func run() -> void:
 	for step in 12:scene._update_player(1.0/120)
 	check(scene.effects.is_empty(),"Dash rendering allocates no per-substep particle dictionaries")
 	scene.combat_feedback.clear();scene.combat_feedback.reduced=true
-	for i in 100:scene.combat_feedback.projectile_trail({"pos":Vector2(700,400),"vel":Vector2.RIGHT,"radius":8},1)
-	check(scene.combat_feedback.trails.size()==24,"Reduced effects cap trails at 24 emitters under a 100-projectile load")
-	for record in scene.combat_feedback.trails.values():check(record["emitter"].amount==5,"Reduced projectile emitters use five particles")
+	var ribbon:=preload("res://scripts/projectile_readability_v25.gd")
+	for i in 100:
+		var shot:Dictionary={"pos":Vector2(i,400),"radius":8}
+		ribbon.record(shot,Vector2(i-15,400),shot["pos"],.04)
+		scene.combat_feedback.finish_trail(shot)
+	check(scene.combat_feedback.fading_ribbons.size()==24,"Detached ribbons stay bounded under 100 simultaneous impacts")
 	scene.low_effects=true;scene._process(.01)
 	for particle in scene.atmosphere.ambient+scene.atmosphere.rain_layers:check(particle.material==null,"Reduced ambient particles skip repeated blur texture sampling")
 	scene._enter_room(merchant);check(scene.atmosphere.merchant_room and not scene.atmosphere.rainy,"Merchant has dedicated indoor scenery without outdoor rain")

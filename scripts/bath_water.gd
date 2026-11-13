@@ -9,7 +9,7 @@ static func contains(pool:Rect2,at:Vector2) -> bool:
 func reset() -> void:ripples.clear();was_wet=false;timer=0;splashes=0
 func attack(pool:Rect2,at:Vector2) -> void:
 	if ripples.size()>=18:ripples.pop_front()
-	ripples.append({"x":clampf(at.x,pool.position.x+20,pool.end.x-20),"age":0.0,"splash":true});splashes+=1
+	ripples.append({"x":clampf(at.x,pool.position.x+8,pool.end.x-8),"age":0.0,"splash":true});splashes+=1;timer=.15
 func step(pool:Rect2,at:Vector2,velocity:Vector2,delta:float) -> void:
 	for ripple in ripples:ripple["age"]+=delta
 	if not ripples.is_empty():ripples=ripples.filter(func(r:Dictionary)->bool:return r["age"]<1.2)
@@ -36,6 +36,11 @@ func draw(c:CanvasItem,pool:Rect2,base:Transform2D,time:float,surface_only:bool=
 		for i in 17:
 			var angle:float=PI+float(i)/16*PI
 			wave.append(Vector2(float(ripple["x"])+cos(angle)*radius,pool.position.y+sin(angle)*radius*.13+3))
-		c.draw_polyline(wave,Color(.88,1,.98,(1-t)*.75),1.5,true)
+		var clipped:=PackedVector2Array()
+		for point:Vector2 in wave:
+			if point.x>pool.position.x+3 and point.x<pool.end.x-3:clipped.append(point)
+		if clipped.size()>1:
+			c.draw_polyline(clipped,Color(.42,.84,.78,(1-t)*.38),3,true)
+			c.draw_polyline(clipped,Color(.88,1,.98,(1-t)*.75),1.2,true)
 		if ripple["splash"] and t<.5:
 			for i in 5:c.draw_circle(Vector2(float(ripple["x"])+(i-2)*t*38,pool.position.y-sin(t*PI*2)* (14+i*3)),1.8*(1-t),Color(.8,.98,1,(1-t)*.8))

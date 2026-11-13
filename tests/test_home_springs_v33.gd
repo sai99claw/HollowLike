@@ -118,13 +118,16 @@ func run() -> void:
 	check(display["pos"]==at and not display["taken"] and display["vel"]==Vector2.ZERO,"Display weapon remains anchored and cannot auto-pickup")
 	for room:Dictionary in g.tower["rooms"]:
 		if not room.get("fountain",false):continue
-		g._enter_room(room["id"]);g._close_panel();await process_frame;var spring:Dictionary=g.props.filter(func(p:Dictionary)->bool:return p["kind"]=="fountain")[0]
-		check(g.room["type"] in ["combat","elite"] and not g.enemies.is_empty(),"Fountain leaves the battle encounter active")
-		g.p["pos"]=spring["pos"];g.p["hp"]=1;g.p["energy"]=0;g._update_props(1)
-		check(g.p["hp"]==2 and g.p["energy"]==2,"Fountain heals from its grounded interaction range")
-		g._hit_props(preload("res://scripts/spring_v33.gd").body(spring["pos"]),1,99)
-		check(not g.spring_particles.bursts.is_empty() and g.spring_particles.bursts[0].texture is GradientTexture2D,"Hitting spring emits native water droplets")
-		check(not spring["used"] and g.effects.filter(func(e:Dictionary)->bool:return e.has("water_attack")).is_empty(),"Spring survives hits without a splash sprite effect")
+		g._enter_room(room["id"]);g._close_panel();await process_frame
+		var pool:Rect2=g._active_pool()
+		if not pool.has_area():continue
+		check(g.room["type"] in ["combat","elite"] and not g.enemies.is_empty(),"Basin leaves the battle encounter active")
+		check(not g.props.any(func(p:Dictionary)->bool:return p["kind"] in ["spring","fountain"]),"No raised spring prop is spawned")
+		g.p["pos"]=Vector2(pool.get_center().x,pool.end.y);g.p["hp"]=1;g.p["energy"]=0;g._update_props(1)
+		check(g.p["hp"]==2 and g.p["energy"]==2,"Water heals the submerged player")
+		g._hit_props(Rect2(pool.get_center()-Vector2.ONE*5,Vector2.ONE*10),1,99)
+		check(not g.spring_particles.bursts.is_empty() and g.spring_particles.bursts[0].texture is GradientTexture2D,"Hitting water emits native droplets")
+		check(g._active_pool()==pool,"Water remains after an attack")
 		break
 	g.queue_free();await process_frame
 	print("v33 rates: merchant=",float(shops)/chapters," fountains=",float(wet)/fights,"; ",failures)

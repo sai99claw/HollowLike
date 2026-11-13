@@ -56,11 +56,17 @@ func _draw() -> void:
 	for wave:Dictionary in waves:
 		var progress:float=clampf(float(wave["age"])/float(wave["duration"]),0,1)
 		var radius:float=float(wave["radius"])*(.15+.85*progress)
-		var bounds:=Rect2(Vector2(wave["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2)
+		var at:Vector2=wave["pos"]
+		var alpha:=1.0-smoothstep(.18,1.0,progress)
+		draw_set_transform_matrix(world)
 		if wave["injury"]:
-			draw_set_transform_matrix(world)
-			SkillArt.draw_ring(self,progress,bounds,Color(.72,.86,1))
+			draw_arc(at,radius,0,TAU,56,Color(.40,.60,1,alpha*.24),9,true)
+			draw_arc(at,radius,0,TAU,56,Color(.80,.95,1,alpha*.87),2,true)
 		else:
-			FX.frame(self,"feather_charge",progress,wave["pos"],world,1.0,float(wave["radius"])*2.0)
+			draw_arc(at,radius,0,TAU,42,Color(.56,.66,.93,alpha*.30),2,true)
+			for i in 4:
+				var angle:=i*TAU/4.0+progress*1.5
+				draw_arc(at,radius,angle-.48,angle+.40,14,Color(.45,.62,1,alpha*.55),6,true)
+				draw_arc(at,radius,angle-.27,angle+.40,14,Color(.91,.97,1,alpha),1.8,true)
 
 	draw_set_transform_matrix(Transform2D.IDENTITY)

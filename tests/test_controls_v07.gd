@@ -60,11 +60,15 @@ func run() -> void:
 	check(not scene.show_hitboxes,"All debug geometry and projectile aim guides default to hidden")
 	scene.combat_feedback.clear();scene.projectiles.clear();scene.enemies.clear();scene.solids.clear();scene.platforms.clear()
 	scene._emit_weapon(Vector2(600,500),Vector2.RIGHT,load("res://scripts/combat_library.gd").attack("arc",{"speed":150,"range":1000}),true)
-	scene._update_projectiles(.05);var pr:Dictionary=scene.projectiles[0];var key:int=pr["trail_id"];var emitter:CPUParticles2D=scene.combat_feedback.trails[key]["emitter"]
-	check(emitter.local_coords and emitter.position==Vector2.ZERO and emitter.texture is GradientTexture2D,"Native projectile trail stays in world coordinates and has a soft transparent particle texture")
-	var before:Vector2=emitter.emission_points[0];scene._update_projectiles(.05)
-	check(emitter.emission_points[0]!=before and emitter.position==Vector2.ZERO,"Emission follows the real curved path without dragging previous particles")
-	scene.combat_feedback.finish_trail(pr);check(not emitter.emitting,"Finished projectile stops adding trail particles")
+	scene._update_projectiles(.05)
+	var pr:Dictionary=scene.projectiles[0]
+	var first:Vector2=pr["trail_points"][0]
+	scene._update_projectiles(.05)
+	check(pr["trail_points"][0]==first and pr["trail_points"][-1]==pr["pos"],"Ribbon records actual curved movement in world coordinates")
+	scene.combat_feedback.finish_trail(pr)
+	check(scene.combat_feedback.fading_ribbons.size()==1,"Projectile leaves a fading ribbon on expiry")
+	scene.combat_feedback.step(.4)
+	check(scene.combat_feedback.fading_ribbons.is_empty(),"Detached ribbon expires after its brief lifetime")
 	check(Walk.clip()["frames"].size()==10 and Walk.clip()["fps"]==20,"Walk uses the ten enabled frames at the authored preview rate")
 	for f in Walk.clip()["frames"]:check(Vector2(f["pivot"][0],f["pivot"][1]).is_equal_approx(Vector2(164,224)) and ResourceLoader.exists(Walk.ROOT+f["path"]),"Walk uses a shared authored foot pivot and all delivered PNGs")
 	var walk=scene.walker;walk.reset();walk.emitted_events=0

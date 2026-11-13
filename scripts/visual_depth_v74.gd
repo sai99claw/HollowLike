@@ -1,11 +1,18 @@
 extends Node2D
 const FOREGROUND_FACTOR:float=1.48
+const VFX=preload("res://scripts/gameplay_vfx.gd")
 const Cache=preload("res://scripts/cached_canvas.gd")
 const Edge=preload("res://scripts/platform_overhang_v74.gd")
 var ambient:CanvasModulate
 var grade:Environment
 var lantern:PointLight2D
 var lights:Array[PointLight2D]=[]
+var flash_light:PointLight2D
+var flash_at:=Vector2.ZERO
+var flash_strength:=0.0
+var flash_radius:=0.0
+var flash_time:float=-INF
+var room_biome:String="trunk"
 var foreground:Control
 var canopy:Node2D
 var root_sprites:Array[Dictionary]=[]
@@ -56,9 +63,12 @@ func _ready() -> void:
 	ramp.colors=PackedColorArray([Color.WHITE,Color(1,1,1,.75),Color(1,1,1,.33),Color(1,1,1,.09),Color(1,1,1,0)])
 	soft.gradient=ramp
 	lantern=_light(Color("fff0d7"),.8)
+	flash_light=_light(Color("ffd598"),0.0)
+	flash_light.enabled=false
 	for depth:int in [-12,3]:
 		var fog:=_overlay("GroundFog",depth,preload("res://shaders/ground_fog_v74.gdshader"))
-		fog.material.set_shader_parameter("haze",Color(.43,.46,.66,.19) if depth<0 else Color(.61,.48,.59,.15))
+		fog.material.set_shader_parameter("drift_noise",VFX.shared_noise())
+		fog.material.set_shader_parameter("haze",Color(.43,.46,.66,.19) if depth<0 else Color(.61,.48,.59,.12))
 		fogs.append(fog)
 	foreground=Control.new()
 	foreground.name="SuperForeground"
@@ -152,6 +162,13 @@ func configure(layout:Dictionary,solids:Array,doors:Array,props:Array,active:boo
 	origin=Vector2.INF
 	fog_y=INF
 	wind_time=-INF
+	flash_time=-INF
+	room_biome=biome
+	ambient.color={"underground":Color("9f9ab0"),"trunk":Color("a4aeaa"),"sky":Color("a2abc6")}.get(biome,Color("a4aeaa"))
+	lantern.color={"underground":Color("ffe3b6"),"trunk":Color("f1f0d4"),"sky":Color("dbedff")}.get(biome,Color("fff0d7"))
+	var haze:Color={"underground":Color("9699ba"),"trunk":Color("7ca59a"),"sky":Color("bac8db")}.get(biome,Color("939cb0"))
+	fogs[0].material.set_shader_parameter("haze",Color(haze,.24))
+	fogs[1].material.set_shader_parameter("haze",Color(haze,.12))
 	shapes.clear()
 	root_sprites.clear()
 	if active:
@@ -187,13 +204,27 @@ func grass_bend(at:Vector2,now:float) -> float:
 	return 12.0*_grass_wind_amount(now)*(1.0-smoothstep(12.0,56.0,at.distance_to(nearby)))
 
 func _warm(at:Vector2,radius:float) -> void:
-	var light:=_light(Color("ffc178"),.53)
+	var tint:Color={"underground":Color("dfb582"),"trunk":Color("acd6ab"),"sky":Color("a3c9ff")}.get(room_biome,Color("ffc178"))
+	var light:=_light(tint,.53)
+	light.enabled=false
 	light.set_meta("at",at)
 	light.set_meta("radius",radius)
 	lights.append(light)
-	var pulse:=light.create_tween().set_loops().set_trans(Tween.TRANS_SINE)
-	pulse.tween_property(light,"energy",.67,1.35+fposmod(at.x,100.0)*.008)
-	pulse.tween_property(light,"energy",.46,1.55)
+
+func flash(at:Vector2,radius:float,strength:float,now:float) -> void:
+	if strength < flash_strength*(1.0-smoothstep(0.0,.22,now-flash_time)):return
+	flash_at=at
+	flash_radius=clampf(radius,45.0,190.0)
+	flash_strength=strength
+	flash_time=now
+
+func draw_shafts(vfx:Node2D,base:Transform2D) -> void:
+	if reduced:return
+	for light:PointLight2D in lights:
+		if not light.enabled:continue
+		var at:Vector2=light.get_meta("at")
+		var radius:float=light.get_meta("radius")
+		vfx.flow(VFX.SHAFT,base,at-Vector2(12,radius*.49),Vector2(radius*.86,radius*1.62),.18,Color(light.color,.13))
 
 func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,floor_y:float,now:float,active:bool,low:bool,paused:bool,visible_region:Rect2,rate:float=1.0) -> void:
 	var dt:float=clampf(now-time,0,.1)
@@ -210,14 +241,26 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	lantern.enabled=active
 	lantern.position=base*(feet-Vector2(0,27))
 	lantern.texture_scale=440.0*zoom/soft.get_width()
-	var count:int=0
+	var candidates:Array[PointLight2D]=[]
 	for light:PointLight2D in lights:
-		var at:Vector2=base*Vector2(light.get_meta("at"))
-		light.enabled=active and count<(2 if low else 5) and safe.grow(180).has_point(at)
-		if not light.enabled:continue
-		count+=1
-		light.position=at
+		light.enabled=false
+		if active and safe.grow(125).has_point(base*Vector2(light.get_meta("at"))):
+			candidates.append(light)
+	candidates.sort_custom(func(a:PointLight2D,b:PointLight2D)->bool:
+		return feet.distance_squared_to(a.get_meta("at"))<feet.distance_squared_to(b.get_meta("at")))
+	for i in mini(candidates.size(),2 if low else 4):
+		var light:=candidates[i]
+		var at:Vector2=light.get_meta("at")
+		light.enabled=true
+		light.position=base*at
+		light.energy=.46+sin(now*1.7+at.x*.017)*.08
 		light.texture_scale=float(light.get_meta("radius"))*2.0*zoom/soft.get_width()
+	var energy:=flash_strength*(1.0-smoothstep(0.0,.22,now-flash_time))
+	flash_light.enabled=active and not low and energy>.03 and safe.grow(160).has_point(base*flash_at)
+	if flash_light.enabled:
+		flash_light.position=base*flash_at
+		flash_light.texture_scale=flash_radius*2.0*zoom/soft.get_width()
+		flash_light.energy=energy
 	for layer:Control in [foreground,vignette]:
 		layer.position=safe.position
 		layer.size=safe.size
@@ -228,9 +271,13 @@ func update_view(camera:Vector2,base:Transform2D,viewport:Rect2,feet:Vector2,flo
 	for i in fogs.size():
 		var fog:ColorRect=fogs[i]
 		fog.visible=active and (i==0 or not low)
-		fog.position=Vector2(safe.position.x,(base*Vector2(feet.x,fog_y)).y-(155.0 if i==0 else 57.0)*zoom)
-		fog.size=Vector2(safe.size.x,(220.0 if i==0 else 85.0)*zoom)
-		fog.material.set_shader_parameter("drift",camera.x*.002-time*.08)
+		fog.position=Vector2(safe.position.x,(base*Vector2(feet.x,fog_y)).y-(105.0 if i==0 else 41.0)*zoom)
+		fog.size=Vector2(safe.size.x,(142.0 if i==0 else 68.0)*zoom)
+		fog.visible=fog.visible and safe.intersects(Rect2(fog.position,fog.size))
+		if fog.visible:
+			fog.material.set_shader_parameter("world_left",(safe.position.x-base.origin.x)/zoom)
+			fog.material.set_shader_parameter("world_width",safe.size.x/zoom)
+			fog.material.set_shader_parameter("phase",now+float(i)*23.0)
 	spores.position=safe.get_center()
 	spores.visible=active
 	if spores.emitting!=active:spores.emitting=active

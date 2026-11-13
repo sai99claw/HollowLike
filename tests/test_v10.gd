@@ -32,11 +32,13 @@ func run() -> void:
 	scene.p["hurt"]=.2;scene._set_action("attack",true);scene.p["hurt"]=0;scene._set_action("attack",false)
 	check(scene.pending_attack.is_empty(),"Press while hurt is discarded even if released after recovery")
 	scene._set_action("attack",true);scene.charge_timer=.5;scene._process(.01)
-	check(scene.combat_feedback.charging and scene.combat_feedback.charge_motes.emitting and scene.combat_feedback.charge_motes.amount>=30,"Holding valid attack displays native inward charge particles")
+	await process_frame
+	check(not scene.gameplay_vfx.commands[scene.VFX.VORTEX].is_empty(),"Holding valid attack draws the shared inward charge vortex")
 	var clip:Dictionary=FX.definition("pigeon_feather_charge")
 	check(FX.sample_index(clip,0,"idle",.1)!=FX.sample_index(clip,0,"idle",.3),"Charge artwork changes frames while holding")
 	scene._set_action("attack",false);check(scene.pending_attack.is_empty() and scene.p_attack.is_active(),"Available click starts immediately and release does not queue a second attack")
-	scene.pending_attack.clear();scene._process(.01);check(not scene.combat_feedback.charge_motes.emitting,"Release stops the charge emitter")
+	scene.pending_attack.clear();scene._process(.01);await process_frame
+	check(scene.gameplay_vfx.commands[scene.VFX.VORTEX].is_empty(),"Release clears the charge vortex")
 	check(Vector2(Walk.clip()["frames"][0]["size"][0],Walk.clip()["frames"][0]["size"][1])==Vector2(256,256) and load(Walk.ROOT+Walk.clip()["frames"][0]["path"]).get_width()==256,"Walk uses high resolution source, matching combat texture density")
 	# Cut grass emits the same sharp attack flash and cannot be farmed repeatedly.
 	scene.props.assign([{"kind":"grass","pos":Vector2(650,1050),"seed":.1,"used":false,"hurt":0.0}]);scene.p_attack.cancel();scene.p_attack.begin(Data.primary_attack(1,"right",false));scene.p_attack.phase="active"
