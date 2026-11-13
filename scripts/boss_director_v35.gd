@@ -137,16 +137,3 @@ static func _tell_stroke(c:CanvasItem,points:PackedVector2Array,radius:float,col
 	c.draw_polyline(points,Color(.98,.35,.16,.19),maxf(8.0,radius*1.1),true)
 	c.draw_polyline(points,color,2.5,true)
 	c.draw_circle(points[-1],4,color,true,-1,true)
-
-
-static func play_attack(host:Node,definition:Dictionary) -> void:
-	var key:String=definition.get("boss_sound","")
-	if key.is_empty():return
-	var path:String="res://assets/v55/boss_sounds/"+key+".mp3"
-	if not ResourceLoader.exists(path):return
-	var voice:=AudioStreamPlayer.new()
-	voice.stream=load(path)
-	voice.volume_db=-10
-	host.add_child(voice)
-	voice.finished.connect(voice.queue_free)
-	voice.play()

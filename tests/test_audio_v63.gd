@@ -31,18 +31,33 @@ func run() -> void:
 			check(game.sounds.has(id) and not heard.has(id), "Each boss attack has its own loaded cue " + id)
 			heard.append(id)
 	for biome in Roster.BIOMES:
-		for index in 5:
-			var actors := [Roster.regular(biome, index), Roster55.create(biome, index, Roster.BIOMES.find(biome) * 2)]
+		for index in Roster.REGULAR_COUNT:
+			var actors := [Roster.regular(biome, index)]
+			if index < 5:actors.append(Roster55.create(biome, index, Roster.BIOMES.find(biome) * 2))
 			for actor in actors:
-				for definition in actor["attacks"]:
-					var id := Cues.attack_cue(definition)
-					check(game.sounds.has(id), "Species attack is mapped " + id)
+				for slot in actor["attacks"].size():
+					var id := Cues.enemy_attack_cue(actor, actor["attacks"][slot], slot)
+					check(id.begins_with("actor_") and Cues.cue_stream(id) != null, "Species attack is mapped " + id)
+				for event in ["hit","defeat","jump","rush"]:
+					var id := Cues.actor_cue(actor,event,"")
+					check(Cues.cue_stream(id) != null, "Species has its own " + event + " cue: " + id)
 	for stage in 6:
-		for definition in Roster.elite(stage)["attacks"]:
-			var id := Cues.attack_cue(definition)
-			check(game.sounds.has(id), "Legacy elite attack is mapped " + id)
+		var elite := Roster.elite(stage)
+		for slot in elite["attacks"].size():
+			var id := Cues.enemy_attack_cue(elite, elite["attacks"][slot], slot)
+			check(id.begins_with("actor_") and Cues.cue_stream(id) != null, "Legacy elite attack is mapped " + id)
 	for id in Cues.ACTIONS:
 		check(game.sounds.has(id) and game.sounds[id].get_length() > .06, "Action has a packaged cue " + id)
+	for id in Cues.directory:
+		var stream := Cues.cue_stream(id)
+		check(stream != null and stream.get_length() > .06 and stream.get_length() < 1.0, "Every bank stream decodes with a one-shot duration " + id)
+	for surface in ["wood","stone","grass"]:
+		for take in range(1,5):
+			check(Cues.cue_stream("footstep_%s_%02d" % [surface,take]) != null, "All four surface footstep takes exist")
+	check(Cues.primary_cue(Cues.Data.action_attack("right",false,false,0)) == "attack_whoosh", "A1 uses its own cue")
+	check(Cues.primary_cue(Cues.Data.action_attack("right",false,false,1)) == "attack_reverse", "A2 uses its own cue")
+	check(Cues.primary_cue(Cues.Data.action_attack("up",false,false)) == "attack_up", "Up slash uses its own cue")
+	check(Cues.primary_cue(Cues.Data.action_attack("down",false,false)) == "attack_down", "Down slash uses its own cue")
 	game.audio_enabled = true
 	game._reset_player(Vector2(440, 600))
 	game.jump_request = true
@@ -63,7 +78,7 @@ func run() -> void:
 	game.audio_enabled = false
 	for voice in game.combat_audio.voices:
 		check(not voice.playing, "Mute stops each existing sound voice")
-	print("v0.63 audio validation with %d failures" % failures)
+	print("Short audio bank validation with %d failures" % failures)
 	game.queue_free()
 	await process_frame
 	quit(1 if failures else 0)

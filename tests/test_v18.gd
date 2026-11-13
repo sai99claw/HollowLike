@@ -85,6 +85,6 @@ func run() -> void:
 		check(clip["frames"].size()==8 and hashes.size()==8 and indices.size()==8,"Eight distinct authored poses are sampled: "+id)
 		check(Catalog.entry("motion:v18:"+id).get("frame_count",0)==8,"RD shows the same eight movement frames: "+id)
 	check(Catalog.entry("slash:v18").get("frame_count",0)==8,"New independent slash layer is inspectable in RD")
-	check(ResourceLoader.exists("res://assets/metal_hit.wav"),"Metal impact audio is included")
+	check(preload("res://scripts/combat_audio_v63.gd").cue_stream("metal_hit")!=null,"Metal impact audio is included")
 	print("v18: jump heights=",[short_h,mid_h,full_h],"; ","passed" if failures.is_empty() else failures)
 	game.queue_free();await process_frame;quit(0 if failures.is_empty() else 1)

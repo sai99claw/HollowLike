@@ -1,5 +1,6 @@
 class_name WalkAnimation
 extends Node
+const AudioCues=preload("res://scripts/combat_audio_v63.gd")
 const ROOT="res://assets/walk_v2/"
 const DISTANCE_PER_FRAME:float=16.5
 const WALK_SEQUENCE=[6,2,7,8,9]
@@ -23,7 +24,7 @@ var voice_index:int=0
 var emitted_events:int=0
 func _ready() -> void:
 	for i in 3:
-		var voice:=AudioStreamPlayer.new();voice.volume_db=-17;add_child(voice);voices.append(voice)
+		var voice:=AudioStreamPlayer.new();voice.volume_db=-8;add_child(voice);voices.append(voice)
 static func ensure() -> bool:
 	if manifest.is_empty() and FileAccess.file_exists(ROOT+"manifest.json"):
 		manifest=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"manifest.json"))
@@ -61,7 +62,13 @@ func _footstep(ground:String,audible:bool) -> void:
 	last_variants[ground]=variant
 	if not audible or voices.is_empty():return
 	var voice:AudioStreamPlayer=voices[voice_index%voices.size()];voice_index+=1
-	voice.stream=load("res://assets/audio/footsteps/footstep_%s_%02d.wav"%[ground,variant]);voice.pitch_scale=randf_range(.97,1.03);voice.play()
+	voice.stream=AudioCues.cue_stream("footstep_%s_%02d"%[ground,variant])
+	voice.pitch_scale=randf_range(.97,1.03)
+	if voice.stream!=null:voice.play()
+
+func stop_audio() -> void:
+	for voice in voices:voice.stop()
+
 static func surface(biome:String,at:Vector2,layout:Dictionary) -> String:
 	for block:Rect2 in layout.get("blocks",[]):
 		if absf(at.y-block.position.y)<4 and at.x>=block.position.x-10 and at.x<=block.end.x+10:return "stone"

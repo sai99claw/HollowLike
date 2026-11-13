@@ -200,6 +200,7 @@ var audio_enabled:bool=true:
 		audio_enabled=value
 		AudioServer.set_bus_mute(0,not value)
 		if not value and combat_audio!=null:combat_audio.stop_all()
+		if not value and walker!=null:walker.stop_audio()
 		if room_music!=null:room_music.set_enabled(value)
 		if atmosphere!=null:atmosphere.set_audio_enabled(value)
 var walker:Node
@@ -344,9 +345,6 @@ func _ready() -> void:
 	combat_audio = AudioCues.new()
 	add_child(combat_audio)
 	room_music=Music.new();add_child(room_music);room_music.set_enabled(audio_enabled);room_music.select("hub","branches")
-	for sound_name in ["hit","slash","parry","coin","jump","metal_hit","explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh","charge_build","charge_release","impact_hit","impact_heavy"]:
-		var path: String = "res://assets/v30/audio/"+sound_name+".wav" if sound_name in ["charge_build","charge_release","impact_hit","impact_heavy"] else ("res://assets/v29/audio/" if sound_name in ["explosion","ground_slam","dash_wind","double_dash_wind","attack_whoosh"] else "res://assets/")+sound_name+".wav"
-		if ResourceLoader.exists(path): sounds[sound_name] = load(path)
 	AudioCues.load_cues(sounds)
 	_configure_home()
 	_update_hud()
@@ -933,7 +931,11 @@ func _step_player(delta: float) -> void:
 		return
 	var preparing_lift:bool=p.has("lift_charge") and _key("up") and _key("jump") and _can_start_lift()
 	if preparing_lift:
-		p["lift_charge"]=minf(_lift_threshold(),float(p.get("lift_charge",0))+delta)
+		var previous_charge:float=float(p["lift_charge"])
+		var threshold:float=_lift_threshold()
+		p["lift_charge"]=minf(threshold,previous_charge+delta)
+		if previous_charge==0.0:_sound("lift_charge")
+		if previous_charge<threshold and float(p["lift_charge"])>=threshold:_sound("lift_ready")
 		p["jump_buffer_left"]=0.0
 		jump_request=false
 	else:p.erase("lift_charge")
@@ -1082,7 +1084,9 @@ func _step_player(delta: float) -> void:
 		vel=p["launch_pending_velocity"];p.erase("launch_pending_velocity")
 		p["grounded"]=false;p["wall"]=0;p["landing_left"]=0
 	p["_motion_step"]=false
+	var glide_was_open:bool=p.get("gliding",false)
 	p["gliding"]=gliding and not p["grounded"] and int(p["wall"])==0
+	if p["gliding"] and not glide_was_open:_sound("glide_open")
 	p["pos"]=pos;p["vel"]=vel
 	if visual_depth!=null and (dash_contact or (p_attack.is_active() and p_attack.attack.get("kind","")=="pierce")):
 		visual_depth.record_grass_wind(old_pos,pos,draw_clock)
@@ -1131,6 +1135,7 @@ func _step_lift(delta:float) -> void:
 		p["vel"]=Vector2.ZERO
 		p["pos"]=from.lerp(at,first)
 		p["lift_invul_left"]=.5
+		_sound("lift_hit")
 		_hit_enemy(target,LIFT_HIT_DAMAGE,Color("d3eaff"),145.0,from,Vector2.UP)
 		_contact_fx("hit_medium",_enemy_body_box(target).get_center(),.25,72.0)
 		return
@@ -1159,7 +1164,7 @@ func _cast_ultimate() -> void:
 		var closest:Vector2=center.clamp(body.position,body.end)
 		if float(enemy["hp"])<=0 or center.distance_squared_to(closest)>ULTIMATE_RADIUS*ULTIMATE_RADIUS:continue
 		_hit_enemy(enemy,ULTIMATE_DAMAGE,Color("f6e8ff"),ULTIMATE_KNOCKBACK,center,center.direction_to(body.get_center()))
-	_sound("attack_heavy")
+	_sound("ultimate_cast")
 	shake=maxf(shake,11.0)
 	_update_hud()
 
@@ -1358,7 +1363,7 @@ func _player_active_started() -> void:
 		"secondary":
 			if def.has("salvo"):
 				for weapon:Dictionary in def["salvo"]:_emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),weapon,true)
-			elif def.get("weapon_kind","")=="sword":_sound("attack_whoosh")
+			elif def.get("weapon_kind","")=="sword":_sound(AudioCues.attack_cue(def))
 			else: _emit_weapon(p["pos"]-Vector2(0,24),def.get("dir",Vector2.RIGHT),def,true)
 		"pierce","slam":
 			p["slam_speed"]=520.0;p["slam_age"]=0.0;p["slam_land_left"]=0.0;_sound("slam_wind" if def["kind"]=="slam" else "double_dash_wind")
@@ -1373,7 +1378,7 @@ func _player_active_started() -> void:
 			_effect(p["pos"],Color("ffca8d"),420,.6);shake=10
 		_:
 			if bool(def.get("dash_charge",false)): p["vel"]=_aim_vector()*500
-			if def.get("primary",false) and not def.get("charged",false):_sound("attack_heavy" if def.get("style","")=="heavy" else "attack_whoosh")
+			if def.get("primary",false) and not def.get("charged",false):_sound(AudioCues.primary_cue(def))
 
 func _attack_box(pos: Vector2, def: Dictionary, face: float) -> Rect2:
 	var reach: float=float(def.get("range",70))
@@ -1488,7 +1493,8 @@ func _update_hit_white(delta:float) -> void:
 func _hit_enemy(en:Dictionary,damage:float,color:Color,knockback:float=76,source:Vector2=Vector2.INF,direction:Vector2=Vector2.ZERO,gain_dream:bool=true,impact_duration:float=.125) -> void:
 	if float(en["hp"])<=0:return
 	if mode=="musou":damage*=dream.damage_factor()
-	_sound("impact_heavy" if p_attack.is_busy() and p_attack.attack.get("charged",false) else "impact_hit")
+	var heavy:bool=p_attack.is_busy() and p_attack.attack.get("charged",false)
+	_sound("impact_heavy" if heavy else AudioCues.actor_cue(en,"hit","impact_hit"))
 	en["flash_left"]=HIT_WHITE_SECONDS;en["_impact_time"]=clock
 	if int(en.get("model",0))!=4 or float(en.get("boss_impact_guard",0))<=0:
 		en["impact_freeze_left"]=impact_duration;en["impact_pose_clock"]=draw_clock
@@ -1539,7 +1545,7 @@ func _hurt_player(amount:float,source:Vector2,enemy_contact:bool=false,projectil
 		ui.flash_shield()
 		_effect(_body_box(p["pos"]).get_center(),Color("acddff"),110.0 if broken else 44.0,.45 if broken else .21)
 		shake=maxf(shake,26.0 if broken else 3.0)
-		_sound("parry")
+		_sound("shield_break" if broken else "shield_hit")
 		if not projectile:p["invul"]=2.0 if mode=="musou" else .55+_rune_effect("guard")
 		if enemy_contact:_knock_player_back(source)
 		_update_hud()
@@ -1639,7 +1645,7 @@ func _boss_summoning(en:Dictionary,delta:float) -> bool:
 	en["attack"].cancel()
 	en["charge_phase"]="idle";en["charge_left"]=0.0
 	en["motion_dash_left"]=0.0;en["motion_dash_wait"]=0.0
-	en["vel"]=Vector2.ZERO;en["summon_cast_left"]=.8;_sound("boss_summon")
+	en["vel"]=Vector2.ZERO;en["summon_cast_left"]=.8;_sound(AudioCues.actor_cue(en,"summon","boss_summon"))
 	_float(en["pos"]-Vector2(0,110),"召喚援軍",Color("ffbd89"))
 	return true
 
@@ -1665,6 +1671,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 					en["hp"]=en["max_hp"];en["pos"]=en["anchor"];en["vel"]=Vector2.ZERO
 					for key in ["hurt","stun","flash_left","push_left","impact_freeze_left"]:en[key]=0.0
 					en["tutorial_patrol_age"]=0.0
+					_sound("dummy_respawn")
 			else:
 				for key in ["hurt"]:en[key]=maxf(0,float(en.get(key,0))-delta)
 				var age:float=float(en.get("tutorial_patrol_age",0))+movement_delta
@@ -1727,11 +1734,11 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size,engaged,support)
 			if engaged and previous_charge!="active" and en.get("charge_phase","idle")=="active":
 				Juice.squash(en,Juice.LAUNCH,draw_clock,.15)
-				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else "enemy_ram"
-				_sound(cue if sounds.has(cue) else "enemy_ram")
+				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else AudioCues.actor_cue(en,"rush","enemy_ram")
+				_sound(cue)
 			if engaged and grounded and vel.y<-140 and Motion.current(en)=="jump":
 				Juice.squash(en,Juice.LAUNCH,draw_clock,.15)
-				_sound("boss_jump" if int(en["model"])==4 else "enemy_jump")
+				_sound(AudioCues.actor_cue(en,"jump","boss_jump" if int(en["model"])==4 else "enemy_jump"))
 		# A ram is one deliberately telegraphed attack, not a second movement attack.
 		if not frozen and float(en["stun"])<=0 and atk.is_active() and atk.attack.get("ram",false):
 			vel.x=float(atk.attack.get("ram_direction",en["face"]))*float(atk.attack.get("ram_speed",340))
@@ -1774,7 +1781,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 				var face:=Vector2(float(en["face"]),0)
 				var origin:Vector2=Vector2(en["pos"])+Vector2(face.x*8,float(atk.attack.get("origin_y",-30)))
 				visual_juice.flash(origin,face,draw_clock,"smear",clampf(float(atk.attack.get("range",75))*.65,32.0,145.0))
-			_sound(AudioCues.attack_cue(atk.attack))
+			_sound(AudioCues.enemy_attack_cue(en,atk.attack,int(atk.attack.get("audio_slot",-1))))
 			if atk.attack.get("poison_cloud",false):
 				poison_clouds.append({"pos":Vector2(en["pos"])+Vector2(float(en["face"])*48,-26),"left":3.0,"hostile":true})
 			elif atk.attack.get("library_kind","")=="trap":_emit_traps(en,atk.attack)
@@ -1834,13 +1841,14 @@ func _start_enemy_attack(en:Dictionary,definition:Dictionary) -> void:
 	if def.get("ram",false):def["ram_direction"]=float(en["face"])
 	def["direction"]="right" if float(en["face"])>0 else "left"
 	def["owner_uid"]=en["uid"]
+	def["audio_slot"]=en.get("attacks",[]).find(definition)
 	def["aim"]=(target-origin).normalized()
 	def["target"]=en["pos"]+(p["pos"]-en["pos"]).limit_length(float(def.get("range",500)))
 	for key in ["windup","active","recovery"]:def[key]=float(def[key])*phase_multiplier/maxf(.1,float(en.get("attack_speed",1)))
 	if mode=="musou" and int(en.get("model",0))!=4 and not def.get("ram",false) and not def.get("poison_cloud",false):Dream.instant(def)
 	if not str(def.get("boss_tell","")).is_empty():def["windup"]=maxf(.42,float(def["windup"]))
 	if en["attack"].begin(def):
-		if not str(def.get("boss_tell","")).is_empty():_sound("boss_warning")
+		if not str(def.get("boss_tell","")).is_empty():_sound(AudioCues.actor_cue(en,"warning","boss_warning"))
 		en["cooldown"]=float(def["windup"])+float(def["active"])+float(def["recovery"])+float(def.get("attack_cooldown",1.1))/maxf(.1,float(en.get("attack_speed",1)))
 
 func _enemy_body_box(en:Dictionary) -> Rect2:
@@ -2173,10 +2181,11 @@ func _block_effect(at:Vector2,clip:String="block") -> void:
 
 func _enemy_defeated(en: Dictionary) -> void:
 	if en.has("tutorial_respawn"):
+		_sound(AudioCues.actor_cue(en,"defeat","enemy_defeat"))
 		en["tutorial_respawn"]=3.0
 		return
 	if en.get("corpse_created",false):return
-	_sound("boss_defeat" if int(en.get("model",0))==4 else "enemy_defeat")
+	_sound(AudioCues.actor_cue(en,"defeat","boss_defeat" if int(en.get("model",0))==4 else "enemy_defeat"))
 	en["corpse_created"]=true
 	var body:Dictionary=CorpseField.create(en)
 	body["hit_actor"]=en
@@ -2206,6 +2215,7 @@ func _check_room_clear() -> void:
 	if enemies.any(func(enemy:Dictionary)->bool:return float(enemy["hp"])>0 and not enemy.get("training",false)):return
 	room["cleared"]=true
 	room_clear_slow_left=ROOM_CLEAR_SLOW_SECONDS
+	_sound("room_clear")
 	if room["type"]=="combat":return
 	hazards.clear()
 	if room["type"]=="elite":
@@ -2266,7 +2276,7 @@ func _update_drops_profiled_body(delta:float) -> void:
 			if drop["kind"]=="coin":picked_gold+=int(drop["value"])
 			else:_give_drop(str(drop["kind"]),int(drop["value"]))
 	if not cleared:CoinField.collide(drops)
-	if picked_gold>0:run_coins+=picked_gold;_sound("coin")
+	if picked_gold>0:run_coins+=picked_gold;_sound("coin_collect")
 	drops=drops.filter(func(drop:Dictionary)->bool:return not bool(drop["taken"]))
 	room["drops"]=drops
 
@@ -2296,7 +2306,7 @@ func _step_clear_loot_vortex(drop:Dictionary,target:Vector2,delta:float) -> bool
 	return progress>=1.0
 
 func _give_drop(kind: String, value: int) -> void:
-	_sound("coin")
+	_sound(str({"coin":"coin_collect","heal":"heal_finish","rune":"rune_collect","weapon":"weapon_collect","growth":"weapon_collect","upgrade":"rune_collect","item":"item_collect"}.get(kind,"item_collect")))
 	match kind:
 		"coin":run_coins+=value
 		"heal": _restore_vital("hp",1);_float(p["pos"]-Vector2(0,50),"+1 生命",Color("a9ecc1"))
@@ -2387,6 +2397,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 	if not room.is_empty():
 		room["enemies"]=enemies;room["drops"]=drops;room["corpses"]=corpses
 	if walker!=null:walker.reset();walker.reset_turn(float(p["face"]))
+	if current_room>=0 and current_room!=id:_sound("portal_enter")
 	current_room=id;room=tower["rooms"][id]
 	room["ecology"]=Ecology.from_stage(int(room["map_index"]))
 	if room["type"]=="start":last_checkpoint=id
@@ -2620,8 +2631,14 @@ func _load_meta() -> void:
 	for weapon in meta.get("weapons",[]):_unlock_blueprint(str(weapon.get("id","")))
 
 func _sound(id: String) -> void:
-	if audio_enabled and combat_audio!=null and sounds.has(id):
-		combat_audio.play_cue(id,sounds[id])
+	if not audio_enabled or combat_audio == null or id.is_empty():
+		return
+	var stream: AudioStream = sounds.get(id)
+	if stream == null:
+		stream = AudioCues.cue_stream(id)
+		if stream != null:
+			sounds[id] = stream
+	combat_audio.play_cue(id, stream)
 
 func _effect(at:Vector2,color:Color,radius:float,life:float) -> void:
 	if effects.size()>=MAX_PARTICLES: effects.pop_front()
@@ -2985,6 +3002,9 @@ func _update_hud_profiled_body() -> void:
 		["護盾回復",p.get("shield_recharge_left",0.0)],
 	]:
 		if float(effect[1])>0.0:timed_effects.append("%s  %d 秒"%[effect[0],ceili(float(effect[1]))])
+	var ultimate_full:bool=screen=="game" and _ultimate_progress()>=1.0
+	if ultimate_full and not p.get("ultimate_audio_full",false):_sound("ultimate_ready")
+	p["ultimate_audio_full"]=ultimate_full
 	ui.update_ultimate_hud(_ultimate_progress(),screen=="game")
 	ui.update_shield_hud(int(p.get("shield_cells",SHIELD_BASE_CELLS)),int(p.get("max_shield",SHIELD_BASE_CELLS)),timed_effects,screen=="game")
 	ui.update_trial(merchant_trial,room.get("stock",[]),run_coins)
@@ -3454,6 +3474,7 @@ func _update_home_profiled_body(delta:float) -> void:
 	camera_pos=camera_pos.lerp(_camera_target(p["pos"]),1.0-exp(-delta*10.0))
 
 func _wake_home() -> void:
+	_sound("home_wake")
 	home_sleeping=false;home_wake_left=.48
 
 
@@ -3716,6 +3737,7 @@ func _update_shield(delta:float) -> void:
 	while remaining<=.000001 and cells<capacity:
 		cells+=1
 		remaining+=SHIELD_RECHARGE_INTERVAL
+	if cells>int(p["shield_cells"]):_sound("shield_recover")
 	p["shield_cells"]=cells
 	p["shield_recharge_left"]=maxf(0.0,remaining) if cells<capacity else 0.0
 
@@ -3962,6 +3984,8 @@ func _prop_impact(prop:Dictionary,at:Vector2,direction:Vector2,break_apart:bool=
 	var art:Array=GothicProps.entry(prop,str(_ecology()["id"]))
 	if art.is_empty():return
 	prop["gothic_broken"]=true
+	var cue:String=str({"coin_urn":"prop_ceramic","ecology_object":"prop_plant","grass":"prop_plant","energy":"prop_plant","energy_infinite":"prop_plant","health":"prop_plant","launcher":"","fountain":"water_splash","spring":"water_splash","home_projector":"","chest":""}.get(prop["kind"],"prop_wood"))
+	_sound(cue)
 	if static_props!=null:static_props.invalidate()
 	if effects.size()>=MAX_PARTICLES:effects.pop_front()
 	effects.append({"prop_fragment":art,"pos":at,"color":Color.WHITE,"life":.75,"max":.75,"ring":false,"radius":0.0,"vel":direction*270.0+Vector2(0,-140.0)})
@@ -4011,7 +4035,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 				Stones.launch(prop,direction,damage)
 			_prop_impact(prop,center,direction,false)
 			_particles(center,Color("bca58d"),6,100)
-			_sound("metal_hit")
+			_sound("prop_stone")
 			continue
 		if prop["kind"]=="home_projector":
 			if not prop["used"] and damage>0:
@@ -4024,7 +4048,7 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 					if int(prop["hits"])>=3:
 						prop["break_origin"]=center;prop["broken_at"]=clock;prop["used"]=true
 					_prop_impact(prop,center,_prop_strike_direction(source,center),prop["used"])
-					_sound("metal_hit")
+					_sound("prop_stone")
 			continue
 		if prop["kind"]=="spikes":
 			if attack_id<0 and p_attack.attack.get("direction","")=="down" and box.intersects(prop["rect"]) and p_attack.mark_hit(-10000-i):
@@ -4408,12 +4432,12 @@ func _damage_traps(box:Rect2,damage:float,gain_dream:bool=true) -> void:
 		if hazard.get("from_player",false) or float(hazard.get("hp",1))<=0:continue
 		if box.intersects(TrapArt.body_box(hazard)):
 			if hazard.get("pogoable",false) and p_attack.is_active() and p_attack.attack.get("direction","")=="down" and not p["grounded"]:_pogo();_melee_hitstop()
-			hazard["hp"]=0.0;_contact_fx("block",hazard["pos"]-Vector2(0,15));_particles(hazard["pos"],Color("d0e9c8"),8,100)
+			hazard["hp"]=0.0;_sound("trap_break");_contact_fx("block",hazard["pos"]-Vector2(0,15));_particles(hazard["pos"],Color("d0e9c8"),8,100)
 			if mode=="musou" and gain_dream and damage>0:dream.hit()
 	for pr in projectiles:
 		if not pr.get("trap_carrier",false) or pr.get("from_player",false) or float(pr["life"])<=0:continue
 		if box.has_point(pr["pos"]):
-			pr["life"]=0;pr["destroyed"]=true;_contact_fx("block",pr["pos"])
+			pr["life"]=0;pr["destroyed"]=true;_sound("trap_break");_contact_fx("block",pr["pos"])
 			if mode=="musou" and gain_dream and damage>0:dream.hit()
 
 func _open_chest(chest:Dictionary) -> void:
@@ -4427,10 +4451,11 @@ func _open_chest(chest:Dictionary) -> void:
 	if chest.get("guaranteed_strong",false):_drop("rune",at+Vector2(35,-30),Data.RUNES.size()+rng.randi_range(0,Data.STRONG_RUNES.size()-1))
 	elif rng.randf()<.5:_drop("rune",at+Vector2(35,-30),_random_rune_index())
 	else:_drop("weapon",at+Vector2(35,-30),Arsenal.random_index(rng))
-	_feather_burst(at-Vector2(0,25),12);_sound("coin");_toast("寶箱已開啟！")
+	_feather_burst(at-Vector2(0,25),12);_sound("chest_open");_toast("寶箱已開啟！")
 
 func _show_merchant(index:int=-1) -> void:
 	if room.get("type","")!="merchant":return
+	_sound("merchant_greet")
 	if not room.has("stock"):room["stock"]=Sanctuary.stock(int(room.get("map_index",0)))
 	if index<0:index=Sanctuary.nearest_stock(room["stock"],p["pos"])
 	var entries:Array[Dictionary]=[]
@@ -4501,12 +4526,12 @@ func _merchant_buy(index:int) -> void:
 	else:_give_drop("rune",int(item["value"]))
 	# The stock and payment commit only after the item has actually been granted.
 	run_coins-=int(item["price"]);item["sold"]=true
-	_close_panel();_sound("coin");_toast("購買完成，商品已正式加入行囊");_update_hud()
+	_close_panel();_sound("coin_collect");_toast("購買完成，商品已正式加入行囊");_update_hud()
 
 func _adapt_boss(en:Dictionary) -> void:
 	if en.get("adapted",false) or float(en.get("hp",0))<=0:return
 	en["adapted"]=true
-	_sound("boss_phase")
+	_sound(AudioCues.actor_cue(en,"phase","boss_phase"))
 	en["attacks"].append(Combat.boss_phase_two(en))
 	en["adaptations"]=["新攻擊"]
 	_float(en["pos"]-Vector2(0,110),"首領覺醒",Color("ffbd89"));_toast(str(en["name"])+"進入第二階段：新招式已解放")
@@ -5012,7 +5037,7 @@ func _launch_from_object(prop:Dictionary,strike:Vector2) -> void:
 	_restore_ground_movement()
 	prop["launch_left"]=.625;prop["launch_cooldown"]=.45
 	if not strike.is_zero_approx():prop["launch_hit_cooldown"]=.15
-	_sound("mushroom_pogo" if down_cut else "mushroom_bounce")
+	_sound("mushroom_pogo" if down_cut else ("mushroom_side" if side_cut else "mushroom_bounce"))
 
 func _unlock_blueprint(id:String) -> void:
 	if Arsenal.index_of(id)<0:return

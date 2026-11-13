@@ -26,7 +26,7 @@ func run() -> void:
 		check(boss["attacks"].size()==3 and boss["movements"].size()>=2,"Boss has a bespoke attack and movement set")
 		check(boss["attacks"].any(func(attack:Dictionary)->bool:return attack.has("boss_tell")),"Boss has a visible tell for a major attack")
 		for attack:Dictionary in boss["attacks"]:
-			check(ResourceLoader.exists("res://assets/v55/boss_sounds/"+attack["boss_sound"]+".mp3"),"Boss attack cue is packed")
+			check(preload("res://scripts/combat_audio_v63.gd").cue_stream("boss_"+attack["boss_sound"])!=null,"Boss attack cue is packed")
 	var g=load("res://main.tscn").instantiate()
 	root.add_child(g)
 	await process_frame
