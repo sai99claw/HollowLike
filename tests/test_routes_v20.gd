@@ -20,6 +20,7 @@ func is_open(grid:Array,cell:Vector2i) -> bool:
 func run() -> void:
 	var walls:int=0
 	var mushrooms:int=0
+	var platforms:int=0
 	var rooms:int=0
 	for seed_value in 10:
 		var tower:Dictionary=Tower.generate(seed_value)
@@ -42,11 +43,12 @@ func run() -> void:
 					check(left or right,"Climbing uses a continuous rock face")
 					check(link["step_height"]==Scale.TILE_HEIGHT,"Wall routes do not need assisted vertical tiers")
 				else:
-					mushrooms+=1
-					check(plan["launchers"].has(feet),"An open vertical link gets a launch mushroom")
-					check(link["step_height"]<=Motion.BASE_JUMP_HEIGHT*3.0*.30,"Mushroom path is planned at 30% of actual down-cut height")
-					var approach:=Rect2(feet-Vector2(17,42),Vector2(34,41.9))
-					check(not layout["solids"].any(func(rock:Rect2)->bool:return approach.intersects(rock)),"Mushroom has room for the player at launch")
+					platforms+=1
+					check(link["step_height"]<=Motion.BASE_JUMP_HEIGHT,"Vertical fallback tiers are within a single jump")
+					if link["method"]=="mushroom":
+						mushrooms+=1
+						check(link["open_height_cells"]>5 and plan["launchers"].has(feet),"Mushrooms only aid an open ascent greater than five cells")
+						check(layout["one_way"].any(func(ledge:Rect2)->bool:return is_equal_approx(ledge.position.y,feet.y) and feet.x>ledge.position.x and feet.x<ledge.end.x),"Navigation mushroom is rooted on a jump platform")
 			var cells:Dictionary={}
 			for cell:Vector2i in plan["cells"]:cells[cell]=true
 			var start:Vector2i=plan["start"]
@@ -64,9 +66,8 @@ func run() -> void:
 				check(reached.has(target),"Door or reward has a route with available movement")
 			check(plan["targets"].has(Vector2i(1,1)) and plan["targets"].has(Vector2i(grid[0].size()-2,1)),"Both upper corners are checked")
 			for span:Array in plan["horizontal_links"]:
-				for i in range(1,span.size()):
-					check(span[i]!=span[i-1],"Long spans alternate mushroom and platform")
-	check(rooms>80 and walls>0 and mushrooms>0,"Seeded rooms exercise walls and mushrooms")
+				check(span.all(func(support:String)->bool:return support=="platform"),"Horizontal gaps only use platforms")
+	check(rooms>80 and walls>0 and platforms>0 and mushrooms>0,"Seeded rooms exercise walls and platforms")
 	var game=load("res://main.tscn").instantiate()
 	game.audio_enabled=false
 	root.add_child(game)

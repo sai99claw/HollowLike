@@ -27,7 +27,7 @@ func run() -> void:
 	check(g.p["jumps"]==2 and g.p["flap_left"]>0,"Home allows double jump before exploration unlocks")
 	g._set_action("dash",true);g._physics_process(.06);g._set_action("dash",false);g._set_action("dash",true);g._physics_process(.06)
 	check(g.p_attack.attack.get("kind","")=="pierce","Home allows double-C wind movement")
-	g._configure_home();g._clear_keys();g._reset_player(Vector2(455,600));g._physics_process(.01)
+	g._configure_home();g._clear_keys();g._reset_player(Vector2(455,533));g._physics_process(.01)
 	check(is_equal_approx(g.p["vel"].y,-g.JUMP_SPEED*.38) and not g.p["grounded"],"Home contact lightly rebounds without the down-strike impulse")
 	g._configure_home();g._clear_keys();g._reset_player(Vector2(790,600));g._interact();check(g.ui.is_panel_open(),"Adventure records are an actual nearby station")
 	g._close_panel();g._reset_player(Vector2(1080,600))

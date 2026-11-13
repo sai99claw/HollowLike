@@ -29,6 +29,7 @@ func _ready() -> void:
 	variation.randomize()
 	for index in VOICE_COUNT:
 		var voice := AudioStreamPlayer.new()
+		voice.bus = "Effects"
 		voices.append(voice)
 		add_child(voice)
 

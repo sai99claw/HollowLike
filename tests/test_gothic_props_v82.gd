@@ -32,13 +32,20 @@ func run() -> void:
 	game._hit_props(Rect2(590,610,90,100),1,1,Vector2(570,650))
 	check(plant.get("gothic_broken",false) and plant["pos"]==Vector2(620,700),"Damaged base stays at the original position")
 	check(game.effects.any(func(fx:Dictionary)->bool:return fx.has("prop_flash")),"Strike adds the straight flash")
-	var fragments:Array=game.effects.filter(func(fx:Dictionary)->bool:return fx.has("prop_fragment"))
+	var fragments:Array=game._room_fragments()
 	check(fragments.size()==1 and fragments[0]["vel"].x>0 and fragments[0]["vel"].y<0,"The separate shard is launched away from the strike")
 	var origin:Vector2=fragments[0]["pos"]
 	game._update_visual_effects(.1)
 	check(fragments[0]["pos"]!=origin and plant["pos"]==Vector2(620,700),"Flying shard moves independently of the remnant")
 	game._hit_props(Rect2(590,610,90,100),1,1,Vector2(570,650))
-	check(game.effects.filter(func(fx:Dictionary)->bool:return fx.has("prop_fragment")).size()==1,"A shattered object cannot produce duplicate shards")
+	check(game._room_fragments().size()==1,"A shattered object cannot produce duplicate shards")
+	game.solids.assign([Rect2(0,790,game._room_size().x,40)])
+	var rebounds:int=0
+	for i in 1000:
+		var was_falling:bool=fragments[0]["vel"].y>0
+		game._step_fragments(1.0/120.0)
+		if was_falling and fragments[0]["vel"].y<0:rebounds+=1
+	check(rebounds>=2 and fragments[0].get("sleeping",false),"Shard bounces more than once and remains at rest")
 	var mushroom:Dictionary={"kind":"launcher","pos":Vector2(620,700),"hurt":0.0,"navigation":true}
 	game._launch_from_object(mushroom,Vector2.ZERO)
 	var light:float=game.p["vel"].y

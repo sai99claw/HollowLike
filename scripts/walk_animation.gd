@@ -24,7 +24,7 @@ var voice_index:int=0
 var emitted_events:int=0
 func _ready() -> void:
 	for i in 3:
-		var voice:=AudioStreamPlayer.new();voice.volume_db=-8;add_child(voice);voices.append(voice)
+		var voice:=AudioStreamPlayer.new();voice.volume_db=-8;voice.bus="Effects";add_child(voice);voices.append(voice)
 static func ensure() -> bool:
 	if manifest.is_empty() and FileAccess.file_exists(ROOT+"manifest.json"):
 		manifest=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"manifest.json"))

@@ -17,6 +17,20 @@ func run() -> void:
 	var game: Node = preload("res://main.tscn").instantiate()
 	game.audio_enabled = false
 	root.add_child(game)
+	var background:=AudioServer.get_bus_index("Background")
+	var effects:=AudioServer.get_bus_index("Effects")
+	check(background>0 and effects>0 and background!=effects,"Independent audio buses are loaded")
+	game._set_audio_volume("Background",0.0)
+	game._set_audio_volume("Effects",.5)
+	check(AudioServer.is_bus_mute(background) and not AudioServer.is_bus_mute(effects),"Silencing background leaves effects enabled")
+	check(is_equal_approx(AudioServer.get_bus_volume_db(effects),linear_to_db(.5)),"Effects gain is independent")
+	game._save_settings()
+	check(game.meta["settings"]["background_volume"]==0.0 and game.meta["settings"]["sfx_volume"]==.5,"Both gains are saved")
+	game._load_settings()
+	check(game.background_volume==0.0 and game.sfx_volume==.5,"Both gains reload")
+	check(game.room_music.bus=="Background" and game.combat_audio.voices[0].bus=="Effects","Music and gameplay use separate buses")
+	game.room_music.select("combat","underground")
+	check(game.room_music.current_title=="Subterranean_Roots_Ambient" and game.room_music.stream!=null,"Underground combat uses the supplied track")
 	game.room_music.stream = null
 	for weapon in Cues.Data.SECONDARY:
 		var id := Cues.attack_cue(weapon)
@@ -59,7 +73,7 @@ func run() -> void:
 	check(Cues.primary_cue(Cues.Data.action_attack("up",false,false)) == "attack_up", "Up slash uses its own cue")
 	check(Cues.primary_cue(Cues.Data.action_attack("down",false,false)) == "attack_down", "Down slash uses its own cue")
 	game.audio_enabled = true
-	game._reset_player(Vector2(440, 600))
+	game._reset_player(Vector2(610, 600))
 	game.jump_request = true
 	game._update_player(.016)
 	game.jump_request = true

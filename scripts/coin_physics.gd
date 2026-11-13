@@ -91,7 +91,7 @@ static func step(drop: Dictionary, delta: float, platforms: Array, bounds: Rect2
 					velocity.y = 0.0
 					grounded = true
 				else:
-					velocity += normal * incoming * (1.0 + RESTITUTION)
+					velocity += normal * incoming * (1.0 + float(drop.get("restitution", RESTITUTION)))
 					grounded = false
 				if absf(normal.y) > 0.5:
 					# A rolling coin keeps its tangent speed across the expanded ledge corner.

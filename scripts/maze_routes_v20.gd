@@ -6,7 +6,7 @@ extends RefCounted
 const Scale=preload("res://scripts/world_scale_v17.gd")
 const TILE:float=Scale.TILE
 const Motion=preload("res://scripts/player_motion_v18.gd")
-const MUSHROOM_CHECK_HEIGHT:float=Motion.BASE_JUMP_HEIGHT*3.0*.30
+const MUSHROOM_MIN_CELLS:int=5
 const DIRS:Array[Vector2i]=[Vector2i.UP,Vector2i.RIGHT,Vector2i.LEFT,Vector2i.DOWN]
 static func generate(maze,seed_value:int) -> Dictionary:
 	var width:int=maze.config.width;var height:int=maze.config.height
@@ -48,7 +48,7 @@ static func generate(maze,seed_value:int) -> Dictionary:
 				var to:Vector2i=at+step
 				if not costs.has(to):continue
 				var cost:float=float(distances[at])+float(costs[to])
-				if step.y!=0 and vertical_method(maze,at if step.y<0 else to)=="mushroom":cost+=1.8
+				if step.y!=0 and vertical_method(maze,at if step.y<0 else to)=="platform":cost+=1.8
 				if cost>=float(distances.get(to,INF)):continue
 				distances[to]=cost;previous[to]=at
 				if not pending.has(to):pending.append(to)
@@ -58,20 +58,31 @@ static func generate(maze,seed_value:int) -> Dictionary:
 	var bridges:Array[Rect2]=[]
 	var launchers:Array[Vector2]=[]
 	var climbs:Array[Dictionary]=[]
+	var launcher_links:Dictionary={}
+	for cell:Vector2i in network:
+		if not network.has(cell+Vector2i.UP) or vertical_method(maze,cell)!="platform":continue
+		if network.has(cell+Vector2i.DOWN) and vertical_method(maze,cell+Vector2i.DOWN)=="platform":continue
+		var run:int=0
+		var current:Vector2i=cell
+		while network.has(current+Vector2i.UP) and vertical_method(maze,current)=="platform":
+			run+=1
+			current+=Vector2i.UP
+		if run>MUSHROOM_MIN_CELLS:launcher_links[cell]=run
 	for cell:Vector2i in network:
 		if not network.has(cell+Vector2i.UP):continue
 		var method:String=vertical_method(maze,cell)
 		var feet:Vector2=(Vector2(cell)+Vector2(.5,1.0))*Scale.CELL_SIZE
-		var tier_count:int=ceili(Scale.TILE_HEIGHT/MUSHROOM_CHECK_HEIGHT) if method=="mushroom" else 1
+		var tall_run:int=int(launcher_links.get(cell,0))
+		var tier_count:int=ceili(Scale.TILE_HEIGHT/(Motion.BASE_JUMP_HEIGHT*.82)) if method=="platform" else 1
 		var rise:float=Scale.TILE_HEIGHT/tier_count
-		climbs.append({"from":cell,"to":cell+Vector2i.UP,"method":method,"feet":feet,"step_height":rise})
-		if method!="mushroom":continue
+		climbs.append({"from":cell,"to":cell+Vector2i.UP,"method":"mushroom" if tall_run>0 else method,"feet":feet,"step_height":rise,"open_height_cells":tall_run})
+		if method=="wall":continue
 		for tier in tier_count:
 			var at:Vector2=feet-Vector2(0,tier*rise)
-			if tier%2==0:
-				if not launchers.has(at):launchers.append(at)
-			else:
-				bridges.append(Rect2(at-Vector2(TILE*.5,0),Vector2(TILE,9)))
+			if tier==0 and tall_run>0:launchers.append(at)
+			if tier==0 and not maze.is_floor(cell+Vector2i.DOWN) and tall_run==0:continue
+			var ledge:=Rect2(at-Vector2(TILE*.5,0),Vector2(TILE,9))
+			if not bridges.has(ledge):bridges.append(ledge)
 	# Keep long horizontal gaps traversable without creating a continuous floor.
 	var horizontal_links:Array[Array]=[]
 	for y in range(1,height-1):
@@ -82,16 +93,11 @@ static func generate(maze,seed_value:int) -> Dictionary:
 			while x<width-1 and network.has(Vector2i(x,y)) and maze.is_floor(Vector2i(x,y+1)):x+=1
 			if x-first<=2:continue
 			var supports:Array[String]=[]
-			for column in range(first,x):
+			for column in range(first,x,2):
 				var at:=Vector2((column+.5)*TILE,(y+1)*Scale.TILE_HEIGHT)
-				var mushroom:bool=(column-first)%2==1 or launchers.has(at)
-				if not supports.is_empty():mushroom=supports.back()!="mushroom"
-				if mushroom:
-					if not launchers.has(at):launchers.append(at)
-					supports.append("mushroom")
-				else:
-					bridges.append(Rect2(at-Vector2(TILE*.5,0),Vector2(TILE,9)))
-					supports.append("platform")
+				var ledge:=Rect2(at-Vector2(TILE*.5,0),Vector2(TILE,9))
+				if not bridges.has(ledge):bridges.append(ledge)
+				supports.append("platform")
 			horizontal_links.append(supports)
 	return {"bridges":bridges,"launchers":launchers,"climbs":climbs,"cells":network.keys(),"start":start,"targets":targets,"horizontal_links":horizontal_links}
 
@@ -99,4 +105,4 @@ static func vertical_method(maze,lower:Vector2i) -> String:
 	var upper:=lower+Vector2i.UP
 	for side:Vector2i in [Vector2i.LEFT,Vector2i.RIGHT]:
 		if not maze.is_floor(lower+side) and not maze.is_floor(upper+side):return "wall"
-	return "mushroom"
+	return "platform"

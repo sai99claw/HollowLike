@@ -62,7 +62,7 @@ func _ready() -> void:
 		var rain_gradient:=Gradient.new();rain_gradient.offsets=PackedFloat32Array([0,.35,.65,1]);rain_gradient.colors=PackedColorArray([Color(1,1,1,0),Color.WHITE,Color.WHITE,Color(1,1,1,0)]);streak.gradient=rain_gradient;rain.texture=streak
 		rain.modulate=Color(.72,.83,.9,.14 if depth==0 else .22);rain.scale_amount_min=.45;rain.scale_amount_max=.8;rain.material=_blur
 		add_child(rain);rain_layers.append(rain)
-	rain_audio=AudioStreamPlayer.new();rain_audio.name="RoomRainAmbience";rain_audio.stream=load("res://assets/atmosphere_v10/rain.wav");rain_audio.volume_db=-18
+	rain_audio=AudioStreamPlayer.new();rain_audio.name="RoomRainAmbience";rain_audio.bus="Background";rain_audio.stream=load("res://assets/atmosphere_v10/rain.wav");rain_audio.volume_db=-18
 	var rain_stream:AudioStreamWAV=rain_audio.stream;rain_stream.loop_mode=AudioStreamWAV.LOOP_FORWARD;rain_stream.loop_begin=0;rain_stream.loop_end=rain_stream.data.size()/2
 	add_child(rain_audio)
 func configure(ecology_id:String,seed_value:int,enabled:bool=true,merchant:bool=false,quiet:bool=false,_layout:Dictionary={},background:Rect2=Rect2()) -> void:

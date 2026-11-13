@@ -28,6 +28,8 @@ static func build(ui,game,category:String) -> void:
 			if game.display_fit=="cover":_display_zoom(ui,right,game.display_zoom,game.DISPLAY_ZOOM_MAX)
 			Station._button(ui,right,"特效量："+("精簡" if game.low_effects else "標準"),"effects",null,"settings:effects")
 			Station._button(ui,right,"音樂與音效："+("開" if game.audio_enabled else "關"),"audio",null,"settings:audio")
+			_slider(ui,right,"背景音量","background_volume",0,1,.05,game.background_volume,"%d%%",100)
+			_slider(ui,right,"特效音量","sfx_volume",0,1,.05,game.sfx_volume,"%d%%",100)
 			Station._text(ui,right,"精簡模式保留投射物軌跡、命中回饋與地面燃燒。",15)
 		"practice":
 			Station._text(ui,right,"練習與檢查",22,ui.GOLD)
@@ -52,10 +54,10 @@ static func build(ui,game,category:String) -> void:
 			Station._button(ui,right,"Roguelike · 戰士鴿子","start_rogue",null,"settings:rogue")
 			Station._button(ui,right,"回鳥巢（結束本次）","hub",null,"settings:hub")
 	ui.call_deferred("focus_first")
-static func _slider(ui,parent:Node,title:String,action:String,min_value:float,max_value:float,step:float,value:float) -> void:
-	var caption:Label=Station._text(ui,parent,title+" %.2f×"%value,17,ui.INK)
+static func _slider(ui,parent:Node,title:String,action:String,min_value:float,max_value:float,step:float,value:float,format:String="%.2f×",display_scale:float=1.0) -> void:
+	var caption:Label=Station._text(ui,parent,title+" "+format%(value*display_scale),17,ui.INK)
 	var slider:=HSlider.new();slider.min_value=min_value;slider.max_value=max_value;slider.step=step;slider.value=value;slider.custom_minimum_size.y=35;slider.set_meta("station_key","settings:"+action);parent.add_child(slider)
-	slider.value_changed.connect(func(next:float)->void:caption.text=title+" %.2f×"%next;ui.action_requested.emit(action,next))
+	slider.value_changed.connect(func(next:float)->void:caption.text=title+" "+format%(next*display_scale);ui.action_requested.emit(action,next))
 
 
 static func _display_zoom(ui,parent:Node,value:float,max_value:float) -> void:

@@ -554,40 +554,54 @@
     {
       "id": "attack_heavy",
       "context": "鴿子、道具與場景",
-      "description": "厚重刃身低頻帶短刀鳴",
-      "seconds": 0.288,
-      "peak_dbtp": -8,
+      "description": "大刀帶著更寬、更低的風壓切過，尾段迅速收束。",
+      "seconds": 0.268,
+      "peak_dbtp": -6,
       "seed": 2423797825,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 0.42,
           "at": 0,
-          "seconds": 0.27,
+          "seconds": 0.243,
+          "gain": 1,
           "args": {
-            "d": 0.27,
-            "lo": 403.2,
-            "hi": 2562.0
-          }
+            "d": 0.243,
+            "lo": 123,
+            "hi": 1080
+          },
+          "band": [
+            98.4,
+            1166.4
+          ]
         },
         {
-          "recipe": "ding",
-          "gain": 0.2214,
-          "at": 0,
-          "seconds": 0.23,
+          "recipe": "whoosh",
+          "at": 0.032,
+          "seconds": 0.153,
+          "gain": 0.49,
           "args": {
-            "f": 234
+            "d": 0.153,
+            "lo": 80,
+            "hi": 470
           },
-          "decay": 0.062
+          "band": [
+            64.0,
+            507.6
+          ]
         },
         {
           "recipe": "thump",
-          "gain": 0.22,
-          "at": 0,
-          "seconds": 0.2,
+          "at": 0.036,
+          "seconds": 0.115,
+          "gain": 0.25,
           "args": {
-            "f": 82.08
-          }
+            "f": 77
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.046000000000000006
         }
       ]
     },
@@ -786,40 +800,54 @@
     {
       "id": "dream_slash",
       "context": "鴿子、道具與場景",
-      "description": "滿能量寬幅刀鳴與延展氣流",
-      "seconds": 0.418,
-      "peak_dbtp": -8,
+      "description": "夢境羽刃以寬厚低風擴開，尾部仍保留切風輪廓。",
+      "seconds": 0.46,
+      "peak_dbtp": -6,
       "seed": 591399125,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 0.39,
           "at": 0,
           "seconds": 0.4,
+          "gain": 1,
           "args": {
             "d": 0.4,
-            "lo": 626.4,
-            "hi": 3538.0
-          }
+            "lo": 140,
+            "hi": 1420
+          },
+          "band": [
+            112.0,
+            1533.6000000000001
+          ]
         },
         {
-          "recipe": "ding",
-          "gain": 0.2132,
-          "at": 0,
-          "seconds": 0.33,
+          "recipe": "whoosh",
+          "at": 0.066,
+          "seconds": 0.31,
+          "gain": 0.61,
           "args": {
-            "f": 446
+            "d": 0.31,
+            "lo": 96,
+            "hi": 630
           },
-          "decay": 0.089
+          "band": [
+            76.80000000000001,
+            680.4000000000001
+          ]
         },
         {
           "recipe": "thump",
-          "gain": 0.23,
-          "at": 0,
-          "seconds": 0.28,
+          "at": 0.027,
+          "seconds": 0.14,
+          "gain": 0.35,
           "args": {
-            "f": 84.96
-          }
+            "f": 85
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.05600000000000001
         }
       ]
     },
@@ -4066,121 +4094,160 @@
     {
       "id": "attack_whoosh",
       "context": "鴿子｜水平 A1",
-      "description": "短而帶齒的羽刃，刃尖切過時有一點高頻亮邊。",
-      "seconds": 0.17,
+      "description": "短促的低沉羽刃切風，氣流中段收窄後迅速切斷。",
+      "seconds": 0.149,
       "peak_dbtp": -8,
       "seed": 1779209644,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 1,
           "at": 0,
-          "seconds": 0.153,
+          "seconds": 0.136,
+          "gain": 1,
           "args": {
-            "d": 0.153,
-            "lo": 790,
-            "hi": 4800
-          }
+            "d": 0.136,
+            "lo": 185,
+            "hi": 1160
+          },
+          "band": [
+            148.0,
+            1252.8000000000002
+          ]
         },
         {
-          "recipe": "click",
-          "gain": 0.2,
-          "at": 0.034,
-          "seconds": 0.022,
+          "recipe": "whoosh",
+          "at": 0.012,
+          "seconds": 0.092,
+          "gain": 0.34,
           "args": {
-            "pitch": 1.15
-          }
+            "d": 0.092,
+            "lo": 92,
+            "hi": 570
+          },
+          "band": [
+            73.60000000000001,
+            615.6
+          ]
         }
       ]
     },
     {
       "id": "attack_reverse",
       "context": "鴿子｜水平 A2",
-      "description": "反手刃的風較圓厚，末端羽梗回撥一聲。",
-      "seconds": 0.18,
+      "description": "反手切風更圓厚，低風先掠過，後段略微向下沉。",
+      "seconds": 0.168,
       "peak_dbtp": -8,
       "seed": 532501660,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 1,
           "at": 0,
-          "seconds": 0.159,
+          "seconds": 0.151,
+          "gain": 1,
           "args": {
-            "d": 0.159,
-            "lo": 690,
-            "hi": 4080
-          }
+            "d": 0.151,
+            "lo": 155,
+            "hi": 930
+          },
+          "band": [
+            124.0,
+            1004.4000000000001
+          ]
         },
         {
-          "recipe": "clack",
-          "gain": 0.23,
-          "at": 0.073,
-          "seconds": 0.038,
+          "recipe": "whoosh",
+          "at": 0.027,
+          "seconds": 0.102,
+          "gain": 0.42,
           "args": {
-            "pitch": 1.48
-          }
+            "d": 0.102,
+            "lo": 106,
+            "hi": 644
+          },
+          "band": [
+            84.80000000000001,
+            695.5200000000001
+          ]
         }
       ]
     },
     {
       "id": "attack_up",
       "context": "鴿子｜上砍",
-      "description": "翼尖從胸前掀到頭頂，細風和微亮的羽管音往上拔。",
-      "seconds": 0.183,
+      "description": "低風由胸前往上拔，尾段略抬高，像翼面掀開空氣。",
+      "seconds": 0.161,
       "peak_dbtp": -8,
       "seed": 3853882204,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 1,
           "at": 0,
-          "seconds": 0.16,
+          "seconds": 0.137,
+          "gain": 1,
           "args": {
-            "d": 0.16,
-            "lo": 970,
-            "hi": 4750
-          }
+            "d": 0.137,
+            "lo": 165,
+            "hi": 740
+          },
+          "band": [
+            132.0,
+            799.2
+          ]
         },
         {
-          "recipe": "pop",
-          "gain": 0.31,
-          "at": 0.033,
-          "seconds": 0.098,
+          "recipe": "whoosh",
+          "at": 0.049,
+          "seconds": 0.093,
+          "gain": 0.42,
           "args": {
-            "f0": 480,
-            "f1": 980
-          }
+            "d": 0.093,
+            "lo": 260,
+            "hi": 1120
+          },
+          "band": [
+            208.0,
+            1209.6000000000001
+          ]
         }
       ]
     },
     {
       "id": "attack_down",
       "context": "鴿子｜下砍",
-      "description": "趾爪先有乾點，向後抓踢帶一截下沉硬風。",
-      "seconds": 0.168,
+      "description": "抓踢時一道壓向地面的厚風，低尾在下一拍前收乾。",
+      "seconds": 0.154,
       "peak_dbtp": -8,
       "seed": 2854242452,
       "layers": [
         {
-          "recipe": "clack",
-          "gain": 0.4,
+          "recipe": "whoosh",
           "at": 0,
-          "seconds": 0.041,
+          "seconds": 0.143,
+          "gain": 1,
           "args": {
-            "pitch": 1.2
-          }
+            "d": 0.143,
+            "lo": 137,
+            "hi": 940
+          },
+          "band": [
+            109.60000000000001,
+            1015.2
+          ]
         },
         {
           "recipe": "whoosh",
-          "gain": 0.9,
-          "at": 0.013,
-          "seconds": 0.145,
+          "at": 0.033,
+          "seconds": 0.097,
+          "gain": 0.48,
           "args": {
-            "d": 0.145,
-            "lo": 500,
-            "hi": 3250
-          }
+            "d": 0.097,
+            "lo": 83,
+            "hi": 470
+          },
+          "band": [
+            66.4,
+            507.6
+          ]
         }
       ]
     },
@@ -4219,91 +4286,108 @@
     {
       "id": "charge_release",
       "context": "鴿子｜主武器放出蓄力",
-      "description": "厚羽刃瞬間鬆開，亮金屬切風後留下低沉空氣尾。",
-      "seconds": 0.45,
+      "description": "蓄力釋放時兩層低沉氣流先後切過，中心短促下沉。",
+      "seconds": 0.362,
       "peak_dbtp": -5.5,
       "seed": 1028531359,
       "layers": [
         {
           "recipe": "whoosh",
-          "gain": 1,
           "at": 0,
-          "seconds": 0.34,
+          "seconds": 0.337,
+          "gain": 1,
           "args": {
-            "d": 0.34,
-            "lo": 560,
-            "hi": 5100
-          }
+            "d": 0.337,
+            "lo": 119,
+            "hi": 1220
+          },
+          "band": [
+            95.2,
+            1317.6000000000001
+          ]
         },
         {
-          "recipe": "ding",
-          "gain": 0.42,
-          "at": 0.052,
-          "seconds": 0.25,
+          "recipe": "whoosh",
+          "at": 0.062,
+          "seconds": 0.23,
+          "gain": 0.57,
           "args": {
-            "f": 682
+            "d": 0.23,
+            "lo": 83,
+            "hi": 540
           },
-          "decay": 0.068
+          "band": [
+            66.4,
+            583.2
+          ]
         },
         {
           "recipe": "thump",
-          "gain": 0.6,
-          "at": 0,
-          "seconds": 0.29,
+          "at": 0.036,
+          "seconds": 0.157,
+          "gain": 0.42,
           "args": {
-            "f": 96
-          }
+            "f": 78
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.06280000000000001
         }
       ]
     },
     {
       "id": "ultimate_cast",
       "context": "鴿子｜S 羽刃大招",
-      "description": "中心壓力炸開，三圈羽刃連續掃出，最後留低沉環鳴。",
-      "seconds": 0.76,
+      "description": "羽刃大招以低壓向外展開，兩層厚風接連擴散。",
+      "seconds": 0.64,
       "peak_dbtp": -3,
       "seed": 3645954593,
       "layers": [
         {
-          "recipe": "explosion",
-          "gain": 0.85,
+          "recipe": "whoosh",
           "at": 0,
-          "seconds": 0.55,
+          "seconds": 0.46,
+          "gain": 1,
           "args": {
-            "d": 0.55
-          }
+            "d": 0.46,
+            "lo": 117,
+            "hi": 1390
+          },
+          "band": [
+            93.60000000000001,
+            1501.2
+          ]
         },
         {
           "recipe": "whoosh",
-          "gain": 1,
-          "at": 0,
+          "at": 0.134,
           "seconds": 0.42,
+          "gain": 0.71,
           "args": {
             "d": 0.42,
-            "lo": 460,
-            "hi": 3900
-          }
-        },
-        {
-          "recipe": "whoosh",
-          "gain": 0.72,
-          "at": 0.096,
-          "seconds": 0.43,
-          "args": {
-            "d": 0.43,
-            "lo": 690,
-            "hi": 5300
-          }
-        },
-        {
-          "recipe": "ding",
-          "gain": 0.6,
-          "at": 0.134,
-          "seconds": 0.5,
-          "args": {
-            "f": 362
+            "lo": 94,
+            "hi": 819
           },
-          "decay": 0.135
+          "band": [
+            75.2,
+            884.5200000000001
+          ]
+        },
+        {
+          "recipe": "thump",
+          "at": 0.044,
+          "seconds": 0.248,
+          "gain": 0.59,
+          "args": {
+            "f": 65
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.09920000000000001
         }
       ]
     },
@@ -4351,78 +4435,76 @@
     {
       "id": "impact_hit",
       "context": "鴿子｜近戰命中",
-      "description": "短硬接觸點配薄層羽塵，清楚蓋過普攻刀風。",
-      "seconds": 0.142,
-      "peak_dbtp": -7,
+      "description": "一記低沉、乾脆的撞點，尾音在下一下之前收乾。",
+      "seconds": 0.108,
+      "peak_dbtp": -6,
       "seed": 1523693604,
       "layers": [
         {
-          "recipe": "click",
-          "gain": 0.82,
-          "at": 0,
-          "seconds": 0.035,
-          "args": {
-            "pitch": 1.1
-          }
-        },
-        {
           "recipe": "thump",
-          "gain": 0.55,
           "at": 0,
-          "seconds": 0.113,
+          "seconds": 0.1,
+          "gain": 1,
           "args": {
-            "f": 142
-          }
+            "f": 106
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.04000000000000001
         },
         {
-          "recipe": "whoosh",
-          "gain": 0.23,
-          "at": 0.029,
-          "seconds": 0.088,
+          "recipe": "clack",
+          "at": 0,
+          "seconds": 0.041,
+          "gain": 0.71,
           "args": {
-            "d": 0.088,
-            "lo": 1400,
-            "hi": 3700
-          }
+            "pitch": 0.74
+          },
+          "band": [
+            135,
+            1250
+          ],
+          "decay": 0.011
         }
       ]
     },
     {
       "id": "impact_heavy",
       "context": "鴿子｜重擊命中",
-      "description": "厚實撞擊帶硬殼裂點，低頻在羽塵後短留半拍。",
-      "seconds": 0.295,
-      "peak_dbtp": -5,
+      "description": "更深一層的重擊，起音清楚、撞點厚實，沒有拖長的碎聲。",
+      "seconds": 0.143,
+      "peak_dbtp": -4.5,
       "seed": 950471656,
       "layers": [
         {
-          "recipe": "clack",
-          "gain": 0.69,
-          "at": 0,
-          "seconds": 0.059,
-          "args": {
-            "pitch": 0.91
-          }
-        },
-        {
           "recipe": "thump",
-          "gain": 1,
           "at": 0,
-          "seconds": 0.26,
+          "seconds": 0.137,
+          "gain": 1,
           "args": {
-            "f": 88
-          }
+            "f": 82
+          },
+          "band": [
+            38,
+            580
+          ],
+          "decay": 0.05480000000000001
         },
         {
-          "recipe": "whoosh",
-          "gain": 0.45,
-          "at": 0.048,
-          "seconds": 0.19,
+          "recipe": "clack",
+          "at": 0,
+          "seconds": 0.049,
+          "gain": 0.61,
           "args": {
-            "d": 0.19,
-            "lo": 650,
-            "hi": 3200
-          }
+            "pitch": 0.58
+          },
+          "band": [
+            135,
+            1250
+          ],
+          "decay": 0.011
         }
       ]
     },

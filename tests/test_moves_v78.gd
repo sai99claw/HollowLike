@@ -67,7 +67,7 @@ func run() -> void:
 		game._step_player(1.0/120.0)
 	check(not game.p.get("lift_flying",false) and is_equal_approx(game.p["pos"].x,550.0),"Uninterrupted lift continues vertically to the ceiling")
 	check(game.p["pos"].y>=352.0,"Swept lift never crosses the ceiling")
-	check(game.effects.any(func(e:Dictionary)->bool:return e.get("combat_fx","")=="vertical_launch"),"Lift launches the authored exhaust")
+	check(game.effects.any(func(e:Dictionary)->bool:return e.get("lift_fog",false)),"Lift leaves a ground fog vortex")
 	for action:String in ["left","right","jump","dash","attack"]:
 		game._clear_keys()
 		game._reset_player(Vector2(550,700))

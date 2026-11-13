@@ -69,24 +69,28 @@ func run() -> void:
 	game._clear_keys();game.p_attack.cancel();game.props.clear();game.enemies.clear();game.hazards.clear();game.solids.clear();game.platforms.clear();game.doors.clear();game.layout={"size":Vector2(2000,1800),"floor_y":1700.0};game._reset_player(Vector2(700,1000))
 	var launcher:Dictionary={"kind":"launcher","pos":Vector2(700,1050),"hurt":0.0,"used":false}
 	game.props.assign([launcher])
-	game.p["pos"]=game.LaunchArt.body_box(launcher,str(game._ecology()["id"])).get_center()
+	var side_contact:Dictionary=game.Coll.move_body(Vector2(600,1030),Vector2(760,0),.3,Vector2(34,42),game._mushroom_bodies())
+	check(side_contact["pos"].x<=642.0,"Player cannot pass through the mushroom from the side")
+	game.p["pos"]=Vector2(700,game.LaunchArt.body_box(launcher).position.y)
 	game._update_props(.01)
 	check(is_equal_approx(game.p["vel"].y,-530*.38) and not game.p["grounded"],"Touching the launcher causes a light bounce")
+	check(not launcher.get("gothic_broken",false),"Touch keeps the cap intact")
 	var touch_velocity:float=game.p["vel"].y;game._hit_props(Rect2(650,960,100,100),1,1)
 	check(game.p["vel"].y==touch_velocity,"A remote projectile cannot launch its owner from across the room")
 	game.p_attack.begin({"kind":"melee","windup":0.0,"active":.1,"recovery":.1,"damage":1,"direction":"down"});game._hit_props(Rect2(650,960,100,100),1)
 	check(is_equal_approx(game.p["vel"].y,-530*sqrt(3.0)),"An intentional attack upgrades an overlapping touch to exactly triple HEIGHT")
+	check(not launcher.get("gothic_broken",false),"Cut keeps the cap intact")
 	game.p_attack.cancel();game._reset_player(Vector2(700,900));launcher["launch_hit_cooldown"]=0;launcher["launch_cooldown"]=0
 	game.p_attack.begin({"kind":"slam","dir":Vector2.DOWN,"windup":0.0,"active":.5,"recovery":.1,"damage":2});game._update_player(.12)
 	check(game.p["vel"].y<0 and not game._wind_form_active(),"A swept down-slam into a launcher turns into an upward bounce, not another forced downward frame")
 	var heights:Array[float]=[]
 	for attacked:bool in [false,true]:
-		game._reset_player(Vector2(700,1000));game.p_attack.cancel();game._launch_from_object(launcher,Vector2.DOWN if attacked else Vector2.ZERO);var peak:float=1000
+		game._reset_player(Vector2(700,983));game.p_attack.cancel();game._launch_from_object(launcher,Vector2.DOWN if attacked else Vector2.ZERO);var peak:float=983
 		for tick in 240:
 			game._step_player(1.0/240);peak=minf(peak,game.p["pos"].y)
 			if game.p["vel"].y>=0:break
 		check(not game.p["jump_cut_allowed"],"Releasing jump cannot truncate a physical launcher impulse")
-		heights.append(1000-peak)
+		heights.append(983-peak)
 	check(heights[0]<25.0 and heights[1]>330.0,"Only the down-cut produces a high launch")
 	game.room={"id":0,"type":"combat","map_index":0};game.layout=Layout.generate({"id":0,"type":"combat","width":21,"height":13,"maze_seed":2,"maze_config":{"dead_end_chance":1.0}},2);game.solids.assign(game.layout["solids"]);game.doors.clear();var props:Array=game._make_props()
 	var rewards:Array=props.filter(func(prop:Dictionary)->bool:return prop.has("dead_end_length"))

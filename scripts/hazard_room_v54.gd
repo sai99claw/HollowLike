@@ -74,13 +74,18 @@ static func prepare(layout:Dictionary,room_id:int,chosen:String="") -> void:
 			remaining-=tiles
 			islands.append(island)
 			spikes.append(Rect2(island.position-Vector2(0,20),Vector2(island.size.x,20)))
+	var mushrooms:Array[Vector2]=_mushrooms(rng,bounds,cell.y,boundary,supports) if floating else []
+	for at:Vector2 in mushrooms:
+		var width:float=tile*2.0
+		if is_equal_approx(at.y,floor_y):continue
+		supports.append(Rect2(at-Vector2(width*.5,0),Vector2(width,9)))
 	layout["one_way"]=supports
 	layout["platform_art_runs"]=supports
 	layout["platforms"]=supports+boundary.filter(func(cell:Rect2)->bool:return is_equal_approx(cell.end.y,bounds.y))
 	layout["solids"]=boundary+islands
 	layout["walls"]=layout["solids"]
 	layout["spike_rects"]=spikes
-	layout["launcher_spawns"]=_mushrooms(rng,bounds,cell.y,boundary,supports) if floating else []
+	layout["launcher_spawns"]=mushrooms
 
 static func _mushrooms(rng:RandomNumberGenerator,bounds:Vector2,cell_height:float,boundary:Array[Rect2],supports:Array[Rect2]) -> Array[Vector2]:
 	var result:Array[Vector2]=[]
