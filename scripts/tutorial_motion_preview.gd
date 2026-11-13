@@ -6,19 +6,24 @@ const Slash=preload("res://scripts/slash_art_v18.gd")
 const Flap=preload("res://scripts/double_jump_v27.gd")
 const PigeonBurst=preload("res://scripts/pigeon_burst_v72.gd")
 const AdventurePose=preload("res://scripts/adventure_visual.gd")
-const Wind=preload("res://scripts/wind_art.gd")
-const Weapon=preload("res://scripts/weapon_art_v24.gd")
+const VFX=preload("res://scripts/gameplay_vfx.gd")
+const Preview=preload("res://scripts/weapon_preview_v27.gd")
 const READY_TIME:float=.55
 
 var lesson:Dictionary={}
 var clock:float=0.0
 var timing:Label
 var weapon_id:String
+var effects:Node2D
 
 func _init() -> void:
 	custom_minimum_size=Vector2(320,220)
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
 	clip_contents=true
+
+func _ready() -> void:
+	effects=VFX.new()
+	add_child(effects)
 
 func select_lesson(value:Dictionary) -> void:
 	lesson=value
@@ -41,7 +46,8 @@ func _refresh_timing() -> void:
 	timing.text=label
 
 func _draw() -> void:
-	if lesson.is_empty():return
+	if lesson.is_empty() or effects==null:return
+	effects.begin(clock)
 	draw_rect(Rect2(Vector2.ZERO,size),Color("0b1e20"))
 	var floor_y:float=size.y-34.0
 	draw_line(Vector2(14,floor_y),Vector2(size.x-14,floor_y),Color("4d7665"),2,true)
@@ -80,6 +86,7 @@ func _draw() -> void:
 				PigeonBurst.draw(self,PigeonBurst.IMPULSE,at-Vector2(12,24),Vector2.LEFT,t,PigeonBurst.IMPULSE_DURATION,110.0,Transform2D.IDENTITY)
 				at.x+=minf(t/.16,1)*size.x*.14
 				if t<.16:
+					effects.gust(Transform2D.IDENTITY,at-Vector2(0,24),direction,86,(1.0-t/.16)*.64)
 					Flap.draw(self,at,1.0,t*2.0,Transform2D.IDENTITY,Color.WHITE)
 					_draw_timeline()
 					return
@@ -87,7 +94,7 @@ func _draw() -> void:
 					at.x+=clampf((t-.24)/.46,0,1)*size.x*.29
 					if t<.70:
 						AdventurePose.draw_action(self,2,1,at,direction.x,Transform2D.IDENTITY,Color.WHITE)
-						Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,direction,t-.24,.46,Transform2D.IDENTITY)
+						effects.gust(Transform2D.IDENTITY,at-AdventurePose.WIND_BODY_CENTER,direction,122,.92)
 						_draw_timeline()
 						return
 			"slam":
@@ -95,11 +102,11 @@ func _draw() -> void:
 				anim="jump_down" if at.y<floor_y else "land"
 				if t>=.24 and t<.63:
 					AdventurePose.draw_action(self,3,AdventurePose.slam_frame(t-.24),at,1,Transform2D.IDENTITY,Color.WHITE)
-					Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,Vector2.DOWN,t-.24,.39,Transform2D.IDENTITY,true)
+					effects.gust(Transform2D.IDENTITY,at-AdventurePose.WIND_BODY_CENTER,Vector2.DOWN,126,.92)
 					_draw_timeline()
 					return
 				if t>=.63 and t<.91:
-					Wind.impact(self,at,(t-.63)/.28,Transform2D.IDENTITY)
+					effects.charge(self,Transform2D.IDENTITY,at,1.0,true,1.0-(t-.63)/.28)
 					if t<.755:
 						AdventurePose.draw_action(self,3,3,at,1,Transform2D.IDENTITY,Color.WHITE)
 						_draw_timeline()
@@ -112,17 +119,15 @@ func _draw() -> void:
 					direction=Vector2.DOWN
 				if elapsed<0:
 					anim="charge"
-					draw_arc(at-Vector2(0,25),37,0,TAU*clampf(t/release,0,1),32,Color("98e5c6"),2,true)
+					effects.charge(self,Transform2D.IDENTITY,at,t/release,false)
 				elif elapsed<.44:
 					anim="active";progress=elapsed/.44
 					attack=Data.action_attack("down" if action=="down_attack" else "right",action=="charged",false)
 					slash_age=elapsed
 					slash_box=Rect2(at+Vector2(-29,-8),Vector2(58,82)) if action=="down_attack" else Rect2(at+Vector2(7,-58),Vector2(103,57))
 			"sub":
-				if t<.85:
-					var origin:Vector2=at-Vector2(0,26)
-					var tip:Vector2=origin+direction*size.x*.43*(t/.85)
-					Weapon.draw(self,weapon_id,tip,direction,14,true,Transform2D.IDENTITY,t)
+				var origin:Vector2=at-Vector2(0,26)
+				Preview.draw_shot(self,effects,weapon_id,origin,origin+direction*size.x*.48,floor_y,t,.85)
 	Art.draw_pigeon(self,at,1,clock,anim,Color.WHITE,1.0,progress,Transform2D.IDENTITY,"quick",attack)
 	if slash_box.has_area():Slash.draw(self,slash_box,attack,slash_age,Transform2D.IDENTITY)
 	_draw_timeline()

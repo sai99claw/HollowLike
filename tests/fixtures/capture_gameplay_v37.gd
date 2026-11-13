@@ -45,7 +45,7 @@ func run() -> void:
 	g.meta["rd_tuning"]={"fountain_chance":1.0};g.new_run("rogue",171);g._close_panel()
 	for stage:int in [0,2,4]:
 		var target:Dictionary=g.tower["rooms"].filter(func(r:Dictionary)->bool:return r["type"]=="combat" and int(r["map_index"])==stage)[0]
-		g._enter_room(target["id"]);g._close_panel();g.p["pos"]=g.layout["fountain_pos"];g.camera_pos=g._camera_target(g.p["pos"]);g.shake=0;g.p["invul"]=0;g._process(0);g._invalidate_scene();await snap("pool-stage"+str(stage))
+		g._enter_room(target["id"]);g._close_panel();g.p["pos"]=Vector2(g._active_pool().get_center().x,g._active_pool().end.y);g.camera_pos=g._camera_target(g.p["pos"]);g.shake=0;g.p["invul"]=0;g._process(0);g._invalidate_scene();await snap("pool-stage"+str(stage))
 	g._enter_room(g.tower["maps"][2]["start_id"]);g._close_panel();g.shake=0
 	for i in 2:g.camera_pos+=Vector2(200,0)*i;g._process(0);g._invalidate_scene();await snap("parallax"+str(i))
 	g.queue_free();await process_frame;quit()

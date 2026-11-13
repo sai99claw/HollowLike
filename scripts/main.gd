@@ -52,6 +52,8 @@ const RD=preload("res://scripts/rd_room_v16.gd")
 const PracticeRD=preload("res://scripts/practice_rd_v22.gd")
 const Stones=preload("res://scripts/throwable_stones.gd")
 const Explosion=preload("res://scripts/explosion_v16.gd")
+const VFX=preload("res://scripts/gameplay_vfx.gd")
+const RecessedPool=preload("res://scripts/recessed_pool.gd")
 const Coins = preload("res://scripts/coin_physics.gd")
 const Bindings = preload("res://scripts/input_settings.gd")
 const Combat = preload("res://scripts/combat_library.gd")
@@ -132,6 +134,7 @@ var home_sleeping:bool=true
 var home_wake_left:float=0
 var screen: String = "hub"
 var spring_particles:Node2D
+var gameplay_vfx:Node2D
 var home_atmosphere:Node2D
 var mode: String = "rogue"
 var meta: Dictionary = {"coins":0,"runes":{"gale":1,"reach":1,"guard":1},"skills":[],"attempts":0,"skins":[0],"skin":0,"best_map":0,"rd_tuning":{},"items":{},"weapons":[],"records":[],"blueprints":[],"trophies":{"weapons":[],"runes":[]},"settings":{"zoom":1.3,"speed":.8,"keys":{}}}
@@ -321,6 +324,7 @@ func _ready() -> void:
 	_reset_player(Vector2(640,600))
 	atmosphere=Atmosphere.new();add_child(atmosphere);atmosphere.configure("branches",0,false);atmosphere.set_audio_enabled(audio_enabled)
 	combat_feedback=Feedback.new();combat_feedback.z_index=2;add_child(combat_feedback)
+	gameplay_vfx=VFX.new();add_child(gameplay_vfx)
 	dream_visual=preload("res://scripts/dream_visual_v41.gd").new();add_child(dream_visual)
 	spring_particles=preload("res://scripts/spring_particles_v33.gd").new();spring_particles.z_index=2;add_child(spring_particles)
 	home_atmosphere=preload("res://scripts/home_atmosphere_v33.gd").new();add_child(home_atmosphere)
@@ -663,9 +667,6 @@ func _process_profiled_body(delta: float) -> void:
 		combat_feedback.set_frozen(perf_paused or hitstop>0 or minimap_open or practice_rd_panel!=null,world_speed*_clear_world_rate())
 		combat_feedback.reduced=low_effects
 		combat_feedback.transform=world_transform
-		var lift_elapsed:float=float(p.get("lift_charge",-1))
-		var charging:bool=lift_elapsed>=0 or (_key("attack") and charge_timer>.08)
-		combat_feedback.update_charge(screen=="game" and life_event.is_empty() and not ui.is_panel_open() and charging,p["pos"]-Vector2(0,27),lift_elapsed if lift_elapsed>=0 else charge_timer,_lift_threshold() if lift_elapsed>=0 else _charge_threshold())
 		combat_feedback.update_cache(screen=="game" and ((life_event.get("kind","")=="death" and float(life_event.get("elapsed",0))>.7) or (not feather.is_empty() and int(feather.get("room",-1))==current_room)),p["pos"] if life_event.get("kind","")=="death" else feather.get("pos",Vector2.ZERO),clock)
 	if dream_visual!=null:dream_visual.set_view(screen=="game" and mode=="musou",world_transform,p["pos"],dream.rage_left>0 and life_event.is_empty(),perf_paused or hitstop>0 or minimap_open or ui.is_panel_open() or practice_rd_panel!=null or not life_event.is_empty(),world_speed)
 	if ui!=null and ui.is_panel_open():
@@ -788,7 +789,6 @@ func _camera_target(at:Vector2) -> Vector2:
 func _in_bath() -> bool:return Bath.contains(_active_pool(),p.get("pos",Vector2.ZERO))
 
 func _active_pool() -> Rect2:
-	if room.get("fountain",false) and layout.has("fountain_pos"):return preload("res://scripts/spring_v33.gd").pool(layout["fountain_pos"],str(_ecology()["id"]))
 	return layout.get("pool",Rect2())
 
 func _load_settings() -> void:
@@ -1370,11 +1370,11 @@ func _reject_attack(reason:String) -> void:
 
 func _player_active_started() -> void:
 	var def: Dictionary=p_attack.attack
-	if def.get("charged",false):_sound("charge_release")
-	if _in_bath():
-		var pool:Rect2=_active_pool()
-		spring_particles.splash(Vector2(p["pos"].x,pool.position.y),str(_ecology()["id"]),_attack_direction(def))
-		bath.attack(pool,p["pos"]);_sound("water_splash")
+	if def.get("charged",false):
+		_sound("charge_release")
+		if effects.size()>=MAX_PARTICLES:effects.pop_front()
+		effects.append({"pos":p["pos"],"color":Color("f5ddb1"),"life":.25,"max":.25,"radius":75.0,"vel":Vector2.ZERO,"ring":false,"charge_wake":true,"dir":_attack_direction(def)})
+	if _in_bath():_splash_water(float(p["pos"].x),_attack_direction(def))
 	match str(def.get("kind","")):
 		"secondary":
 			if def.has("salvo"):
@@ -1387,11 +1387,13 @@ func _player_active_started() -> void:
 			p["slam"]=def["kind"]=="slam"
 		"item_bomb":
 			_sound("explosion")
-			_contact_fx("explosion_artificial",p["pos"]-Vector2(0,25))
-			effects[-1]["fx_extent"]=840.0
+			if effects.size()>=MAX_PARTICLES:effects.pop_front()
+			var at:Vector2=p["pos"]-Vector2(0,25)
+			effects.append({"explosion_v16":true,"pos":at,"radius":420.0,"life":.58,"max":.58,"color":Color("ffbf79"),"vel":Vector2.ZERO,"ring":false})
+			visual_depth.flash(at,190,1.25,draw_clock)
 			for en in enemies:
 				if en["pos"].distance_to(p["pos"])<420 and p_attack.mark_hit(int(en["uid"])):_hit_enemy(en,float(def["damage"]),Color("ffd18d"),400)
-			_effect(p["pos"],Color("ffca8d"),420,.6);shake=10
+			shake=10
 		_:
 			if bool(def.get("dash_charge",false)): p["vel"]=_aim_vector()*500
 			if def.get("primary",false) and not def.get("charged",false):_sound(AudioCues.primary_cue(def))
@@ -1999,9 +2001,10 @@ func _segment_hits_box(a:Vector2,b:Vector2,box:Rect2) -> bool:
 
 func _projectile_impact(pr:Dictionary) -> void:
 	var biome:String=pr.get("boss_biome","")
-	if biome.is_empty():return
+	if pr.get("explode_on_hit",false) or pr.get("ground_fire",false):return
+	if biome.is_empty() and low_effects:return
 	if effects.size()>=MAX_PARTICLES:effects.pop_front()
-	effects.append({"boss_fx":biome,"pos":pr["pos"],"color":pr["color"],"life":.4,"max":.4,"radius":0.0,"ring":false,"vel":Vector2.ZERO,"fx_scale":.65})
+	effects.append({"boss_fx":biome,"pos":pr.get("impact_point",pr["pos"]),"normal":pr.get("impact_normal",Vector2.ZERO),"color":pr["color"],"life":.28,"max":.28,"radius":clampf(float(pr["radius"])*2.4,16,78),"ring":false,"vel":Vector2.ZERO})
 
 func _projectile_surfaces() -> Array:
 	return projectile_surfaces
@@ -2036,6 +2039,8 @@ func _try_projectile_riposte(enemy:Dictionary,shot:Dictionary,old:Vector2,next:V
 	if incoming.dot(center-old)<=0 or not _segment_hits_box(old,next,_enemy_body_box(enemy).grow(radius+33)):return false
 	_start_enemy_attack(enemy,Combat.attack("slash",{"windup":0.0,"active":.13,"recovery":.36,"range":95.0,"damage":1.0}))
 	var direction:Vector2=(Vector2(p["pos"])-Vector2(0,22)-next).normalized()
+	if combat_feedback!=null:combat_feedback.finish_trail(shot)
+	shot.erase("trail_points");shot.erase("trail_times")
 	shot["from_player"]=false
 	shot["vel"]=direction*maxf(320.0,incoming.length())
 	shot["base_velocity"]=shot["vel"]
@@ -2079,12 +2084,8 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 		pr["pos"]=next
 		if trail_view.has_point(next):
 			ProjectileReadability.record(pr,old,next,delta)
-			if combat_feedback!=null and ProjectileReadability.uses_dust(pr):
-				combat_feedback.projectile_trail(pr,world_speed)
 		elif pr.has("trail_points"):
 			pr.erase("trail_points");pr.erase("trail_times")
-			if combat_feedback!=null:combat_feedback.finish_trail(pr)
-			pr.erase("trail_id")
 		pr["distance_left"]=float(pr.get("distance_left",INF))-old.distance_to(next)
 		if pr.get("trap_carrier",false):
 			if not pr.get("destroyed",false) and (wall_hit or pr["life"]<=0 or pr["distance_left"]<=0):_settle_trap(pr);pr["life"]=0
@@ -2117,6 +2118,7 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 					for en in enemies:
 						if int(en["uid"])==int(pr.get("owner_uid",-2)):_parry(en);break
 				if _rune_effect("reflect")>0:
+					if combat_feedback!=null:combat_feedback.finish_trail(pr)
 					pr["from_player"]=true;pr["hits"]={};pr["vel"]=-pr["vel"];pr["base_velocity"]=pr["vel"];pr["pos"]=p["pos"]+Vector2(float(p["face"])*45,-25);pr["distance_left"]=maxf(200,float(pr["distance_left"]));pr["return_after"]=0
 					pr.erase("trail_points");pr.erase("trail_times")
 				else:pr["life"]=0
@@ -2176,7 +2178,6 @@ func _update_hazards_profiled_body(delta:float) -> void:
 	for hazard in hazards:
 		if float(hazard.get("hp",1))<=0:continue
 		hazard["elapsed"]+=delta
-		if hazard.get("fire",false):GroundFire.emit(hazard,effects,delta,low_effects,MAX_PARTICLES)
 		if hazard["elapsed"]<float(hazard.get("arming_time",0)) or hazard["elapsed"]>float(hazard.get("lifetime",4))+float(hazard.get("arming_time",0)):continue
 		var zone:Rect2=Rect2(Vector2(hazard["pos"])-Vector2(float(hazard.get("size",100))*.5,32),Vector2(float(hazard.get("size",100)),32)) if hazard.get("fire",false) else TrapArt.body_box(hazard)
 		if hazard.get("from_player",false):
@@ -2429,7 +2430,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			HazardRoom.prepare(room["layout"],id,forced_hazard)
 			if room["layout"].has("hazard_room"):room["fountain"]=false
 	layout=room["layout"]
-	if room.get("fountain",false) and not layout.has("fountain_pos"):preload("res://scripts/spring_v33.gd").prepare(layout)
+	if room.get("fountain",false):room["fountain"]=RecessedPool.prepare(layout)
 	NewBiome.prepare(layout,int(layout.get("seed",0)))
 	if room.get("type","")=="merchant" and not room.has("stock"):
 		room["stock"]=Sanctuary.stock(int(room["map_index"]))
@@ -2518,7 +2519,8 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 			var avoid:Array=layout["spawn_positions"].values()
 			for door:Dictionary in doors:avoid.append(door["pos"])
 			for prop:Dictionary in room["props"]:
-				if prop["kind"] in ["launcher","chest","fountain"]:avoid.append(prop["pos"])
+				if prop["kind"] in ["launcher","chest"]:avoid.append(prop["pos"])
+			if _active_pool().has_area():avoid.append(_active_pool().get_center())
 			for spike:Rect2 in layout.get("spike_rects",[]):avoid.append(spike.get_center())
 			room["props"].append_array(Stones.spawn(layout,platforms+solids,solids,avoid))
 	props.assign(room["props"])
@@ -2680,7 +2682,7 @@ func _update_visual_effects_profiled_body(delta:float) -> void:
 	_step_fragments(delta)
 	for e in effects:
 		e["life"]-=delta;e["pos"]+=e["vel"]*delta
-		if not bool(e["ring"]) and not e.has("beam") and not e.has("lightning") and not e.has("boss_fx") and not e.has("combat_fx") and not e.has("ground_wind") and not e.has("wind_burst") and not e.has("water_attack") and not e.has("fire_ember") and not e.has("prop_flash") and not e.has("lift_fog"):e["vel"].y+=180.0*delta
+		if not bool(e["ring"]) and not e.has("explosion_v16") and not e.has("charge_wake") and not e.has("beam") and not e.has("lightning") and not e.has("boss_fx") and not e.has("combat_fx") and not e.has("ground_wind") and not e.has("wind_burst") and not e.has("water_attack") and not e.has("fire_ember") and not e.has("prop_flash") and not e.has("lift_fog"):e["vel"].y+=180.0*delta
 		if e.has("ground_y") and not e.has("ground_wind") and e["pos"].y>float(e["ground_y"])-float(e["radius"]):e["life"]=0
 	effects=effects.filter(func(e:Dictionary)->bool:return float(e["life"])>0)
 	for f in floaters:f["life"]-=delta;f["pos"].y-=35*delta
@@ -3077,8 +3079,10 @@ func _draw() -> void:
 	perf_log.span("draw.main",Time.get_ticks_usec()-measured)
 
 func _draw_profiled_body() -> void:
-	if font==null:return
+	if font==null or gameplay_vfx==null:return
+	gameplay_vfx.begin(draw_clock,low_effects)
 	if screen=="hub":_draw_hub();return
+	visual_depth.draw_shafts(gameplay_vfx,world_transform)
 	draw_set_transform_matrix(world_transform)
 	for door in doors:_draw_door(door)
 	var focus:Dictionary=_game_station()
@@ -3086,7 +3090,7 @@ func _draw_profiled_body() -> void:
 	_draw_fragments()
 	if not focus.is_empty():
 		draw_set_transform_matrix(world_transform)
-		HomeArt.station_light(self,focus["pos"])
+		_draw_station_glow(focus["pos"])
 		if focus["kind"]!="tutorial":
 			var label:String="按 %s 互動"%_tutorial_key("up")
 			var width:float=font.get_string_size(label,HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
@@ -3107,21 +3111,22 @@ func _draw_profiled_body() -> void:
 		if en.get("training",false):continue
 		var atk=en["attack"]
 
-		MonsterDesign.draw_charge(self,en,clock,world_transform)
+		_draw_enemy_charge(en)
 		_draw_attack(en["pos"]+Vector2(0,5),atk,float(en["face"]),false)
 		_draw_enemy_warning(en)
 		if int(en["model"])!=4:EnemyVitals.draw(self,en,_enemy_body_box(en),clock)
 	_draw_player_body()
-	if room.get("fountain",false) and layout.has("fountain_pos"):
-		preload("res://scripts/spring_v33.gd").draw_water(self,layout["fountain_pos"],str(_ecology()["id"]),world_transform,bath,draw_clock)
-	elif room.get("spring",false):
-		bath.draw(self,_active_pool(),world_transform,draw_clock)
+	var pool:Rect2=_active_pool()
+	if pool.has_area() and view_rect.intersects(pool):
+		var water_tint:Color={"underground":Color("62aeaa"),"trunk":Color("5ead91"),"sky":Color("78bacc")}.get(str(_ecology()["id"]),Color("62aeaa"))
+		gameplay_vfx.pool(pool,world_transform,water_tint,layout.get("recessed_pool",false))
+		bath.draw(self,pool,world_transform,draw_clock,true)
 	if _is_healing():FX.fitted(self,"heal_guard",0,Rect2(p["pos"]-Vector2(35,65),Vector2(70,75)),world_transform,"right","idle",Color(.7,1,.8,.65),clock)
-	if p.has("lift_charge"):_draw_lift_charge()
+	_draw_player_charge()
 	_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	for cloud:Dictionary in poison_clouds:
-		var fog:=Color(.75,.29,.8,.67) if cloud.get("hostile",false) else Color(.55,.82,.30,.64)
-		SkillArt.draw(self,SkillArt.POISON,1.0-float(cloud["left"])/3.0,Rect2(Vector2(cloud["pos"])-Vector2(58,38),Vector2(116,76)),fog)
+		if view_rect.grow(90).has_point(cloud["pos"]):
+			gameplay_vfx.gas(world_transform,cloud["pos"],1.0-float(cloud["left"])/3.0,cloud.get("hostile",false))
 
 	if float(p.get("power_item_left",0))>0:
 		draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(45,67),Vector2(90,90)),false,Color(1,.22,.12,.78))
@@ -3129,31 +3134,45 @@ func _draw_profiled_body() -> void:
 	if float(p["shield"])>0:draw_texture_rect(preload("res://assets/v55/effects/aura.svg"),Rect2(Vector2(p["pos"])-Vector2(44,67),Vector2(88,88)),false,Color(.69,.79,1,.8))
 	for hazard in hazards:
 		if hazard.get("fire",false):
-			GroundFire.draw(self,hazard,clock,world_transform);continue
+			if view_rect.grow(120).has_point(hazard["pos"]):
+				var remaining:float=float(hazard["lifetime"])-float(hazard["elapsed"])
+				gameplay_vfx.fire(world_transform,hazard["pos"],float(hazard["size"])*2.0,clampf(remaining*4.0,0,1))
+			continue
 		if view_rect.has_point(hazard["pos"]) and not MonsterDesign.draw_hazard(self,hazard,clock,world_transform) and not FX.hazard(self,hazard,clock,world_transform):BossVisual.hazard(self,hazard,clock,world_transform,show_hitboxes)
+	var projectile_view:=view_rect.grow(160)
+	var full_ribbons:=0
 	for pr in projectiles:
-		if not view_rect.grow(160).has_point(pr["pos"]):continue
-		ProjectileReadability.draw_trail(self,pr,world_transform,low_effects);ProjectileReadability.draw_cue(self,pr,world_transform)
-		var visual:Dictionary=pr.duplicate(false);visual["radius"]=ProjectileReadability.visual_radius(pr)
+		if not projectile_view.has_point(pr["pos"]):
+			var trail:PackedVector2Array=pr.get("trail_points",PackedVector2Array())
+			if not trail.is_empty() and projectile_view.has_point(trail[0]):ProjectileReadability.draw_trail(self,pr,world_transform,low_effects)
+			continue
+		ProjectileReadability.draw_trail(self,pr,world_transform,low_effects or full_ribbons>=48)
+		full_ribbons+=1
+		var visual:Dictionary=pr.duplicate(false)
+		visual["radius"]=ProjectileReadability.visual_radius(pr)
 		if WeaponArt.Animated.has(str(pr.get("weapon_id",""))) or (pr.get("from_player",false) and WeaponArt.texture(str(pr.get("weapon_id","")),true)!=null):
-			WeaponArt.draw(self,str(pr["weapon_id"]),pr["pos"],pr["vel"],float(visual["radius"]),true,world_transform,float(pr.get("elapsed",0)),float(pr.get("launch_angle",0)));draw_set_transform_matrix(world_transform);continue
-		if not MonsterDesign.draw_projectile(self,visual,clock,world_transform) and not FX.projectile(self,visual,clock,world_transform) and not BossVisual.projectile(self,visual,clock,world_transform) and not Sprites.projectile(self,visual,clock,world_transform):
-			var size:float=float(visual["radius"])*2.3
-			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(pr["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,pr["color"])
+			WeaponArt.draw(self,str(pr["weapon_id"]),pr["pos"],pr["vel"],float(visual["radius"]),true,world_transform,float(pr.get("elapsed",0)),float(pr.get("launch_angle",0)))
+			gameplay_vfx.shot(self,pr,world_transform,visual["radius"])
+			draw_set_transform_matrix(world_transform)
+			continue
+		var has_art:bool=MonsterDesign.draw_projectile(self,visual,clock,world_transform) or FX.projectile(self,visual,clock,world_transform) or BossVisual.projectile(self,visual,clock,world_transform) or Sprites.projectile(self,visual,clock,world_transform)
+		gameplay_vfx.shot(self,pr,world_transform,visual["radius"],not has_art)
 	for e in effects:
-		if not view_rect.has_point(e["pos"]):continue
+		if e.has("end"):
+			var endpoint:Vector2=e["end"]
+			var start:Vector2=e["pos"]
+			if not view_rect.grow(32).intersects(Rect2(start.min(endpoint), (endpoint-start).abs()+Vector2.ONE)):continue
+		elif not view_rect.grow(float(e.get("radius",0.0))+80).has_point(e["pos"]):continue
 		if _draw_prop_impact(e):continue
 		var c:Color=e["color"];c.a=clampf(float(e["life"])/float(e["max"]),0,1)
-		if e.has("beam"):preload("res://scripts/laser_art_v38.gd").draw(self,e,world_transform)
-		elif e.has("lightning"):
-			var end:Vector2=e["end"]
-			var points:=PackedVector2Array([e["pos"]]);var tangent:Vector2=(end-e["pos"]).normalized().orthogonal()
-			for i in range(1,8):points.append(Vector2(e["pos"]).lerp(end,float(i)/8)+tangent*sin(i*7.3)*10)
-			points.append(end);draw_polyline(points,Color(c,.4),9,true);draw_polyline(points,Color(1,1,1,c.a),2,true)
-		elif e.has("explosion_v16"):Explosion.draw(self,e,world_transform)
-		elif e.has("lift_fog"):_draw_lift_fog(e["pos"],1.0,c.a,true)
-		elif e.has("ground_wind"):Wind.impact(self,e["pos"],1-c.a,world_transform)
-		elif e.has("boss_fx"):BossVisual.impact(self,e,world_transform)
+		if e.has("beam"):gameplay_vfx.beam(self,e,world_transform)
+		elif e.has("lightning"):VFX.lightning(self,e,world_transform)
+		elif e.has("explosion_v16") or e.has("boss_fx"):gameplay_vfx.burst(self,e,world_transform)
+		elif e.has("charge_wake"):
+			var direction:Vector2=e["dir"]
+			gameplay_vfx.gust(world_transform,Vector2(e["pos"])-Vector2(0,20)+direction*(1.0-c.a)*38,direction,137,c.a*.77)
+		elif e.has("lift_fog") or e.has("ground_wind"):
+			gameplay_vfx.charge(self,world_transform,e["pos"],1.0,true,c.a)
 		elif e.has("combat_fx"):
 			var extent:float=float(e.get("fx_extent",65))
 			var alpha:float=Explosion.OPACITY if str(e["combat_fx"]).begins_with("explosion_") else 1.0
@@ -3162,7 +3181,7 @@ func _draw_profiled_body() -> void:
 			else:FX.fitted(self,e["combat_fx"],progress,Rect2(e["pos"]-Vector2.ONE*extent*.5,Vector2.ONE*extent),world_transform,"right","",Color(1,1,1,alpha))
 		elif bool(e["ring"]):
 			var radius:float=float(e["radius"])
-			SkillArt.draw_ring(self,1.0-c.a,Rect2(Vector2(e["pos"])-Vector2.ONE*radius,Vector2.ONE*radius*2),e["color"])
+			gameplay_vfx.flow(VFX.VORTEX,world_transform,e["pos"],Vector2.ONE*radius*(1.5+1.1*(1-c.a)),0,Color(e["color"],c.a))
 		else:
 			var size:float=float(e["radius"])*c.a*2.0
 			draw_texture_rect(preload("res://assets/v55/effects/spark.svg"),Rect2(Vector2(e["pos"])-Vector2.ONE*size*.5,Vector2.ONE*size),false,c)
@@ -3216,23 +3235,36 @@ func _draw_enemy_warning(en:Dictionary) -> void:
 		var dir:Vector2=def.get("aim",Vector2.RIGHT)
 		draw_line(at,at+dir*minf(350,float(def["range"])),Color(color,.28),2,false)
 
-func _draw_lift_charge() -> void:
-	var progress:float=clampf(float(p["lift_charge"])/_lift_threshold(),0.0,1.0)
-	_draw_lift_fog(p["pos"],progress,1.0)
+func _draw_enemy_charge(enemy:Dictionary) -> void:
+	var phase:String=enemy.get("charge_phase","idle")
+	if phase not in ["windup","active"]:return
+	var at:Vector2=_enemy_body_box(enemy).get_center()
+	var direction:Vector2=enemy.get("charge_vector",Vector2.RIGHT)
+	var boss:bool=int(enemy.get("model",0))==4
+	if phase=="active":
+		gameplay_vfx.gust(world_transform,at,direction,152 if boss else 112,.75)
+		return
+	var progress:float=1.0-float(enemy.get("charge_left",0))/maxf(.01,float(enemy.get("dash_windup",.6)))
+	gameplay_vfx.charge(self,world_transform,enemy["pos"],progress,false,.64)
+	if boss or enemy.get("air_lunge",false):
+		var length:float=float(enemy["dash_speed"])*float(enemy["dash_duration"]) if boss else float(enemy["dash_trigger"])
+		var line_color:=Color("ffda99") if boss else Color(enemy["color"])
+		draw_line(at,at+direction*length,Color(line_color,.20),20 if boss else 7,true)
+		draw_line(at,at+direction*length,Color(line_color,.81),1.6,true)
 
-func _draw_lift_fog(feet:Vector2,progress:float,opacity:float,release:bool=false) -> void:
-	draw_set_transform_matrix(world_transform)
-	var spread:float=(1.0-opacity)*40.0 if release else 0.0
-	var count:int=11 if low_effects else 18
-	for i in count:
-		var angle:float=draw_clock*(3.1+progress*2.0)+float(i)*TAU/count
-		var phase:float=fposmod(draw_clock*.9+float(i)*.27,1.0)
-		var wide:float=32.0+29.0*progress+spread+float(i%3)*7.0
-		var at:Vector2=feet+Vector2(cos(angle)*wide,-12.0+sin(angle)*9.0-phase*8.0)
-		var mist:float=sin(PI*phase)*opacity*(.38+progress*.62)
-		for layer in 4:
-			var radius:float=(5.0+float(layer)*3.2)*(1.0+phase*.5)
-			Art._ellipse(self,at,Vector2(radius*2.1,radius*.45),Color(.77,.88,.93,mist*(.105-float(layer)*.021)))
+func _draw_player_charge() -> void:
+	if not life_event.is_empty():return
+	var lift:bool=p.has("lift_charge")
+	if lift or (charge_timer>.08 and _key("attack")):
+		var elapsed:float=float(p["lift_charge"]) if lift else charge_timer
+		var threshold:float=_lift_threshold() if lift else _charge_threshold()
+		gameplay_vfx.charge(self,world_transform,p["pos"],elapsed/maxf(.01,threshold),lift)
+	if float(p.get("dash_t",0))>0 and not p_attack.is_busy():
+		gameplay_vfx.gust(world_transform,Vector2(p["pos"])-Vector2(0,24),p["dash_dir"],94,clampf(float(p["dash_t"])/.13,0,1)*.64)
+
+func _draw_station_glow(feet:Vector2) -> void:
+	gameplay_vfx.flow(VFX.FIRE,world_transform,feet-Vector2(0,38),Vector2(78,86),0,Color(1,.76,.36,.48))
+	gameplay_vfx.flow(VFX.VORTEX,world_transform,feet-Vector2(0,5),Vector2(95,23),0,Color(1,.86,.59,.52))
 
 func _draw_player_body() -> void:
 	var anim:String="limp" if injured else ("rest" if idle_time>=5 else "idle")
@@ -3303,7 +3335,7 @@ func _draw_hub() -> void:
 	draw_set_transform_matrix(world_transform)
 	if trophy_room:_draw_trophy_room();return
 	var focus:String=_home_station()
-	if not focus.is_empty():HomeArt.station_light(self,HomeArt.STATIONS[focus])
+	if not focus.is_empty():_draw_station_glow(HomeArt.STATIONS[focus])
 	HomeArt.gates(self,clock,low_effects,world_transform)
 	HomeArt.nest(self)
 	for prop:Dictionary in props:
@@ -3311,11 +3343,17 @@ func _draw_hub() -> void:
 		elif prop["kind"] in ["adventure_records","trophy_case"]:GothicProps.draw_prop(self,prop,"trunk",world_transform)
 	_draw_home_projector()
 	_draw_fragments()
-	for effect:Dictionary in effects:_draw_prop_impact(effect)
+	for effect:Dictionary in effects:
+		if effect.has("charge_wake"):
+			var direction:Vector2=effect["dir"]
+			var alpha:float=float(effect["life"])/float(effect["max"])
+			gameplay_vfx.gust(world_transform,Vector2(effect["pos"])-Vector2(0,20)+direction*(1.0-alpha)*38,direction,137,alpha*.77)
+		else:_draw_prop_impact(effect)
 	draw_set_transform_matrix(world_transform)
 	if home_sleeping or home_wake_left>0:HomeArt.resting(self,clock,home_wake_left if not home_sleeping else -1,world_transform)
 	else:
 		_draw_player_body()
+		_draw_player_charge()
 		_draw_attack(p["pos"],p_attack,float(p["face"]),true)
 	draw_set_transform_matrix(world_transform)
 	_draw_home_keys()
@@ -3354,7 +3392,9 @@ func _draw_home_projector() -> void:
 	if opacity>0:
 		var origin:Vector2=Vector2(home_projector.get("break_origin",at))+Vector2(21,5)
 		var screen_rect:Rect2=HomeArt.PROJECTION_SCREEN
-		var beam:=Color(.68,.94,.83,.22*opacity)
+		var delta:Vector2=screen_rect.get_center()-origin
+		gameplay_vfx.flow(VFX.SHAFT,world_transform,origin+delta*.5,Vector2(screen_rect.size.y,delta.length()),delta.angle()-PI*.5,Color(.59,.90,.79,opacity*.40))
+		var beam:=Color(.68,.94,.83,.13*opacity)
 		var edge:=Color(.69,.95,.84,.63*opacity)
 		draw_polygon(PackedVector2Array([origin+Vector2(0,-5),screen_rect.position,Vector2(screen_rect.position.x,screen_rect.end.y),origin+Vector2(0,6)]),PackedColorArray([beam,Color(beam,0),Color(beam,0),beam]))
 		draw_rect(screen_rect,Color(.04,.12,.11,.92*opacity))
@@ -3605,11 +3645,15 @@ func _draw_attack(at:Vector2,atk:Variant,face:float,is_player:bool) -> void:
 	if is_player and atk.attack.get("kind","") in ["pierce","slam"]:
 		if bool(p.get("slam",false)) or (atk.is_active() and atk.attack["kind"]=="pierce"):
 			var down:bool=atk.attack["kind"]=="slam"
-			Wind.wind_form(self,at-AdventurePose.WIND_BODY_CENTER,atk.attack["dir"],float(p["slam_age"]) if down else atk.elapsed,float(atk.attack["active"]),world_transform,down)
+			gameplay_vfx.gust(world_transform,at-AdventurePose.WIND_BODY_CENTER,atk.attack["dir"],168 if down else 151,.98)
 		return
 	if is_player and atk.attack.get("primary",false) and (not atk.attack.get("charged",false) or atk.attack.get("great_spin_release",false)):
 		if show_hitboxes and atk.is_active():draw_rect(_player_strike_box(atk.attack),Color("ffe3a0"),false,1)
 		return
+	if atk.attack.get("charged",false) and atk.is_active():
+		var box:Rect2=_player_strike_box(atk.attack)
+		var direction:=_attack_direction(atk.attack)
+		gameplay_vfx.flow(VFX.SLASH,world_transform,box.get_center()-direction*box.size.length()*.13,Vector2.ONE*box.size.length()*1.1,direction.angle(),Color(.98,.82,.58,1.0-atk.progress()*.59))
 	if is_player and atk.attack.has("fx_clip"):
 		var primary:Dictionary=atk.attack
 		var hitbox:Rect2=_attack_box(at,primary,face)
@@ -3657,7 +3701,7 @@ func _draw_enemy_release(at:Vector2,atk:Variant,face:float) -> void:
 	var extent:=Vector2(62,50)
 	var row:int=SkillArt.attack_row(def)
 	match row:
-		SkillArt.POISON:extent=Vector2(94,62)
+		SkillArt.POISON:return # The persistent cloud supplies the release and dispersal.
 		SkillArt.RUSH:
 			extent=Vector2(134,56)
 			at_fx.x-=face*38
@@ -3911,7 +3955,6 @@ func _make_props() -> Array[Dictionary]:
 		result.append({"kind":"merchant","pos":_furniture_offset()+Vector2(160,1050),"used":false,"hurt":0.0})
 		for table:Vector2 in Sanctuary.TABLES:
 			result.append({"kind":"merchant_table","pos":table+_furniture_offset(),"hurt":0.0})
-	elif room.get("spring",false):result.append({"kind":"spring","pos":_furniture_offset()+Vector2(690,1050),"used":false,"hurt":0.0})
 	elif room["type"]=="reward":
 		_reward_choices()
 		for i in 3:result.append({"kind":"coin_urn","variant":3,"pos":_furniture_offset()+Vector2(430+i*320,1050),"used":false,"hurt":0.0,"coins":10+i*10})
@@ -3925,7 +3968,6 @@ func _make_props() -> Array[Dictionary]:
 		for fraction in [.30,.70]:
 			var at:=Vector2(_room_size().x*fraction,_room_floor())
 			result.append({"kind":"launcher","pos":at,"used":false,"hurt":0.0,"launch_left":0.0,"launch_cooldown":0.0})
-	if room.get("fountain",false) and layout.has("fountain_pos"):result.append({"kind":"fountain","pos":layout["fountain_pos"],"used":false,"hurt":0.0,"water_cd":0.0})
 	if room["type"] in ["combat","elite"] and not room.get("spring",false):
 		for reward:Dictionary in layout.get("dead_end_rewards",[]):
 			var cell:Vector2i=reward["cell"];var at:=(Vector2(cell)+Vector2(.5,1))*Scale.CELL_SIZE
@@ -3973,10 +4015,9 @@ func _update_props_profiled_body(delta:float) -> void:
 			var feet:Vector2=p["pos"]
 			var on_cap:bool=absf(feet.y-body.position.y)<.15 and feet.x+17>body.position.x and feet.x-17<body.end.x
 			if float(prop.get("launch_cooldown",0))<=0 and float(p["vel"].y)>=0.0 and on_cap:_launch_from_object(prop,Vector2.ZERO)
-		prop["water_cd"]=maxf(0,float(prop.get("water_cd",0))-delta)
-		if prop["kind"] in ["spring","fountain"] and _in_bath():
-			_restore_vital("hp",delta)
-			_restore_vital("energy",delta*2)
+	if _in_bath():
+		_restore_vital("hp",delta)
+		_restore_vital("energy",delta*2)
 
 func _step_stone(stone:Dictionary,delta:float) -> void:
 	var speed:Vector2=stone["vel"]
@@ -4054,8 +4095,24 @@ func _draw_prop_impact(e:Dictionary) -> bool:
 	PropStrike.draw(self,e,world_transform,155.0*world_transform.get_scale().x)
 	return true
 
+func _splash_water(x:float,direction:Vector2) -> void:
+	var pool:=_active_pool()
+	var at:=Vector2(clampf(x,pool.position.x+6,pool.end.x-6),pool.position.y)
+	spring_particles.splash(at,str(_ecology()["id"]),direction)
+	bath.attack(pool,at)
+	_sound("water_splash")
+
 func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.INF,projectile_hits:Variant=null) -> void:
 	if damage<=0.0:return
+	var pool:=_active_pool()
+	const WATER_HIT:=-240000
+	if pool.has_area() and box.intersects(pool.grow(3)) and (attack_id<0 or projectile_hits==null or not projectile_hits.has(WATER_HIT)):
+		if attack_id<0:
+			if p_attack.mark_hit(WATER_HIT) and not _in_bath():
+				_splash_water(box.get_center().x,_attack_direction(p_attack.attack))
+		else:
+			if projectile_hits!=null:projectile_hits[WATER_HIT]=true
+			if bath.timer<=0:_splash_water(box.get_center().x,_aim_vector())
 	for i in props.size():
 		var prop:Dictionary=props[i]
 		if prop["kind"]=="stone":
@@ -4107,12 +4164,6 @@ func _hit_props(box:Rect2,damage:float,attack_id:int=-1,source:Vector2=Vector2.I
 				if p.get("_motion_step",false):p["launch_pending_velocity"]=p["vel"]
 			continue
 		if prop.get("used",false) or GothicProps.entry(prop,str(_ecology()["id"])).is_empty():continue
-		if prop["kind"]=="fountain":
-			if box.intersects(preload("res://scripts/spring_v33.gd").body(prop["pos"])) and float(prop.get("water_cd",0))<=0:
-				var at:Vector2=prop["pos"]-Vector2(0,28)
-				_prop_impact(prop,at,_prop_strike_direction(source,at))
-				prop["water_cd"]=.12;spring_particles.splash(preload("res://scripts/spring_v33.gd").water_at(prop["pos"],str(_ecology()["id"])),str(_ecology()["id"]),_aim_vector())
-			continue
 		if prop["kind"]=="launcher":
 			if attack_id>=0:continue # Remote projectiles do not teleport recoil to the player.
 			if box.intersects(LaunchArt.body_box(prop,str(_ecology()["id"]))) and float(prop.get("launch_hit_cooldown",0))<=0:
@@ -4282,9 +4333,10 @@ func _projectile_explosion(pr:Dictionary) -> void:
 func _explode(at:Vector2,radius:float,damage:float,knockback:float,from_player:bool,exclude:Dictionary={},group:String="",normal:Vector2=Vector2.ZERO,point:Vector2=Vector2.INF) -> void:
 	var origin:Vector2=at if point==Vector2.INF else point
 	_sound("explosion")
-	effects.append({"explosion_v16":true,"pos":origin,"normal":normal,"radius":radius,"life":.5,"max":.5,"color":Color.WHITE,"vel":Vector2.ZERO,"ring":false})
-	# The contact atlas and its entire animation remain above the hit plane.
+	if effects.size()>=MAX_PARTICLES:effects.pop_front()
+	effects.append({"explosion_v16":true,"pos":origin,"normal":normal,"radius":radius,"life":.5,"max":.5,"color":Color("ffbc71") if from_player else Color("ef9272"),"vel":Vector2.ZERO,"ring":false})
 	shake=maxf(shake,6)
+	if visual_depth!=null:visual_depth.flash(origin,radius*1.28,1.18,draw_clock)
 	if from_player:
 		for en in enemies:
 			if en["hp"]>0 and not exclude.has(en["uid"]) and _enemy_body_box(en).get_center().distance_to(at)<=radius:_hit_enemy(en,damage,Color("ffe0aa"),knockback)
@@ -4381,14 +4433,10 @@ func _draw_props(focus:Dictionary={}) -> void:
 			continue
 		if kind=="spikes":
 			HazardRoom.draw_spikes(self,prop["rect"]);continue
-		if kind in ["ecology_object","coin_urn","merchant_table"]:continue
+		if kind in ["ecology_object","coin_urn","merchant_table","spring","fountain"]:continue
 		if kind=="merchant":Adventure.merchant(self,at,clock,prop_base)
 		var retained:bool=_is_start() and kind in ["aid","forge","reforge","mail","energy_infinite","wardrobe"]
-		var extent:=Vector2.ZERO
-		if kind=="spring":
-			var wet:Rect2=layout.get("pool",Rect2())
-			if wet.has_area():extent=Vector2(wet.size.x+50,105)
-		if not retained and not GothicProps.draw_prop(self,prop,biome,prop_base,extent):
+		if not retained and not GothicProps.draw_prop(self,prop,biome,prop_base):
 			if prop.get("used",false):continue
 			EnvArt.prop(self,prop,biome,clock,prop_base,weapon_index)
 		draw_set_transform_matrix(world_transform)

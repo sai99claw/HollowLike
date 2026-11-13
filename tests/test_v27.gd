@@ -59,7 +59,8 @@ func run() -> void:
 	check(preload("res://scripts/double_jump_v27.gd").texture()!=null,"New four-frame pigeon wing animation imports")
 	reset(game);game.platforms.assign([Rect2(0,900,2000,80)]);game._projectile_explosion({"ground_fire":true,"pos":Vector2(500,700),"radius":8,"damage":2,"fire_size":140,"color":Color.ORANGE,"vel":Vector2.DOWN});check(game.hazards.size()==1 and game.hazards[0]["pos"].y==900,"Flask impact creates flame on actual support below, never a floating projectile")
 	var enemy:Dictionary=game.Arms.enemy("walk",game.rng);enemy.merge({"uid":888,"hp":30.0,"max_hp":30.0,"pos":Vector2(500,900),"vel":Vector2.ZERO,"face":-1.0,"attack":game.Attack.new(),"stun":0.0,"hurt":0.0,"cooldown":9.0},true);game.enemies.assign([enemy])
-	game.effects.clear();game._update_hazards(.2);check(enemy["hp"]==28,"Ground flame damages enemy standing on its actual surface");check(game.effects.any(func(effect:Dictionary)->bool:return effect.get("fire_ember",false)),"Actual hazard update emits grounded-fire particles")
+	game.effects.clear();game._update_hazards(.2);check(enemy["hp"]==28,"Ground flame damages enemy standing on its actual surface");game.view_rect=Rect2(0,0,2000,1300);game.queue_redraw();await settle()
+	check(not game.gameplay_vfx.commands[game.VFX.FIRE].is_empty(),"Actual ground hazard supplies visible flame shader layers")
 	game._close_panel();game.mode="rogue";game.life_event={};game.new_run("rogue",270027)
 	var elite_room:int=-1
 	for room:Dictionary in game.tower["rooms"]:

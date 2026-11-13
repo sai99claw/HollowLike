@@ -44,7 +44,7 @@ static func draw(c:CanvasItem,en:Dictionary,time:float,base:Transform2D) -> void
 	if identity.is_empty():return
 	var atk=en["attack"]
 	if NewActionArt.draw_actor(c,en,time,base):
-		if atk.phase=="active" and (atk.attack.get("primary",false) or atk.attack.get("library_kind","")=="explosion"):
+		if atk.phase=="active" and atk.attack.get("primary",false) and atk.attack.get("library_kind","")!="explosion":
 			NewActionArt.draw_release(c,en,atk.attack,atk.progress(),base)
 		return
 	var charge:String=en.get("charge_phase","idle")
