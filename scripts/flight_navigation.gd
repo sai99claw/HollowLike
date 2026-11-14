@@ -9,9 +9,9 @@ static var grids:Dictionary={}
 static func _inflated(box:Rect2,half:Vector2,margin:float=6) -> Rect2:
 	return Rect2(box.position-half-Vector2.ONE*margin,box.size+half*2+Vector2.ONE*margin*2)
 
-static func _visible(a:Vector2,b:Vector2,half:Vector2,obstacles:Array) -> bool:
+static func _visible(a:Vector2,b:Vector2,half:Vector2,obstacles:Array,index:RefCounted=null) -> bool:
 	var sweep:=Rect2(a.min(b),a.max(b)-a.min(b)).grow(maxf(half.x,half.y)+6.001)
-	for box:Rect2 in obstacles:
+	for box:Rect2 in (obstacles if index==null else index.query(sweep)):
 		if box.intersects(sweep,true) and Coll.segment(a,b,_inflated(box,half))<INF:return false
 	return true
 
@@ -67,14 +67,14 @@ static func _clearance(at:Vector2,half:Vector2,obstacles:Array) -> float:
 	distance=minf(distance,minf(at.y-half.y-55,1020-half.y-at.y))
 	return distance
 
-static func steer(en:Dictionary,target:Vector2,desired:Vector2,size:Vector2,obstacles:Array,delta:float) -> Vector2:
+static func steer(en:Dictionary,target:Vector2,desired:Vector2,size:Vector2,obstacles:Array,delta:float,index:RefCounted=null) -> Vector2:
 	var half:Vector2=size*.5
 	var center:Vector2=en["pos"]-Vector2(0,half.y)
 	var goal:Vector2=target-Vector2(0,half.y)
 	var speed:float=maxf(35,float(en.get("speed",70)))
 	var direction:Vector2=desired.normalized()
 	en["flight_repath"]=float(en.get("flight_repath",0))-delta
-	if _visible(center,goal,half,obstacles):
+	if _visible(center,goal,half,obstacles,index):
 		en["flight_path"]=PackedVector2Array()
 	else:
 		if float(en["flight_repath"])<=0 or goal.distance_to(en.get("flight_goal",Vector2.INF))>80:
@@ -83,15 +83,18 @@ static func steer(en:Dictionary,target:Vector2,desired:Vector2,size:Vector2,obst
 		while path.size()>1 and center.distance_to(path[0])<18:path.remove_at(0)
 		# Skip visible waypoints to prevent unnecessary zigzags on a grid.
 		for i in range(path.size()-1,0,-1):
-			if _visible(center,path[i],half,obstacles):
+			if _visible(center,path[i],half,obstacles,index):
 				path=path.slice(i);break
 		en["flight_path"]=path
 		if not path.is_empty():direction=(path[0]-center).normalized()
 	var local:Array=[]
 	# Clearance is capped at150; even a20px escape probe cannot see beyond176.
 	var area:=Rect2(center-half-Vector2.ONE*176,size+Vector2.ONE*352)
-	for obstacle:Rect2 in obstacles:
-		if obstacle.intersects(area,true):local.append(obstacle)
+	if index!=null:
+		local=index.query(area)
+	else:
+		for obstacle:Rect2 in obstacles:
+			if obstacle.intersects(area,true):local.append(obstacle)
 	var clearance:float=_clearance(center,half,local)
 	if clearance<38:
 		# While near any solid, the priority is gaining room, even mid-attack.

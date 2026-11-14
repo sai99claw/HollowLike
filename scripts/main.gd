@@ -68,6 +68,7 @@ const Sprites = preload("res://scripts/sprite_art.gd")
 const Ecology = preload("res://scripts/ecology.gd")
 const Arms=preload("res://scripts/armament.gd")
 const Coll=preload("res://scripts/world_collision.gd")
+const CollisionGrid=preload("res://scripts/collision_grid.gd")
 const RuneLinks=preload("res://scripts/rune_links.gd")
 const Bag=preload("res://scripts/expedition_bag.gd")
 const Music=preload("res://scripts/room_music.gd")
@@ -282,6 +283,19 @@ var merchant_trial:Dictionary={}
 var bath=Bath.new()
 var coin_field=CoinField.new()
 var projectile_surfaces: Array = []
+var _shot_terrain := CollisionGrid.new()
+var _solid_terrain := CollisionGrid.new()
+var _platform_terrain := CollisionGrid.new()
+var _enemy_support_terrain := CollisionGrid.new()
+var _enemy_ground_terrain := CollisionGrid.new()
+var _enemy_air_terrain := CollisionGrid.new()
+var _enemy_ground_surfaces: Array = []
+var _enemy_air_surfaces: Array = []
+var _indexed_mushrooms: Array[Rect2] = []
+var _terrain_counts := Vector2i(-1,-1)
+var _carrier_positions := CollisionGrid.new()
+var _hostile_carriers: Dictionary = {}
+var _carrier_serial := 0
 var lab_mode:String=""
 var tutorial_previous_practice:bool=false
 var lab_meta:Dictionary={}
@@ -1203,10 +1217,14 @@ func _can_drop_through(at:Vector2) -> bool:
 			return true
 	return false
 
-func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0, skip_one_way:bool=false) -> float:
+func _support_y(old:Vector2, next:Vector2, vertical_speed:float, half_width:float=9.0, ignore_y:float=-10000.0, skip_one_way:bool=false,terrain_index:RefCounted=null) -> float:
 	if vertical_speed<0: return INF
 	var best:float=INF
-	for plat in platforms:
+	var candidates:Array=platforms
+	if terrain_index!=null:
+		if next.y<old.y-.6:return INF
+		candidates=terrain_index.query(Rect2(next.x-half_width,old.y-.6,half_width*2,next.y-old.y+.6))
+	for plat in candidates:
 		if absf(plat.position.y-ignore_y)<.5: continue
 		if old.y<=plat.position.y+.6 and next.y>=plat.position.y and next.x+half_width>plat.position.x and next.x-half_width<plat.end.x:
 			if skip_one_way and layout.get("one_way",[]).has(plat):continue
@@ -1671,8 +1689,10 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 	if movement_delta<0:movement_delta=delta*world_speed
 	var frozen:bool=freeze_timer>0
 	var initial_room:int=current_room
-	var enemy_solids:Array=solids+_mushroom_bodies()
-	var world:Array=enemy_solids+platforms
+	_ensure_terrain_index()
+	_sync_enemy_terrain()
+	var enemy_solids:Array=_enemy_ground_surfaces
+	var world:Array=_enemy_air_surfaces
 	for index in enemies.size():
 		if screen!="game" or current_room!=initial_room:return
 		var en:Dictionary=enemies[index]
@@ -1750,7 +1770,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		elif en.get("training",false):vel=Vector2(0,minf(800.0,vel.y+GRAVITY*movement_delta))
 		else:
 			var previous_charge:String=en.get("charge_phase","idle")
-			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size,engaged,support)
+			vel=Motion.velocity(en,p["pos"],movement_delta,rng,grounded,world,body_size,engaged,support,_enemy_air_terrain)
 			if engaged and previous_charge!="active" and en.get("charge_phase","idle")=="active":
 				Juice.squash(en,Juice.LAUNCH,draw_clock,.15)
 				var cue:String="boss_move_"+str(en.get("biome","")) if int(en["model"])==4 else AudioCues.actor_cue(en,"rush","enemy_ram")
@@ -1768,7 +1788,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 			if (vel.x<0 and en["pos"].x+vel.x*movement_delta<support.position.x+margin) or (vel.x>0 and en["pos"].x+vel.x*movement_delta>support.end.x-margin):vel.x=0
 		var old:Vector2=en["pos"]
 		var falling:bool=vel.y>75.0
-		var resolved:Dictionary=Coll.move_body(old,vel,movement_delta,body_size,world if flying else enemy_solids)
+		var resolved:Dictionary=Coll.move_body(old,vel,movement_delta,body_size,world if flying else enemy_solids,0,false,[],_enemy_air_terrain if flying else _enemy_ground_terrain)
 		Motion.resolve_collision(en,vel,resolved["vel"])
 		if atk.is_active() and atk.attack.get("ram",false) and absf(vel.x)>80 and absf(resolved["vel"].x)<absf(vel.x)*.25:
 			atk._change_phase("recovery");en["ram_hit_wall"]=true
@@ -1778,7 +1798,7 @@ func _update_enemies_profiled_body(delta:float,movement_delta:float=-1) -> void:
 		if flying:
 			en["pos"].y=clampf(en["pos"].y,55+body_size.y,_room_floor()-30)
 		else:
-			var ground:float=_support_y(old,en["pos"],vel.y,9.0*float(en["scale"]))
+			var ground:float=_support_y(old,en["pos"],vel.y,9.0*float(en["scale"]),-10000.0,false,_platform_terrain)
 			if ground<INF:en["pos"].y=ground;vel.y=0
 			if falling and not grounded and (ground<INF or bool(resolved.get("grounded",false))) and not en.get("training",false):
 				Juice.squash(en,Juice.LAND,draw_clock,.12)
@@ -1948,8 +1968,9 @@ func _keep_enemy_in_room(enemy:Dictionary,previous:Vector2) -> void:
 	enemy["push_left"]=0.0
 
 func _enemy_support(en:Dictionary) -> Rect2:
-	for surface in platforms+solids:
-		if absf(en["pos"].y-surface.position.y)<1 and en["pos"].x>=surface.position.x and en["pos"].x<=surface.end.x:
+	var at:Vector2=en["pos"]
+	for surface:Rect2 in _enemy_support_terrain.query(Rect2(at-Vector2(0,1),Vector2(0,2))):
+		if absf(at.y-surface.position.y)<1 and at.x>=surface.position.x and at.x<=surface.end.x:
 			return surface
 	return Rect2()
 
@@ -2013,6 +2034,46 @@ func _rebuild_projectile_surfaces() -> void:
 	# Pass-through traversal ledges are supports, never horizontal shot barriers.
 	var pass_through:Array=layout.get("one_way",[])
 	projectile_surfaces=solids+platforms.filter(func(surface:Rect2)->bool:return not pass_through.has(surface))
+	_shot_terrain.rebuild(projectile_surfaces)
+	_solid_terrain.rebuild(solids)
+	_platform_terrain.rebuild(platforms)
+	_enemy_support_terrain.rebuild(platforms+solids)
+	_terrain_counts=Vector2i(solids.size(),platforms.size())
+	_sync_enemy_terrain(true)
+
+func _ensure_terrain_index() -> void:
+	# Room entry rebuilds explicitly. Practice fixtures can also replace/clear the arrays.
+	if _terrain_counts!=Vector2i(solids.size(),platforms.size()):
+		_rebuild_projectile_surfaces()
+
+func _sync_enemy_terrain(force:bool=false) -> void:
+	var mushrooms:=_mushroom_bodies()
+	if not force and mushrooms==_indexed_mushrooms:return
+	_indexed_mushrooms=mushrooms
+	_enemy_ground_surfaces=solids+mushrooms
+	_enemy_air_surfaces=_enemy_ground_surfaces+platforms
+	_enemy_ground_terrain.rebuild(_enemy_ground_surfaces)
+	_enemy_air_terrain.rebuild(_enemy_air_surfaces)
+
+func _register_hostile_carrier(shot:Dictionary) -> void:
+	if shot.get("from_player",false):return
+	var id:=_carrier_serial
+	_carrier_serial+=1
+	shot["hostile_carrier_id"]=id
+	_hostile_carriers[id]=shot
+	_carrier_positions.put(id,Rect2(shot["pos"],Vector2.ZERO))
+
+func _remove_hostile_carrier(shot:Dictionary) -> void:
+	if not shot.has("hostile_carrier_id"):return
+	var id:int=shot["hostile_carrier_id"]
+	_carrier_positions.erase(id)
+	_hostile_carriers.erase(id)
+
+func _clear_projectiles() -> void:
+	projectiles.clear()
+	_carrier_positions.clear()
+	_hostile_carriers.clear()
+	_carrier_serial=0
 
 func _update_projectiles(delta:float) -> void:
 	if not perf_log.active:
@@ -2055,7 +2116,11 @@ func _try_projectile_riposte(enemy:Dictionary,shot:Dictionary,old:Vector2,next:V
 	return true
 
 func _update_projectiles_profiled_body(delta:float) -> void:
-	if projectiles.is_empty():return
+	if projectiles.is_empty():
+		# Handles practice fixtures that clear the public array directly.
+		if not _hostile_carriers.is_empty():_clear_projectiles()
+		return
+	_ensure_terrain_index()
 	var room_bounds:=Rect2(Vector2.ZERO,_room_size())
 	var trail_view:=view_rect.grow(250)
 	var initial_room:int=current_room
@@ -2072,13 +2137,13 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 			var target:Vector2=Vector2.INF;var closest:float=600
 			for enemy:Dictionary in enemies:
 				var center:Vector2=_enemy_body_box(enemy).get_center();var distance:float=center.distance_to(pr["pos"])
-				if enemy["hp"]>0 and distance<closest and Coll.first_solid(pr["pos"],center,1,solids)==INF:target=center;closest=distance
+				if enemy["hp"]>0 and distance<closest and Coll.first_solid(pr["pos"],center,1,solids,_solid_terrain)==INF:target=center;closest=distance
 			if target.is_finite():pr["vel"]=Vector2(pr["vel"]).rotated(clampf(Vector2(pr["vel"]).angle_to(target-pr["pos"]),-2.4*delta,2.4*delta))
 		pr["vel"].y+=float(pr.get("gravity",0))*delta
 		var old:Vector2=pr["pos"];var radius:float=float(pr["radius"])
 		var movement:Vector2=(pr["vel"]*delta).limit_length(maxf(0,float(pr.get("distance_left",INF))))
 		var next:Vector2=old+movement
-		var wall_t:float=Coll.first_solid(old,next,radius,world)
+		var wall_t:float=Coll.first_solid(old,next,radius,world,_shot_terrain)
 		var wall_hit:bool=wall_t<INF
 		if wall_hit:next=old+movement*maxf(0,wall_t-.0001)
 		pr["pos"]=next
@@ -2088,7 +2153,11 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 			pr.erase("trail_points");pr.erase("trail_times")
 		pr["distance_left"]=float(pr.get("distance_left",INF))-old.distance_to(next)
 		if pr.get("trap_carrier",false):
-			if not pr.get("destroyed",false) and (wall_hit or pr["life"]<=0 or pr["distance_left"]<=0):_settle_trap(pr);pr["life"]=0
+			if not pr.get("destroyed",false) and (wall_hit or pr["life"]<=0 or pr["distance_left"]<=0):
+				_settle_trap(pr);pr["life"]=0
+			if pr.has("hostile_carrier_id"):
+				if float(pr["life"])>0:_carrier_positions.put(pr["hostile_carrier_id"],Rect2(next,Vector2.ZERO))
+				else:_remove_hostile_carrier(pr)
 			continue
 		if bool(pr["from_player"]):
 			for en in enemies:
@@ -2136,17 +2205,18 @@ func _update_projectiles_profiled_body(delta:float) -> void:
 		if screen!="game" or current_room!=initial_room or not life_event.is_empty():return
 		if wall_hit and float(pr["life"])>0:
 			if int(pr.get("bounces",0))>0:
-				var contact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],world,radius)
+				var contact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],_shot_terrain.query(Rect2(pr["pos"],Vector2.ZERO).grow(radius+2)),radius)
 				var normal:Vector2=contact.get("normal",Vector2.LEFT)
 				pr["vel"]=Vector2(pr["vel"]).bounce(normal);pr["base_velocity"]=pr["vel"];pr["pos"]+=normal*1.0;pr["bounces"]-=1;_sound("projectile_bounce")
 			else:
-				var impact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],world,radius)
+				var impact:Dictionary=Explosion.contact(pr["pos"],pr["vel"],_shot_terrain.query(Rect2(pr["pos"],Vector2.ZERO).grow(radius+2)),radius)
 				pr["impact_normal"]=impact.get("normal",Vector2.ZERO);pr["impact_point"]=impact.get("point",pr["pos"])
 				pr["life"]=0;_projectile_impact(pr);_projectile_explosion(pr)
 		if pr["distance_left"]<=.001:pr["life"]=0
-	if combat_feedback!=null:
-		for pr in projectiles:
-			if float(pr["life"])<=0:combat_feedback.finish_trail(pr)
+	for pr in projectiles:
+		if float(pr["life"])>0:continue
+		_remove_hostile_carrier(pr)
+		if combat_feedback!=null:combat_feedback.finish_trail(pr)
 	projectiles=projectiles.filter(func(pr:Dictionary)->bool:return float(pr["life"])>0)
 
 func _trap_position(at:Vector2) -> Vector2:
@@ -2165,6 +2235,7 @@ func _emit_traps(en:Dictionary,def:Dictionary) -> void:
 		var gravity:float=900;var flight:float=.38
 		var velocity:Vector2=(landing-start)/flight-Vector2(0,.5*gravity*flight)
 		projectiles.append({"pos":start,"vel":velocity,"launch_angle":Vector2(target-start).angle(),"radius":float(def.get("size",16))*1.20 if def.get("from_player",false) else 8.0,"life":flight,"elapsed":0.0,"gravity":gravity,"distance_left":1000.0,"trap_carrier":true,"landing":landing,"visual_id":str(def.get("visual_id","")),"hazard_visual_id":str(def.get("hazard_visual_id","")),"weapon_id":str(def.get("id","")),"definition":def.duplicate(true),"group":str(def.get("group","biological")),"from_player":bool(def.get("from_player",false)),"owner_uid":en["uid"],"color":def["color"],"kind":"throw","sprite":"fruit","hits":{},"pierce":false,"damage":0.0,"bounces":0,"boss_biome":str(def.get("boss_biome",""))})
+		_register_hostile_carrier(projectiles[-1])
 
 func _update_hazards(delta:float) -> void:
 	if not perf_log.active:
@@ -2533,7 +2604,7 @@ func _enter_room(id: int, from_dir: String="center") -> void:
 		_refresh_checkpoint_gift()
 	var loaded_corpses:Array[Dictionary]=[];loaded_corpses.assign(room.get("corpses",[]));corpses=loaded_corpses
 	if corpse_layer!=null:corpse_layer.invalidate()
-	projectiles.clear();hazards.clear();effects.clear();
+	_clear_projectiles();hazards.clear();effects.clear();
 	if combat_feedback!=null:combat_feedback.clear()
 	if atmosphere!=null:
 		atmosphere.room_bounds=_room_size();atmosphere.configure(str(room["ecology"]["id"]),int(layout["seed"]),true,room["type"]=="merchant",room["type"] in ["start","merchant","reward"] or room.get("spring",false),layout,_background_rect())
@@ -2753,13 +2824,13 @@ func _ui_action(action:String,payload:Variant) -> void:
 		"lab_primary":weapon_index=1;_close_panel();_update_hud()
 		"lab_secondary":secondary_index=clampi(int(payload),0,bag_weapons.size()-1);_close_panel();_update_hud()
 		"lab_monster":_summon_monster(int(payload));_close_panel()
-		"lab_clear":enemies.clear();projectiles.clear();hazards.clear();drops.clear();_close_panel()
+		"lab_clear":enemies.clear();_clear_projectiles();hazards.clear();drops.clear();_close_panel()
 		"lab_ai":lab_ai=not lab_ai;_show_practice()
 		"lab_runes":_close_panel();_show_runes(false)
 		"close":equipment_open=false;capturing_key="";_clear_keys()
 		"hub":
 			if not lab_mode.is_empty():_leave_lab();return
-			_return_trial(false);_close_panel();screen="hub";home_sleeping=true;home_wake_left=0;room={};tower={};enemies=[];drops=[];projectiles=[];hazards=[];run_coins=0;bag_items.clear();bag_runes.clear();bag_weapons.clear();rune_slots.clear();strong_slots.clear();sub_growth.clear();feather={};injured=false;current_room=-1;_reset_player(Vector2(640,600));camera_pos=Vector2.ZERO;room_music.select("hub","branches");atmosphere.configure("branches",0,false);atmosphere.set_audio_enabled(audio_enabled);combat_feedback.clear();_configure_home();_invalidate_scene()
+			_return_trial(false);_close_panel();screen="hub";home_sleeping=true;home_wake_left=0;room={};tower={};enemies=[];drops=[];_clear_projectiles();hazards=[];run_coins=0;bag_items.clear();bag_runes.clear();bag_weapons.clear();rune_slots.clear();strong_slots.clear();sub_growth.clear();feather={};injured=false;current_room=-1;_reset_player(Vector2(640,600));camera_pos=Vector2.ZERO;room_music.select("hub","branches");atmosphere.configure("branches",0,false);atmosphere.set_audio_enabled(audio_enabled);combat_feedback.clear();_configure_home();_invalidate_scene()
 		"start_musou":new_run("musou")
 		"start_rogue":
 			if screen!="hub" or _at_rogue_gate():new_run("rogue")
@@ -4292,7 +4363,7 @@ func _respawn_from_soul() -> void:
 	tower["rooms"][checkpoint]["refresh_gift"]=true
 	# Room entry saves the outgoing arrays. Detach them before entering so the
 	# old enemies cannot overwrite the freshly reset room state.
-	room={};enemies=[];drops=[];corpses=[];projectiles.clear();hazards.clear();effects.clear();hitstop=0
+	room={};enemies=[];drops=[];corpses=[];_clear_projectiles();hazards.clear();effects.clear();hitstop=0
 	combat_feedback.clear()
 	_reset_player(Vector2(230,FLOOR_Y));_sync_vitals();p["hp"]=p["max_hp"];p["energy"]=3
 	_enter_room(checkpoint);p["invul"]=2
@@ -4537,11 +4608,13 @@ func _damage_traps(box:Rect2,damage:float,gain_dream:bool=true) -> void:
 			if hazard.get("pogoable",false) and p_attack.is_active() and p_attack.attack.get("direction","")=="down" and not p["grounded"]:_pogo();_melee_hitstop()
 			hazard["hp"]=0.0;_sound("trap_break");_contact_fx("block",hazard["pos"]-Vector2(0,15));_particles(hazard["pos"],Color("d0e9c8"),8,100)
 			if mode=="musou" and gain_dream and damage>0:dream.hit()
-	for pr in projectiles:
-		if not pr.get("trap_carrier",false) or pr.get("from_player",false) or float(pr["life"])<=0:continue
-		if box.has_point(pr["pos"]):
-			pr["life"]=0;pr["destroyed"]=true;_sound("trap_break");_contact_fx("block",pr["pos"])
-			if mode=="musou" and gain_dream and damage>0:dream.hit()
+	if _hostile_carriers.is_empty():return
+	for id:int in _carrier_positions.ids(box):
+		var pr:Dictionary=_hostile_carriers[id]
+		if float(pr["life"])<=0 or not box.has_point(pr["pos"]):continue
+		_remove_hostile_carrier(pr)
+		pr["life"]=0;pr["destroyed"]=true;_sound("trap_break");_contact_fx("block",pr["pos"])
+		if mode=="musou" and gain_dream:dream.hit()
 
 func _open_chest(chest:Dictionary) -> void:
 	if chest.get("used",false):return
@@ -4603,7 +4676,7 @@ func _return_trial(notify:bool=true) -> void:
 	_sync_vitals()
 	for key in ["hp","energy","hp_recovery","energy_recovery"]:p[key]=previous[key]
 	passive_energy=float(previous["passive_energy"]);move_energy_distance=float(previous["move_energy_distance"])
-	p_attack.cancel();pending_attack.clear();charge_timer=0;keys["attack"]=false;keys["sub"]=false;projectiles.clear();hazards.clear()
+	p_attack.cancel();pending_attack.clear();charge_timer=0;keys["attack"]=false;keys["sub"]=false;_clear_projectiles();hazards.clear()
 	if combat_feedback!=null:combat_feedback.clear()
 	if ui!=null:_update_hud()
 	if notify:_toast("試用品已歸還，原裝備已還原")
@@ -4640,6 +4713,7 @@ func _adapt_boss(en:Dictionary) -> void:
 	_float(en["pos"]-Vector2(0,110),"首領覺醒",Color("ffbd89"));_toast(str(en["name"])+"進入第二階段：新招式已解放")
 
 func _cast_special(at:Vector2,dir:Vector2,def:Dictionary) -> void:
+	_ensure_terrain_index()
 	var kind:String=def["weapon_kind"]
 	if kind=="laser":
 		var direction:Vector2=dir.normalized()
@@ -4647,7 +4721,7 @@ func _cast_special(at:Vector2,dir:Vector2,def:Dictionary) -> void:
 		for i in int(def.get("count",1)):
 			var start:Vector2=at+direction.orthogonal()*(i-float(int(def.get("count",1))-1)*.5)*maxf(20,beam_width*1.25)
 			var finish:Vector2=start+direction*float(def.get("range",900))
-			var wall:float=Coll.first_solid(start,finish,beam_width*.5,_projectile_surfaces())
+			var wall:float=Coll.first_solid(start,finish,beam_width*.5,_projectile_surfaces(),_shot_terrain)
 			if wall<INF:finish=start+(finish-start)*wall
 			for en in enemies:
 				if en["hp"]>0 and _segment_hits_box(start,finish,_enemy_body_box(en).grow(beam_width*.5)):_hit_enemy(en,float(def["damage"]),def["color"],70,start,direction)
@@ -4660,7 +4734,7 @@ func _cast_special(at:Vector2,dir:Vector2,def:Dictionary) -> void:
 			for en in enemies:
 				if en["hp"]<=0 or hit.has(en["uid"]) or not _in_aggro(en):continue
 				var center:Vector2=_enemy_body_box(en).get_center();var distance:float=center.distance_to(origin)
-				if distance<closest and Coll.first_solid(origin,center,1,solids)==INF:closest=distance;target=en
+				if distance<closest and Coll.first_solid(origin,center,1,solids,_solid_terrain)==INF:closest=distance;target=en
 			if target.is_empty():break
 			var end:Vector2=_enemy_body_box(target).get_center();hit[target["uid"]]=true
 			_hit_enemy(target,float(def["damage"]),def["color"],45,origin,(end-origin).normalized())
