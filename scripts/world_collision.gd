@@ -1,10 +1,15 @@
 class_name WorldCollision
 extends RefCounted
 ## Solid AABB solver; all actor anchors are at their feet.
-static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0,_full_scan:bool=false,circles:Array[Vector3]=[]) -> Dictionary:
-	var pos:Vector2=depenetrate(at,size,solids);var vel:Vector2=velocity
+static func move_body(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0,_full_scan:bool=false,circles:Array[Vector3]=[],grid:RefCounted=null) -> Dictionary:
+	var initial_body:=Rect2(at-Vector2(size.x*.5,size.y),size)
+	var pos:=at
+	# Exact legacy correction can chain across overlapping solids in list order.
+	if grid==null or _full_scan or grid.query(initial_body).any(func(solid:Rect2)->bool:return initial_body.intersects(solid)):
+		pos=depenetrate(at,size,solids)
+	var vel:=velocity
 	var grounded:bool=false;var wall:int=0;var corrected:bool=false
-	var near:Array=solids if _full_scan else motion_candidates(pos,velocity,delta,size,solids,corner_margin)
+	var near:Array=solids if _full_scan else motion_candidates(pos,velocity,delta,size,solids,corner_margin,grid)
 	var end:Vector2=pos+velocity*delta
 	var anchor_sweep:=Rect2(pos.min(end),pos.max(end)-pos.min(end)).grow(corner_margin+1.0)
 	var steps:int=clampi(int(ceil(velocity.length()*delta/8)),1,96)
@@ -71,10 +76,10 @@ static func segment(a:Vector2,b:Vector2,rect:Rect2) -> float:
 			lo=maxf(lo,minf(u,v));hi=minf(hi,maxf(u,v))
 			if lo>hi:return INF
 	return lo
-static func first_solid(a:Vector2,b:Vector2,radius:float,solids:Array) -> float:
+static func first_solid(a:Vector2,b:Vector2,radius:float,solids:Array,grid:RefCounted=null) -> float:
 	var earliest:float=INF
 	var sweep:=Rect2(a.min(b),a.max(b)-a.min(b)).grow(radius+.001)
-	for solid:Rect2 in solids:
+	for solid:Rect2 in (solids if grid==null else grid.query(sweep)):
 		if solid.intersects(sweep,true):earliest=minf(earliest,segment(a,b,solid.grow(radius)))
 	return earliest
 
@@ -93,9 +98,10 @@ static func depenetrate(at:Vector2,size:Vector2,solids:Array) -> Vector2:
 		if not changed:break
 	return pos
 
-static func motion_candidates(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0) -> Array:
+static func motion_candidates(at:Vector2,velocity:Vector2,delta:float,size:Vector2,solids:Array,corner_margin:int=0,grid:RefCounted=null) -> Array:
 	var end:Vector2=at+velocity*delta
 	var sweep:=Rect2(at.min(end)-Vector2(size.x*.5,size.y),at.max(end)-at.min(end)+size).grow(corner_margin+1.0)
+	if grid!=null:return grid.query(sweep)
 	var result:Array=[]
 	for solid:Rect2 in solids:
 		if solid.intersects(sweep,true):result.append(solid)

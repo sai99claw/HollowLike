@@ -86,7 +86,7 @@ static func _charge_velocity(en:Dictionary,target:Vector2,delta:float,flying:boo
 	if not flying:velocity.y=minf(800,velocity.y+GRAVITY*delta)
 	return velocity
 
-static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGenerator,grounded:bool,obstacles:Array=[],body_size:Vector2=Vector2(34,42),engaged:bool=true,support:Rect2=Rect2()) -> Vector2:
+static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGenerator,grounded:bool,obstacles:Array=[],body_size:Vector2=Vector2(34,42),engaged:bool=true,support:Rect2=Rect2(),obstacle_index:RefCounted=null) -> Vector2:
 	prepare(en)
 	en["motion_clock"]+=delta;en["motion_left"]-=delta
 	en["charge_cooldown"]=maxf(0,float(en["charge_cooldown"])-delta)
@@ -142,5 +142,5 @@ static func velocity(en:Dictionary,player:Vector2,delta:float,rng:RandomNumberGe
 			if grounded and en["jump_left"]<=0 and not en["motion_stopped"]:result.y=-float(en.get("jump_speed",540));en["jump_left"]=1.7
 		_:
 			result.x=move_toward(result.x,direction*speed,delta*300);result.y=minf(800,result.y+GRAVITY*delta)
-	if flying:return Flight.steer(en,flight_target,(flight_target-en["pos"]).limit_length(speed) if current(en)=="dash" else result,body_size,obstacles,delta)
+	if flying:return Flight.steer(en,flight_target,(flight_target-en["pos"]).limit_length(speed) if current(en)=="dash" else result,body_size,obstacles,delta,obstacle_index)
 	return result
